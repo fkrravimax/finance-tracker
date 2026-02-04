@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, ReactNode, useCallback } from 'react';
+import React, { createContext, useContext, useState, type ReactNode, useCallback } from 'react';
 
 type NotificationType = 'success' | 'error' | 'info';
 
