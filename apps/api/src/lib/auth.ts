@@ -27,5 +27,11 @@ export const auth = betterAuth({
         "http://localhost:5173",
         "http://localhost:5174"
     ],
-    // Add other providers if needed
+    baseURL: process.env.BETTER_AUTH_URL,
+    advanced: {
+        defaultCookieAttributes: {
+            sameSite: "none",
+            secure: true
+        }
+    }
 });
