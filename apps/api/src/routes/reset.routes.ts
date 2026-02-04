@@ -1,6 +1,6 @@
 import { Router, Request, Response } from 'express';
-import { resetService } from '../services/reset.service';
-import { authMiddleware } from '../middleware/auth.middleware';
+import { resetService } from '../services/reset.service.js';
+import { authMiddleware } from '../middleware/auth.middleware.js';
 
 const router = Router();
 

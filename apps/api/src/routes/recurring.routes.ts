@@ -1,6 +1,6 @@
 import { Router, Request, Response } from 'express';
-import { recurringService } from '../services/recurring.service';
-import { authMiddleware } from '../middleware/auth.middleware';
+import { recurringService } from '../services/recurring.service.js';
+import { authMiddleware } from '../middleware/auth.middleware.js';
 
 const router = Router();
 

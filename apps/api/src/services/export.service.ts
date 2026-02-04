@@ -1,6 +1,6 @@
 
-import { db } from "../db";
-import { transactions, budgets, savingsGoals } from "../db/schema";
+import { db } from '../db/index.js';
+import { transactions, budgets, savingsGoals } from '../db/schema.js';
 import { eq, and, like, desc, sql, gte, lte } from "drizzle-orm";
 import ExcelJS from 'exceljs';
 

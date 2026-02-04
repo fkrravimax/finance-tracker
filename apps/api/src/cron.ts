@@ -1,5 +1,5 @@
 import cron from 'node-cron';
-import { recurringService } from './services/recurring.service';
+import { recurringService } from './services/recurring.service.js';
 
 export const startCronJobs = () => {
     console.log('[CRON] Initializing Cron Jobs...');

@@ -1,7 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import * as dotenv from 'dotenv';
-import { auth } from './lib/auth';
+import { auth } from './lib/auth.js';
 import { toNodeHandler } from 'better-auth/node';
 
 dotenv.config();
@@ -19,30 +19,30 @@ app.use(express.json());
 // Auth Routes
 app.all("/api/auth/*splat", toNodeHandler(auth));
 
-import transactionRoutes from './routes/transaction.routes';
-import { authMiddleware } from './middleware/auth.middleware';
+import transactionRoutes from './routes/transaction.routes.js';
+import { authMiddleware } from './middleware/auth.middleware.js';
 app.use('/api/transactions', authMiddleware, transactionRoutes);
 
-import budgetRoutes from './routes/budget.routes';
+import budgetRoutes from './routes/budget.routes.js';
 app.use('/api/budgets', authMiddleware, budgetRoutes);
 
-import dashboardRoutes from './routes/dashboard.routes';
+import dashboardRoutes from './routes/dashboard.routes.js';
 app.use('/api/dashboard', authMiddleware, dashboardRoutes);
 
-import exportRoutes from './routes/export.routes';
+import exportRoutes from './routes/export.routes.js';
 app.use('/api/export', authMiddleware, exportRoutes);
 
-import savingsGoalRoutes from './routes/savings-goal.routes';
+import savingsGoalRoutes from './routes/savings-goal.routes.js';
 app.use('/api/savings-goals', authMiddleware, savingsGoalRoutes);
 
-import { recurringRoutes } from './routes/recurring.routes';
+import { recurringRoutes } from './routes/recurring.routes.js';
 app.use('/api/recurring', authMiddleware, recurringRoutes);
 
-import { resetRoutes } from './routes/reset.routes';
+import { resetRoutes } from './routes/reset.routes.js';
 app.use('/api/reset', authMiddleware, resetRoutes);
 
 // Helper to keep cron alive
-import { startCronJobs } from './cron';
+import { startCronJobs } from './cron.js';
 // Only start cron in non-serverless environment or use Vercel Cron (different topic)
 // For now, allow it but it might not run reliably on serverless
 if (!process.env.VERCEL) {

@@ -1,6 +1,6 @@
 
 import { Router } from 'express';
-import { budgetController } from '../controllers/budget.controller';
+import { budgetController } from '../controllers/budget.controller.js';
 
 const router = Router();
 
