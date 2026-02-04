@@ -17,7 +17,7 @@ app.use(cors({
 app.use(express.json());
 
 // Auth Routes
-app.all("/api/auth/*splat", toNodeHandler(auth));
+app.all("/api/auth/*", toNodeHandler(auth));
 
 import transactionRoutes from './routes/transaction.routes.js';
 import { authMiddleware } from './middleware/auth.middleware.js';
