@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
 import { dashboardService } from '../services/dashboardService';
+import CurrencyInput from './CurrencyInput';
 
 interface OnboardingModalProps {
     isOpen: boolean;
@@ -18,7 +19,9 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClose, onCo
         e.preventDefault();
         setLoading(true);
         try {
-            await dashboardService.setBudget(Number(budget));
+            // Remove non-numeric chars for formatted input
+            const rawValue = budget.replace(/[^0-9]/g, '');
+            await dashboardService.setBudget(Number(rawValue));
             onComplete();
             onClose();
         } catch (error) {
@@ -39,13 +42,13 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClose, onCo
                 </div>
 
                 <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+
                     <div>
                         <label className="text-sm font-bold text-slate-700 dark:text-[#cbbc90] mb-1 block">Monthly Budget Limit (Rp)</label>
-                        <input
-                            type="number"
+                        <CurrencyInput
                             value={budget}
-                            onChange={(e) => setBudget(e.target.value)}
-                            placeholder="e.g. 5000"
+                            onChange={setBudget} // CurrencyInput expects (val: string) => void
+                            placeholder="e.g. 5.000.000"
                             className="w-full bg-slate-50 dark:bg-[#1a160b] border border-slate-200 dark:border-[#493f22] rounded-xl px-4 py-3 text-slate-900 dark:text-white font-bold text-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
                             required
                         />
