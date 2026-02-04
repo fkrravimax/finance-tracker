@@ -1,0 +1,84 @@
+# Integration Guide: Finance Tracker App
+
+This guide explains how to set up the new backend API and integrate it with the existing frontend.
+
+## 1. Prerequisites
+- Node.js (v18+)
+- PostgreSQL (Local or Docker)
+- pnpm or npm
+
+## 2. Backend Setup (`apps/api`)
+
+### Installation
+Navigate to the api directory and install dependencies:
+```bash
+cd apps/api
+npm install
+```
+
+### Environment Variables
+Copy the example environment file:
+```bash
+cp .env.example .env
+```
+Edit `.env` and set your database URL:
+```ini
+DATABASE_URL=postgres://user:password@localhost:5432/finance_db
+PORT=3000
+BETTER_AUTH_SECRET=generate_a_secure_random_string
+BETTER_AUTH_URL=http://localhost:3000
+```
+
+### Database Setup
+1. **Running Postgres**:
+   If you have Docker, you can run:
+   ```bash
+   docker run --name finance-db -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=finance_db -p 5432:5432 -d postgres
+   ```
+   Update `.env` `DATABASE_URL` to: `postgres://postgres:postgres@localhost:5432/finance_db`
+
+2. **Push Schema**:
+   Run Drizzle Kit to push the schema to the database:
+   ```bash
+   npx drizzle-kit push
+   ```
+
+### Running the Server
+Start the development server:
+```bash
+npm run dev
+# OR if you haven't added a script yet (I will add it):
+npx tsx --watch src/index.ts
+```
+
+## 3. Frontend Integration (`apps/web`)
+
+### Update API Service
+Modify `apps/web/src/services/api.ts` to point to the new backend.
+Ensure `baseURL` is set to `http://localhost:3000/api`.
+
+### Authentication
+The backend uses Better Auth. You might need to install `better-auth` client on the frontend or continue using Axios calls to the `/api/auth/*` endpoints.
+- Login: `POST /api/auth/sign-in/email`
+- Register: `POST /api/auth/sign-up/email`
+- Logout: `POST /api/auth/sign-out`
+
+### Testing
+1. Start Backend: `npm run dev` in `apps/api`
+2. Start Frontend: `npm run dev` in `apps/web`
+3. Open http://localhost:5173 and try logging in/registering.
+
+## 4. Running Full Stack Locally
+You can run both from the root if you add a turbo/concurrently script, or just run them in separate terminals.
+
+Terminal 1 (Backend):
+```bash
+cd apps/api
+npm run dev
+```
+
+Terminal 2 (Frontend):
+```bash
+cd apps/web
+npm run dev
+```
