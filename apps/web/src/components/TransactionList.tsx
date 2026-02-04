@@ -58,7 +58,7 @@ const TransactionList: React.FC<TransactionListProps> = ({ limit }) => {
                                 : 'text-green-600 dark:text-green-400'
                                 }`}>
                                 {transaction.type === 'expense' ? '-' : '+'}
-                                <HiddenAmount value={transaction.amount} prefix="" isImportant={false} className="" />
+                                <HiddenAmount value={Number(transaction.amount)} prefix="Rp " isImportant={false} className="" />
                             </p>
                         </div>
                     ))
