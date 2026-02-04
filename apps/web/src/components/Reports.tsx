@@ -58,12 +58,12 @@ const Reports: React.FC = () => {
                         <p className="text-slate-500 dark:text-[#cbbc90] text-base">Track your financial health over time.</p>
                     </div>
                     {/* Time Range Filter */}
-                    <div className="flex bg-white dark:bg-[#2b2616] border border-slate-200 dark:border-[#493f22] rounded-xl p-1">
+                    <div className="flex bg-white dark:bg-[#2b2616] border border-slate-200 dark:border-[#493f22] rounded-xl p-1 overflow-x-auto max-w-full">
                         {timeOptions.map((option) => (
                             <button
                                 key={option}
                                 onClick={() => setTimeRange(option)}
-                                className={`px-4 py-2 text-sm font-bold rounded-lg transition-all ${timeRange === option
+                                className={`px-4 py-2 text-sm font-bold rounded-lg transition-all whitespace-nowrap ${timeRange === option
                                     ? 'bg-primary text-slate-900 shadow-sm'
                                     : 'text-slate-500 dark:text-[#cbbc90] hover:bg-slate-50 dark:hover:bg-[#342d18]'
                                     }`}
