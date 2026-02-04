@@ -22,7 +22,13 @@ app.use(cors({
 app.use(express.json());
 
 // Auth Routes
-app.all("/api/auth/:path*", toNodeHandler(auth));
+// Root route for sanity check
+app.get("/", (req, res) => {
+    res.json({ status: "API is running", env: process.env.NODE_ENV });
+});
+
+// Auth Routes - Express 5 compatible wildcard
+app.all("/api/auth/:wildcard(.*)", toNodeHandler(auth));
 
 import transactionRoutes from './routes/transaction.routes.js';
 import { authMiddleware } from './middleware/auth.middleware.js';
