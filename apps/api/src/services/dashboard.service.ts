@@ -1,6 +1,6 @@
 
-import { db } from "../db";
-import { transactions, budgets } from "../db/schema";
+import { db } from '../db/index.js';
+import { transactions, budgets } from '../db/schema.js';
 import { eq, sql } from "drizzle-orm";
 
 export const dashboardService = {

@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { savingsGoalController } from '../controllers/savings-goal.controller';
-import { authMiddleware } from '../middleware/auth.middleware';
+import { savingsGoalController } from '../controllers/savings-goal.controller.js';
+import { authMiddleware } from '../middleware/auth.middleware.js';
 
 const router = Router();
 

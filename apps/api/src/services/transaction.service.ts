@@ -1,5 +1,5 @@
-import { db } from "../db";
-import { transactions } from "../db/schema";
+import { db } from '../db/index.js';
+import { transactions } from '../db/schema.js';
 import { eq, desc, and } from "drizzle-orm";
 import { randomUUID } from "crypto";
 

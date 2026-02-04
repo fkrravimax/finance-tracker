@@ -1,6 +1,6 @@
 
 import { Request, Response } from 'express';
-import { exportService } from '../services/export.service';
+import { exportService } from '../services/export.service.js';
 
 export const exportController = {
     exportData: async (req: Request, res: Response) => {

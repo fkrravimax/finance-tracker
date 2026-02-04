@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { savingsGoalService } from '../services/savings-goal.service';
+import { savingsGoalService } from '../services/savings-goal.service.js';
 
 export const savingsGoalController = {
     getAll: async (req: Request, res: Response) => {

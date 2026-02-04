@@ -1,5 +1,5 @@
-import { db } from "../db";
-import { savingsGoals } from "../db/schema";
+import { db } from '../db/index.js';
+import { savingsGoals } from '../db/schema.js';
 import { eq, and } from "drizzle-orm";
 import { randomUUID } from "crypto";
 
