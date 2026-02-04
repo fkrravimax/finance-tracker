@@ -47,7 +47,7 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClose, onCo
                         <label className="text-sm font-bold text-slate-700 dark:text-[#cbbc90] mb-1 block">Monthly Budget Limit (Rp)</label>
                         <CurrencyInput
                             value={budget}
-                            onChange={setBudget} // CurrencyInput expects (val: string) => void
+                            onChange={(val) => setBudget(val.toString())} // Convert number to string for state
                             placeholder="e.g. 5.000.000"
                             className="w-full bg-slate-50 dark:bg-[#1a160b] border border-slate-200 dark:border-[#493f22] rounded-xl px-4 py-3 text-slate-900 dark:text-white font-bold text-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
                             required
