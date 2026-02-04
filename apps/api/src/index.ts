@@ -10,7 +10,12 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(cors({
-    origin: process.env.FRONTEND_URL ? [process.env.FRONTEND_URL, "http://localhost:5173", "http://localhost:5174"] : ["http://localhost:5173", "http://localhost:5174"],
+    origin: [
+        "https://finance-web-five-coral.vercel.app", // Explicit production domain
+        process.env.FRONTEND_URL || "",               // Env var (if set)
+        "http://localhost:5173",
+        "http://localhost:5174"
+    ].filter(Boolean), // Remove empty strings
     credentials: true,
     allowedHeaders: ["Content-Type", "Authorization"],
 }));
