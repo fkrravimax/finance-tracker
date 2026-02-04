@@ -22,7 +22,7 @@ app.use(cors({
 app.use(express.json());
 
 // Auth Routes
-app.use("/api/auth", toNodeHandler(auth));
+app.all("/api/auth/:path*", toNodeHandler(auth));
 
 import transactionRoutes from './routes/transaction.routes.js';
 import { authMiddleware } from './middleware/auth.middleware.js';
