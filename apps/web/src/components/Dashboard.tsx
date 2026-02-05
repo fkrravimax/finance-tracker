@@ -133,8 +133,8 @@ const Dashboard: React.FC = () => {
 
                     <div className="relative z-10">
                         <p className="text-sky-100 text-base font-bold mb-2">Total Balance</p>
-                        <div className="flex items-baseline gap-2">
-                            <p className="text-5xl font-black tracking-tight drop-shadow-sm">
+                        <div className="flex items-baseline gap-2 overflow-hidden">
+                            <p className="text-4xl md:text-5xl font-black tracking-tight drop-shadow-sm whitespace-nowrap truncate">
                                 <HiddenAmount value={stats?.totalBalance || 0} prefix="Rp " isImportant className="" />
                             </p>
                         </div>
@@ -166,9 +166,9 @@ const Dashboard: React.FC = () => {
 
                     {stats?.budget ? (
                         <>
-                            <div className="flex items-end gap-3 mb-6 relative z-10">
-                                <span className="text-5xl font-black text-slate-800 dark:text-white">{stats.budget.percentage}%</span>
-                                <span className="text-base text-slate-500 dark:text-[#cbbc90] font-bold mb-2">
+                            <div className="flex flex-col md:flex-row md:items-end gap-1 md:gap-3 mb-6 relative z-10">
+                                <span className="text-4xl md:text-5xl font-black text-slate-800 dark:text-white">{stats.budget.percentage}%</span>
+                                <span className="text-sm md:text-base text-slate-500 dark:text-[#cbbc90] font-bold mb-2">
                                     used of <HiddenAmount value={stats.budget.limit} prefix="Rp " />
                                 </span>
                             </div>
