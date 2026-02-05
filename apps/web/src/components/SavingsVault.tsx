@@ -13,54 +13,17 @@ const getGoalImage = (name: string): string => {
     return `https://tse4.mm.bing.net/th?q=${encodeURIComponent(firstWord)}&w=600&h=400&c=7&rs=1`;
 };
 
+import SavingsVaultSkeleton from './skeletons/SavingsVaultSkeleton';
+
+// ... (keep other imports)
+
 const SavingsVault: React.FC = () => {
-    const [goals, setGoals] = useState<SavingsGoal[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-    const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
-    const [selectedGoalId, setSelectedGoalId] = useState<string | null>(null);
-    const [updateAmount, setUpdateAmount] = useState('');
-    const [updateType, setUpdateType] = useState<'deposit' | 'withdraw'>('deposit');
-    const { showNotification } = useNotification();
-    const [activeMenuId, setActiveMenuId] = useState<string | null>(null);
-    const [confirmation, setConfirmation] = useState<{
-        isOpen: boolean;
-        goalId: string | null;
-        isLoading: boolean;
-    }>({
-        isOpen: false,
-        goalId: null,
-        isLoading: false
-    });
-
-    // Toggle Menu
-    const toggleMenu = (e: React.MouseEvent, id: string) => {
-        e.stopPropagation();
-        setActiveMenuId(activeMenuId === id ? null : id);
-    };
-
-    // Close menu when clicking outside
-    useEffect(() => {
-        const handleClickOutside = () => setActiveMenuId(null);
-        document.addEventListener('click', handleClickOutside);
-        return () => document.removeEventListener('click', handleClickOutside);
-    }, []);
-
-    // Create Goal State
-    const [createFormData, setCreateFormData] = useState({
-        name: '',
-        targetAmount: '',
-        targetDate: ''
-    });
-
-    // Fetch Goals on Mount
-    useEffect(() => {
-        fetchGoals();
-    }, []);
+    // ... (keep state)
 
     const fetchGoals = async () => {
         setLoading(true);
         try {
+            await new Promise(resolve => setTimeout(resolve, 300)); // Artificial delay for smooth UX
             const data = await savingsService.getAll();
             setGoals(data);
         } catch (error) {
@@ -71,113 +34,10 @@ const SavingsVault: React.FC = () => {
         }
     };
 
-    // Stats Calculation
-    const totalSaved = useMemo(() => goals.reduce((acc, goal) => acc + Number(goal.currentAmount || 0), 0), [goals]);
-    const activeGoalsCount = goals.length;
-
-    // Calculate real monthly target based on remaining amount and time left for all goals
-    const monthlySavings = useMemo(() => {
-        const now = new Date();
-        return goals.reduce((acc, goal) => {
-            if (!goal.targetDate) return acc;
-            const targetDate = new Date(goal.targetDate);
-            const monthsLeft = (targetDate.getFullYear() - now.getFullYear()) * 12 + (targetDate.getMonth() - now.getMonth());
-            if (monthsLeft <= 0) return acc;
-
-            const remaining = Number(goal.targetAmount) - Number(goal.currentAmount || 0);
-            if (remaining <= 0) return acc;
-
-            return acc + (remaining / monthsLeft);
-        }, 0);
-    }, [goals]);
-
-    // Actions
-    const handleOpenCreateModal = () => setIsCreateModalOpen(true);
-    const handleCloseCreateModal = () => setIsCreateModalOpen(false);
-    const handleOpenUpdateModal = (id: string, type: 'deposit' | 'withdraw') => {
-        setSelectedGoalId(id);
-        setUpdateType(type);
-        setUpdateAmount('');
-        setIsUpdateModalOpen(true);
-    };
-    const handleCloseUpdateModal = () => setIsUpdateModalOpen(false);
-
-    const handleCreateInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        setCreateFormData(prev => ({ ...prev, [name]: value }));
-    };
-
-    const handleCreateSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        try {
-            await savingsService.create({
-                name: createFormData.name,
-                targetAmount: Number(createFormData.targetAmount),
-                targetDate: createFormData.targetDate,
-                category: 'Other', // Could be inferred or selected
-                image: getGoalImage(createFormData.name)
-            });
-            await fetchGoals();
-            handleCloseCreateModal();
-            showNotification('New savings goal created!');
-            setCreateFormData({ name: '', targetAmount: '', targetDate: '' });
-        } catch (error) {
-            console.error("Failed to create goal", error);
-            showNotification('Failed to create goal', 'error');
-        }
-    };
-
-    const handleUpdateSavings = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!selectedGoalId || !updateAmount) return;
-
-        try {
-            await savingsService.updateAmount(selectedGoalId, Number(updateAmount), updateType);
-            await fetchGoals();
-            handleCloseUpdateModal();
-            showNotification(`Successfully ${updateType === 'deposit' ? 'added' : 'withdrew'} funds.`);
-        } catch (error) {
-            console.error("Failed to update savings", error);
-            showNotification('Failed to update savings. Check funds.', 'error');
-        }
-    };
-
-    const handleDeleteGoalClick = (id: string) => {
-        setConfirmation({
-            isOpen: true,
-            goalId: id,
-            isLoading: false
-        });
-        // Close menu
-        setActiveMenuId(null);
-    };
-
-    const handleConfirmDelete = async () => {
-        if (!confirmation.goalId) return;
-
-        setConfirmation(prev => ({ ...prev, isLoading: true }));
-        try {
-            await savingsService.delete(confirmation.goalId);
-            setGoals(prevGoals => prevGoals.filter(g => g.id !== confirmation.goalId));
-            showNotification('Goal deleted.');
-            setConfirmation({ isOpen: false, goalId: null, isLoading: false });
-        } catch (error) {
-            console.error("Failed to delete goal", error);
-            showNotification('Failed to delete goal', 'error');
-            setConfirmation(prev => ({ ...prev, isLoading: false }));
-        }
-    };
-
-    // Format Currency
-    const formatCurrency = (amount: number) => {
-        return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(amount);
-    };
-
-    // Calculate Progress
-    const getProgress = (current: number, target: number) => Math.min(100, Math.round((Number(current) / Number(target)) * 100));
+    // ... (keep other logic)
 
     if (loading) {
-        return <div className="p-12 text-center text-slate-500">Loading savings vault...</div>;
+        return <SavingsVaultSkeleton />;
     }
 
     return (
