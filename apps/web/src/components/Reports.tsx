@@ -9,7 +9,15 @@ const Reports: React.FC = () => {
     const [reportData, setReportData] = useState<any>(null);
     const [loading, setLoading] = useState(true);
 
-    // ... (keep logic)
+    const timeOptions = ['Daily', 'Weekly', 'Monthly', 'Yearly'];
+
+    const formatPeriod = (dateStr: string) => {
+        const date = new Date(dateStr);
+        if (timeRange === 'Daily') return date.toLocaleDateString('en-US', { day: 'numeric', month: 'short' });
+        if (timeRange === 'Weekly') return `Week of ${date.toLocaleDateString('en-US', { day: 'numeric', month: 'short' })}`;
+        if (timeRange === 'Yearly') return date.getFullYear().toString();
+        return date.toLocaleDateString('en-US', { month: 'short', year: '2-digit' });
+    };
 
     useEffect(() => {
         const fetchReport = async () => {
