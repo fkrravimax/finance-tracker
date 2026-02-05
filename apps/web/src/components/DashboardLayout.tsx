@@ -33,8 +33,10 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, onLogout })
                 {/* Mobile Header (Visible only on small screens) */}
                 <div className="md:hidden flex items-center justify-between p-4 border-b border-slate-200 dark:border-[#493f22] bg-surface-light dark:bg-background-dark sticky top-0 z-10">
                     <div className="flex items-center gap-2">
-                        <span className="material-symbols-outlined text-primary text-2xl">account_balance</span>
-                        <span className="font-bold text-lg dark:text-white">FinTrack</span>
+                        <span className="w-8 h-8 bg-primary text-white rounded-xl flex items-center justify-center shadow-md shadow-primary/30 transform rotate-3">
+                            <img src="/logo.png" alt="Logo" className="w-5 h-5 object-contain brightness-0 invert" />
+                        </span>
+                        <span className="font-black text-xl tracking-tight text-slate-800 dark:text-white">FinTrack</span>
                     </div>
                     <button
                         onClick={toggleSidebar}
