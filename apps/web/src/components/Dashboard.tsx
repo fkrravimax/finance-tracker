@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import DashboardSkeleton from './skeletons/DashboardSkeleton';
 import CashFlowChart from './CashFlowChart';
 import TransactionList from './TransactionList';
 import HiddenAmount from './HiddenAmount';
@@ -51,7 +52,7 @@ const Dashboard: React.FC = () => {
     };
 
     if (loading) {
-        return <div className="flex items-center justify-center min-h-[50vh]">Loading dashboard...</div>;
+        return <DashboardSkeleton />;
     }
 
     const trend = stats && stats.totalBalance > 0
