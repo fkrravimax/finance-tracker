@@ -2,19 +2,51 @@
 
 @theme {
     /* Colors */
-    --color-primary: #f4c025;
-    --color-background-light: #f8f8f5;
+    --color-primary: #8b5cf6;
+    /* Violet */
+    --color-primary-hover: #7c3aed;
+    --color-background-light: #f3f0ff;
     --color-background-dark: #221e10;
+    /* Keep dark background for now */
+
+    /* Lavender */
+    --color-lavender-50: #fdfbff;
+    --color-lavender-100: #f7f5ff;
+    --color-lavender-200: #ede9fe;
+    --color-lavender-300: #ddd6fe;
+    --color-lavender-500: #e0d4fc;
+    --color-lavender-900: #581c87;
+
+    /* Mint */
+    --color-mint: #86efac;
+    --color-mint-dark: #22c55e;
+
+    /* Peach */
+    --color-peach: #fdba74;
+    --color-peach-dark: #ea580c;
+
+    /* Sky */
+    --color-sky: #7dd3fc;
+    --color-sky-dark: #0284c7;
+
     --color-surface-dark: #2b2616;
     --color-surface-light: #ffffff;
+    --color-card-bg: #ffffff;
 
     /* Fonts */
-    --font-display: "Inter", "sans-serif";
+    --font-display: "Nunito", "sans-serif";
 
     /* Border Radius */
     --radius-lg: 0.5rem;
-    --radius-xl: 0.75rem;
-    --radius-2xl: 1rem;
+    --radius-xl: 1rem;
+    --radius-2xl: 1.5rem;
+    --radius-3xl: 2rem;
+    --radius-bubbly: 2.5rem;
+
+    /* Shadows */
+    --shadow-soft: 0 10px 40px -10px rgba(139, 92, 246, 0.1);
+    --shadow-card: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+    --shadow-pop: 4px 4px 0px 0px rgba(0, 0, 0, 0.1);
 }
 
 /* Force dark mode to use class strategy */
@@ -22,7 +54,7 @@
 
 @layer base {
     body {
-        font-family: 'Inter', sans-serif;
+        font-family: 'Nunito', sans-serif;
     }
 }
 
@@ -41,7 +73,7 @@
 }
 
 .light ::-webkit-scrollbar-thumb {
-    background: #cbd5e1;
+    background: #c4b5fd;
 }
 
 /* Material Symbols alignment helper */
