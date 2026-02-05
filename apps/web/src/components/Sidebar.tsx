@@ -28,7 +28,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onLogout, isOpen = false, onClose }) 
                         <div className="flex flex-col">
                             <h1 className="text-3xl font-black tracking-tight text-slate-800 dark:text-white flex items-center gap-2">
                                 <span className="w-10 h-10 bg-primary text-white rounded-2xl flex items-center justify-center shadow-lg shadow-primary/30 rotate-3">
-                                    <img src="/logo.png" alt="Logo" className="w-6 h-6 object-contain brightness-0 invert" />
+                                    <img src="/icon-512.png" alt="Logo" className="w-6 h-6 object-contain brightness-0 invert" />
                                 </span>
                                 FinTrack
                             </h1>
