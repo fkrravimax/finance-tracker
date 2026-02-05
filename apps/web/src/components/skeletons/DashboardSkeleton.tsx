@@ -19,20 +19,20 @@ const DashboardSkeleton: React.FC = () => {
             {/* Stats Check Cards Skeleton */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Total Balance Card */}
-                <div className="flex flex-col justify-between rounded-bubbly p-8 bg-sky-dark/10 dark:bg-sky-900/10 border border-slate-100 dark:border-white/5 h-64">
+                <div className="flex flex-col justify-between rounded-bubbly p-8 bg-sky-dark/10 dark:bg-sky-900/10 border border-slate-100 dark:border-white/5">
                     <div className="flex justify-between mb-6">
                         <Skeleton className="h-14 w-14 rounded-2xl" />
                         <Skeleton className="h-8 w-24 rounded-full" />
                     </div>
                     <div>
                         <Skeleton className="h-6 w-32 mb-4 rounded-lg" />
-                        <Skeleton className="h-16 w-3/4 rounded-2xl mb-4" />
+                        <Skeleton className="h-12 w-3/4 rounded-2xl mb-4" />
                         <Skeleton className="h-4 w-40 rounded-full" />
                     </div>
                 </div>
 
                 {/* Budget Card */}
-                <div className="flex flex-col justify-center rounded-bubbly p-8 bg-white dark:bg-surface-dark border border-slate-100 dark:border-white/5 h-64">
+                <div className="flex flex-col justify-center rounded-bubbly p-8 bg-white dark:bg-surface-dark border border-slate-100 dark:border-white/5">
                     <div className="flex justify-between mb-4">
                         <Skeleton className="h-8 w-40 rounded-lg" />
                         <Skeleton className="h-12 w-12 rounded-2xl" />
@@ -41,8 +41,8 @@ const DashboardSkeleton: React.FC = () => {
                         <Skeleton className="h-12 w-24 rounded-xl" />
                         <Skeleton className="h-6 w-32 rounded-lg mb-2" />
                     </div>
-                    <Skeleton className="h-6 w-full rounded-full mb-5" />
-                    <Skeleton className="h-16 w-full rounded-2xl" />
+                    <Skeleton className="h-4 w-full rounded-full mb-4" />
+                    <Skeleton className="h-14 w-full rounded-2xl" />
                 </div>
             </div>
 
