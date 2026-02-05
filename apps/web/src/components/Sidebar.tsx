@@ -19,7 +19,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onLogout, isOpen = false, onClose }) 
     return (
         <>
             <aside className={`
-                fixed inset-y-0 left-0 z-30 w-72 bg-white/80 backdrop-blur-xl border border-white/50 dark:bg-background-dark dark:border-lavender-300 p-6 flex flex-col justify-between transition-transform duration-300 ease-in-out md:static md:translate-x-0 md:m-4 md:rounded-3xl shadow-soft
+                fixed inset-y-0 left-0 z-30 w-72 bg-white/80 backdrop-blur-xl border border-white/50 dark:bg-background-dark dark:border-white/5 p-6 flex flex-col justify-between transition-transform duration-300 ease-in-out md:static md:translate-x-0 md:m-4 md:rounded-3xl shadow-soft
                 ${isOpen ? 'translate-x-0' : '-translate-x-full'}
             `}>
                 <div className="flex flex-col gap-8 h-full">
@@ -70,8 +70,8 @@ const Sidebar: React.FC<SidebarProps> = ({ onLogout, isOpen = false, onClose }) 
 
                     {/* Pro Tip replaced with User Profile as per design */}
                     <div className="mt-auto">
-                        <div className="flex items-center gap-3 px-3 py-3 rounded-2xl bg-lavender-100/50 dark:bg-lavender-100 border border-lavender-200 dark:border-lavender-300 hover:bg-lavender-200 dark:hover:bg-lavender-200 transition-colors cursor-pointer group">
-                            <div className="w-12 h-12 rounded-full border-2 border-white dark:border-lavender-300 shadow-sm overflow-hidden flex items-center justify-center bg-primary/20 text-primary">
+                        <div className="flex items-center gap-3 px-3 py-3 rounded-2xl bg-lavender-100/50 dark:bg-white/5 border border-lavender-200 dark:border-white/5 hover:bg-lavender-200 dark:hover:bg-white/10 transition-colors cursor-pointer group">
+                            <div className="w-12 h-12 rounded-full border-2 border-white dark:border-white/10 shadow-sm overflow-hidden flex items-center justify-center bg-primary/20 text-primary">
                                 <span className="material-symbols-outlined">person</span>
                             </div>
                             <div className="flex flex-col flex-1 min-w-0">
