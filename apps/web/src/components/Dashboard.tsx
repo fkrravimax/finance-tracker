@@ -87,7 +87,7 @@ const Dashboard: React.FC = () => {
             />
 
             {/* Page Heading - Glassmorphism */}
-            <header className="flex flex-wrap justify-between items-end gap-6 bg-white/60 dark:bg-white/5 p-6 rounded-bubbly shadow-sm backdrop-blur-sm border border-white/60 dark:border-white/10">
+            <header className="flex flex-wrap justify-between items-end gap-6 bg-white/60 dark:bg-white/5 p-6 rounded-bubbly shadow-sm backdrop-blur-sm border border-white/60 dark:border-white/5">
                 <div className="flex flex-col gap-2">
                     <h2 className="text-3xl md:text-4xl font-black leading-tight tracking-tight text-slate-800 dark:text-white">
                         Dashboard <span className="text-primary">Overview</span>
@@ -151,7 +151,7 @@ const Dashboard: React.FC = () => {
                 </div>
 
                 {/* Budget Progress Card - Peach Style */}
-                <div className="flex flex-col justify-center rounded-bubbly p-8 bg-white dark:bg-surface-dark border border-slate-100 dark:border-[#493f22] shadow-card relative overflow-hidden group hover:scale-[1.01] transition-transform duration-300">
+                <div className="flex flex-col justify-center rounded-bubbly p-8 bg-white dark:bg-surface-dark border border-slate-100 dark:border-white/5 shadow-card relative overflow-hidden group hover:scale-[1.01] transition-transform duration-300">
                     <div className="absolute top-0 right-0 w-32 h-32 bg-peach/10 rounded-bl-full -mr-4 -mt-4"></div>
 
                     <div className="flex items-center justify-between mb-4 relative z-10">
@@ -173,7 +173,7 @@ const Dashboard: React.FC = () => {
                                 </span>
                             </div>
 
-                            <div className="relative w-full h-6 bg-slate-100 dark:bg-[#493f22] rounded-full overflow-hidden mb-5 border border-slate-100 dark:border-[#493f22]">
+                            <div className="relative w-full h-6 bg-slate-100 dark:bg-white/5 rounded-full overflow-hidden mb-5 border border-slate-100 dark:border-white/5">
                                 <div
                                     className={`absolute top-0 left-0 h-full rounded-full shadow-sm ${stats.budget.percentage > 90 ? 'bg-red-500' : 'bg-peach'}`}
                                     style={{ width: `${Math.min(stats.budget.percentage, 100)}%` }}
