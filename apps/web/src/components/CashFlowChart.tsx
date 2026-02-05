@@ -1,6 +1,6 @@
 import React from 'react';
 import HiddenAmount from './HiddenAmount';
-import CurrencyInput from './CurrencyInput';
+
 interface CashFlowChartProps {
     income: number;
     expense: number;
