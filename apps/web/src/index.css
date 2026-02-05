@@ -1,19 +1,60 @@
 @import "tailwindcss";
 
-@theme {
-    /* Colors */
-    --color-primary: #8b5cf6;
-    /* Violet */
-    --color-primary-hover: #7c3aed;
-    --color-background-light: #f3f0ff;
-    --color-background-dark: #221e10;
-    /* Keep dark background for now */
+@layer base {
+    :root {
+        /* Light Theme (Lavander/Purple Playful) */
+        --color-primary-val: #8b5cf6;
+        /* Violet */
+        --color-primary-hover-val: #7c3aed;
+        --color-bg-light: #f3f0ff;
+        --color-bg-dark: #221e10;
+        --color-surface-light-val: #ffffff;
+        --color-surface-dark-val: #2b2616;
 
-    /* Lavender */
+        --color-lavender-100-val: #f7f5ff;
+        --color-lavender-200-val: #ede9fe;
+
+        --color-text-main: #1e293b;
+        --color-text-muted: #64748b;
+    }
+
+    .dark {
+        /* Dark Theme (Gold/Brown/Earth) - Matching Logo */
+        --color-primary-val: #f4c025;
+        /* Gold */
+        --color-primary-hover-val: #dca60e;
+
+        /* Override Lavender with warm dark greys/browns for dark mode */
+        /* Keeping variable names same for compatibility, but changing visual color */
+        --color-lavender-100-val: #2b2616;
+        /* Deep Brown Surface */
+        --color-lavender-200-val: #36301d;
+        /* Slightly Lighter Brown */
+        --color-lavender-300-val: #493f22;
+        /* Border-like Brown */
+        --color-lavender-900-val: #f4c025;
+        /* Text accent instead of purple */
+
+        --color-text-main: #ffffff;
+        --color-text-muted: #cbbc90;
+    }
+}
+
+@theme {
+    /* Colors - Mapping to CSS Variables */
+    --color-primary: var(--color-primary-val);
+    --color-primary-hover: var(--color-primary-hover-val);
+
+    --color-background-light: #f3f0ff;
+    /* In dark mode, we want background-dark to be the main bg */
+    --color-background-dark: #221e10;
+
+    /* Helper colors */
     --color-lavender-50: #fdfbff;
-    --color-lavender-100: #f7f5ff;
-    --color-lavender-200: #ede9fe;
+    --color-lavender-100: var(--color-lavender-100-val);
+    --color-lavender-200: var(--color-lavender-200-val);
     --color-lavender-300: #ddd6fe;
+    /* Used for borders mostly, might need override if used extensively */
     --color-lavender-500: #e0d4fc;
     --color-lavender-900: #581c87;
 
