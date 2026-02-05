@@ -34,7 +34,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, onLogout })
                 <div className="md:hidden flex items-center justify-between p-4 border-b border-slate-200 dark:border-white/5 bg-surface-light dark:bg-background-dark sticky top-0 z-50 shadow-sm">
                     <div className="flex items-center gap-2">
                         <span className="w-8 h-8 bg-primary text-white rounded-xl flex items-center justify-center shadow-md shadow-primary/30 transform rotate-3">
-                            <img src="/logo.png" alt="Logo" className="w-5 h-5 object-contain brightness-0 invert" />
+                            <img src="/logo.png" alt="Logo" className="w-5 h-5 object-contain" />
                         </span>
                         <span className="font-black text-xl tracking-tight text-slate-800 dark:text-white">FinTrack</span>
                     </div>
