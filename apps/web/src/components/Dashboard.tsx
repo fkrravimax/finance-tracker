@@ -59,7 +59,8 @@ const Dashboard: React.FC = () => {
         : 0;
 
     return (
-        <div className="max-w-7xl mx-auto w-full p-4 md:p-8 lg:p-12 flex flex-col gap-8">
+    return (
+        <div className="max-w-7xl mx-auto w-full p-4 md:p-6 lg:p-8 flex flex-col gap-8">
             <QuickAddTransactionModal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
@@ -70,7 +71,6 @@ const Dashboard: React.FC = () => {
                 isOpen={isOnboardingOpen}
                 onClose={() => setIsOnboardingOpen(false)}
                 onComplete={() => {
-                    // Re-fetch stats, which might trigger the next modal (Balance)
                     fetchStats();
                 }}
             />
@@ -86,114 +86,119 @@ const Dashboard: React.FC = () => {
                 onClose={() => setIsExportModalOpen(false)}
             />
 
-            {/* Page Heading */}
-            <header className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
-                <div className="flex flex-col gap-1">
-                    <h2 className="text-3xl md:text-4xl font-black leading-tight tracking-tight text-slate-900 dark:text-white">Dashboard Overview</h2>
-                    <p className="text-slate-500 dark:text-[#cbbc90] text-base font-normal">Welcome back, {user?.name || 'User'}! Here's your financial summary.</p>
+            {/* Page Heading - Glassmorphism */}
+            <header className="flex flex-wrap justify-between items-end gap-6 bg-white/60 dark:bg-white/5 p-6 rounded-bubbly shadow-sm backdrop-blur-sm border border-white/60 dark:border-white/10">
+                <div className="flex flex-col gap-2">
+                    <h2 className="text-3xl md:text-4xl font-black leading-tight tracking-tight text-slate-800 dark:text-white">
+                        Dashboard <span className="text-primary">Overview</span>
+                    </h2>
+                    <p className="text-slate-500 dark:text-[#cbbc90] text-lg font-bold flex items-center gap-2">
+                        Welcome back, {user?.name || 'User'}! ✨ Here's your summary.
+                    </p>
                 </div>
-                <div className="flex gap-3 w-full md:w-auto">
+                <div className="flex gap-4">
                     <button
                         onClick={() => setIsExportModalOpen(true)}
-                        className="flex-1 md:flex-none justify-center flex items-center gap-2 px-4 py-3 md:py-2 bg-white dark:bg-[#2b2616] border border-slate-200 dark:border-[#493f22] rounded-lg text-sm font-medium shadow-sm hover:bg-slate-50 dark:hover:bg-[#36301d] transition-colors text-slate-900 dark:text-white"
+                        className="flex items-center gap-2 px-6 py-3 bg-white dark:bg-white/10 text-slate-600 dark:text-white border-2 border-lavender-200 dark:border-white/20 rounded-2xl text-sm font-bold hover:bg-lavender-50 dark:hover:bg-white/20 hover:border-lavender-300 transition-all hover:-translate-y-1 shadow-sm"
                     >
-                        <span className="material-symbols-outlined text-[20px]">download</span>
+                        <span className="material-symbols-outlined text-[22px]">download</span>
                         Export
                     </button>
                     <button
                         onClick={() => setIsModalOpen(true)}
-                        className="flex-1 md:flex-none justify-center flex items-center gap-2 px-4 py-3 md:py-2 bg-primary text-slate-900 rounded-lg text-sm font-bold shadow-md hover:bg-[#e0b020] transition-colors"
+                        className="flex items-center gap-2 px-6 py-3 bg-slate-800 dark:bg-primary text-white dark:text-slate-900 rounded-2xl text-sm font-bold shadow-lg shadow-slate-300 dark:shadow-primary/30 hover:bg-slate-900 dark:hover:bg-primary-hover transition-all hover:-translate-y-1"
                     >
-                        <span className="material-symbols-outlined text-[20px]">add</span>
-                        New Transaction
+                        <span className="material-symbols-outlined text-[22px]">add_circle</span>
+                        Add New
                     </button>
                 </div>
             </header>
 
             {/* Top Row: Stats & Progress */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* Total Balance Card */}
-                <div className="flex flex-col justify-between rounded-2xl p-6 bg-white dark:bg-surface-dark border border-slate-100 dark:border-[#493f22] shadow-sm">
-                    <div className="flex justify-between items-start mb-4">
-                        <div className="p-3 rounded-xl bg-primary/10 dark:bg-[#493f22] text-primary dark:text-[#f4c025]">
-                            <span className="material-symbols-outlined">account_balance_wallet</span>
+                {/* Total Balance Card - Sky Blue Style */}
+                <div className="flex flex-col justify-between rounded-bubbly p-8 bg-sky-dark dark:bg-sky-900/50 text-white shadow-lg shadow-sky-200 dark:shadow-none relative overflow-hidden group hover:scale-[1.01] transition-transform duration-300">
+                    <div className="absolute -right-10 -top-10 w-40 h-40 bg-sky/30 rounded-full blur-2xl"></div>
+                    <div className="absolute -left-10 -bottom-10 w-32 h-32 bg-sky/20 rounded-full blur-xl"></div>
+
+                    <div className="flex justify-between items-start mb-6 relative z-10">
+                        <div className="p-4 rounded-2xl bg-white/20 backdrop-blur-md text-white border border-white/20">
+                            <span className="material-symbols-outlined text-3xl">account_balance_wallet</span>
                         </div>
-                        {/* Dynamic Trend */}
-                        <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-sm font-medium ${trend >= 0 ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400' : 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400'}`}>
-                            <span className="material-symbols-outlined text-[16px]">{trend >= 0 ? 'trending_up' : 'trending_down'}</span>
+                        <span className={`inline-flex items-center gap-1 rounded-full px-4 py-1.5 text-sm font-extrabold shadow-sm ${trend >= 0 ? 'bg-white text-sky-dark' : 'bg-red-100 text-red-600'}`}>
+                            <span className="material-symbols-outlined text-[18px]">{trend >= 0 ? 'trending_up' : 'trending_down'}</span>
                             {trend >= 0 ? '+' : ''}{trend.toFixed(1)}%
                         </span>
                     </div>
-                    <div>
-                        <p className="text-slate-500 dark:text-[#cbbc90] text-sm font-medium mb-1">Total Balance</p>
+
+                    <div className="relative z-10">
+                        <p className="text-sky-100 text-base font-bold mb-2">Total Balance</p>
                         <div className="flex items-baseline gap-2">
-                            <p className="text-4xl font-black tracking-tight text-slate-900 dark:text-white">
+                            <p className="text-5xl font-black tracking-tight drop-shadow-sm">
                                 <HiddenAmount value={stats?.totalBalance || 0} prefix="Rp " isImportant className="" />
                             </p>
-                            {stats?.totalBalance === 0 && (
-                                <button
-                                    onClick={() => setIsBalanceModalOpen(true)}
-                                    className="text-xs bg-primary text-slate-900 px-2 py-1 rounded-md font-bold hover:bg-[#dca60e]"
-                                >
-                                    + Add Balance
-                                </button>
-                            )}
                         </div>
-                        <p className="text-slate-400 dark:text-[#cbbc90]/70 text-xs mt-2">Net Worth</p>
+                        {stats?.totalBalance === 0 && (
+                            <button
+                                onClick={() => setIsBalanceModalOpen(true)}
+                                className="mt-4 text-xs bg-white text-sky-dark px-3 py-1.5 rounded-full font-bold hover:bg-sky-50 transition-colors"
+                            >
+                                + Add Initial Balance
+                            </button>
+                        )}
+                        <p className="text-sky-100 text-sm mt-3 font-semibold bg-white/10 inline-block px-3 py-1 rounded-full">Updated just now</p>
                     </div>
                 </div>
 
-                {/* Budget Progress Card */}
-                <div className="flex flex-col justify-center rounded-2xl p-6 bg-white dark:bg-surface-dark border border-slate-100 dark:border-[#493f22] shadow-sm">
-                    <div className="flex items-center justify-between mb-2">
-                        <p className="text-slate-900 dark:text-white text-lg font-bold">Monthly Budget</p>
+                {/* Budget Progress Card - Peach Style */}
+                <div className="flex flex-col justify-center rounded-bubbly p-8 bg-white dark:bg-surface-dark border border-slate-100 dark:border-[#493f22] shadow-card relative overflow-hidden group hover:scale-[1.01] transition-transform duration-300">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-peach/10 rounded-bl-full -mr-4 -mt-4"></div>
+
+                    <div className="flex items-center justify-between mb-4 relative z-10">
+                        <p className="text-slate-800 dark:text-white text-xl font-extrabold">Monthly Budget</p>
                         <button
                             onClick={() => setIsBudgetModalOpen(true)}
-                            className="p-2 rounded-lg bg-slate-100 dark:bg-[#493f22] hover:bg-slate-200 dark:hover:bg-[#5a4e2b] transition-colors"
-                            title="View Budget Breakdown"
+                            className="p-3 rounded-2xl bg-peach/20 text-peach-dark hover:bg-peach/30 transition-colors"
                         >
-                            <span className="material-symbols-outlined text-slate-500 dark:text-[#cbbc90]">pie_chart</span>
+                            <span className="material-symbols-outlined">donut_large</span>
                         </button>
                     </div>
+
                     {stats?.budget ? (
                         <>
-                            <div className="flex items-end gap-2 mb-4">
-                                <span className="text-3xl font-bold text-slate-900 dark:text-white">{stats.budget.percentage}%</span>
-                                <span className="text-sm text-slate-500 dark:text-[#cbbc90] mb-1">
-                                    used of <HiddenAmount value={stats.budget.limit} prefix="Rp " /> limit
+                            <div className="flex items-end gap-3 mb-6 relative z-10">
+                                <span className="text-5xl font-black text-slate-800 dark:text-white">{stats.budget.percentage}%</span>
+                                <span className="text-base text-slate-500 dark:text-[#cbbc90] font-bold mb-2">
+                                    used of <HiddenAmount value={stats.budget.limit} prefix="Rp " />
                                 </span>
                             </div>
-                            <div className="relative w-full h-3 bg-slate-100 dark:bg-[#493f22] rounded-full overflow-hidden mb-3">
+
+                            <div className="relative w-full h-6 bg-slate-100 dark:bg-[#493f22] rounded-full overflow-hidden mb-5 border border-slate-100 dark:border-[#493f22]">
                                 <div
-                                    className={`absolute top-0 left-0 h-full rounded-full ${stats.budget.percentage > 90 ? 'bg-red-500' : 'bg-primary'}`}
-                                    style={{ width: `${stats.budget.percentage}%` }}
-                                ></div>
+                                    className={`absolute top-0 left-0 h-full rounded-full shadow-sm ${stats.budget.percentage > 90 ? 'bg-red-500' : 'bg-peach'}`}
+                                    style={{ width: `${Math.min(stats.budget.percentage, 100)}%` }}
+                                >
+                                    <div className="absolute top-0 right-0 bottom-0 w-full bg-white/20 animate-pulse"></div>
+                                </div>
                             </div>
-                            <div className="flex justify-between items-start">
-                                <div className="flex items-start gap-2 text-amber-600 dark:text-[#f4c025] max-w-[60%]">
-                                    {stats.budget.percentage > 80 && (
-                                        <>
-                                            <span className="material-symbols-outlined text-[18px] mt-0.5">warning</span>
-                                            <p className="text-sm font-medium leading-tight">You've used {stats.budget.percentage}% of your budget.</p>
-                                        </>
-                                    )}
-                                </div>
-                                <div className="text-right">
-                                    <p className="text-xs text-slate-400 dark:text-[#cbbc90]/70 font-medium">
-                                        {new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}
-                                    </p>
-                                    <p className="text-xs font-bold text-slate-600 dark:text-[#cbbc90]">
-                                        {new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate() - new Date().getDate()} days left
-                                    </p>
-                                </div>
+
+                            <div className="flex items-start gap-3 p-4 rounded-2xl bg-peach/10 dark:bg-peach/5 text-peach-dark dark:text-peach relative z-10">
+                                <span className="material-symbols-outlined text-[20px] mt-0.5">info</span>
+                                <p className="text-sm font-bold leading-tight">
+                                    {stats.budget.percentage > 90
+                                        ? "Whoa! You've almost hit your limit. Time to slow down! 🛑"
+                                        : stats.budget.percentage > 65
+                                            ? "You've used over 65%. Maybe cook dinner tonight? 🍳"
+                                            : "You're doing great! Keep it up. 🌟"}
+                                </p>
                             </div>
                         </>
                     ) : (
-                        <div className="flex flex-col items-center justify-center py-4">
-                            <p className="text-slate-500 mb-2">No budget set</p>
+                        <div className="flex flex-col items-center justify-center py-8">
+                            <p className="text-slate-500 mb-4 font-bold">No budget set for this month</p>
                             <button
                                 onClick={() => setIsOnboardingOpen(true)}
-                                className="text-primary font-bold hover:underline"
+                                className="px-6 py-2 bg-peach text-white font-bold rounded-xl shadow-lg shadow-peach/30 hover:bg-peach-dark transition-all"
                             >
                                 Set Budget
                             </button>
@@ -209,9 +214,12 @@ const Dashboard: React.FC = () => {
             </div>
 
             {/* Bottom decorative element */}
-            <div className="pb-8 text-center text-xs text-slate-400 dark:text-[#cbbc90]/40">
-                © 2026 FinTrack by @Fkrravi. Secure & Encrypted.
+            <div className="pb-8 text-center text-xs font-bold text-slate-400 flex items-center justify-center gap-2">
+                <span>© 2026 FinTrack Inc.</span>
+                <span className="w-1 h-1 bg-slate-300 rounded-full"></span>
+                <span>Made with <span className="text-red-400">♥</span> for your wallet</span>
             </div>
+
             {/* Budget Breakdown Modal */}
             <BudgetBreakdownModal
                 isOpen={isBudgetModalOpen}
