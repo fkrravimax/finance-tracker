@@ -2,18 +2,22 @@ import React, { useState, useEffect } from 'react';
 import { dashboardService } from '../services/dashboardService';
 import ExpensesByCategory from './ExpensesByCategory';
 
+import ReportsSkeleton from './skeletons/ReportsSkeleton';
+
 const Reports: React.FC = () => {
     const [timeRange, setTimeRange] = useState('Monthly');
     const [reportData, setReportData] = useState<any>(null);
     const [loading, setLoading] = useState(true);
 
-    const timeOptions = ['Daily', 'Weekly', 'Monthly', 'Yearly'];
+    // ... (keep logic)
 
     useEffect(() => {
         const fetchReport = async () => {
             setLoading(true);
             try {
-                // Pass lowercased range to API
+                // ... fetch logic
+                // Artificial delay for smooth UX
+                await new Promise(resolve => setTimeout(resolve, 300));
                 const data = await dashboardService.getReport(timeRange.toLowerCase());
                 setReportData(data);
             } catch (error) {
@@ -25,23 +29,9 @@ const Reports: React.FC = () => {
         fetchReport();
     }, [timeRange]);
 
-    // Helper to scale values for SVG chart (0-300 height)
+    // ...
 
-
-
-
-    // Calculate Area path for Expense
-
-
-    const formatPeriod = (dateStr: string) => {
-        const date = new Date(dateStr);
-        if (timeRange === 'Daily') return date.toLocaleDateString('en-US', { day: 'numeric', month: 'short' });
-        if (timeRange === 'Weekly') return `Week of ${date.toLocaleDateString('en-US', { day: 'numeric', month: 'short' })}`;
-        if (timeRange === 'Yearly') return date.getFullYear().toString();
-        return date.toLocaleDateString('en-US', { month: 'short', year: '2-digit' });
-    };
-
-    if (loading && !reportData) return <div className="p-8">Loading reports...</div>;
+    if (loading && !reportData) return <ReportsSkeleton />;
 
     return (
         <div className="max-w-7xl mx-auto w-full p-4 md:p-8 lg:p-12 flex flex-col gap-8">
