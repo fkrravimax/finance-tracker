@@ -113,12 +113,25 @@
     border-radius: 4px;
 }
 
-.light ::-webkit-scrollbar-thumb {
+/* Light mode scrollbar override */
+.light ::-webkit-scrollbar-thumb,
+:root:not(.dark) ::-webkit-scrollbar-thumb {
     background: #c4b5fd;
+    /* lavender-400 roughly */
 }
 
 /* Material Symbols alignment helper */
 .material-symbols-outlined {
+    font-family: 'Material Symbols Outlined';
+    font-weight: normal;
+    font-style: normal;
+    display: inline-block;
+    line-height: 1;
+    text-transform: none;
+    letter-spacing: normal;
+    word-wrap: normal;
+    white-space: nowrap;
+    direction: ltr;
     font-variation-settings:
         'FILL' 0,
         'wght' 400,
