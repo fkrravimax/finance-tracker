@@ -1,7 +1,10 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import api from '../services/api';
+import TransactionTableSkeleton from './skeletons/TransactionTableSkeleton';
 
 type TimeRange = 'day' | 'week' | 'month' | 'year';
+type SortKey = 'category' | 'date' | 'amount';
+type SortDirection = 'asc' | 'desc';
 
 interface Transaction {
     id: string;
@@ -11,18 +14,23 @@ interface Transaction {
     amount: string | number; // Decimal comes as string from DB usually
     type: 'income' | 'expense';
     icon: string;
-    colorClass?: string; // We might need to generate this on fly if not in DB
+    colorClass?: string;
 }
 
 const Transactions: React.FC = () => {
     const [timeRange, setTimeRange] = useState<TimeRange>('month');
     const [transactions, setTransactions] = useState<Transaction[]>([]);
     const [loading, setLoading] = useState(true);
+    const [sortConfig, setSortConfig] = useState<{ key: SortKey; direction: SortDirection } | null>(null);
 
     useEffect(() => {
         const fetchTransactions = async () => {
             try {
-                const response = await api.get('/transactions');
+                // Add artificial delay ensuring skeleton is visible for UX smooth transition (optional)
+                const [response] = await Promise.all([
+                    api.get('/transactions'),
+                    new Promise(resolve => setTimeout(resolve, 500))
+                ]);
                 setTransactions(response.data);
             } catch (error) {
                 console.error("Failed to fetch transactions", error);
@@ -33,11 +41,23 @@ const Transactions: React.FC = () => {
         fetchTransactions();
     }, []);
 
+    const handleSort = (key: SortKey) => {
+        let direction: SortDirection = 'asc';
+        if (sortConfig && sortConfig.key === key && sortConfig.direction === 'asc') {
+            direction = 'desc';
+        }
+        // Default sorts: Date -> newest (desc), Amount -> largest (desc)
+        if (!sortConfig && (key === 'date' || key === 'amount')) {
+            direction = 'desc';
+        }
+        setSortConfig({ key, direction });
+    };
+
     const filteredTransactions = useMemo(() => {
         const now = new Date();
         const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
-        return transactions.filter(t => {
+        let result = transactions.filter(t => {
             const tDate = new Date(t.date);
             switch (timeRange) {
                 case 'day':
@@ -53,7 +73,35 @@ const Transactions: React.FC = () => {
                     return true;
             }
         });
-    }, [timeRange, transactions]);
+
+        if (sortConfig) {
+            result.sort((a, b) => {
+                let aValue: any = a[sortConfig.key];
+                let bValue: any = b[sortConfig.key];
+
+                if (sortConfig.key === 'amount') {
+                    aValue = Number(aValue);
+                    bValue = Number(bValue);
+                } else if (sortConfig.key === 'date') {
+                    aValue = new Date(aValue).getTime();
+                    bValue = new Date(bValue).getTime();
+                } else {
+                    // String comparison (Category)
+                    aValue = aValue.toLowerCase();
+                    bValue = bValue.toLowerCase();
+                }
+
+                if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1;
+                if (aValue > bValue) return sortConfig.direction === 'asc' ? 1 : -1;
+                return 0;
+            });
+        } else {
+            // Default sort by date desc if no specific sort
+            result.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+        }
+
+        return result;
+    }, [timeRange, transactions, sortConfig]);
 
     const formatCurrency = (amount: number | string) => {
         return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'IDR' }).format(Number(amount));
@@ -65,15 +113,18 @@ const Transactions: React.FC = () => {
         return new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).format(date);
     };
 
-    // Helper to assign colors based on category or type if not present
     const getTransactionStyle = (t: Transaction) => {
         if (t.type === 'income') return 'text-green-600 bg-green-100 dark:text-green-400 dark:bg-green-900/30';
-        // Simple hashing or mapping for expense categories could go here, for now using generic default based on type
         return 'text-slate-600 bg-slate-100 dark:text-slate-400 dark:bg-[#493f22]';
     };
 
+    const SortIcon = ({ column }: { column: SortKey }) => {
+        if (sortConfig?.key !== column) return <span className="material-symbols-outlined text-[16px] opacity-30">unfold_more</span>;
+        return <span className="material-symbols-outlined text-[16px] text-primary">{sortConfig.direction === 'asc' ? 'arrow_upward' : 'arrow_downward'}</span>;
+    };
+
     if (loading) {
-        return <div className="p-12 text-center text-slate-500">Loading transactions...</div>;
+        return <TransactionTableSkeleton />;
     }
 
     return (
@@ -144,11 +195,32 @@ const Transactions: React.FC = () => {
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                         <thead>
-                            <tr className="bg-slate-50 dark:bg-[#2b2616] border-b border-slate-200 dark:border-[#493f22]">
+                            <tr className="bg-slate-50 dark:bg-[#2b2616] border-b border-slate-200 dark:border-[#493f22] select-none">
                                 <th className="p-4 pl-6 text-sm font-bold text-slate-600 dark:text-[#cbbc90] whitespace-nowrap">Transaction</th>
-                                <th className="p-4 text-sm font-bold text-slate-600 dark:text-[#cbbc90] whitespace-nowrap">Category</th>
-                                <th className="p-4 text-sm font-bold text-slate-600 dark:text-[#cbbc90] whitespace-nowrap">Date</th>
-                                <th className="p-4 text-sm font-bold text-slate-600 dark:text-[#cbbc90] whitespace-nowrap">Amount</th>
+                                <th
+                                    className="p-4 text-sm font-bold text-slate-600 dark:text-[#cbbc90] whitespace-nowrap cursor-pointer hover:bg-slate-100 dark:hover:bg-[#493f22] transition-colors"
+                                    onClick={() => handleSort('category')}
+                                >
+                                    <div className="flex items-center gap-1">
+                                        Category <SortIcon column="category" />
+                                    </div>
+                                </th>
+                                <th
+                                    className="p-4 text-sm font-bold text-slate-600 dark:text-[#cbbc90] whitespace-nowrap cursor-pointer hover:bg-slate-100 dark:hover:bg-[#493f22] transition-colors"
+                                    onClick={() => handleSort('date')}
+                                >
+                                    <div className="flex items-center gap-1">
+                                        Date <SortIcon column="date" />
+                                    </div>
+                                </th>
+                                <th
+                                    className="p-4 text-sm font-bold text-slate-600 dark:text-[#cbbc90] whitespace-nowrap cursor-pointer hover:bg-slate-100 dark:hover:bg-[#493f22] transition-colors"
+                                    onClick={() => handleSort('amount')}
+                                >
+                                    <div className="flex items-center gap-1">
+                                        Amount <SortIcon column="amount" />
+                                    </div>
+                                </th>
                                 <th className="p-4 pr-6 text-sm font-bold text-slate-600 dark:text-[#cbbc90] whitespace-nowrap text-right">Status</th>
                             </tr>
                         </thead>
