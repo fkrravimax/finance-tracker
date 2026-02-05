@@ -27,7 +27,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onLogout, isOpen = false, onClose }) 
                     <div className="flex items-start justify-between">
                         <div className="flex flex-col">
                             <h1 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white flex items-center gap-2">
-                                <span className="material-symbols-outlined text-primary text-3xl">account_balance</span>
+                                <img src="/logo.png" alt="Logo" className="w-8 h-8 object-contain" />
                                 FinTrack
                             </h1>
                             <p className="text-slate-500 dark:text-[#cbbc90] text-sm font-medium">Pro Plan</p>

@@ -78,8 +78,8 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
                         </span>
                     </button>
 
-                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/20 text-primary mb-4">
-                        <span className="material-symbols-outlined text-4xl">account_balance</span>
+                    <div className="inline-flex items-center justify-center w-20 h-20 mb-4">
+                        <img src="/logo.png" alt="FinTrack Logo" className="w-full h-full object-contain" />
                     </div>
                     <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">FinTrack</h1>
                     <p className="text-slate-500 dark:text-[#cbbc90] mt-2">
