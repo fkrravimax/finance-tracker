@@ -58,7 +58,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onLogout, isOpen = false, onClose }) 
                                     ? 'bg-primary text-white shadow-lg shadow-primary/30 scale-[1.02]'
                                     : 'hover:bg-lavender-100 dark:hover:bg-[#2b2616] text-slate-500 hover:text-primary dark:text-[#cbbc90] hover:scale-[1.02] active:scale-95'}`}
                             >
-                                {({ isActive }) => (
+                                {() => (
                                     <>
                                         <span className="material-symbols-outlined">{item.icon}</span>
                                         <span className="text-base">{item.label}</span>
