@@ -51,5 +51,20 @@ export const tradingController = {
             }
             res.status(500).json({ error: 'Failed to withdraw funds' });
         }
+    },
+
+    deposit: async (req: Request, res: Response) => {
+        try {
+            const userId = (req as any).user.id;
+            const { amount, convertedAmount } = req.body;
+            if (!amount || amount <= 0) {
+                return res.status(400).json({ error: 'Invalid amount' });
+            }
+            const result = await tradingService.deposit(userId, parseFloat(amount), convertedAmount ? parseFloat(convertedAmount) : undefined);
+            res.json(result);
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ error: 'Failed to deposit funds' });
+        }
     }
 };

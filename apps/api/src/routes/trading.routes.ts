@@ -10,5 +10,6 @@ router.post('/', tradingController.createTrade);
 router.get('/', tradingController.getTrades);
 router.get('/stats', tradingController.getStats);
 router.post('/withdraw', tradingController.withdraw);
+router.post('/deposit', tradingController.deposit);
 
 export default router;
