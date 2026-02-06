@@ -77,13 +77,13 @@ const LogTradeModal: React.FC<LogTradeModalProps> = ({ isOpen, onClose, onSave }
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-            <div className="w-full max-w-lg bg-[#2b2616] border border-[#f4c025]/20 rounded-2xl shadow-[0_0_40px_-10px_rgba(244,192,37,0.1)] overflow-hidden">
-                <div className="flex items-center justify-between p-6 border-b border-[#f4c025]/10">
+            <div className="w-full max-w-lg bg-white dark:bg-[#2b2616] border border-slate-200 dark:border-[#f4c025]/20 rounded-2xl shadow-[0_0_40px_-10px_rgba(0,0,0,0.1)] dark:shadow-[0_0_40px_-10px_rgba(244,192,37,0.1)] overflow-hidden">
+                <div className="flex items-center justify-between p-6 border-b border-slate-200 dark:border-[#f4c025]/10">
                     <div>
-                        <h2 className="text-xl font-bold text-white">Log New Trade</h2>
-                        <p className="text-xs text-[#cbbc90] mt-1">Enter your trade details to track performance.</p>
+                        <h2 className="text-xl font-bold text-slate-800 dark:text-white">Log New Trade</h2>
+                        <p className="text-xs text-slate-500 dark:text-[#cbbc90] mt-1">Enter your trade details to track performance.</p>
                     </div>
-                    <button onClick={onClose} className="text-[#cbbc90] hover:text-white transition-colors">
+                    <button onClick={onClose} className="text-slate-400 hover:text-slate-600 dark:text-[#cbbc90] dark:hover:text-white transition-colors">
                         <X size={20} />
                     </button>
                 </div>
@@ -92,24 +92,24 @@ const LogTradeModal: React.FC<LogTradeModalProps> = ({ isOpen, onClose, onSave }
                     <form onSubmit={handleSubmit} className="p-6 space-y-6">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="space-y-2">
-                                <label className="text-xs font-semibold text-[#cbbc90] uppercase tracking-wider">Trading Pair</label>
+                                <label className="text-xs font-semibold text-slate-500 dark:text-[#cbbc90] uppercase tracking-wider">Trading Pair</label>
                                 <input
                                     type="text"
                                     value={pair}
                                     onChange={(e) => setPair(e.target.value)}
-                                    className="w-full bg-[#1e1b10] border border-[#f4c025]/20 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#f4c025] transition-colors font-mono"
+                                    className="w-full bg-slate-50 dark:bg-[#1e1b10] border border-slate-200 dark:border-[#f4c025]/20 rounded-lg px-4 py-3 text-slate-800 dark:text-white focus:outline-none focus:border-amber-400 dark:focus:border-[#f4c025] transition-colors font-mono"
                                     placeholder="BTC/USDT"
                                 />
                             </div>
                             <div className="space-y-2">
-                                <label className="text-xs font-semibold text-[#cbbc90] uppercase tracking-wider">Position Side</label>
-                                <div className="grid grid-cols-2 bg-[#1e1b10] rounded-lg p-1 border border-[#f4c025]/20">
+                                <label className="text-xs font-semibold text-slate-500 dark:text-[#cbbc90] uppercase tracking-wider">Position Side</label>
+                                <div className="grid grid-cols-2 bg-slate-100 dark:bg-[#1e1b10] rounded-lg p-1 border border-slate-200 dark:border-[#f4c025]/20">
                                     <button
                                         type="button"
                                         onClick={() => setType('LONG')}
                                         className={`text-sm font-medium py-2 rounded-md transition-all ${type === 'LONG'
-                                            ? 'bg-gradient-to-r from-emerald-500/20 to-emerald-500/10 text-emerald-400 border border-emerald-500/30'
-                                            : 'text-[#cbbc90] hover:text-white'
+                                            ? 'bg-emerald-100 dark:bg-gradient-to-r dark:from-emerald-500/20 dark:to-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30'
+                                            : 'text-slate-500 dark:text-[#cbbc90] hover:text-slate-800 dark:hover:text-white'
                                             }`}
                                     >
                                         ↗ Long
@@ -118,8 +118,8 @@ const LogTradeModal: React.FC<LogTradeModalProps> = ({ isOpen, onClose, onSave }
                                         type="button"
                                         onClick={() => setType('SHORT')}
                                         className={`text-sm font-medium py-2 rounded-md transition-all ${type === 'SHORT'
-                                            ? 'bg-gradient-to-r from-rose-500/20 to-rose-500/10 text-rose-400 border border-rose-500/30'
-                                            : 'text-[#cbbc90] hover:text-white'
+                                            ? 'bg-rose-100 dark:bg-gradient-to-r dark:from-rose-500/20 dark:to-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/30'
+                                            : 'text-slate-500 dark:text-[#cbbc90] hover:text-slate-800 dark:hover:text-white'
                                             }`}
                                     >
                                         ↘ Short
@@ -130,9 +130,9 @@ const LogTradeModal: React.FC<LogTradeModalProps> = ({ isOpen, onClose, onSave }
 
                         <div className="space-y-3">
                             <div className="flex justify-between items-center">
-                                <label className="text-xs font-semibold text-[#cbbc90] uppercase tracking-wider">Leverage</label>
+                                <label className="text-xs font-semibold text-slate-500 dark:text-[#cbbc90] uppercase tracking-wider">Leverage</label>
                                 <div className="flex items-center space-x-2">
-                                    <span className="text-[#f4c025] font-bold text-lg">{leverage}x</span>
+                                    <span className="text-amber-600 dark:text-[#f4c025] font-bold text-lg">{leverage}x</span>
                                 </div>
                             </div>
                             <div className="relative pt-2">
@@ -142,9 +142,9 @@ const LogTradeModal: React.FC<LogTradeModalProps> = ({ isOpen, onClose, onSave }
                                     max="150"
                                     value={leverage}
                                     onChange={(e) => setLeverage(parseInt(e.target.value))}
-                                    className="w-full h-1 bg-[#1e1b10] rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-[#f4c025] [&::-webkit-slider-thumb]:shadow-[0_0_10px_rgba(244,192,37,0.5)]"
+                                    className="w-full h-1 bg-slate-200 dark:bg-[#1e1b10] rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-amber-500 dark:[&::-webkit-slider-thumb]:bg-[#f4c025] [&::-webkit-slider-thumb]:shadow-[0_0_10px_rgba(244,192,37,0.5)]"
                                 />
-                                <div className="flex justify-between text-[10px] text-[#cbbc90] mt-2">
+                                <div className="flex justify-between text-[10px] text-slate-400 dark:text-[#cbbc90] mt-2">
                                     <span>1x</span>
                                     <span>50x</span>
                                     <span>100x</span>
@@ -155,54 +155,54 @@ const LogTradeModal: React.FC<LogTradeModalProps> = ({ isOpen, onClose, onSave }
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="space-y-2">
-                                <label className="text-xs font-semibold text-[#cbbc90] uppercase tracking-wider">Margin ($)</label>
+                                <label className="text-xs font-semibold text-slate-500 dark:text-[#cbbc90] uppercase tracking-wider">Margin ($)</label>
                                 <input
                                     type="number"
                                     value={amount}
                                     onChange={(e) => setAmount(e.target.value)}
-                                    className="w-full bg-[#1e1b10] border border-[#f4c025]/20 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#f4c025] transition-colors"
+                                    className="w-full bg-slate-50 dark:bg-[#1e1b10] border border-slate-200 dark:border-[#f4c025]/20 rounded-lg px-4 py-3 text-slate-800 dark:text-white focus:outline-none focus:border-amber-400 dark:focus:border-[#f4c025] transition-colors"
                                 />
                             </div>
                             <div className="space-y-2">
-                                <label className="text-xs font-semibold text-[#cbbc90] uppercase tracking-wider">Entry Price ($)</label>
+                                <label className="text-xs font-semibold text-slate-500 dark:text-[#cbbc90] uppercase tracking-wider">Entry Price ($)</label>
                                 <input
                                     type="number"
                                     value={entryPrice}
                                     onChange={(e) => setEntryPrice(e.target.value)}
-                                    className="w-full bg-[#1e1b10] border border-[#f4c025]/20 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#f4c025] transition-colors"
+                                    className="w-full bg-slate-50 dark:bg-[#1e1b10] border border-slate-200 dark:border-[#f4c025]/20 rounded-lg px-4 py-3 text-slate-800 dark:text-white focus:outline-none focus:border-amber-400 dark:focus:border-[#f4c025] transition-colors"
                                 />
                             </div>
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="space-y-2">
-                                <label className="text-xs font-semibold text-[#cbbc90] uppercase tracking-wider">Close Price ($)</label>
+                                <label className="text-xs font-semibold text-slate-500 dark:text-[#cbbc90] uppercase tracking-wider">Close Price ($)</label>
                                 <input
                                     type="number"
                                     value={closePrice}
                                     onChange={(e) => setClosePrice(e.target.value)}
-                                    className="w-full bg-[#1e1b10] border border-[#f4c025]/20 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#f4c025] transition-colors"
+                                    className="w-full bg-slate-50 dark:bg-[#1e1b10] border border-slate-200 dark:border-[#f4c025]/20 rounded-lg px-4 py-3 text-slate-800 dark:text-white focus:outline-none focus:border-amber-400 dark:focus:border-[#f4c025] transition-colors"
                                 />
                             </div>
                             <div className="space-y-2">
-                                <label className="text-xs font-semibold text-[#cbbc90] uppercase tracking-wider">Realized PnL ($)</label>
+                                <label className="text-xs font-semibold text-slate-500 dark:text-[#cbbc90] uppercase tracking-wider">Realized PnL ($)</label>
                                 <input
                                     type="number"
                                     value={pnl}
                                     onChange={(e) => setPnl(e.target.value)}
-                                    className={`w-full bg-[#1e1b10] border border-[#f4c025]/20 rounded-lg px-4 py-3 focus:outline-none focus:border-[#f4c025] transition-colors font-bold ${parseFloat(pnl) > 0 ? 'text-emerald-400' : parseFloat(pnl) < 0 ? 'text-rose-400' : 'text-white'
+                                    className={`w-full bg-slate-50 dark:bg-[#1e1b10] border border-slate-200 dark:border-[#f4c025]/20 rounded-lg px-4 py-3 focus:outline-none focus:border-amber-400 dark:focus:border-[#f4c025] transition-colors font-bold ${parseFloat(pnl) > 0 ? 'text-emerald-500 dark:text-emerald-400' : parseFloat(pnl) < 0 ? 'text-rose-500 dark:text-rose-400' : 'text-slate-800 dark:text-white'
                                         }`}
                                     placeholder="+ 0.00"
                                 />
                             </div>
                         </div>
 
-                        <div className="bg-[#1e1b10] border border-[#f4c025]/10 border-dashed rounded-lg p-3">
+                        <div className="bg-slate-50 dark:bg-[#1e1b10] border border-slate-200 dark:border-[#f4c025]/10 border-dashed rounded-lg p-3">
                             <textarea
                                 value={notes}
                                 onChange={(e) => setNotes(e.target.value)}
                                 placeholder="Add Trade Notes..."
-                                className="w-full bg-transparent text-sm text-white placeholder-[#cbbc90] resize-none focus:outline-none h-16"
+                                className="w-full bg-transparent text-sm text-slate-800 dark:text-white placeholder-slate-400 dark:placeholder-[#cbbc90] resize-none focus:outline-none h-16"
                             />
                         </div>
 
@@ -210,14 +210,14 @@ const LogTradeModal: React.FC<LogTradeModalProps> = ({ isOpen, onClose, onSave }
                             <button
                                 type="button"
                                 onClick={onClose}
-                                className="px-6 py-3 rounded-lg border border-[#f4c025]/30 text-[#f4c025] hover:bg-[#f4c025]/10 transition-colors"
+                                className="px-6 py-3 rounded-lg border border-slate-200 dark:border-[#f4c025]/30 text-slate-500 hover:text-slate-800 dark:text-[#f4c025] dark:hover:bg-[#f4c025]/10 transition-colors"
                             >
                                 Cancel
                             </button>
                             <button
                                 type="submit"
                                 disabled={loading}
-                                className="px-6 py-3 rounded-lg bg-[#f4c025] text-[#2b2616] font-bold hover:bg-[#dca60e] transition-all transform hover:scale-[1.02] shadow-[0_0_20px_-5px_rgba(244,192,37,0.5)] disabled:opacity-50"
+                                className="px-6 py-3 rounded-lg bg-amber-500 dark:bg-[#f4c025] text-white dark:text-[#2b2616] font-bold hover:bg-amber-600 dark:hover:bg-[#dca60e] transition-all transform hover:scale-[1.02] shadow-[0_4px_10px_rgba(0,0,0,0.1)] dark:shadow-[0_0_20px_-5px_rgba(244,192,37,0.5)] disabled:opacity-50"
                             >
                                 {loading ? 'Saving...' : 'Save Trade'}
                             </button>
