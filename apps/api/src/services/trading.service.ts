@@ -127,5 +127,35 @@ export const tradingService = {
 
             return transaction;
         });
+    },
+
+    async deposit(userId: string, amount: number, convertedAmount?: number) {
+        return await db.transaction(async (tx) => {
+            // 1. Add to Trading Wallet (USD)
+            await tx.execute(
+                sql`UPDATE "user" SET trading_balance = trading_balance + ${amount} WHERE id = ${userId}`
+            );
+
+            // 2. Deduct from Main Transactions (Expense in IDR if converted)
+            const transactionAmount = convertedAmount || amount; // Use converted amount if provided, else USD amount
+
+            // Note: We don't strictly check main balance here as this is a simple expense logging in the current architecture.
+            // If main balance is strictly tracked in a 'balances' table, we would check it.
+            // But currently main balance is a sum of transactions.
+
+            const [transaction] = await tx.insert(transactions).values({
+                id: randomUUID(),
+                userId,
+                merchant: 'Trading Wallet',
+                category: 'Investments',
+                date: new Date(),
+                amount: transactionAmount.toString(),
+                type: 'expense',
+                icon: 'candlestick_chart',
+                description: convertedAmount ? `Deposit to Trading Wallet ($${amount})` : 'Deposit to Trading Wallet'
+            }).returning();
+
+            return transaction;
+        });
     }
 };

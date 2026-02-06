@@ -4,6 +4,7 @@ import { Wallet, Plus } from 'lucide-react';
 import { authService } from '../services/authService';
 import LogTradeModal from './LogTradeModal';
 import WithdrawTradeModal from './WithdrawTradeModal';
+import DepositTradeModal from './DepositTradeModal';
 import Skeleton from './Skeleton';
 
 const TradingDashboard = () => {
@@ -12,6 +13,7 @@ const TradingDashboard = () => {
     const [loading, setLoading] = useState(true);
     const [isLogModalOpen, setIsLogModalOpen] = useState(false);
     const [isWithdrawModalOpen, setIsWithdrawModalOpen] = useState(false);
+    const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
 
     const fetchData = async () => {
         try {
@@ -57,7 +59,7 @@ const TradingDashboard = () => {
                     <p className="text-sm md:text-base text-[#cbbc90] mt-1">Manage your daily trades, performance, and journal.</p>
                 </div>
 
-                <div className="w-full md:w-auto mt-0 bg-[#1e1b10] p-4 rounded-xl border border-[#f4c025]/20 flex justify-between items-center group hover:border-[#f4c025]/40 transition-colors">
+                <div className="w-full md:w-auto mt-0 bg-[#1e1b10] p-4 rounded-xl border border-[#f4c025]/20 flex justify-between items-center group hover:border-[#f4c025]/40 transition-colors gap-4">
                     <div>
                         <p className="text-xs text-[#cbbc90] uppercase tracking-wider mb-1 flex items-center gap-2">
                             <Wallet size={12} /> Trading Balance
@@ -68,12 +70,20 @@ const TradingDashboard = () => {
                             </h2>
                         )}
                     </div>
-                    <button
-                        onClick={() => setIsWithdrawModalOpen(true)}
-                        className="ml-4 bg-[#f4c025] text-[#2b2616] px-4 py-2 rounded-lg font-bold text-sm hover:bg-[#dca60e] transition-all shadow-[0_0_15px_rgba(244,192,37,0.3)] hover:shadow-[0_0_20px_rgba(244,192,37,0.5)] transform active:scale-95"
-                    >
-                        Withdraw
-                    </button>
+                    <div className="flex gap-2">
+                        <button
+                            onClick={() => setIsDepositModalOpen(true)}
+                            className="bg-[#1e1b10] text-[#f4c025] border border-[#f4c025]/50 px-4 py-2 rounded-lg font-bold text-sm hover:bg-[#f4c025]/10 transition-all active:scale-95"
+                        >
+                            Deposit
+                        </button>
+                        <button
+                            onClick={() => setIsWithdrawModalOpen(true)}
+                            className="bg-[#f4c025] text-[#2b2616] px-4 py-2 rounded-lg font-bold text-sm hover:bg-[#dca60e] transition-all shadow-[0_0_15px_rgba(244,192,37,0.3)] hover:shadow-[0_0_20px_rgba(244,192,37,0.5)] transform active:scale-95"
+                        >
+                            Withdraw
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -256,6 +266,12 @@ const TradingDashboard = () => {
                 isOpen={isWithdrawModalOpen}
                 onClose={() => setIsWithdrawModalOpen(false)}
                 maxAmount={stats?.currentBalance || 0}
+                onSuccess={fetchData}
+            />
+
+            <DepositTradeModal
+                isOpen={isDepositModalOpen}
+                onClose={() => setIsDepositModalOpen(false)}
                 onSuccess={fetchData}
             />
         </div>
