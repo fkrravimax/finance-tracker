@@ -161,7 +161,6 @@ const LogTradeModal: React.FC<LogTradeModalProps> = ({ isOpen, onClose, onSave }
                                     value={amount}
                                     onChange={(e) => setAmount(e.target.value)}
                                     className="w-full bg-[#1e1b10] border border-[#f4c025]/20 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#f4c025] transition-colors"
-                                    placeholder="1000.00"
                                 />
                             </div>
                             <div className="space-y-2">
@@ -171,7 +170,6 @@ const LogTradeModal: React.FC<LogTradeModalProps> = ({ isOpen, onClose, onSave }
                                     value={entryPrice}
                                     onChange={(e) => setEntryPrice(e.target.value)}
                                     className="w-full bg-[#1e1b10] border border-[#f4c025]/20 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#f4c025] transition-colors"
-                                    placeholder="25430.00"
                                 />
                             </div>
                         </div>
@@ -184,7 +182,6 @@ const LogTradeModal: React.FC<LogTradeModalProps> = ({ isOpen, onClose, onSave }
                                     value={closePrice}
                                     onChange={(e) => setClosePrice(e.target.value)}
                                     className="w-full bg-[#1e1b10] border border-[#f4c025]/20 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#f4c025] transition-colors"
-                                    placeholder="26100.00"
                                 />
                             </div>
                             <div className="space-y-2">
