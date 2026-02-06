@@ -7,8 +7,8 @@ import SavingsVault from './components/SavingsVault'
 import Transactions from './components/Transactions'
 import Settings from './components/Settings'
 import Login from './components/Login'
+import TradingDashboard from './components/TradingDashboard'
 import { authService } from './services/authService'
-
 import { authClient } from './lib/auth-client';
 
 function App() {
@@ -30,10 +30,6 @@ function App() {
                 const session = await authClient.getSession();
                 if (session.data) {
                     setIsAuthenticated(true);
-                    // Sync to local storage for subsequent checks (optional but keeps consistency)
-                    // Note: session.data includes { user, session }. We might not have a JWT 'token' here if it's cookie based.
-                    // So we accept that isAuthenticated relying on 'token' in localStorage is imperfect for OAuth.
-                    // We just rely on state.
                 }
             } catch (error) {
                 console.error("Auth check failed", error);
@@ -73,6 +69,7 @@ function App() {
                 <Route path="/transactions" element={<Transactions />} />
                 <Route path="/reports" element={<Reports />} />
                 <Route path="/savings" element={<SavingsVault />} />
+                <Route path="/trading" element={<TradingDashboard />} />
                 <Route path="/settings" element={<Settings />} />
                 <Route path="*" element={
                     <div className="flex flex-col items-center justify-center h-full text-slate-500 dark:text-[#cbbc90]">

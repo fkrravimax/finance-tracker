@@ -97,5 +97,31 @@ export const authService = {
 
     isAuthenticated: (): boolean => {
         return !!localStorage.getItem('token');
+    },
+
+    fetchWithAuth: async (url: string, options: RequestInit = {}) => {
+        const token = localStorage.getItem('token');
+        const headers = {
+            'Content-Type': 'application/json',
+            ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+            ...options.headers,
+        };
+
+        const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000'}${url}`, {
+            ...options,
+            headers,
+        });
+
+        if (response.status === 401) {
+            authService.logout();
+            throw new Error('Unauthorized');
+        }
+
+        if (!response.ok) {
+            const error = await response.json().catch(() => ({}));
+            throw new Error(error.message || 'Request failed');
+        }
+
+        return response;
     }
 };

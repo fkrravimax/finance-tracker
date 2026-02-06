@@ -11,6 +11,7 @@ export const users = pgTable("user", {
     notifyBudget50: boolean("notify_budget_50").default(true),
     notifyBudget80: boolean("notify_budget_80").default(true),
     notifyDaily: boolean("notify_daily").default(false),
+    tradingBalance: decimal("trading_balance", { precision: 12, scale: 2 }).default("0").notNull(),
     createdAt: timestamp("created_at").notNull(),
     updatedAt: timestamp("updated_at").notNull(),
 });
@@ -99,6 +100,25 @@ export const recurringTransactions = pgTable("recurring_transaction", {
     date: integer("date").notNull(), // Day of month/week
     icon: text("icon"),
     nextDueDate: timestamp("next_due_date"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const trades = pgTable("trade", {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: text("user_id").notNull().references(() => users.id),
+    pair: text("pair").notNull(), // e.g. BTC/USDT
+    type: text("type").notNull(), // 'LONG' | 'SHORT'
+    amount: decimal("amount", { precision: 12, scale: 2 }).notNull(), // Margin amount
+    entryPrice: decimal("entry_price", { precision: 12, scale: 2 }).notNull(),
+    closePrice: decimal("close_price", { precision: 12, scale: 2 }),
+    leverage: integer("leverage").notNull(),
+    pnl: decimal("pnl", { precision: 12, scale: 2 }), // Realized PnL
+    outcome: text("outcome"), // 'WIN' | 'LOSS' | 'BE'
+    status: text("status").notNull().default("OPEN"), // 'OPEN' | 'CLOSED'
+    notes: text("notes"),
+    openedAt: timestamp("opened_at").defaultNow().notNull(),
+    closedAt: timestamp("closed_at"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });

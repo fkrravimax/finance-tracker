@@ -41,6 +41,9 @@ app.use('/api/recurring', authMiddleware, recurringRoutes);
 import { resetRoutes } from './routes/reset.routes.js';
 app.use('/api/reset', authMiddleware, resetRoutes);
 
+import tradingRoutes from './routes/trading.routes.js';
+app.use('/api/trading', authMiddleware, tradingRoutes);
+
 // Helper to keep cron alive
 import { startCronJobs } from './cron.js';
 // Only start cron in non-serverless environment or use Vercel Cron (different topic)

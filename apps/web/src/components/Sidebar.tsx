@@ -12,6 +12,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onLogout, isOpen = false, onClose }) 
         { id: 'dashboard', label: 'Overview', icon: 'grid_view' },
         { id: 'transactions', label: 'Transactions', icon: 'list_alt' },
         { id: 'reports', label: 'Reports', icon: 'pie_chart' },
+        { id: 'trading', label: 'Trading Terminal', icon: 'candlestick_chart' },
         { id: 'savings', label: 'Savings Vault', icon: 'savings' },
         { id: 'settings', label: 'Settings', icon: 'settings' },
     ];
