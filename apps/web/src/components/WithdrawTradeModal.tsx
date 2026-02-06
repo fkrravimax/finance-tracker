@@ -52,7 +52,7 @@ const WithdrawTradeModal: React.FC<WithdrawTradeModalProps> = ({ isOpen, onClose
 
                 <form onSubmit={handleWithdraw} className="p-6 space-y-8">
                     {/* From -> To Visualization */}
-                    <div className="bg-[#1e1b10] rounded-xl p-4 border border-[#f4c025]/20 flex items-center justify-between">
+                    <div className="bg-[#1e1b10] rounded-xl p-4 border border-[#f4c025]/20 flex flex-col md:flex-row items-center justify-between gap-4 md:gap-0">
                         <div className="flex flex-col items-center space-y-2">
                             <div className="w-10 h-10 rounded-full bg-[#f4c025]/10 flex items-center justify-center text-[#f4c025]">
                                 <Wallet size={20} />
@@ -63,7 +63,7 @@ const WithdrawTradeModal: React.FC<WithdrawTradeModalProps> = ({ isOpen, onClose
                             </div>
                         </div>
 
-                        <div className="text-[#cbbc90]/40">
+                        <div className="text-[#cbbc90]/40 rotate-90 md:rotate-0">
                             <ArrowRight size={24} />
                         </div>
 
