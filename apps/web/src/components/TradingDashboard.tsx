@@ -156,16 +156,16 @@ const TradingDashboard = () => {
             </div>
 
             {/* Trade Log */}
-            <div className="bg-[#2b2616] rounded-2xl border border-[#f4c025]/10 p-6">
-                <div className="flex justify-between items-center mb-6">
+            <div className="bg-[#2b2616] rounded-2xl border border-[#f4c025]/10 p-4 md:p-6">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
                     <h3 className="text-white font-bold text-lg">Trade Log</h3>
-                    <div className="flex gap-3">
-                        <div className="relative">
-                            <input type="text" placeholder="Search pair..." className="bg-[#1e1b10] border border-[#f4c025]/10 rounded-lg py-2 px-4 text-sm text-white focus:outline-none focus:border-[#f4c025]/50" />
+                    <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+                        <div className="relative flex-1 sm:flex-none">
+                            <input type="text" placeholder="Search pair..." className="w-full sm:w-auto bg-[#1e1b10] border border-[#f4c025]/10 rounded-lg py-2 px-4 text-sm text-white focus:outline-none focus:border-[#f4c025]/50" />
                         </div>
                         <button
                             onClick={() => setIsLogModalOpen(true)}
-                            className="bg-[#f4c025] text-[#2b2616] px-4 py-2 rounded-lg font-bold text-sm hover:bg-[#dca60e] transition-colors flex items-center gap-2"
+                            className="bg-[#f4c025] text-[#2b2616] px-4 py-2 rounded-lg font-bold text-sm hover:bg-[#dca60e] transition-colors flex items-center justify-center gap-2 whitespace-nowrap"
                         >
                             <Plus size={16} /> Log Trade
                         </button>
