@@ -11,7 +11,7 @@ interface WithdrawTradeModalProps {
 
 const WithdrawTradeModal: React.FC<WithdrawTradeModalProps> = ({ isOpen, onClose, maxAmount, onSuccess }) => {
     const [amount, setAmount] = useState('');
-    const [rate, setRate] = useState('16200'); // Default estimtated rate
+    const [rate, setRate] = useState('16888'); // Default estimtated rate
     const [loading, setLoading] = useState(false);
 
     const handleWithdraw = async (e: React.FormEvent) => {
