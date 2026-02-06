@@ -96,7 +96,7 @@ export const tradingService = {
         };
     },
 
-    async withdraw(userId: string, amount: number) {
+    async withdraw(userId: string, amount: number, convertedAmount?: number) {
         return await db.transaction(async (tx) => {
             // 1. Check Balance
             const [user] = await tx.select().from(users).where(eq(users.id, userId));
@@ -106,22 +106,23 @@ export const tradingService = {
                 throw new Error("Insufficient trading balance");
             }
 
-            // 2. Deduct from Trading Wallet
+            // 2. Deduct from Trading Wallet (USD)
             await tx.execute(
                 sql`UPDATE "user" SET trading_balance = trading_balance - ${amount} WHERE id = ${userId}`
             );
 
-            // 3. Add to Main Transactions (Income)
+            // 3. Add to Main Transactions (Income in IDR if converted)
+            const transactionAmount = convertedAmount || amount; // Use converted amount if provided, else USD amount
             const [transaction] = await tx.insert(transactions).values({
                 id: randomUUID(),
                 userId,
                 merchant: 'Trading Wallet',
                 category: 'Investments', // or Income
                 date: new Date(),
-                amount: amount.toString(),
+                amount: transactionAmount.toString(),
                 type: 'income',
                 icon: 'candlestick_chart',
-                description: 'Withdrawal from Trading Wallet'
+                description: convertedAmount ? `Withdrawal from Trading Wallet ($${amount})` : 'Withdrawal from Trading Wallet'
             }).returning();
 
             return transaction;

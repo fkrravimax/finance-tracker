@@ -11,15 +11,23 @@ interface WithdrawTradeModalProps {
 
 const WithdrawTradeModal: React.FC<WithdrawTradeModalProps> = ({ isOpen, onClose, maxAmount, onSuccess }) => {
     const [amount, setAmount] = useState('');
+    const [rate, setRate] = useState('16200'); // Default estimtated rate
     const [loading, setLoading] = useState(false);
 
     const handleWithdraw = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
         try {
+            const withdrawAmount = parseFloat(amount);
+            const conversionRate = parseFloat(rate);
+            const convertedAmount = withdrawAmount * conversionRate;
+
             await authService.fetchWithAuth('/api/trading/withdraw', {
                 method: 'POST',
-                body: JSON.stringify({ amount: parseFloat(amount) })
+                body: JSON.stringify({
+                    amount: withdrawAmount,
+                    convertedAmount: convertedAmount
+                })
             });
             if (onSuccess) onSuccess();
             onClose();
@@ -34,6 +42,8 @@ const WithdrawTradeModal: React.FC<WithdrawTradeModalProps> = ({ isOpen, onClose
     const handleMax = () => {
         setAmount(maxAmount.toFixed(2));
     };
+
+    const estimatedIdr = (parseFloat(amount || '0') * parseFloat(rate || '0')) || 0;
 
     if (!isOpen) return null;
 
@@ -79,7 +89,7 @@ const WithdrawTradeModal: React.FC<WithdrawTradeModalProps> = ({ isOpen, onClose
                     </div>
 
                     <div className="space-y-4">
-                        <label className="text-center block text-sm text-[#cbbc90]">Enter Withdrawal Amount</label>
+                        <label className="text-center block text-sm text-[#cbbc90]">Enter Withdrawal Amount (USD)</label>
                         <div className="relative">
                             <span className="absolute left-6 top-1/2 -translate-y-1/2 text-4xl font-light text-[#cbbc90]">$</span>
                             <input
@@ -98,12 +108,26 @@ const WithdrawTradeModal: React.FC<WithdrawTradeModalProps> = ({ isOpen, onClose
                         </div>
                     </div>
 
+                    <div className="space-y-2">
+                        <label className="text-xs font-semibold text-[#cbbc90] uppercase tracking-wider block">Exchange Rate (1 USD = IDR)</label>
+                        <input
+                            type="number"
+                            value={rate}
+                            onChange={(e) => setRate(e.target.value)}
+                            className="w-full bg-[#1e1b10] border border-[#f4c025]/20 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#f4c025] transition-colors font-mono"
+                        />
+                        <div className="flex justify-between items-center bg-[#f4c025]/5 p-3 rounded-lg border border-[#f4c025]/10">
+                            <span className="text-xs text-[#cbbc90]">You will receive approx:</span>
+                            <span className="text-sm font-bold text-emerald-400">Rp {estimatedIdr.toLocaleString('id-ID')}</span>
+                        </div>
+                    </div>
+
                     <div className="bg-[#f4c025]/5 border border-[#f4c025]/20 rounded-lg p-4 flex items-start space-x-3">
                         <div className="min-w-5 pt-0.5">
                             <div className="w-5 h-5 rounded-full bg-[#f4c025] flex items-center justify-center text-black font-bold text-xs">i</div>
                         </div>
                         <p className="text-xs text-[#cbbc90] leading-relaxed">
-                            <span className="font-bold text-white">Accounting Notice:</span> Funds will be instantly available. This withdrawal will be recorded as 'Income' for tax estimation purposes in your main finance dashboard.
+                            <span className="font-bold text-white">Accounting Notice:</span> Your Trading Wallet (USD) will be deducted, and the equivalent IDR value will be added to your Main Balance as 'Income'.
                         </p>
                     </div>
 

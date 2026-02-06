@@ -38,11 +38,11 @@ export const tradingController = {
     withdraw: async (req: Request, res: Response) => {
         try {
             const userId = (req as any).user.id;
-            const { amount } = req.body;
+            const { amount, convertedAmount } = req.body;
             if (!amount || amount <= 0) {
                 return res.status(400).json({ error: 'Invalid amount' });
             }
-            const result = await tradingService.withdraw(userId, parseFloat(amount));
+            const result = await tradingService.withdraw(userId, parseFloat(amount), convertedAmount ? parseFloat(convertedAmount) : undefined);
             res.json(result);
         } catch (error: any) {
             console.error(error);
