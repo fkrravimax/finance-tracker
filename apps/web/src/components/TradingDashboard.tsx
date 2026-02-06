@@ -59,7 +59,7 @@ const TradingDashboard = () => {
                     <p className="text-sm md:text-base text-[#cbbc90] mt-1">Manage your daily trades, performance, and journal.</p>
                 </div>
 
-                <div className="w-full md:w-auto mt-0 bg-[#1e1b10] p-4 rounded-xl border border-[#f4c025]/20 flex justify-between items-center group hover:border-[#f4c025]/40 transition-colors gap-4">
+                <div className="w-full md:w-auto mt-0 bg-[#1e1b10] p-4 rounded-xl border border-[#f4c025]/20 flex flex-col sm:flex-row justify-between items-start sm:items-center group hover:border-[#f4c025]/40 transition-colors gap-4">
                     <div>
                         <p className="text-xs text-[#cbbc90] uppercase tracking-wider mb-1 flex items-center gap-2">
                             <Wallet size={12} /> Trading Balance
@@ -70,16 +70,16 @@ const TradingDashboard = () => {
                             </h2>
                         )}
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 w-full sm:w-auto">
                         <button
                             onClick={() => setIsDepositModalOpen(true)}
-                            className="bg-[#1e1b10] text-[#f4c025] border border-[#f4c025]/50 px-4 py-2 rounded-lg font-bold text-sm hover:bg-[#f4c025]/10 transition-all active:scale-95"
+                            className="bg-[#1e1b10] text-[#f4c025] border border-[#f4c025]/50 px-4 py-2 rounded-lg font-bold text-sm hover:bg-[#f4c025]/10 transition-all active:scale-95 flex-1 sm:flex-none"
                         >
                             Deposit
                         </button>
                         <button
                             onClick={() => setIsWithdrawModalOpen(true)}
-                            className="bg-[#f4c025] text-[#2b2616] px-4 py-2 rounded-lg font-bold text-sm hover:bg-[#dca60e] transition-all shadow-[0_0_15px_rgba(244,192,37,0.3)] hover:shadow-[0_0_20px_rgba(244,192,37,0.5)] transform active:scale-95"
+                            className="bg-[#f4c025] text-[#2b2616] px-4 py-2 rounded-lg font-bold text-sm hover:bg-[#dca60e] transition-all shadow-[0_0_15px_rgba(244,192,37,0.3)] hover:shadow-[0_0_20px_rgba(244,192,37,0.5)] transform active:scale-95 flex-1 sm:flex-none"
                         >
                             Withdraw
                         </button>
