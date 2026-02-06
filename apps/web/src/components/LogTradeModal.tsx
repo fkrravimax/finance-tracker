@@ -20,16 +20,24 @@ const LogTradeModal: React.FC<LogTradeModalProps> = ({ isOpen, onClose, onSave }
     const [loading, setLoading] = useState(false);
 
     // Auto-calculate PnL guess (optional)
+    // Auto-calculate PnL
     useEffect(() => {
         if (amount && entryPrice && closePrice && leverage) {
-            const m = parseFloat(amount);
-            const e = parseFloat(entryPrice);
-            const c = parseFloat(closePrice);
-            // const Lev = leverage;
+            const margin = parseFloat(amount);
+            const entry = parseFloat(entryPrice);
+            const close = parseFloat(closePrice);
 
-            if (!isNaN(m) && !isNaN(e) && !isNaN(c)) {
-                // (Exit - Entry) / Entry * Margin * Leverage
-                // Logic kept for future reference or auto-fill feature
+            if (!isNaN(margin) && !isNaN(entry) && !isNaN(close) && entry > 0) {
+                let percentage = 0;
+
+                if (type === 'LONG') {
+                    percentage = (close - entry) / entry;
+                } else {
+                    percentage = (entry - close) / entry;
+                }
+
+                const calculatedPnl = margin * leverage * percentage;
+                setPnl(calculatedPnl.toFixed(2));
             }
         }
     }, [amount, entryPrice, closePrice, leverage, type]);
