@@ -47,39 +47,39 @@ const TradingDashboard = () => {
     const winRate = stats ? (stats.wins / (stats.wins + stats.losses) * 100).toFixed(0) : 0;
 
     return (
-        <div className="p-space-4 md:p-space-6 space-y-6 max-w-[1600px] mx-auto text-[#e2e8f0]">
+        <div className="p-4 md:p-6 space-y-6 w-full max-w-[1600px] mx-auto text-[#e2e8f0] overflow-x-hidden">
             {/* Header */}
-            <div className="bg-[#2b2616] p-6 rounded-2xl border border-[#f4c025]/10 flex flex-col md:flex-row justify-between items-start md:items-center shadow-[0_4px_20px_-2px_rgba(0,0,0,0.2)]">
+            <div className="bg-[#2b2616] p-4 md:p-6 rounded-2xl border border-[#f4c025]/10 flex flex-col md:flex-row justify-between items-start md:items-center shadow-[0_4px_20px_-2px_rgba(0,0,0,0.2)] gap-4">
                 <div>
-                    <h1 className="text-3xl font-bold text-white flex items-center gap-3">
+                    <h1 className="text-2xl md:text-3xl font-bold text-white flex items-center gap-3">
                         Trading Terminal
                     </h1>
-                    <p className="text-[#cbbc90] mt-1">Manage your daily trades, performance, and journal.</p>
+                    <p className="text-sm md:text-base text-[#cbbc90] mt-1">Manage your daily trades, performance, and journal.</p>
                 </div>
 
-                <div className="mt-4 md:mt-0 bg-[#1e1b10] p-4 rounded-xl border border-[#f4c025]/20 min-w-[280px] flex justify-between items-center group hover:border-[#f4c025]/40 transition-colors">
+                <div className="w-full md:w-auto mt-0 bg-[#1e1b10] p-4 rounded-xl border border-[#f4c025]/20 flex justify-between items-center group hover:border-[#f4c025]/40 transition-colors">
                     <div>
                         <p className="text-xs text-[#cbbc90] uppercase tracking-wider mb-1 flex items-center gap-2">
                             <Wallet size={12} /> Trading Balance
                         </p>
                         {loading ? <Skeleton className="h-8 w-32 bg-[#f4c025]/10" /> : (
-                            <h2 className="text-3xl font-bold text-white">
+                            <h2 className="text-2xl md:text-3xl font-bold text-white">
                                 ${stats?.currentBalance?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                             </h2>
                         )}
                     </div>
                     <button
                         onClick={() => setIsWithdrawModalOpen(true)}
-                        className="bg-[#f4c025] text-[#2b2616] px-4 py-2 rounded-lg font-bold text-sm hover:bg-[#dca60e] transition-all shadow-[0_0_15px_rgba(244,192,37,0.3)] hover:shadow-[0_0_20px_rgba(244,192,37,0.5)] transform active:scale-95"
+                        className="ml-4 bg-[#f4c025] text-[#2b2616] px-4 py-2 rounded-lg font-bold text-sm hover:bg-[#dca60e] transition-all shadow-[0_0_15px_rgba(244,192,37,0.3)] hover:shadow-[0_0_20px_rgba(244,192,37,0.5)] transform active:scale-95"
                     >
                         Withdraw
                     </button>
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
                 {/* Win Rate Card */}
-                <div className="md:col-span-1 bg-[#2b2616] rounded-2xl border border-[#f4c025]/10 p-6 flex flex-col items-center justify-center relative overflow-hidden">
+                <div className="lg:col-span-1 bg-[#2b2616] rounded-2xl border border-[#f4c025]/10 p-6 flex flex-col items-center justify-center relative overflow-hidden min-h-[300px] lg:min-h-auto">
                     <h3 className="text-[#cbbc90] font-medium absolute top-6 left-6">Win Rate</h3>
                     <div className="w-56 h-56 relative mt-4">
                         <ResponsiveContainer width="100%" height="100%">
@@ -106,20 +106,20 @@ const TradingDashboard = () => {
                 </div>
 
                 {/* Equity Curve & Stats */}
-                <div className="md:col-span-3 bg-[#2b2616] rounded-2xl border border-[#f4c025]/10 p-6 flex flex-col">
-                    <div className="flex justify-between items-start mb-6">
+                <div className="lg:col-span-3 bg-[#2b2616] rounded-2xl border border-[#f4c025]/10 p-6 flex flex-col">
+                    <div className="flex flex-col md:flex-row justify-between items-start mb-6 gap-4">
                         <div>
                             <h3 className="text-white font-bold text-lg">Equity Curve</h3>
                             <p className="text-xs text-[#cbbc90]">Performance over last 30 days</p>
                         </div>
-                        <div className="flex gap-4">
-                            <div className="bg-[#1e1b10] px-4 py-2 rounded-lg border border-[#f4c025]/10">
+                        <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
+                            <div className="flex-1 md:flex-none bg-[#1e1b10] px-4 py-2 rounded-lg border border-[#f4c025]/10 flex justify-between sm:block items-center">
                                 <p className="text-[10px] text-[#cbbc90] uppercase">Total PnL</p>
                                 <p className={`text-xl font-bold ${stats?.totalPnl >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
                                     {stats?.totalPnl >= 0 ? '+' : ''}${stats?.totalPnl?.toLocaleString()}
                                 </p>
                             </div>
-                            <div className="bg-[#1e1b10] px-4 py-2 rounded-lg border border-[#f4c025]/10">
+                            <div className="flex-1 md:flex-none bg-[#1e1b10] px-4 py-2 rounded-lg border border-[#f4c025]/10 flex justify-between sm:block items-center">
                                 <p className="text-[10px] text-[#cbbc90] uppercase">Best Pair</p>
                                 <div className="flex items-center gap-1">
                                     <span className="text-xl font-bold text-[#f4c025]">{stats?.bestPair}</span>
