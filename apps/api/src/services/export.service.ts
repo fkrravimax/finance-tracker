@@ -37,10 +37,11 @@ export const exportService = {
             { header: 'Wallet Source', key: 'wallet', width: 15 },
         ];
 
-        let whereClause = eq(transactions.userId, userId);
+        const conditions = [eq(transactions.userId, userId)];
         if (filters.wallet) {
-            whereClause = and(whereClause, like(transactions.description, `%via ${filters.wallet}%`));
+            conditions.push(like(transactions.description, `%via ${filters.wallet}%`));
         }
+        const whereClause = and(...conditions);
 
         const data = await db.select().from(transactions).where(whereClause).orderBy(desc(transactions.date));
 
@@ -73,15 +74,17 @@ export const exportService = {
             { header: 'Amount (< 20k)', key: 'amount', width: 15 },
         ];
 
-        let whereClause = and(
+        const conditions = [
             eq(transactions.userId, userId),
             eq(transactions.type, 'expense'),
             sql`CAST(${transactions.amount} AS DECIMAL) < 20000`
-        );
+        ];
 
         if (filters.wallet) {
-            whereClause = and(whereClause, like(transactions.description, `%via ${filters.wallet}%`));
+            conditions.push(like(transactions.description, `%via ${filters.wallet}%`));
         }
+
+        const whereClause = and(...conditions);
 
         const data = await db.select().from(transactions).where(whereClause).orderBy(desc(transactions.date));
 
@@ -143,14 +146,16 @@ export const exportService = {
         // Logic: specific category budget vs actual is requested, but schema only supports global budget now.
         // We will show "Spending by Category" which is the closest calculation.
 
-        let whereClause = and(
+        const conditions = [
             eq(transactions.userId, userId),
             eq(transactions.type, 'expense')
-        );
+        ];
 
         if (filters.wallet) {
-            whereClause = and(whereClause, like(transactions.description, `%via ${filters.wallet}%`));
+            conditions.push(like(transactions.description, `%via ${filters.wallet}%`));
         }
+
+        const whereClause = and(...conditions);
 
         const expenses = await db.select({
             category: transactions.category,
