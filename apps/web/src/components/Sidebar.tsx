@@ -1,5 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
+import { authService } from '../services/authService';
 
 interface SidebarProps {
     onLogout: () => void;
@@ -8,6 +9,9 @@ interface SidebarProps {
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ onLogout, isOpen = false, onClose }) => {
+    const user = authService.getCurrentUser();
+    const isAdmin = user?.role === 'ADMIN';
+
     const mainNavItems = [
         { id: 'dashboard', label: 'Overview', icon: 'grid_view' },
         { id: 'transactions', label: 'Transactions', icon: 'list_alt' },
@@ -16,6 +20,10 @@ const Sidebar: React.FC<SidebarProps> = ({ onLogout, isOpen = false, onClose }) 
         { id: 'savings', label: 'Savings Vault', icon: 'savings' },
         { id: 'settings', label: 'Settings', icon: 'settings' },
     ];
+
+    if (isAdmin) {
+        mainNavItems.push({ id: 'admin', label: 'Admin Dashboard', icon: 'admin_panel_settings' });
+    }
 
     return (
         <>
@@ -76,10 +84,10 @@ const Sidebar: React.FC<SidebarProps> = ({ onLogout, isOpen = false, onClose }) 
                                 <span className="material-symbols-outlined">person</span>
                             </div>
                             <div className="flex flex-col flex-1 min-w-0">
-                                <p className="text-sm font-black text-slate-800 dark:text-white truncate">User</p>
+                                <p className="text-sm font-black text-slate-800 dark:text-white truncate">{user?.name || 'User'}</p>
                                 <div className="flex items-center gap-1">
                                     <span className="w-2 h-2 rounded-full bg-mint-dark"></span>
-                                    <p className="text-xs font-bold text-slate-500 dark:text-text-muted">Premium Plan</p>
+                                    <p className="text-xs font-bold text-slate-500 dark:text-text-muted">{user?.plan ? `${user.plan} Plan` : 'Free Plan'}</p>
                                 </div>
                             </div>
                             <button
