@@ -33,7 +33,7 @@ export const savingsGoalController = {
             const { id } = req.params;
             const { amount, type } = req.body; // type: 'deposit' | 'withdraw'
 
-            const result = await savingsGoalService.updateAmount(userId, id, Number(amount), type);
+            const result = await savingsGoalService.updateAmount(userId, id as string, Number(amount), type);
             res.json(result);
         } catch (error) {
             res.status(500).json({ error: 'Failed to update savings goal' });
@@ -44,7 +44,7 @@ export const savingsGoalController = {
         try {
             const userId = (req as any).user.id;
             const { id } = req.params;
-            await savingsGoalService.delete(userId, id);
+            await savingsGoalService.delete(userId, id as string);
             res.json({ success: true });
         } catch (error) {
             res.status(500).json({ error: 'Failed to delete savings goal' });
