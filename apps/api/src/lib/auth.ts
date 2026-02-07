@@ -13,6 +13,22 @@ export const auth = betterAuth({
             verification: schema.verifications,
         }
     }),
+    user: {
+        additionalFields: {
+            role: {
+                type: "string",
+                required: false,
+                defaultValue: "USER",
+                input: false // Don't allow user to set this
+            },
+            plan: {
+                type: "string",
+                required: false,
+                defaultValue: "FREE",
+                input: false // Don't allow user to set this
+            }
+        }
+    },
     emailAndPassword: {
         enabled: true,
     },
