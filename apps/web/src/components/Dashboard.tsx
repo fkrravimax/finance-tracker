@@ -218,7 +218,7 @@ const Dashboard: React.FC = () => {
             <div className="pb-8 text-center text-xs font-bold text-slate-400 flex items-center justify-center gap-2">
                 <span>© 2026 FinTrack.</span>
                 <span className="w-1 h-1 bg-slate-300 rounded-full"></span>
-                <span>Created by<span className="text-red-400">@fkrravi</span></span>
+                <span>Created by <span className="text-red-400">@fkrravi</span></span>
             </div>
 
             {/* Budget Breakdown Modal */}
