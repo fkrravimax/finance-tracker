@@ -8,6 +8,7 @@ import Transactions from './components/Transactions'
 import Settings from './components/Settings'
 import Login from './components/Login'
 import TradingDashboard from './components/TradingDashboard'
+import AdminDashboard from './components/AdminDashboard'
 import { authService } from './services/authService'
 import { authClient } from './lib/auth-client';
 
@@ -71,6 +72,7 @@ function App() {
                 <Route path="/savings" element={<SavingsVault />} />
                 <Route path="/trading" element={<TradingDashboard />} />
                 <Route path="/settings" element={<Settings />} />
+                <Route path="/admin" element={<AdminDashboard />} />
                 <Route path="*" element={
                     <div className="flex flex-col items-center justify-center h-full text-slate-500 dark:text-[#cbbc90]">
                         <span className="material-symbols-outlined text-6xl mb-4">construction</span>

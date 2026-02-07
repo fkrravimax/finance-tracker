@@ -5,6 +5,8 @@ export interface User {
     email: string;
     name: string;
     avatar?: string;
+    role?: 'USER' | 'ADMIN';
+    plan?: 'FREE' | 'PREMIUM' | 'PLATINUM';
 }
 
 export interface AuthResponse {
