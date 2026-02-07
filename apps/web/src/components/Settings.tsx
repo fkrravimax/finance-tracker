@@ -57,7 +57,7 @@ const Settings: React.FC = () => {
     }, []);
 
     // Accordion State
-    const [openSection, setOpenSection] = useState<string | null>('account'); // Default open 'account'
+    const [openSection, setOpenSection] = useState<string | null>(''); // Default open 'account'
 
     const toggleSection = (section: string) => {
         setOpenSection(openSection === section ? null : section);
