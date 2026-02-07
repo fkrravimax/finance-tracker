@@ -216,9 +216,9 @@ const Dashboard: React.FC = () => {
 
             {/* Bottom decorative element */}
             <div className="pb-8 text-center text-xs font-bold text-slate-400 flex items-center justify-center gap-2">
-                <span>© 2026 FinTrack Inc.</span>
+                <span>© 2026 FinTrack.</span>
                 <span className="w-1 h-1 bg-slate-300 rounded-full"></span>
-                <span>Made with <span className="text-red-400">♥</span> for your wallet</span>
+                <span>Created <span className="text-red-400">By</span> @fkrravi</span>
             </div>
 
             {/* Budget Breakdown Modal */}
