@@ -9,34 +9,13 @@ const api = axios.create({
     headers: {
         'Content-Type': 'application/json',
     },
-    withCredentials: false,
+    withCredentials: true,
 });
 
 // Request Interceptor: Attach Token
 api.interceptors.request.use(
     (config) => {
-        // Direct read to avoid circular dependency and sync issues with authService
-        const activeUserId = localStorage.getItem('finance_active_user_id');
-        const sessionsStr = localStorage.getItem('finance_sessions');
-
-        let token: string | null = null;
-
-        if (activeUserId && sessionsStr) {
-            try {
-                const sessions = JSON.parse(sessionsStr);
-                if (sessions[activeUserId]) {
-                    token = sessions[activeUserId].token;
-                }
-            } catch (e) {
-                console.error("Failed to parse sessions in api interceptor", e);
-            }
-        }
-
-        // Fallback to legacy if not found
-        if (!token) {
-            token = localStorage.getItem('token');
-        }
-
+        const token = localStorage.getItem('token');
         if (token) {
             config.headers.Authorization = `Bearer ${token}`;
         }

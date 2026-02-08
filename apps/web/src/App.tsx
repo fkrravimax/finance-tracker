@@ -11,8 +11,6 @@ import TradingDashboard from './components/TradingDashboard'
 import AdminDashboard from './components/AdminDashboard'
 import { authService } from './services/authService'
 import { authClient } from './lib/auth-client';
-import { useMultiAccount } from './contexts/MultiAccountContext';
-import SessionVerifier from './components/SessionVerifier';
 
 function App() {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -43,15 +41,8 @@ function App() {
         checkAuth();
     }, []);
 
-    const { isAddingAccount, cancelAddAccount } = useMultiAccount();
-
     const handleLogin = () => {
-        if (isAddingAccount) {
-            // Reload to apply new user context completely
-            window.location.reload();
-        } else {
-            setIsAuthenticated(true);
-        }
+        setIsAuthenticated(true);
     };
 
     const handleLogout = () => {
@@ -67,17 +58,12 @@ function App() {
         );
     }
 
-    if (isAddingAccount) {
-        return <Login onLogin={handleLogin} isAddingAccount={true} onCancel={cancelAddAccount} />;
-    }
-
     if (!isAuthenticated) {
         return <Login onLogin={handleLogin} />;
     }
 
     return (
         <DashboardLayout onLogout={handleLogout}>
-            <SessionVerifier />
             <Routes>
                 <Route path="/" element={<Navigate to="/dashboard" replace />} />
                 <Route path="/dashboard" element={<Dashboard />} />

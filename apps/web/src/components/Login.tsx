@@ -5,11 +5,9 @@ import { useAppearance } from '../contexts/AppearanceContext';
 
 interface LoginProps {
     onLogin: () => void;
-    isAddingAccount?: boolean;
-    onCancel?: () => void;
 }
 
-const Login: React.FC<LoginProps> = ({ onLogin, isAddingAccount, onCancel }) => {
+const Login: React.FC<LoginProps> = ({ onLogin }) => {
     const [isSignUp, setIsSignUp] = useState(false);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -80,25 +78,12 @@ const Login: React.FC<LoginProps> = ({ onLogin, isAddingAccount, onCancel }) => 
                         </span>
                     </button>
 
-                    {isAddingAccount && onCancel && (
-                        <button
-                            onClick={onCancel}
-                            className="absolute top-4 left-4 p-2 rounded-full text-slate-400 hover:text-slate-600 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#2a2515] transition-all flex items-center gap-1"
-                        >
-                            <span className="material-symbols-outlined text-xl">arrow_back</span>
-                            <span className="text-sm font-bold">Cancel</span>
-                        </button>
-                    )}
-
                     <div className="inline-flex items-center justify-center w-20 h-20 mb-4">
                         <img src="/logo.png" alt="FinTrack Logo" className="w-full h-full object-contain" />
                     </div>
                     <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">FinTrack</h1>
                     <p className="text-slate-500 dark:text-[#cbbc90] mt-2">
-                        {isAddingAccount
-                            ? (isSignUp ? 'Create a new account' : 'Sign in to another account')
-                            : (isSignUp ? 'Create an account to get started' : 'Welcome back! Please sign in.')
-                        }
+                        {isSignUp ? 'Create an account to get started' : 'Welcome back! Please sign in.'}
                     </p>
                 </div>
 
