@@ -41,7 +41,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onLogout, isOpen = false, onClose }) 
                                 </span>
                                 Rupiku
                             </h1>
-                            <p className="text-slate-400 dark:text-text-muted text-sm font-bold ml-12 -mt-1">Joyful Finance</p>
+                            <p className="text-slate-400 dark:text-text-muted text-sm font-bold ml-12 -mt-1">Joyful Finance Tracker</p>
                         </div>
                         {/* Mobile Close Button */}
                         <button
