@@ -1,6 +1,7 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { authService } from '../services/authService';
+import { useLanguage } from '../contexts/LanguageContext';
 
 interface SidebarProps {
     onLogout: () => void;
@@ -11,18 +12,19 @@ interface SidebarProps {
 const Sidebar: React.FC<SidebarProps> = ({ onLogout, isOpen = false, onClose }) => {
     const user = authService.getCurrentUser();
     const isAdmin = user?.role === 'ADMIN';
+    const { t } = useLanguage();
 
     const mainNavItems = [
-        { id: 'dashboard', label: 'Overview', icon: 'grid_view' },
-        { id: 'transactions', label: 'Transactions', icon: 'list_alt' },
-        { id: 'reports', label: 'Reports', icon: 'pie_chart' },
-        { id: 'trading', label: 'Trading Terminal', icon: 'candlestick_chart' },
-        { id: 'savings', label: 'Savings Vault', icon: 'savings' },
-        { id: 'settings', label: 'Settings', icon: 'settings' },
+        { id: 'dashboard', label: t('sidebar.overview'), icon: 'grid_view' },
+        { id: 'transactions', label: t('sidebar.transactions'), icon: 'list_alt' },
+        { id: 'reports', label: t('sidebar.reports'), icon: 'pie_chart' },
+        { id: 'trading', label: t('sidebar.trading'), icon: 'candlestick_chart' },
+        { id: 'savings', label: t('sidebar.savings'), icon: 'savings' },
+        { id: 'settings', label: t('sidebar.settings'), icon: 'settings' },
     ];
 
     if (isAdmin) {
-        mainNavItems.push({ id: 'admin', label: 'Admin Dashboard', icon: 'admin_panel_settings' });
+        mainNavItems.push({ id: 'admin', label: t('sidebar.admin'), icon: 'admin_panel_settings' });
     }
 
     return (

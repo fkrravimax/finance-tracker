@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { settingsService, type RecurringTransaction } from '../services/settingsService';
 import { useAppearance } from '../contexts/AppearanceContext';
+import { useLanguage } from '../contexts/LanguageContext';
 import CurrencyInput from './CurrencyInput';
 import { useNavigate } from 'react-router-dom';
 import { authClient } from '../lib/auth-client';
@@ -10,6 +11,7 @@ import { useNotification } from '../contexts/NotificationContext';
 
 const Settings: React.FC = () => {
     const { theme, setTheme, privacyMode, setPrivacyMode } = useAppearance();
+    const { language, setLanguage } = useLanguage();
     const [budgetLimit, setBudgetLimit] = useState('');
     const [loading, setLoading] = useState(false);
 
@@ -365,24 +367,40 @@ const Settings: React.FC = () => {
                             <div className="flex flex-col gap-3">
                                 <h3 className="font-bold text-slate-900 dark:text-white">App Theme</h3>
                                 <div className="grid grid-cols-3 gap-3">
-                                    {(['light', 'dark', 'system'] as const).map((t) => (
+                                    {(['light', 'dark', 'system'] as const).map((themeOption) => (
                                         <button
-                                            key={t}
-                                            onClick={() => setTheme(t)}
+                                            key={themeOption}
+                                            onClick={() => setTheme(themeOption)}
                                             className={`
                                                 flex flex-col items-center justify-center gap-2 p-4 rounded-xl border transition-all
-                                                ${theme === t
+                                                ${theme === themeOption
                                                     ? 'bg-primary text-slate-900 border-primary font-bold shadow-md'
                                                     : 'bg-slate-50 dark:bg-[#1a160b] border-slate-200 dark:border-[#493f22] text-slate-600 dark:text-[#cbbc90] hover:bg-slate-100 dark:hover:bg-[#493f22]/50'
                                                 }
                                             `}
                                         >
                                             <span className="material-symbols-outlined">
-                                                {t === 'light' ? 'light_mode' : t === 'dark' ? 'dark_mode' : 'settings_brightness'}
+                                                {themeOption === 'light' ? 'light_mode' : themeOption === 'dark' ? 'dark_mode' : 'settings_brightness'}
                                             </span>
-                                            <span className="capitalize text-sm">{t}</span>
+                                            <span className="capitalize text-sm">{themeOption}</span>
                                         </button>
                                     ))}
+                                </div>
+                            </div>
+
+                            {/* Language Selection */}
+                            <div className="flex flex-col gap-3">
+                                <h3 className="font-bold text-slate-900 dark:text-white">Language</h3>
+                                <div className="relative">
+                                    <select
+                                        value={language}
+                                        onChange={(e) => setLanguage(e.target.value as 'en' | 'id')}
+                                        className="w-full md:w-auto bg-slate-50 dark:bg-[#1a160b] border border-slate-200 dark:border-[#493f22] rounded-xl px-4 py-3 pr-10 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all appearance-none cursor-pointer font-medium"
+                                    >
+                                        <option value="en">🇺🇸 English</option>
+                                        <option value="id">🇮🇩 Bahasa Indonesia</option>
+                                    </select>
+                                    <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">expand_more</span>
                                 </div>
                             </div>
 
