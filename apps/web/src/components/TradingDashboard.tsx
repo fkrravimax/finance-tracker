@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { AreaChart, Area, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-import { Wallet, Plus } from 'lucide-react';
+import { Wallet, Plus, Lock, Crown } from 'lucide-react';
 import { authService } from '../services/authService';
 import { useAppearance } from '../contexts/AppearanceContext';
 import LogTradeModal from './LogTradeModal';
@@ -18,7 +18,15 @@ const TradingDashboard = () => {
     const [isWithdrawModalOpen, setIsWithdrawModalOpen] = useState(false);
     const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
 
+    // Get user plan
+    const user = authService.getCurrentUser();
+    const isPlatinum = user?.plan === 'PLATINUM';
+
     const fetchData = async () => {
+        if (!isPlatinum) {
+            setLoading(false);
+            return;
+        }
         try {
             const [statsRes, tradesRes] = await Promise.all([
                 authService.fetchWithAuth('/api/trading/stats'),
@@ -50,6 +58,64 @@ const TradingDashboard = () => {
     const COLORS = isDark ? ['#f4c025', '#333'] : ['#f59e0b', '#cbd5e1']; // Gold/Dark for Dark Mode, Amber/Slate for Light Mode
 
     const winRate = stats ? (stats.wins / (stats.wins + stats.losses) * 100).toFixed(0) : 0;
+
+    // Show upgrade prompt for non-platinum users
+    if (!isPlatinum) {
+        return (
+            <div className="p-4 md:p-6 w-full max-w-[1600px] mx-auto">
+                <div className="min-h-[60vh] flex items-center justify-center">
+                    <div className="bg-white dark:bg-[#2b2616] rounded-3xl border border-slate-200 dark:border-[#f4c025]/20 p-8 md:p-12 max-w-lg text-center shadow-xl">
+                        {/* Lock Icon */}
+                        <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-lg shadow-amber-500/30">
+                            <Lock className="w-10 h-10 text-white" />
+                        </div>
+
+                        {/* Title */}
+                        <h1 className="text-2xl md:text-3xl font-bold text-slate-800 dark:text-white mb-3">
+                            Trading Terminal
+                        </h1>
+
+                        {/* Badge */}
+                        <div className="inline-flex items-center gap-2 px-4 py-2 bg-amber-100 dark:bg-amber-500/20 rounded-full mb-6">
+                            <Crown className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+                            <span className="text-sm font-bold text-amber-700 dark:text-amber-400">Platinum Exclusive</span>
+                        </div>
+
+                        {/* Description */}
+                        <p className="text-slate-500 dark:text-[#cbbc90] mb-8 leading-relaxed">
+                            Unlock the Trading Terminal to log trades, track your portfolio performance,
+                            monitor win rates, and analyze your equity curve with advanced charts.
+                        </p>
+
+                        {/* Features List */}
+                        <div className="grid grid-cols-2 gap-3 mb-8 text-left">
+                            {[
+                                { icon: 'candlestick_chart', text: 'Trade Logging' },
+                                { icon: 'monitoring', text: 'Equity Curve' },
+                                { icon: 'pie_chart', text: 'Win Rate Analytics' },
+                                { icon: 'account_balance_wallet', text: 'Balance Tracking' },
+                            ].map((feature) => (
+                                <div key={feature.text} className="flex items-center gap-2 p-3 bg-slate-50 dark:bg-[#1e1b10] rounded-xl">
+                                    <span className="material-symbols-outlined text-amber-500 text-lg">{feature.icon}</span>
+                                    <span className="text-sm font-medium text-slate-700 dark:text-white">{feature.text}</span>
+                                </div>
+                            ))}
+                        </div>
+
+                        {/* CTA Button */}
+                        <button className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold py-4 px-6 rounded-xl transition-all shadow-lg shadow-amber-500/30 hover:shadow-amber-500/50 active:scale-[0.98] flex items-center justify-center gap-2">
+                            <Crown className="w-5 h-5" />
+                            Upgrade to Platinum
+                        </button>
+
+                        <p className="text-xs text-slate-400 dark:text-[#8e8568] mt-4">
+                            Contact admin to upgrade your plan
+                        </p>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="p-4 md:p-6 space-y-6 w-full max-w-[1600px] mx-auto text-slate-900 dark:text-[#e2e8f0] overflow-x-hidden">
