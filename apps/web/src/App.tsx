@@ -11,6 +11,7 @@ import TradingDashboard from './components/TradingDashboard'
 import AdminDashboard from './components/AdminDashboard'
 import { authService } from './services/authService'
 import { authClient } from './lib/auth-client';
+import { useMultiAccount } from './contexts/MultiAccountContext';
 
 function App() {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -41,8 +42,15 @@ function App() {
         checkAuth();
     }, []);
 
+    const { isAddingAccount, cancelAddAccount } = useMultiAccount();
+
     const handleLogin = () => {
-        setIsAuthenticated(true);
+        if (isAddingAccount) {
+            // Reload to apply new user context completely
+            window.location.reload();
+        } else {
+            setIsAuthenticated(true);
+        }
     };
 
     const handleLogout = () => {
@@ -56,6 +64,10 @@ function App() {
                 <span className="w-10 h-10 border-4 border-primary/30 border-t-primary rounded-full animate-spin"></span>
             </div>
         );
+    }
+
+    if (isAddingAccount) {
+        return <Login onLogin={handleLogin} isAddingAccount={true} onCancel={cancelAddAccount} />;
     }
 
     if (!isAuthenticated) {
