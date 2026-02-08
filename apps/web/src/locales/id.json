@@ -18,7 +18,13 @@
         "all": "Semua",
         "none": "Tidak Ada",
         "yes": "Ya",
-        "no": "Tidak"
+        "no": "Tidak",
+        "daily": "Harian",
+        "weekly": "Mingguan",
+        "monthly": "Bulanan",
+        "yearly": "Tahunan",
+        "month": "Bulan",
+        "year": "Tahun"
     },
     "sidebar": {
         "overview": "Ringkasan",
@@ -32,13 +38,31 @@
         "freePlan": "Paket Gratis"
     },
     "dashboard": {
-        "greeting": "Halo",
+        "greeting": "Halo, {name}",
+        "overview": "Dashboard",
+        "overviewSuffix": "Ringkasan",
+        "export": "Ekspor Data",
+        "addNew": "Tambah Baru",
         "summary": "Berikut ringkasan keuangan Anda",
         "totalBalance": "Total Saldo",
-        "monthlyIncome": "Pemasukan Bulan Ini",
-        "monthlyExpense": "Pengeluaran Bulan Ini",
-        "budgetUsed": "Budget Terpakai",
-        "recentTransactions": "Transaksi Terbaru",
+        "updatedJustNow": "Baru saja diperbarui",
+        "monthlyBudget": "Anggaran Bulanan",
+        "daysLeft": "Sisa {days} hari",
+        "usedOf": "terpakai dari",
+        "budgetWarnings": {
+            "critical": "Kritis: Anda telah melebihi 90% dari anggaran!",
+            "warning": "Peringatan: Anda telah menggunakan lebih dari 65% anggaran.",
+            "good": "Bagus! Anggaran Anda masih aman."
+        },
+        "noBudget": "Belum ada anggaran bulanan.",
+        "buttons": {
+            "addBalance": "Tambah Saldo",
+            "setBudget": "Atur Anggaran"
+        },
+        "monthlyIncome": "Pemasukan Bulanan",
+        "monthlyExpense": "Pengeluaran Bulanan",
+        "budgetUsed": "Anggaran Terpakai",
+        "recentTransactions": "Transaksi Terakhir",
         "viewAll": "Lihat Semua",
         "noTransactions": "Belum ada transaksi",
         "addFirst": "Tambahkan transaksi pertama Anda",
@@ -47,7 +71,7 @@
         "lastMonth": "Bulan Lalu",
         "income": "Pemasukan",
         "expense": "Pengeluaran",
-        "savingsProgress": "Progress Tabungan",
+        "savingsProgress": "Progres Tabungan",
         "topCategories": "Kategori Teratas"
     },
     "transactions": {
@@ -80,22 +104,6 @@
             "month": "Bulan Ini",
             "year": "Tahun Ini"
         }
-    },
-    "reports": {
-        "title": "Laporan",
-        "subtitle": "Analisis data keuangan Anda",
-        "monthlyOverview": "Ringkasan Bulanan",
-        "categoryBreakdown": "Rincian Kategori",
-        "incomeVsExpense": "Pemasukan vs Pengeluaran",
-        "trends": "Tren",
-        "export": "Ekspor",
-        "selectPeriod": "Pilih Periode",
-        "thisMonth": "Bulan Ini",
-        "lastMonth": "Bulan Lalu",
-        "last3Months": "3 Bulan Terakhir",
-        "last6Months": "6 Bulan Terakhir",
-        "thisYear": "Tahun Ini",
-        "custom": "Rentang Kustom"
     },
     "trading": {
         "title": "Terminal Trading",
@@ -135,7 +143,8 @@
         "featureWinRate": "Analitik Win Rate",
         "featureBalanceTracking": "Pelacakan Saldo",
         "adminReview": "Admin akan meninjau permintaan upgrade Anda",
-        "notifyWhenProcessed": "Anda akan diberi tahu saat permintaan diproses"
+        "notifyWhenProcessed": "Anda akan diberi tahu saat permintaan diproses",
+        "noTrades": "Belum ada trade yang dicatat. Mulai perjalanan Anda!"
     },
     "savings": {
         "title": "Tabungan",
@@ -152,7 +161,22 @@
         "deposit": "Setor",
         "withdraw": "Tarik",
         "noGoals": "Belum ada target tabungan",
-        "createFirst": "Buat target tabungan pertama Anda"
+        "createFirst": "Buat target tabungan pertama Anda",
+        "totalSaved": "Total Tabungan",
+        "activeGoals": "Target Aktif",
+        "monthlyTarget": "Target Bulanan",
+        "onTrack": "Sesuai Jalur",
+        "completed": "Selesai",
+        "neededForTargets": "Dibutuhkan untuk mencapai target",
+        "createGoal": "Buat Target Baru",
+        "addAnother": "Tambah Target Lain",
+        "startNew": "Mulai menabung untuk hal baru",
+        "confirmDeposit": "Konfirmasi Setoran",
+        "confirmWithdraw": "Konfirmasi Penarikan",
+        "addFunds": "Tambah Dana",
+        "withdrawFunds": "Tarik Dana",
+        "deleteConfirmation": "Apakah Anda yakin ingin menghapus target ini? Semua progres dan riwayat untuk target ini akan dihapus secara permanen.",
+        "keepGoal": "Simpan Target"
     },
     "settings": {
         "title": "Pengaturan",
@@ -263,5 +287,31 @@
         "plan": "Paket",
         "joinedDate": "Bergabung",
         "actions": "Aksi"
+    },
+    "reports": {
+        "title": "Laporan & Analitik",
+        "spendingOverview": "Ringkasan Pengeluaran",
+        "spendingSubtitle": "Lacak kesehatan finansial Anda dari waktu ke waktu.",
+        "history": "Riwayat {period}",
+        "period": "Periode",
+        "income": "Pemasukan",
+        "expense": "Pengeluaran",
+        "status": "Status",
+        "saved": "Hemat",
+        "overspent": "Boros",
+        "realityCheck": "Cek Realitas",
+        "totalSpending": "Total Pengeluaran Tahunan",
+        "totalPeriodSpending": "Total Pengeluaran {period}",
+        "noLimit": "Tanpa Batas",
+        "used": "Terpakai",
+        "noSpendingData": "Belum ada data pengeluaran untuk periode ini.",
+        "totalSavings": "Total Tabungan",
+        "cumulativeCashFlow": "Arus Kas Kumulatif",
+        "trend": "Tren",
+        "start": "Awal",
+        "end": "Akhir",
+        "expensesByCategory": "Pengeluaran per Kategori",
+        "noExpenses": "Tidak ada pengeluaran untuk periode ini.",
+        "totalExpensesPeriod": "Total Pengeluaran Periode Ini"
     }
 }

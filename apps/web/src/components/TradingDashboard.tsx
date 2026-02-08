@@ -4,6 +4,7 @@ import { Wallet, Plus, Lock, Crown, Clock } from 'lucide-react';
 import { authService } from '../services/authService';
 import { upgradeService } from '../services/upgradeService';
 import { useAppearance } from '../contexts/AppearanceContext';
+import { useLanguage } from '../contexts/LanguageContext';
 import LogTradeModal from './LogTradeModal';
 import WithdrawTradeModal from './WithdrawTradeModal';
 import DepositTradeModal from './DepositTradeModal';
@@ -11,6 +12,7 @@ import Skeleton from './Skeleton';
 
 const TradingDashboard = () => {
     const { currentTheme } = useAppearance();
+    const { t } = useLanguage();
     const isDark = currentTheme === 'dark';
     const [stats, setStats] = useState<any>(null);
     const [trades, setTrades] = useState<any[]>([]);
@@ -92,8 +94,8 @@ const TradingDashboard = () => {
                     <div className="bg-white dark:bg-[#2b2616] rounded-3xl border border-slate-200 dark:border-[#f4c025]/20 p-8 md:p-12 max-w-lg text-center shadow-xl">
                         {/* Icon - Lock or Clock based on pending status */}
                         <div className={`w-20 h-20 mx-auto mb-6 rounded-full flex items-center justify-center shadow-lg ${hasPendingRequest
-                                ? 'bg-gradient-to-br from-blue-400 to-blue-600 shadow-blue-500/30'
-                                : 'bg-gradient-to-br from-amber-400 to-amber-600 shadow-amber-500/30'
+                            ? 'bg-gradient-to-br from-blue-400 to-blue-600 shadow-blue-500/30'
+                            : 'bg-gradient-to-br from-amber-400 to-amber-600 shadow-amber-500/30'
                             }`}>
                             {hasPendingRequest
                                 ? <Clock className="w-10 h-10 text-white" />
@@ -103,23 +105,23 @@ const TradingDashboard = () => {
 
                         {/* Title */}
                         <h1 className="text-2xl md:text-3xl font-bold text-slate-800 dark:text-white mb-3">
-                            {hasPendingRequest ? 'Upgrade Pending' : 'Trading Terminal'}
+                            {hasPendingRequest ? t('trading.requestPending') : t('trading.title')}
                         </h1>
 
                         {/* Badge */}
                         <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6 ${hasPendingRequest
-                                ? 'bg-blue-100 dark:bg-blue-500/20'
-                                : 'bg-amber-100 dark:bg-amber-500/20'
+                            ? 'bg-blue-100 dark:bg-blue-500/20'
+                            : 'bg-amber-100 dark:bg-amber-500/20'
                             }`}>
                             {hasPendingRequest ? (
                                 <>
                                     <Clock className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                                    <span className="text-sm font-bold text-blue-700 dark:text-blue-400">Waiting for Admin Approval</span>
+                                    <span className="text-sm font-bold text-blue-700 dark:text-blue-400">{t('trading.waitingApproval')}</span>
                                 </>
                             ) : (
                                 <>
                                     <Crown className="w-4 h-4 text-amber-600 dark:text-amber-400" />
-                                    <span className="text-sm font-bold text-amber-700 dark:text-amber-400">Platinum Exclusive</span>
+                                    <span className="text-sm font-bold text-amber-700 dark:text-amber-400">{t('trading.platinumOnly')}</span>
                                 </>
                             )}
                         </div>
@@ -127,8 +129,8 @@ const TradingDashboard = () => {
                         {/* Description */}
                         <p className="text-slate-500 dark:text-[#cbbc90] mb-8 leading-relaxed">
                             {hasPendingRequest
-                                ? 'Your upgrade request has been submitted. Please wait for admin to review and approve your request.'
-                                : 'Unlock the Trading Terminal to log trades, track your portfolio performance, monitor win rates, and analyze your equity curve with advanced charts.'
+                                ? t('trading.pendingDescription')
+                                : t('trading.upgradeDescription')
                             }
                         </p>
 
@@ -136,10 +138,10 @@ const TradingDashboard = () => {
                         {!hasPendingRequest && (
                             <div className="grid grid-cols-2 gap-3 mb-8 text-left">
                                 {[
-                                    { icon: 'candlestick_chart', text: 'Trade Logging' },
-                                    { icon: 'monitoring', text: 'Equity Curve' },
-                                    { icon: 'pie_chart', text: 'Win Rate Analytics' },
-                                    { icon: 'account_balance_wallet', text: 'Balance Tracking' },
+                                    { icon: 'candlestick_chart', text: t('trading.featureTradeLogging') },
+                                    { icon: 'monitoring', text: t('trading.featureEquityCurve') },
+                                    { icon: 'pie_chart', text: t('trading.featureWinRate') },
+                                    { icon: 'account_balance_wallet', text: t('trading.featureBalanceTracking') },
                                 ].map((feature) => (
                                     <div key={feature.text} className="flex items-center gap-2 p-3 bg-slate-50 dark:bg-[#1e1b10] rounded-xl">
                                         <span className="material-symbols-outlined text-amber-500 text-lg">{feature.icon}</span>
@@ -156,7 +158,7 @@ const TradingDashboard = () => {
                                 className="w-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-bold py-4 px-6 rounded-xl cursor-not-allowed flex items-center justify-center gap-2 border border-blue-200 dark:border-blue-800"
                             >
                                 <Clock className="w-5 h-5" />
-                                Request Pending
+                                {t('trading.requestPending')}
                             </button>
                         ) : (
                             <button
@@ -165,7 +167,7 @@ const TradingDashboard = () => {
                                 className={`w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold py-4 px-6 rounded-xl transition-all shadow-lg shadow-amber-500/30 hover:shadow-amber-500/50 active:scale-[0.98] flex items-center justify-center gap-2 ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''}`}
                             >
                                 <Crown className="w-5 h-5" />
-                                {isSubmitting ? 'Submitting...' : 'Upgrade to Platinum'}
+                                {isSubmitting ? t('common.loading') : t('trading.upgradeToPlatinum')}
                             </button>
                         )}
 
@@ -178,13 +180,13 @@ const TradingDashboard = () => {
 
                         <p className="text-xs text-slate-400 dark:text-[#8e8568] mt-4">
                             {hasPendingRequest
-                                ? 'You will be notified when your request is processed'
-                                : 'Admin will review your upgrade request'
+                                ? t('trading.notifyWhenProcessed')
+                                : t('trading.adminReview')
                             }
                         </p>
                     </div>
                 </div>
-            </div>
+            </div >
         );
     }
 
@@ -194,15 +196,15 @@ const TradingDashboard = () => {
             <div className="bg-white dark:bg-[#2b2616] p-4 md:p-6 rounded-2xl border border-slate-200 dark:border-[#f4c025]/10 flex flex-col md:flex-row justify-between items-start md:items-center shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] dark:shadow-[0_4px_20px_-2px_rgba(0,0,0,0.2)] gap-4">
                 <div>
                     <h1 className="text-2xl md:text-3xl font-bold text-slate-800 dark:text-white flex items-center gap-3">
-                        Trading Terminal
+                        {t('trading.title')}
                     </h1>
-                    <p className="text-sm md:text-base text-slate-500 dark:text-[#cbbc90] mt-1">Manage your daily trades, performance, and journal.</p>
+                    <p className="text-sm md:text-base text-slate-500 dark:text-[#cbbc90] mt-1">{t('trading.subtitle')}</p>
                 </div>
 
                 <div className="w-full md:w-auto mt-0 bg-slate-50 dark:bg-[#1e1b10] p-4 rounded-xl border border-slate-200 dark:border-[#f4c025]/20 flex flex-col sm:flex-row justify-between items-start sm:items-center group hover:border-amber-400/40 dark:hover:border-[#f4c025]/40 transition-colors gap-4">
                     <div>
                         <p className="text-xs text-slate-500 dark:text-[#cbbc90] uppercase tracking-wider mb-1 flex items-center gap-2">
-                            <Wallet size={12} /> Trading Balance
+                            <Wallet size={12} /> {t('trading.balance')}
                         </p>
                         {loading ? <Skeleton className="h-8 w-32 bg-slate-200 dark:bg-[#f4c025]/10" /> : (
                             <h2 className="text-2xl md:text-3xl font-bold text-slate-800 dark:text-white">
@@ -215,13 +217,13 @@ const TradingDashboard = () => {
                             onClick={() => setIsDepositModalOpen(true)}
                             className="bg-white dark:bg-[#1e1b10] text-amber-600 dark:text-[#f4c025] border border-slate-200 dark:border-[#f4c025]/50 px-4 py-2 rounded-lg font-bold text-sm hover:bg-amber-50 dark:hover:bg-[#f4c025]/10 transition-all active:scale-95 flex-1 sm:flex-none"
                         >
-                            Deposit
+                            {t('trading.deposit')}
                         </button>
                         <button
                             onClick={() => setIsWithdrawModalOpen(true)}
                             className="bg-amber-500 dark:bg-[#f4c025] text-white dark:text-[#2b2616] px-4 py-2 rounded-lg font-bold text-sm hover:bg-amber-600 dark:hover:bg-[#dca60e] transition-all shadow-[0_0_15px_rgba(244,192,37,0.3)] hover:shadow-[0_0_20px_rgba(244,192,37,0.5)] transform active:scale-95 flex-1 sm:flex-none"
                         >
-                            Withdraw
+                            {t('trading.withdraw')}
                         </button>
                     </div>
                 </div>
@@ -230,7 +232,7 @@ const TradingDashboard = () => {
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
                 {/* Win Rate Card */}
                 <div className="lg:col-span-1 bg-white dark:bg-[#2b2616] rounded-2xl border border-slate-200 dark:border-[#f4c025]/10 p-6 flex flex-col items-center justify-center relative overflow-hidden min-h-[300px] lg:min-h-auto shadow-sm">
-                    <h3 className="text-slate-500 dark:text-[#cbbc90] font-medium absolute top-6 left-6">Win Rate</h3>
+                    <h3 className="text-slate-500 dark:text-[#cbbc90] font-medium absolute top-6 left-6">{t('trading.winRate')}</h3>
                     <div className="w-56 h-56 relative mt-4">
                         <ResponsiveContainer width="100%" height="100%">
                             <PieChart>
@@ -259,8 +261,8 @@ const TradingDashboard = () => {
                 <div className="lg:col-span-3 bg-white dark:bg-[#2b2616] rounded-2xl border border-slate-200 dark:border-[#f4c025]/10 p-6 flex flex-col shadow-sm">
                     <div className="flex flex-col md:flex-row justify-between items-start mb-6 gap-4">
                         <div>
-                            <h3 className="text-slate-800 dark:text-white font-bold text-lg">Equity Curve</h3>
-                            <p className="text-xs text-slate-500 dark:text-[#cbbc90]">Performance over last 30 days</p>
+                            <h3 className="text-slate-800 dark:text-white font-bold text-lg">{t('trading.equityCurve')}</h3>
+                            <p className="text-xs text-slate-500 dark:text-[#cbbc90]">{t('trading.performance') || 'Performance over last 30 days'}</p>
                         </div>
                         <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
                             <div className="flex-1 md:flex-none bg-slate-50 dark:bg-[#1e1b10] px-4 py-2 rounded-lg border border-slate-200 dark:border-[#f4c025]/10 flex justify-between sm:block items-center">
@@ -312,16 +314,16 @@ const TradingDashboard = () => {
             {/* Trade Log */}
             <div className="bg-white dark:bg-[#2b2616] rounded-2xl border border-slate-200 dark:border-[#f4c025]/10 p-4 md:p-6 shadow-sm">
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
-                    <h3 className="text-slate-800 dark:text-white font-bold text-lg">Trade Log</h3>
+                    <h3 className="text-slate-800 dark:text-white font-bold text-lg">{t('trading.recentTrades')}</h3>
                     <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
                         <div className="relative flex-1 sm:flex-none">
-                            <input type="text" placeholder="Search pair..." className="w-full sm:w-auto bg-slate-50 dark:bg-[#1e1b10] border border-slate-200 dark:border-[#f4c025]/10 rounded-lg py-2 px-4 text-sm text-slate-800 dark:text-white focus:outline-none focus:border-amber-400 dark:focus:border-[#f4c025]/50" />
+                            <input type="text" placeholder={t('common.search') + "..."} className="w-full sm:w-auto bg-slate-50 dark:bg-[#1e1b10] border border-slate-200 dark:border-[#f4c025]/10 rounded-lg py-2 px-4 text-sm text-slate-800 dark:text-white focus:outline-none focus:border-amber-400 dark:focus:border-[#f4c025]/50" />
                         </div>
                         <button
                             onClick={() => setIsLogModalOpen(true)}
                             className="bg-amber-500 dark:bg-[#f4c025] text-white dark:text-[#2b2616] px-4 py-2 rounded-lg font-bold text-sm hover:bg-amber-600 dark:hover:bg-[#dca60e] transition-colors flex items-center justify-center gap-2 whitespace-nowrap"
                         >
-                            <Plus size={16} /> Log Trade
+                            <Plus size={16} /> {t('trading.logTrade')}
                         </button>
                     </div>
                 </div>
@@ -330,13 +332,13 @@ const TradingDashboard = () => {
                     <table className="w-full text-left border-collapse">
                         <thead>
                             <tr className="text-[10px] text-slate-500 dark:text-[#cbbc90] uppercase tracking-wider border-b border-slate-200 dark:border-[#f4c025]/10">
-                                <th className="p-4 font-semibold">Date & Time</th>
-                                <th className="p-4 font-semibold">Pair</th>
-                                <th className="p-4 font-semibold">Side</th>
-                                <th className="p-4 font-semibold">Leverage</th>
-                                <th className="p-4 font-semibold text-right">Entry / Exit</th>
-                                <th className="p-4 font-semibold text-right">PnL</th>
-                                <th className="p-4 font-semibold text-right">Status</th>
+                                <th className="p-4 font-semibold">{t('trading.date')}</th>
+                                <th className="p-4 font-semibold">{t('trading.pair')}</th>
+                                <th className="p-4 font-semibold">{t('trading.type')}</th>
+                                <th className="p-4 font-semibold">{t('trading.leverage')}</th>
+                                <th className="p-4 font-semibold text-right">{t('trading.entryPrice')} / {t('trading.closePrice')}</th>
+                                <th className="p-4 font-semibold text-right">{t('trading.pnl')}</th>
+                                <th className="p-4 font-semibold text-right">{t('trading.status')}</th>
                             </tr>
                         </thead>
                         <tbody className="text-sm font-medium text-slate-700 dark:text-white divide-y divide-slate-100 dark:divide-[#f4c025]/5">
@@ -355,7 +357,7 @@ const TradingDashboard = () => {
                             ) : trades.length === 0 ? (
                                 <tr>
                                     <td colSpan={7} className="p-8 text-center text-[#cbbc90] italic">
-                                        No trades logged yet. Start your journey!
+                                        {t('trading.noTrades')}
                                     </td>
                                 </tr>
                             ) : (
