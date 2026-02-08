@@ -81,8 +81,8 @@ const LandingPage: React.FC<LandingPageProps> = ({ onSignUp, onSignIn }) => {
             {/* Header */}
             <header className="flex items-center justify-between px-4 md:px-12 lg:px-20 py-4 md:py-6 shrink-0 border-b border-transparent md:border-slate-200/10">
                 <div className="flex items-center gap-2 md:gap-3">
-                    <img src="/logo.png" alt="FinTrack" className="w-8 h-8 md:w-10 md:h-10" />
-                    <span className="text-lg md:text-xl font-black text-slate-900 dark:text-white">FinTrack</span>
+                    <img src="/logo.png" alt="Rupiku" className="w-8 h-8 md:w-10 md:h-10" />
+                    <span className="text-lg md:text-xl font-black text-slate-900 dark:text-white">Rupiku</span>
                 </div>
 
                 <nav className="hidden md:flex items-center gap-8">

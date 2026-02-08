@@ -1,6 +1,6 @@
 {
-    "name": "Finance Tracker",
-    "short_name": "FinTrack",
+    "name": "Rupiku - Joyful Finance Tracker",
+    "short_name": "Rupiku",
     "start_url": "/",
     "display": "standalone",
     "background_color": "#09090b",

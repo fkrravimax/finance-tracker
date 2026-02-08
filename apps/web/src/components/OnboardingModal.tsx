@@ -37,7 +37,7 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClose, onCo
             <div className="bg-white dark:bg-[#2a2515] w-full max-w-md rounded-3xl p-6 shadow-2xl border border-slate-200 dark:border-[#493f22]">
                 <div className="text-center mb-6">
                     <span className="material-symbols-outlined text-4xl text-primary mb-2">savings</span>
-                    <h2 className="text-2xl font-black text-slate-900 dark:text-white">Welcome to FinTrack!</h2>
+                    <h2 className="text-2xl font-black text-slate-900 dark:text-white">Welcome to Rupiku!</h2>
                     <p className="text-slate-500 dark:text-[#cbbc90]">Let's set up your financial goals. Start by setting a monthly budget limit.</p>
                 </div>
 

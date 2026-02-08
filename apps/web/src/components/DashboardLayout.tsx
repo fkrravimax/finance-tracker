@@ -36,7 +36,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, onLogout })
                         <span className="w-8 h-8 bg-primary text-white rounded-xl flex items-center justify-center shadow-md shadow-primary/30 transform rotate-3">
                             <img src="/logo.png" alt="Logo" className="w-5 h-5 object-contain" />
                         </span>
-                        <span className="font-black text-xl tracking-tight text-slate-800 dark:text-white">FinTrack</span>
+                        <span className="font-black text-xl tracking-tight text-slate-800 dark:text-white">Rupiku</span>
                     </div>
                     <button
                         onClick={toggleSidebar}
