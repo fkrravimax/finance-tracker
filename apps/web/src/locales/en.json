@@ -70,7 +70,16 @@
         "newest": "Newest",
         "oldest": "Oldest",
         "highest": "Highest Amount",
-        "lowest": "Lowest Amount"
+        "lowest": "Lowest Amount",
+        "totalTransactions": "Total Transactions",
+        "status": "Status",
+        "completed": "Completed",
+        "ranges": {
+            "day": "This Day",
+            "week": "This Week",
+            "month": "This Month",
+            "year": "This Year"
+        }
     },
     "reports": {
         "title": "Reports",

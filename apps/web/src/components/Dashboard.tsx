@@ -10,6 +10,7 @@ import ExportModal from './ExportModal';
 import BudgetBreakdownModal from './BudgetBreakdownModal';
 import { dashboardService, type DashboardStats } from '../services/dashboardService';
 import { authService } from '../services/authService';
+import { useLanguage } from '../contexts/LanguageContext';
 
 const Dashboard: React.FC = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -20,6 +21,7 @@ const Dashboard: React.FC = () => {
     const [stats, setStats] = useState<DashboardStats | null>(null);
     const [loading, setLoading] = useState(true);
     const [user, setUser] = useState<any>(null);
+    const { t } = useLanguage();
 
     const fetchStats = async () => {
         try {
@@ -98,10 +100,10 @@ const Dashboard: React.FC = () => {
             <header className="flex flex-wrap justify-between items-end gap-6 bg-white/60 dark:bg-white/5 p-6 rounded-bubbly shadow-sm backdrop-blur-sm border border-white/60 dark:border-white/5">
                 <div className="flex flex-col gap-2">
                     <h2 className="text-3xl md:text-4xl font-black leading-tight tracking-tight text-slate-800 dark:text-white">
-                        Dashboard <span className="text-primary">Overview</span>
+                        {t('dashboard.overview')} <span className="text-primary">{t('dashboard.overviewSuffix')}</span>
                     </h2>
                     <p className="text-slate-500 dark:text-[#cbbc90] text-lg font-bold flex items-center gap-2">
-                        Welcome back, {user?.name || 'User'}! ✨ Here's your summary.
+                        {t('dashboard.greeting').replace('{name}', user?.name || 'User')}
                     </p>
                 </div>
                 <div className="flex gap-4">
@@ -110,14 +112,14 @@ const Dashboard: React.FC = () => {
                         className="flex items-center gap-2 px-6 py-3 bg-white dark:bg-white/10 text-slate-600 dark:text-white border-2 border-lavender-200 dark:border-white/20 rounded-2xl text-sm font-bold hover:bg-lavender-50 dark:hover:bg-white/20 hover:border-lavender-300 transition-all hover:-translate-y-1 shadow-sm"
                     >
                         <span className="material-symbols-outlined text-[22px]">download</span>
-                        Export
+                        {t('dashboard.export')}
                     </button>
                     <button
                         onClick={() => setIsModalOpen(true)}
                         className="flex items-center gap-2 px-6 py-3 bg-slate-800 dark:bg-primary text-white dark:text-slate-900 rounded-2xl text-sm font-bold shadow-lg shadow-slate-300 dark:shadow-primary/30 hover:bg-slate-900 dark:hover:bg-primary-hover transition-all hover:-translate-y-1"
                     >
                         <span className="material-symbols-outlined text-[22px]">add_circle</span>
-                        Add New
+                        {t('dashboard.addNew')}
                     </button>
                 </div>
             </header>
@@ -140,7 +142,7 @@ const Dashboard: React.FC = () => {
                     </div>
 
                     <div className="relative z-10">
-                        <p className="text-sky-100 text-base font-bold mb-2">Total Balance</p>
+                        <p className="text-sky-100 text-base font-bold mb-2">{t('dashboard.totalBalance')}</p>
                         <div className="flex items-baseline gap-2 overflow-hidden">
                             <p className="text-4xl md:text-5xl font-black tracking-tight drop-shadow-sm whitespace-nowrap truncate">
                                 <HiddenAmount value={stats?.totalBalance || 0} prefix="Rp " isImportant className="" />
@@ -151,10 +153,10 @@ const Dashboard: React.FC = () => {
                                 onClick={() => setIsBalanceModalOpen(true)}
                                 className="mt-4 text-xs bg-white text-sky-dark px-3 py-1.5 rounded-full font-bold hover:bg-sky-50 transition-colors"
                             >
-                                + Add Initial Balance
+                                + {t('dashboard.buttons.addBalance')}
                             </button>
                         )}
-                        <p className="text-sky-100 text-sm mt-3 font-semibold bg-white/10 inline-block px-3 py-1 rounded-full">Updated just now</p>
+                        <p className="text-sky-100 text-sm mt-3 font-semibold bg-white/10 inline-block px-3 py-1 rounded-full">{t('dashboard.updatedJustNow')}</p>
                     </div>
                 </div>
 
@@ -164,10 +166,10 @@ const Dashboard: React.FC = () => {
 
                     <div className="flex items-center justify-between mb-4 relative z-10">
                         <div>
-                            <p className="text-slate-800 dark:text-white text-xl font-extrabold">Monthly Budget</p>
+                            <p className="text-slate-800 dark:text-white text-xl font-extrabold">{t('dashboard.monthlyBudget')}</p>
                             <p className="text-xs font-bold text-slate-500 dark:text-[#cbbc90] mt-1 flex items-center gap-1">
                                 <span className="material-symbols-outlined text-[14px]">calendar_today</span>
-                                {formattedDate} • {daysRemaining} days left
+                                {formattedDate} • {t('dashboard.daysLeft').replace('{days}', daysRemaining.toString())}
                             </p>
                         </div>
                         <button
@@ -183,7 +185,7 @@ const Dashboard: React.FC = () => {
                             <div className="flex flex-col md:flex-row md:items-end gap-1 md:gap-3 mb-6 relative z-10">
                                 <span className="text-4xl md:text-5xl font-black text-slate-800 dark:text-white">{stats.budget.percentage}%</span>
                                 <span className="text-sm md:text-base text-slate-500 dark:text-[#cbbc90] font-bold mb-2">
-                                    used of <HiddenAmount value={stats.budget.limit} prefix="Rp " />
+                                    {t('dashboard.usedOf')} <HiddenAmount value={stats.budget.limit} prefix="Rp " />
                                 </span>
                             </div>
 
@@ -200,21 +202,21 @@ const Dashboard: React.FC = () => {
                                 <span className="material-symbols-outlined text-[20px] mt-0.5">info</span>
                                 <p className="text-sm font-bold leading-tight">
                                     {stats.budget.percentage > 90
-                                        ? "Whoa! You've almost hit your limit. Time to slow down! 🛑"
+                                        ? t('dashboard.budgetWarnings.critical')
                                         : stats.budget.percentage > 65
-                                            ? "You've used over 65%. Maybe cook dinner tonight? 🍳"
-                                            : "You're doing great! Keep it up. 🌟"}
+                                            ? t('dashboard.budgetWarnings.warning')
+                                            : t('dashboard.budgetWarnings.good')}
                                 </p>
                             </div>
                         </>
                     ) : (
                         <div className="flex flex-col items-center justify-center py-8">
-                            <p className="text-slate-500 mb-4 font-bold">No budget set for this month</p>
+                            <p className="text-slate-500 mb-4 font-bold">{t('dashboard.noBudget')}</p>
                             <button
                                 onClick={() => setIsOnboardingOpen(true)}
                                 className="px-6 py-2 bg-peach text-white font-bold rounded-xl shadow-lg shadow-peach/30 hover:bg-peach-dark transition-all"
                             >
-                                Set Budget
+                                {t('dashboard.buttons.setBudget')}
                             </button>
                         </div>
                     )}

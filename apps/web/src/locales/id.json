@@ -70,7 +70,16 @@
         "newest": "Terbaru",
         "oldest": "Terlama",
         "highest": "Jumlah Tertinggi",
-        "lowest": "Jumlah Terendah"
+        "lowest": "Jumlah Terendah",
+        "totalTransactions": "Total Transaksi",
+        "status": "Status",
+        "completed": "Selesai",
+        "ranges": {
+            "day": "Hari Ini",
+            "week": "Minggu Ini",
+            "month": "Bulan Ini",
+            "year": "Tahun Ini"
+        }
     },
     "reports": {
         "title": "Laporan",
