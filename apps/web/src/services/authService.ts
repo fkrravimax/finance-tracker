@@ -95,6 +95,9 @@ export const authService = {
                 // 4. Sync legacy keys
                 authService.syncLegacyKeys();
 
+                // 5. IMPORTANT: Reload ONLY if we are actually switching context or adding a new account that changes the view
+                // For a smooth experience, rely on App.tsx to handle the reload/state update for the UI.
+
                 return authResponse;
             }
 
@@ -154,6 +157,8 @@ export const authService = {
 
     logout: async () => {
         try {
+            // Attempt to sign out on the server
+            // Note: This invalidates the current session.
             await authClient.signOut();
         } catch (error) {
             console.error("Logout failed to clear better-auth session", error);
@@ -170,21 +175,28 @@ export const authService = {
 
             if (remainingUserIds.length > 0) {
                 // Switch to the most recently active user
-                // Sort by lastActive desc
                 const nextUserId = remainingUserIds.sort((a, b) => sessions[b].lastActive - sessions[a].lastActive)[0];
 
                 localStorage.setItem(STORAGE_KEY_SESSIONS, JSON.stringify(sessions));
                 localStorage.setItem(STORAGE_KEY_ACTIVE_USER, nextUserId);
-                authService.syncLegacyKeys();
 
-                // Refresh to load new user data
+                // Force sync legacy keys for immediate availability
+                const nextUser = sessions[nextUserId];
+                localStorage.setItem('token', nextUser.token);
+                localStorage.setItem('user', JSON.stringify(nextUser.user));
+                localStorage.setItem('isAuthenticated', 'true');
+
+                // Reload to load new user data
                 window.location.reload();
             } else {
-                // No users left
+                // No users left - Clean everything
                 localStorage.removeItem(STORAGE_KEY_SESSIONS);
                 localStorage.removeItem(STORAGE_KEY_ACTIVE_USER);
-                authService.syncLegacyKeys(); // This will clear legacy keys
-                window.location.href = '/';
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+                localStorage.removeItem('isAuthenticated');
+
+                window.location.href = '/login';
             }
         }
     },
