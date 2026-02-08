@@ -1,6 +1,8 @@
 
 import { useEffect, useState } from 'react';
 import { authService } from '../services/authService';
+import { upgradeService } from '../services/upgradeService';
+import { Crown, Check, X } from 'lucide-react';
 
 interface User {
     id: string;
@@ -11,10 +13,23 @@ interface User {
     createdAt: string;
 }
 
+interface UpgradeRequest {
+    id: string;
+    userId: string;
+    currentPlan: string;
+    requestedPlan: string;
+    status: string;
+    createdAt: string;
+    userName: string | null;
+    userEmail: string | null;
+}
+
 const AdminDashboard = () => {
     const [users, setUsers] = useState<User[]>([]);
+    const [upgradeRequests, setUpgradeRequests] = useState<UpgradeRequest[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
+    const [processingId, setProcessingId] = useState<string | null>(null);
 
     const fetchUsers = async () => {
         try {
@@ -32,8 +47,18 @@ const AdminDashboard = () => {
         }
     };
 
+    const fetchUpgradeRequests = async () => {
+        try {
+            const requests = await upgradeService.getPendingRequests();
+            setUpgradeRequests(requests);
+        } catch (err) {
+            console.error('Failed to fetch upgrade requests:', err);
+        }
+    };
+
     useEffect(() => {
         fetchUsers();
+        fetchUpgradeRequests();
     }, []);
 
     const handleUpdate = async (id: string, field: 'role' | 'plan', value: string) => {
@@ -54,6 +79,23 @@ const AdminDashboard = () => {
         }
     };
 
+    const handleUpgradeAction = async (requestId: string, action: 'approve' | 'reject') => {
+        setProcessingId(requestId);
+        const result = await upgradeService.processRequest(requestId, action);
+
+        if (result.success) {
+            // Remove from pending list
+            setUpgradeRequests(prev => prev.filter(r => r.id !== requestId));
+            // Refresh users to update plan
+            if (action === 'approve') {
+                fetchUsers();
+            }
+        } else {
+            alert(result.error || 'Failed to process request');
+        }
+        setProcessingId(null);
+    };
+
     if (loading) {
         return (
             <div className="flex justify-center items-center h-full">
@@ -71,14 +113,75 @@ const AdminDashboard = () => {
     }
 
     return (
-        <div className="p-6 max-w-7xl mx-auto">
-            <div className="flex justify-between items-center mb-6">
+        <div className="p-6 max-w-7xl mx-auto space-y-6">
+            {/* Upgrade Requests Section */}
+            {upgradeRequests.length > 0 && (
+                <div className="bg-gradient-to-r from-amber-50 to-amber-100 dark:from-amber-900/20 dark:to-amber-800/20 rounded-xl border border-amber-200 dark:border-amber-700/50 p-6">
+                    <div className="flex items-center gap-3 mb-4">
+                        <div className="w-10 h-10 rounded-full bg-amber-500 flex items-center justify-center">
+                            <Crown className="w-5 h-5 text-white" />
+                        </div>
+                        <div>
+                            <h2 className="text-lg font-bold text-amber-800 dark:text-amber-300">Upgrade Requests</h2>
+                            <p className="text-sm text-amber-600 dark:text-amber-400">{upgradeRequests.length} pending request(s)</p>
+                        </div>
+                    </div>
+
+                    <div className="space-y-3">
+                        {upgradeRequests.map(request => (
+                            <div
+                                key={request.id}
+                                className="bg-white dark:bg-gray-800 rounded-lg p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 border border-amber-200 dark:border-amber-700/30"
+                            >
+                                <div className="flex-1">
+                                    <p className="font-medium text-gray-800 dark:text-white">{request.userName || 'Unknown User'}</p>
+                                    <p className="text-sm text-gray-500 dark:text-gray-400">{request.userEmail}</p>
+                                    <div className="flex items-center gap-2 mt-1">
+                                        <span className="text-xs px-2 py-0.5 rounded bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300">{request.currentPlan}</span>
+                                        <span className="text-gray-400">→</span>
+                                        <span className="text-xs px-2 py-0.5 rounded bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 font-medium">{request.requestedPlan}</span>
+                                    </div>
+                                </div>
+                                <div className="flex gap-2">
+                                    <button
+                                        onClick={() => handleUpgradeAction(request.id, 'reject')}
+                                        disabled={processingId === request.id}
+                                        className="flex items-center gap-1 px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-sm font-medium disabled:opacity-50"
+                                    >
+                                        <X className="w-4 h-4" />
+                                        Reject
+                                    </button>
+                                    <button
+                                        onClick={() => handleUpgradeAction(request.id, 'approve')}
+                                        disabled={processingId === request.id}
+                                        className="flex items-center gap-1 px-4 py-2 rounded-lg bg-amber-500 hover:bg-amber-600 text-white transition-colors text-sm font-medium disabled:opacity-50"
+                                    >
+                                        <Check className="w-4 h-4" />
+                                        Approve
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
+
+            {/* User Management Header */}
+            <div className="flex justify-between items-center">
                 <div>
                     <h1 className="text-2xl font-bold text-gray-800 dark:text-white">User Management</h1>
                     <p className="text-gray-500 dark:text-gray-400 mt-1">Manage user roles and subscription plans</p>
                 </div>
-                <div className="bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 px-3 py-1 rounded-full text-sm font-medium">
-                    {users.length} Users
+                <div className="flex items-center gap-2">
+                    {upgradeRequests.length > 0 && (
+                        <div className="bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 px-3 py-1 rounded-full text-sm font-medium flex items-center gap-1">
+                            <Crown className="w-3 h-3" />
+                            {upgradeRequests.length} Pending
+                        </div>
+                    )}
+                    <div className="bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 px-3 py-1 rounded-full text-sm font-medium">
+                        {users.length} Users
+                    </div>
                 </div>
             </div>
 
