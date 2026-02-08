@@ -39,7 +39,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onLogout, isOpen = false, onClose }) 
                                 <span className="w-10 h-10 bg-primary text-white rounded-2xl flex items-center justify-center shadow-lg shadow-primary/30 rotate-3">
                                     <img src="/logo.png" alt="Logo" className="w-6 h-6 object-contain" />
                                 </span>
-                                FinTrack
+                                Rupiku
                             </h1>
                             <p className="text-slate-400 dark:text-text-muted text-sm font-bold ml-12 -mt-1">Joyful Finance</p>
                         </div>
