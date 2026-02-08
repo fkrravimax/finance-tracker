@@ -12,6 +12,7 @@ import AdminDashboard from './components/AdminDashboard'
 import { authService } from './services/authService'
 import { authClient } from './lib/auth-client';
 import { useMultiAccount } from './contexts/MultiAccountContext';
+import SessionVerifier from './components/SessionVerifier';
 
 function App() {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -76,6 +77,7 @@ function App() {
 
     return (
         <DashboardLayout onLogout={handleLogout}>
+            <SessionVerifier />
             <Routes>
                 <Route path="/" element={<Navigate to="/dashboard" replace />} />
                 <Route path="/dashboard" element={<Dashboard />} />
