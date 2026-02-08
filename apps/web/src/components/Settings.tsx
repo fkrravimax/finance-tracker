@@ -5,7 +5,7 @@ import CurrencyInput from './CurrencyInput';
 import { useNavigate } from 'react-router-dom';
 import { authClient } from '../lib/auth-client';
 import ConfirmationModal from './ConfirmationModal';
-import { authService } from '../services/authService';
+
 import { useNotification } from '../contexts/NotificationContext';
 
 const Settings: React.FC = () => {
