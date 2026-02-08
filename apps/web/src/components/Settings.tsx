@@ -5,7 +5,9 @@ import CurrencyInput from './CurrencyInput';
 import { useNavigate } from 'react-router-dom';
 import { authClient } from '../lib/auth-client';
 import ConfirmationModal from './ConfirmationModal';
+import { authService } from '../services/authService';
 import { useNotification } from '../contexts/NotificationContext';
+import { useMultiAccount } from '../contexts/MultiAccountContext';
 
 const Settings: React.FC = () => {
     const { theme, setTheme, privacyMode, setPrivacyMode } = useAppearance();
@@ -14,6 +16,7 @@ const Settings: React.FC = () => {
 
     const navigate = useNavigate();
     const { showNotification } = useNotification();
+    const { startAddAccount } = useMultiAccount();
 
 
 
@@ -467,6 +470,52 @@ const Settings: React.FC = () => {
                             <div className="flex flex-col gap-6">
                                 <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-xl border border-blue-100 dark:border-blue-900/30 text-sm text-blue-600 dark:text-blue-400">
                                     <strong>Note:</strong> If you logged in via Google, you do not have a separate password to change here.
+                                </div>
+
+                                {/* Account Switcher */}
+                                <div className="flex flex-col gap-3">
+                                    <h3 className="font-bold text-slate-900 dark:text-white border-b border-slate-100 dark:border-[#493f22] pb-2">Switch Accounts</h3>
+                                    <div className="flex flex-col gap-2">
+                                        {authService.getAccounts().map(account => {
+                                            const isActive = authService.getActiveUserId() === account.id;
+                                            return (
+                                                <button
+                                                    key={account.id}
+                                                    onClick={() => !isActive && authService.switchAccount(account.id)}
+                                                    className={`
+                                                        w-full flex items-center justify-between p-3 rounded-xl border transition-all text-left
+                                                        ${isActive
+                                                            ? 'bg-primary/10 border-primary cursor-default'
+                                                            : 'bg-white dark:bg-[#1a160b] border-slate-200 dark:border-[#493f22] hover:bg-slate-50 dark:hover:bg-[#252013] cursor-pointer'
+                                                        }
+                                                    `}
+                                                >
+                                                    <div className="flex items-center gap-3">
+                                                        <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg ${isActive ? 'bg-primary text-slate-900' : 'bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-400'}`}>
+                                                            {account.name?.charAt(0) || account.email?.charAt(0) || '?'}
+                                                        </div>
+                                                        <div className="flex flex-col overflow-hidden">
+                                                            <span className={`text-sm font-bold truncate ${isActive ? 'text-slate-900 dark:text-white' : 'text-slate-700 dark:text-slate-300'}`}>
+                                                                {account.name || 'Unnamed User'}
+                                                            </span>
+                                                            <span className="text-xs text-slate-400 truncate">{account.email}</span>
+                                                        </div>
+                                                    </div>
+                                                    {isActive && (
+                                                        <span className="material-symbols-outlined text-primary">check_circle</span>
+                                                    )}
+                                                </button>
+                                            );
+                                        })}
+
+                                        <button
+                                            onClick={startAddAccount}
+                                            className="w-full flex items-center justify-center gap-2 p-3 rounded-xl border border-dashed border-slate-300 dark:border-slate-600 text-slate-500 dark:text-slate-400 hover:text-primary hover:border-primary hover:bg-slate-50 dark:hover:bg-[#252013] transition-all"
+                                        >
+                                            <span className="material-symbols-outlined">add</span>
+                                            <span className="font-bold text-sm">Add Another Account</span>
+                                        </button>
+                                    </div>
                                 </div>
 
                                 {/* Profile Name */}
