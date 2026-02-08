@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAppearance } from '../contexts/AppearanceContext';
+import { useLanguage } from '../contexts/LanguageContext';
 
 interface LandingPageProps {
     onSignUp: () => void;
@@ -12,6 +13,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onSignUp, onSignIn }) => {
     const [showFeatureModal, setShowFeatureModal] = useState(false);
     const [modalFeature, setModalFeature] = useState(0);
     const { theme, setTheme } = useAppearance();
+    const { language, setLanguage } = useLanguage();
     const totalSlides = 3;
 
     // Auto-rotate slides every 60 seconds (1 minute)
@@ -94,10 +96,20 @@ const LandingPage: React.FC<LandingPageProps> = ({ onSignUp, onSignIn }) => {
                     </button>
                 </nav>
 
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2 md:gap-4">
                     <span className="hidden md:inline text-slate-500 dark:text-[#cbbc90] hover:text-primary cursor-pointer transition-all font-medium">
                         Help Center
                     </span>
+                    {/* Language Toggle */}
+                    <button
+                        onClick={() => setLanguage(language === 'en' ? 'id' : 'en')}
+                        className="flex items-center gap-1 px-2 py-1.5 rounded-full text-slate-500 dark:text-[#cbbc90] hover:text-primary hover:bg-slate-100 dark:hover:bg-[#2b2616] transition-all text-sm font-bold"
+                        title={language === 'en' ? 'Switch to Indonesian' : 'Switch to English'}
+                    >
+                        <span className="material-symbols-outlined text-lg">language</span>
+                        <span className="uppercase">{language}</span>
+                    </button>
+                    {/* Theme Toggle */}
                     <button
                         onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
                         className="p-2 rounded-full text-slate-500 hover:text-primary hover:bg-slate-100 dark:hover:bg-[#2b2616] transition-all"
