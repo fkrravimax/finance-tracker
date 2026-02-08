@@ -13,7 +13,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onSignUp, onSignIn }) => {
     const [showFeatureModal, setShowFeatureModal] = useState(false);
     const [modalFeature, setModalFeature] = useState(0);
     const { theme, setTheme } = useAppearance();
-    const { language, setLanguage } = useLanguage();
+    const { language, setLanguage, t } = useLanguage();
     const totalSlides = 3;
 
     // Auto-rotate slides every 60 seconds (1 minute)
@@ -41,35 +41,35 @@ const LandingPage: React.FC<LandingPageProps> = ({ onSignUp, onSignIn }) => {
     const features = [
         {
             icon: 'dashboard',
-            label: 'Dashboard',
-            desc: 'Get a real-time overview of your finances with beautiful charts and insights.',
+            label: t('landing.features.dashboard'),
+            desc: t('landing.features.dashboardDesc'),
             preview: '/previews/dashboard.jpg'
         },
         {
             icon: 'savings',
-            label: 'Savings',
-            desc: 'Set savings goals and track your progress with our intuitive vault system.',
+            label: t('landing.features.savings'),
+            desc: t('landing.features.savingsDesc'),
             preview: '/previews/savings.jpg'
         },
         {
             icon: 'trending_up',
-            label: 'Trading',
-            desc: 'Monitor your investments and track portfolio performance in real-time.',
+            label: t('landing.features.trading'),
+            desc: t('landing.features.tradingDesc'),
             preview: '/previews/trading.jpg'
         },
         {
             icon: 'receipt_long',
-            label: 'Transactions',
-            desc: 'Categorize and track all your transactions with powerful filtering.',
+            label: t('landing.features.transactions'),
+            desc: t('landing.features.transactionsDesc'),
             preview: '/previews/transactions.jpg'
         },
     ];
 
     // Steps data for Slide 3
     const steps = [
-        { num: 1, icon: 'person_add', title: 'Create', desc: 'Set up your profile and securely link your accounts in minutes.' },
-        { num: 2, icon: 'monitoring', title: 'Track', desc: 'Monitor your spending, net worth, and investments in one unified view.' },
-        { num: 3, icon: 'trending_up', title: 'Grow', desc: 'Optimize your portfolio with AI insights and expert-grade tools.' },
+        { num: 1, icon: 'person_add', title: t('landing.howItWorks.step1Title'), desc: t('landing.howItWorks.step1Desc') },
+        { num: 2, icon: 'monitoring', title: t('landing.howItWorks.step2Title'), desc: t('landing.howItWorks.step2Desc') },
+        { num: 3, icon: 'trending_up', title: t('landing.howItWorks.step3Title'), desc: t('landing.howItWorks.step3Desc') },
     ];
 
     // Handle mobile feature click
@@ -92,7 +92,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onSignUp, onSignIn }) => {
                         onClick={() => goToSlide(2)}
                         className="text-slate-500 dark:text-[#cbbc90] hover:text-primary transition-all font-medium"
                     >
-                        Step-by-step Mastery
+                        {t('common.next')}
                     </button>
                 </nav>
 
@@ -214,10 +214,10 @@ const LandingPage: React.FC<LandingPageProps> = ({ onSignUp, onSignIn }) => {
                     >
                         <div className="flex flex-col items-center text-center px-4">
                             <h1 className="text-3xl md:text-5xl lg:text-6xl font-black text-slate-900 dark:text-white mb-4 md:mb-6">
-                                Your money, <span className="text-primary">your way.</span>
+                                {t('landing.hero.title')}
                             </h1>
                             <p className="text-base md:text-xl text-slate-500 dark:text-[#cbbc90] max-w-xl">
-                                Track expenses, grow savings, and invest smarter — all in one beautiful app.
+                                {t('landing.hero.subtitle')}
                             </p>
                         </div>
                     </div>
@@ -236,10 +236,10 @@ const LandingPage: React.FC<LandingPageProps> = ({ onSignUp, onSignIn }) => {
                                 <span className="text-[9px] md:text-xs font-bold text-primary uppercase tracking-wider">The Roadmap</span>
                             </div>
                             <h2 className="text-lg md:text-3xl lg:text-4xl font-black text-slate-900 dark:text-white text-center mb-1 md:mb-3">
-                                Three steps to <span className="text-primary">financial freedom.</span>
+                                {t('landing.howItWorks.title')}
                             </h2>
                             <p className="text-[10px] md:text-base text-slate-500 dark:text-[#cbbc90] text-center mb-3 md:mb-10 max-w-lg hidden md:block">
-                                We've simplified wealth management into a seamless three-step process designed for growth.
+                                {t('landing.howItWorks.title')}
                             </p>
 
                             {/* Mobile: Horizontal compact cards */}
@@ -313,13 +313,13 @@ const LandingPage: React.FC<LandingPageProps> = ({ onSignUp, onSignIn }) => {
                         onClick={onSignUp}
                         className="w-full max-w-sm bg-primary hover:bg-primary-hover text-slate-900 font-bold py-3 rounded-xl transition-all shadow-lg hover:shadow-primary/25 active:scale-[0.98]"
                     >
-                        Sign Up
+                        {t('landing.hero.getStarted')}
                     </button>
                     <button
                         onClick={onSignIn}
                         className="w-full max-w-sm bg-transparent border-2 border-primary text-primary font-bold py-3 rounded-xl transition-all hover:bg-primary/10 active:scale-[0.98]"
                     >
-                        Sign In
+                        {t('landing.hero.signIn')}
                     </button>
                     <span className="text-xs text-slate-400 dark:text-[#cbbc90]/60 hover:text-primary cursor-pointer transition-all">
                         View Live Demo
@@ -332,7 +332,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onSignUp, onSignIn }) => {
                             onClick={onSignIn}
                             className="text-slate-500 dark:text-[#cbbc90] hover:text-primary font-medium transition-all"
                         >
-                            Log In
+                            {t('landing.hero.signIn')}
                         </button>
                         <button className="px-6 py-3 rounded-xl border border-slate-300 dark:border-[#493f22] text-slate-700 dark:text-white font-bold hover:bg-slate-100 dark:hover:bg-[#2b2616] transition-all">
                             Live Demo
@@ -342,7 +342,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onSignUp, onSignIn }) => {
                         onClick={onSignUp}
                         className="px-8 py-3 bg-primary hover:bg-primary-hover text-slate-900 font-bold rounded-xl transition-all shadow-lg hover:shadow-primary/25 active:scale-[0.98] flex items-center gap-2"
                     >
-                        Get Started
+                        {t('landing.hero.getStarted')}
                         <span className="material-symbols-outlined text-lg">arrow_forward</span>
                     </button>
                 </div>

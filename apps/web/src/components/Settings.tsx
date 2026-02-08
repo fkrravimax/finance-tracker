@@ -11,7 +11,7 @@ import { useNotification } from '../contexts/NotificationContext';
 
 const Settings: React.FC = () => {
     const { theme, setTheme, privacyMode, setPrivacyMode } = useAppearance();
-    const { language, setLanguage } = useLanguage();
+    const { language, setLanguage, t } = useLanguage();
     const [budgetLimit, setBudgetLimit] = useState('');
     const [loading, setLoading] = useState(false);
 
@@ -270,14 +270,14 @@ const Settings: React.FC = () => {
                     <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsRecurringModalOpen(false)}></div>
                     <div className="relative bg-white dark:bg-[#2a2515] w-full max-w-md rounded-2xl shadow-2xl overflow-hidden flex flex-col animate-scale-in">
                         <div className="p-6 border-b border-slate-100 dark:border-[#493f22] flex justify-between items-center bg-surface-light dark:bg-[#342d18]">
-                            <h3 className="text-xl font-bold text-slate-900 dark:text-white">Add Recurring Transaction</h3>
+                            <h3 className="text-xl font-bold text-slate-900 dark:text-white">{t('settings.addRecurring')}</h3>
                             <button onClick={() => setIsRecurringModalOpen(false)} className="text-slate-400 hover:text-slate-600 dark:text-[#cbbc90] dark:hover:text-white transition-colors">
                                 <span className="material-symbols-outlined">close</span>
                             </button>
                         </div>
                         <form onSubmit={handleAddRecurring} className="p-6 flex flex-col gap-6">
                             <div className="flex flex-col gap-2">
-                                <label className="text-sm font-bold text-slate-700 dark:text-[#cbbc90]">Name</label>
+                                <label className="text-sm font-bold text-slate-700 dark:text-[#cbbc90]">{t('settings.name')}</label>
                                 <input
                                     type="text"
                                     value={newRecurring.name}
@@ -288,7 +288,7 @@ const Settings: React.FC = () => {
                                 />
                             </div>
                             <div className="flex flex-col gap-2">
-                                <label className="text-sm font-bold text-slate-700 dark:text-[#cbbc90]">Amount</label>
+                                <label className="text-sm font-bold text-slate-700 dark:text-[#cbbc90]">{t('settings.amount')}</label>
                                 <div className="relative">
                                     <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-600 font-bold">Rp</span>
                                     <CurrencyInput
@@ -302,33 +302,33 @@ const Settings: React.FC = () => {
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="flex flex-col gap-2">
-                                    <label className="text-sm font-bold text-slate-700 dark:text-[#cbbc90]">Date (Monthly)</label>
+                                    <label className="text-sm font-bold text-slate-700 dark:text-[#cbbc90]">{t('settings.date')}</label>
                                     <input
                                         type="number"
                                         min="1"
                                         max="31"
                                         value={newRecurring.date}
                                         onChange={(e) => setNewRecurring({ ...newRecurring, date: e.target.value })}
-                                        placeholder="Day (1-31)"
+                                        placeholder={t('settings.date')}
                                         className="w-full bg-slate-50 dark:bg-[#1a160b] border border-slate-200 dark:border-[#493f22] rounded-xl px-4 py-3 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-slate-600"
                                         required
                                     />
                                 </div>
                                 <div className="flex flex-col gap-2">
-                                    <label className="text-sm font-bold text-slate-700 dark:text-[#cbbc90]">Frequency</label>
+                                    <label className="text-sm font-bold text-slate-700 dark:text-[#cbbc90]">{t('settings.frequency')}</label>
                                     <select
                                         value={newRecurring.frequency}
                                         onChange={(e) => setNewRecurring({ ...newRecurring, frequency: e.target.value })}
                                         className="w-full bg-slate-50 dark:bg-[#1a160b] border border-slate-200 dark:border-[#493f22] rounded-xl px-4 py-3 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
                                     >
-                                        <option value="Monthly">Monthly</option>
-                                        <option value="Weekly">Weekly</option>
-                                        <option value="Yearly">Yearly</option>
+                                        <option value="Monthly">{t('settings.monthly')}</option>
+                                        <option value="Weekly">{t('settings.weekly')}</option>
+                                        <option value="Yearly">{t('settings.yearly')}</option>
                                     </select>
                                 </div>
                             </div>
                             <button type="submit" className="w-full bg-primary hover:bg-[#dca60e] text-slate-900 font-bold py-4 rounded-xl transition-all shadow-lg hover:shadow-primary/25 active:scale-95">
-                                Add Transaction
+                                {t('settings.addTransaction')}
                             </button>
                         </form>
                     </div>
@@ -337,8 +337,8 @@ const Settings: React.FC = () => {
 
             {/* Page Header */}
             <div className="flex flex-col gap-1">
-                <h1 className="text-3xl md:text-4xl font-black text-slate-900 dark:text-white tracking-tight">Settings</h1>
-                <p className="text-slate-500 dark:text-[#cbbc90] text-base">Manage your preferences and financial configurations.</p>
+                <h1 className="text-3xl md:text-4xl font-black text-slate-900 dark:text-white tracking-tight">{t('settings.title')}</h1>
+                <p className="text-slate-500 dark:text-[#cbbc90] text-base">{t('settings.subtitle')}</p>
             </div>
 
             {/* Accordion Categories */}
@@ -353,8 +353,8 @@ const Settings: React.FC = () => {
                         <div className="flex items-center gap-3">
                             <span className="material-symbols-outlined text-primary text-2xl">palette</span>
                             <div>
-                                <h2 className="text-lg font-bold text-slate-900 dark:text-white">Appearance</h2>
-                                <p className="text-sm text-slate-500 dark:text-[#cbbc90]">Theme and Privacy Masking</p>
+                                <h2 className="text-lg font-bold text-slate-900 dark:text-white">{t('settings.appearance')}</h2>
+                                <p className="text-sm text-slate-500 dark:text-[#cbbc90]">{t('settings.appearanceDesc')}</p>
                             </div>
                         </div>
                         <span className={`material-symbols-outlined text-slate-400 transition-transform ${openSection === 'appearance' ? 'rotate-180' : ''}`}>expand_more</span>
@@ -365,7 +365,7 @@ const Settings: React.FC = () => {
 
                             {/* Theme Selection */}
                             <div className="flex flex-col gap-3">
-                                <h3 className="font-bold text-slate-900 dark:text-white">App Theme</h3>
+                                <h3 className="font-bold text-slate-900 dark:text-white">{t('settings.theme')}</h3>
                                 <div className="grid grid-cols-3 gap-3">
                                     {(['light', 'dark', 'system'] as const).map((themeOption) => (
                                         <button
@@ -382,7 +382,7 @@ const Settings: React.FC = () => {
                                             <span className="material-symbols-outlined">
                                                 {themeOption === 'light' ? 'light_mode' : themeOption === 'dark' ? 'dark_mode' : 'settings_brightness'}
                                             </span>
-                                            <span className="capitalize text-sm">{themeOption}</span>
+                                            <span className="capitalize text-sm">{t(`settings.${themeOption}` as any)}</span>
                                         </button>
                                     ))}
                                 </div>
@@ -390,15 +390,15 @@ const Settings: React.FC = () => {
 
                             {/* Language Selection */}
                             <div className="flex flex-col gap-3">
-                                <h3 className="font-bold text-slate-900 dark:text-white">Language</h3>
+                                <h3 className="font-bold text-slate-900 dark:text-white">{t('settings.language')}</h3>
                                 <div className="relative">
                                     <select
                                         value={language}
                                         onChange={(e) => setLanguage(e.target.value as 'en' | 'id')}
                                         className="w-full md:w-auto bg-slate-50 dark:bg-[#1a160b] border border-slate-200 dark:border-[#493f22] rounded-xl px-4 py-3 pr-10 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all appearance-none cursor-pointer font-medium"
                                     >
-                                        <option value="en">🇺🇸 English</option>
-                                        <option value="id">🇮🇩 Bahasa Indonesia</option>
+                                        <option value="en">🇺🇸 {t('settings.english')}</option>
+                                        <option value="id">🇮🇩 {t('settings.indonesian')}</option>
                                     </select>
                                     <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">expand_more</span>
                                 </div>
@@ -406,7 +406,7 @@ const Settings: React.FC = () => {
 
                             {/* Privacy Mode Selection */}
                             <div className="flex flex-col gap-3">
-                                <h3 className="font-bold text-slate-900 dark:text-white">Hide Balance</h3>
+                                <h3 className="font-bold text-slate-900 dark:text-white">{t('settings.hideBalance')}</h3>
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                                     <button
                                         onClick={() => setPrivacyMode('none')}
@@ -420,8 +420,8 @@ const Settings: React.FC = () => {
                                     >
                                         <span className="material-symbols-outlined">visibility</span>
                                         <div className="flex flex-col">
-                                            <span className="text-sm font-bold">Show All</span>
-                                            <span className="text-xs opacity-80">Default visibility</span>
+                                            <span className="text-sm font-bold">{t('settings.showAll')}</span>
+                                            <span className="text-xs opacity-80">{t('settings.defaultVisibility')}</span>
                                         </div>
                                     </button>
 
@@ -437,8 +437,8 @@ const Settings: React.FC = () => {
                                     >
                                         <span className="material-symbols-outlined">visibility_off</span>
                                         <div className="flex flex-col">
-                                            <span className="text-sm font-bold">Soft Hide</span>
-                                            <span className="text-xs opacity-80">Hide total balance</span>
+                                            <span className="text-sm font-bold">{t('settings.softHide')}</span>
+                                            <span className="text-xs opacity-80">{t('settings.hideTotalBalance')}</span>
                                         </div>
                                     </button>
 
@@ -454,8 +454,8 @@ const Settings: React.FC = () => {
                                     >
                                         <span className="material-symbols-outlined">password</span>
                                         <div className="flex flex-col">
-                                            <span className="text-sm font-bold">Extreme Hide</span>
-                                            <span className="text-xs opacity-80">Hide ALL numbers</span>
+                                            <span className="text-sm font-bold">{t('settings.extremeHide')}</span>
+                                            <span className="text-xs opacity-80">{t('settings.hideAllNumbers')}</span>
                                         </div>
                                     </button>
                                 </div>
@@ -473,8 +473,8 @@ const Settings: React.FC = () => {
                         <div className="flex items-center gap-3">
                             <span className="material-symbols-outlined text-primary text-2xl">manage_accounts</span>
                             <div>
-                                <h2 className="text-lg font-bold text-slate-900 dark:text-white">Account</h2>
-                                <p className="text-sm text-slate-500 dark:text-[#cbbc90]">Profile, Security, and Data</p>
+                                <h2 className="text-lg font-bold text-slate-900 dark:text-white">{t('settings.account')}</h2>
+                                <p className="text-sm text-slate-500 dark:text-[#cbbc90]">{t('settings.accountDesc')}</p>
                             </div>
                         </div>
                         <span className={`material-symbols-outlined text-slate-400 transition-transform ${openSection === 'account' ? 'rotate-180' : ''}`}>expand_more</span>
@@ -485,14 +485,14 @@ const Settings: React.FC = () => {
                             {/* Account Management Content */}
                             <div className="flex flex-col gap-6">
                                 <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-xl border border-blue-100 dark:border-blue-900/30 text-sm text-blue-600 dark:text-blue-400">
-                                    <strong>Note:</strong> If you logged in via Google, you do not have a separate password to change here.
+                                    <strong>Note:</strong> {t('settings.googleNote')}
                                 </div>
 
                                 {/* Profile Name */}
                                 <form onSubmit={handleUpdateName} className="flex flex-col gap-3">
-                                    <h3 className="font-bold text-slate-900 dark:text-white border-b border-slate-100 dark:border-[#493f22] pb-2">Profile Details</h3>
+                                    <h3 className="font-bold text-slate-900 dark:text-white border-b border-slate-100 dark:border-[#493f22] pb-2">{t('settings.profileDetails')}</h3>
                                     <div className="flex flex-col gap-2">
-                                        <label className="text-sm font-bold text-slate-700 dark:text-[#cbbc90]">Display Name</label>
+                                        <label className="text-sm font-bold text-slate-700 dark:text-[#cbbc90]">{t('settings.displayName')}</label>
                                         <div className="flex gap-2">
                                             <input
                                                 type="text"
@@ -507,7 +507,7 @@ const Settings: React.FC = () => {
                                                 disabled={isUpdatingName}
                                                 className="whitespace-nowrap bg-slate-900 dark:bg-slate-700 text-white font-bold px-4 py-2 rounded-xl text-sm hover:opacity-90 transition-opacity"
                                             >
-                                                {isUpdatingName ? 'Saving...' : 'Save'}
+                                                {isUpdatingName ? t('common.loading') : t('common.save')}
                                             </button>
                                         </div>
                                     </div>
@@ -515,11 +515,11 @@ const Settings: React.FC = () => {
 
                                 {/* Change Password */}
                                 <form onSubmit={handleChangePassword} className="flex flex-col gap-3">
-                                    <h3 className="font-bold text-slate-900 dark:text-white border-b border-slate-100 dark:border-[#493f22] pb-2">Change Password</h3>
+                                    <h3 className="font-bold text-slate-900 dark:text-white border-b border-slate-100 dark:border-[#493f22] pb-2">{t('settings.changePassword')}</h3>
                                     <div className="flex flex-col gap-2">
                                         <input
                                             type="password"
-                                            placeholder="Current Password"
+                                            placeholder={t('settings.currentPassword')}
                                             value={passwordForm.currentPassword}
                                             onChange={e => setPasswordForm({ ...passwordForm, currentPassword: e.target.value })}
                                             className="w-full bg-slate-50 dark:bg-[#1a160b] border border-slate-200 dark:border-[#493f22] rounded-xl px-4 py-2 text-sm"
@@ -527,7 +527,7 @@ const Settings: React.FC = () => {
                                         />
                                         <input
                                             type="password"
-                                            placeholder="New Password"
+                                            placeholder={t('settings.newPassword')}
                                             value={passwordForm.newPassword}
                                             onChange={e => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
                                             className="w-full bg-slate-50 dark:bg-[#1a160b] border border-slate-200 dark:border-[#493f22] rounded-xl px-4 py-2 text-sm"
@@ -535,7 +535,7 @@ const Settings: React.FC = () => {
                                         />
                                         <input
                                             type="password"
-                                            placeholder="Confirm New Password"
+                                            placeholder={t('settings.confirmPassword')}
                                             value={passwordForm.confirmPassword}
                                             onChange={e => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
                                             className="w-full bg-slate-50 dark:bg-[#1a160b] border border-slate-200 dark:border-[#493f22] rounded-xl px-4 py-2 text-sm"
@@ -546,18 +546,18 @@ const Settings: React.FC = () => {
                                             disabled={isChangingPassword}
                                             className="bg-slate-900 dark:bg-slate-700 text-white font-bold py-2 rounded-xl text-sm hover:opacity-90 transition-opacity"
                                         >
-                                            {isChangingPassword ? 'Updating...' : 'Update Password'}
+                                            {isChangingPassword ? t('common.loading') : t('settings.updatePassword')}
                                         </button>
                                     </div>
                                 </form>
 
                                 {/* Change Email */}
                                 <form onSubmit={handleChangeEmail} className="flex flex-col gap-3 pt-4 border-t border-slate-100 dark:border-[#493f22]">
-                                    <h3 className="font-bold text-slate-900 dark:text-white border-b border-slate-100 dark:border-[#493f22] pb-2">Change Email</h3>
+                                    <h3 className="font-bold text-slate-900 dark:text-white border-b border-slate-100 dark:border-[#493f22] pb-2">{t('settings.changeEmail')}</h3>
                                     <div className="flex flex-col gap-2">
                                         <input
                                             type="email"
-                                            placeholder="New Email Address"
+                                            placeholder={t('settings.newEmail')}
                                             value={emailForm.newEmail}
                                             onChange={e => setEmailForm({ ...emailForm, newEmail: e.target.value })}
                                             className="w-full bg-slate-50 dark:bg-[#1a160b] border border-slate-200 dark:border-[#493f22] rounded-xl px-4 py-2 text-sm"
@@ -576,7 +576,7 @@ const Settings: React.FC = () => {
                                             disabled={isChangingEmail}
                                             className="bg-slate-900 dark:bg-slate-700 text-white font-bold py-2 rounded-xl text-sm hover:opacity-90 transition-opacity"
                                         >
-                                            {isChangingEmail ? 'Updating...' : 'Update Email'}
+                                            {isChangingEmail ? t('common.loading') : t('settings.updateEmail')}
                                         </button>
                                     </div>
                                 </form>
@@ -584,17 +584,17 @@ const Settings: React.FC = () => {
                                 {/* Danger Zone */}
                                 <div className="pt-8 border-t border-slate-200 dark:border-[#493f22]">
                                     <div className="flex flex-col gap-2">
-                                        <h3 className="font-bold text-slate-900 dark:text-white">Danger Zone</h3>
+                                        <h3 className="font-bold text-slate-900 dark:text-white">{t('settings.dangerZone')}</h3>
                                         <div className="flex flex-col md:flex-row items-start md:items-center justify-between p-4 rounded-xl bg-red-50 dark:bg-red-900/10 border border-red-100 dark:border-red-900/30 gap-4 md:gap-0">
                                             <div>
-                                                <p className="font-bold text-red-700 dark:text-red-400">Reset All Data</p>
-                                                <p className="text-xs text-red-600/70 dark:text-red-400/70">This action cannot be undone.</p>
+                                                <p className="font-bold text-red-700 dark:text-red-400">{t('settings.resetAllData')}</p>
+                                                <p className="text-xs text-red-600/70 dark:text-red-400/70">{t('settings.resetWarning')}</p>
                                             </div>
                                             <button
                                                 onClick={handleResetAppClick}
                                                 className="w-full md:w-auto px-4 py-2 bg-white dark:bg-red-900/20 text-red-600 dark:text-red-400 font-bold text-sm rounded-lg border border-red-200 dark:border-red-800 hover:bg-red-100 dark:hover:bg-red-900/40 transition-colors"
                                             >
-                                                Reset App
+                                                {t('settings.resetApp')}
                                             </button>
                                         </div>
                                     </div>
@@ -613,8 +613,8 @@ const Settings: React.FC = () => {
                         <div className="flex items-center gap-3">
                             <span className="material-symbols-outlined text-primary text-2xl">extension</span>
                             <div>
-                                <h2 className="text-lg font-bold text-slate-900 dark:text-white">Features</h2>
-                                <p className="text-sm text-slate-500 dark:text-[#cbbc90]">Budgets and Recurring Transactions</p>
+                                <h2 className="text-lg font-bold text-slate-900 dark:text-white">{t('settings.features')}</h2>
+                                <p className="text-sm text-slate-500 dark:text-[#cbbc90]">{t('settings.featuresDesc')}</p>
                             </div>
                         </div>
                         <span className={`material-symbols-outlined text-slate-400 transition-transform ${openSection === 'features' ? 'rotate-180' : ''}`}>expand_more</span>
@@ -629,9 +629,9 @@ const Settings: React.FC = () => {
                                     <h2>Monthly Budget</h2>
                                 </div>
                                 <div className="bg-slate-50 dark:bg-[#2b2616] rounded-xl border border-slate-100 dark:border-[#493f22] p-6 flex flex-col gap-4">
-                                    <p className="text-sm text-slate-500 dark:text-[#cbbc90]">Set your overall spending limit for each month. We'll alert you based on this amount.</p>
+                                    <p className="text-sm text-slate-500 dark:text-[#cbbc90]">{t('settings.budgetDescription')}</p>
                                     <div className="flex flex-col gap-2">
-                                        <label className="text-sm font-bold text-slate-700 dark:text-[#cbbc90]">Budget Limit</label>
+                                        <label className="text-sm font-bold text-slate-700 dark:text-[#cbbc90]">{t('settings.budgetLimit')}</label>
                                         <div className="relative">
                                             <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-600 font-bold">Rp</span>
                                             <CurrencyInput
@@ -647,7 +647,7 @@ const Settings: React.FC = () => {
                                         disabled={loading}
                                         className="w-full bg-primary hover:bg-[#dca60e] text-slate-900 font-bold py-3 rounded-xl transition-all shadow-lg hover:shadow-primary/25 active:scale-95 mt-2 disabled:opacity-50 disabled:cursor-not-allowed"
                                     >
-                                        {loading ? 'Saving...' : 'Save Budget'}
+                                        {loading ? t('common.loading') : t('settings.saveBudget')}
                                     </button>
                                 </div>
                             </div>
@@ -656,7 +656,7 @@ const Settings: React.FC = () => {
                             <div className="flex flex-col gap-4">
                                 <div className="flex items-center gap-2 text-slate-900 dark:text-white font-bold text-xl">
                                     <span className="material-symbols-outlined text-primary">update</span>
-                                    <h2>Recurring Transactions</h2>
+                                    <h2>{t('settings.recurringTransactions')}</h2>
                                 </div>
                                 <div>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -690,7 +690,7 @@ const Settings: React.FC = () => {
                                             className="p-4 rounded-xl border-2 border-dashed border-slate-200 dark:border-[#493f22] flex flex-col items-center justify-center gap-2 text-slate-400 hover:text-primary hover:border-primary hover:bg-slate-50 dark:hover:bg-[#493f22]/30 transition-all min-h-[160px]"
                                         >
                                             <span className="material-symbols-outlined text-3xl">add_circle</span>
-                                            <span className="font-bold">Add Recurring</span>
+                                            <span className="font-bold">{t('settings.addRecurring')}</span>
                                         </button>
                                     </div>
                                 </div>

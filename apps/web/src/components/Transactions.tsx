@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import api from '../services/api';
 import TransactionTableSkeleton from './skeletons/TransactionTableSkeleton';
+import { useLanguage } from '../contexts/LanguageContext';
 
 type TimeRange = 'day' | 'week' | 'month' | 'year';
 type SortKey = 'category' | 'date' | 'amount';
@@ -18,6 +19,7 @@ interface Transaction {
 }
 
 const Transactions: React.FC = () => {
+    const { t } = useLanguage();
     const [timeRange, setTimeRange] = useState<TimeRange>('month');
     const [transactions, setTransactions] = useState<Transaction[]>([]);
     const [loading, setLoading] = useState(true);
@@ -132,8 +134,8 @@ const Transactions: React.FC = () => {
             {/* Header */}
             <header className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 overflow-hidden">
                 <div className="flex flex-col gap-1">
-                    <h1 className="text-3xl md:text-4xl font-black text-slate-900 dark:text-white tracking-tight">Transactions</h1>
-                    <p className="text-slate-500 dark:text-[#cbbc90] text-base">History of your income and expenses.</p>
+                    <h1 className="text-3xl md:text-4xl font-black text-slate-900 dark:text-white tracking-tight">{t('transactions.title')}</h1>
+                    <p className="text-slate-500 dark:text-[#cbbc90] text-base">{t('transactions.subtitle')}</p>
                 </div>
 
                 {/* Filter Controls */}
@@ -147,7 +149,7 @@ const Transactions: React.FC = () => {
                                 : 'text-slate-500 dark:text-[#cbbc90] hover:text-slate-700 dark:hover:text-white'
                                 }`}
                         >
-                            This {range}
+                            {t(`transactions.ranges.${range}` as any)}
                         </button>
                     ))}
                 </div>
@@ -160,7 +162,7 @@ const Transactions: React.FC = () => {
                         <span className="material-symbols-outlined">trending_up</span>
                     </div>
                     <div>
-                        <p className="text-sm text-slate-500 dark:text-[#cbbc90]">Income</p>
+                        <p className="text-sm text-slate-500 dark:text-[#cbbc90]">{t('transactions.income')}</p>
                         <p className="text-2xl font-bold text-slate-900 dark:text-white">
                             {formatCurrency(filteredTransactions.filter(t => t.type === 'income').reduce((sum, t) => sum + Number(t.amount), 0))}
                         </p>
@@ -171,7 +173,7 @@ const Transactions: React.FC = () => {
                         <span className="material-symbols-outlined">trending_down</span>
                     </div>
                     <div>
-                        <p className="text-sm text-slate-500 dark:text-[#cbbc90]">Expense</p>
+                        <p className="text-sm text-slate-500 dark:text-[#cbbc90]">{t('transactions.expense')}</p>
                         <p className="text-2xl font-bold text-slate-900 dark:text-white">
                             {formatCurrency(filteredTransactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + Number(t.amount), 0))}
                         </p>
@@ -182,7 +184,7 @@ const Transactions: React.FC = () => {
                         <span className="material-symbols-outlined">account_balance</span>
                     </div>
                     <div>
-                        <p className="text-sm text-slate-500 dark:text-[#cbbc90]">Total Transactions</p>
+                        <p className="text-sm text-slate-500 dark:text-[#cbbc90]">{t('transactions.totalTransactions')}</p>
                         <p className="text-2xl font-bold text-slate-900 dark:text-white">
                             {filteredTransactions.length}
                         </p>
@@ -196,13 +198,13 @@ const Transactions: React.FC = () => {
                     <table className="w-full text-left border-collapse">
                         <thead>
                             <tr className="bg-slate-50 dark:bg-[#2b2616] border-b border-slate-200 dark:border-[#493f22] select-none">
-                                <th className="p-4 pl-6 text-sm font-bold text-slate-600 dark:text-[#cbbc90] whitespace-nowrap">Transaction</th>
+                                <th className="p-4 pl-6 text-sm font-bold text-slate-600 dark:text-[#cbbc90] whitespace-nowrap">{t('transactions.merchant')}</th>
                                 <th
                                     className="p-4 text-sm font-bold text-slate-600 dark:text-[#cbbc90] whitespace-nowrap cursor-pointer hover:bg-slate-100 dark:hover:bg-[#493f22] transition-colors"
                                     onClick={() => handleSort('category')}
                                 >
                                     <div className="flex items-center gap-1">
-                                        Category <SortIcon column="category" />
+                                        {t('transactions.category')} <SortIcon column="category" />
                                     </div>
                                 </th>
                                 <th
@@ -210,7 +212,7 @@ const Transactions: React.FC = () => {
                                     onClick={() => handleSort('date')}
                                 >
                                     <div className="flex items-center gap-1">
-                                        Date <SortIcon column="date" />
+                                        {t('transactions.date')} <SortIcon column="date" />
                                     </div>
                                 </th>
                                 <th
@@ -218,32 +220,32 @@ const Transactions: React.FC = () => {
                                     onClick={() => handleSort('amount')}
                                 >
                                     <div className="flex items-center gap-1">
-                                        Amount <SortIcon column="amount" />
+                                        {t('transactions.amount')} <SortIcon column="amount" />
                                     </div>
                                 </th>
-                                <th className="p-4 pr-6 text-sm font-bold text-slate-600 dark:text-[#cbbc90] whitespace-nowrap text-right">Status</th>
+                                <th className="p-4 pr-6 text-sm font-bold text-slate-600 dark:text-[#cbbc90] whitespace-nowrap text-right">{t('transactions.status')}</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100 dark:divide-[#493f22]">
                             {filteredTransactions.length > 0 ? (
-                                filteredTransactions.map((t) => (
-                                    <tr key={t.id} className="hover:bg-slate-50 dark:hover:bg-[#493f22]/30 transition-colors group">
+                                filteredTransactions.map((transaction) => (
+                                    <tr key={transaction.id} className="hover:bg-slate-50 dark:hover:bg-[#493f22]/30 transition-colors group">
                                         <td className="p-4 pl-6">
                                             <div className="flex items-center gap-3">
-                                                <div className={`w-10 h-10 rounded-full flex items-center justify-center ${getTransactionStyle(t)}`}>
-                                                    <span className="material-symbols-outlined text-[20px]">{t.icon || (t.type === 'income' ? 'paid' : 'receipt')}</span>
+                                                <div className={`w-10 h-10 rounded-full flex items-center justify-center ${getTransactionStyle(transaction)}`}>
+                                                    <span className="material-symbols-outlined text-[20px]">{transaction.icon || (transaction.type === 'income' ? 'paid' : 'receipt')}</span>
                                                 </div>
-                                                <span className="font-bold text-slate-900 dark:text-white">{t.merchant}</span>
+                                                <span className="font-bold text-slate-900 dark:text-white">{transaction.merchant}</span>
                                             </div>
                                         </td>
-                                        <td className="p-4 text-sm text-slate-600 dark:text-[#cbbc90]">{t.category}</td>
-                                        <td className="p-4 text-sm text-slate-500 dark:text-[#cbbc90]">{formatDate(t.date)}</td>
-                                        <td className={`p-4 font-bold ${t.type === 'income' ? 'text-green-600 dark:text-green-400' : 'text-slate-900 dark:text-white'}`}>
-                                            {t.type === 'income' ? '+' : '-'}{formatCurrency(t.amount)}
+                                        <td className="p-4 text-sm text-slate-600 dark:text-[#cbbc90]">{transaction.category}</td>
+                                        <td className="p-4 text-sm text-slate-500 dark:text-[#cbbc90]">{formatDate(transaction.date)}</td>
+                                        <td className={`p-4 font-bold ${transaction.type === 'income' ? 'text-green-600 dark:text-green-400' : 'text-slate-900 dark:text-white'}`}>
+                                            {transaction.type === 'income' ? '+' : '-'}{formatCurrency(transaction.amount)}
                                         </td>
                                         <td className="p-4 pr-6 text-right">
                                             <span className="inline-block px-2 py-1 text-xs font-bold rounded-md bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
-                                                Completed
+                                                {t('transactions.completed')}
                                             </span>
                                         </td>
                                     </tr>
@@ -253,7 +255,7 @@ const Transactions: React.FC = () => {
                                     <td colSpan={5} className="p-12 text-center text-slate-500 dark:text-[#cbbc90]">
                                         <div className="flex flex-col items-center gap-2">
                                             <span className="material-symbols-outlined text-4xl opacity-50">receipt_long</span>
-                                            <p>No transactions found for this period.</p>
+                                            <p>{t('transactions.noTransactions')}</p>
                                         </div>
                                     </td>
                                 </tr>
