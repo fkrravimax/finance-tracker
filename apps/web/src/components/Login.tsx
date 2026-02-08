@@ -1,20 +1,28 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { authService } from '../services/authService';
 import { authClient } from '../lib/auth-client';
 import { useAppearance } from '../contexts/AppearanceContext';
 
 interface LoginProps {
     onLogin: () => void;
+    onBack?: () => void;
+    defaultSignUp?: boolean;
 }
 
-const Login: React.FC<LoginProps> = ({ onLogin }) => {
-    const [isSignUp, setIsSignUp] = useState(false);
+const Login: React.FC<LoginProps> = ({ onLogin, onBack, defaultSignUp = false }) => {
+    const [isSignUp, setIsSignUp] = useState(defaultSignUp);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [name, setName] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const { theme, setTheme } = useAppearance();
+
+    // Set initial sign up mode from props
+    useEffect(() => {
+        setIsSignUp(defaultSignUp);
+    }, [defaultSignUp]);
+
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -68,6 +76,15 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
             <div className="w-full max-w-md bg-white dark:bg-[#2a2515] rounded-3xl shadow-2xl overflow-hidden border border-slate-200 dark:border-[#493f22]">
                 {/* Header */}
                 <div className="bg-surface-light dark:bg-[#342d18] p-8 text-center border-b border-slate-100 dark:border-[#493f22] relative">
+                    {onBack && (
+                        <button
+                            onClick={onBack}
+                            className="absolute top-4 left-4 p-2 rounded-full text-slate-400 hover:text-primary hover:bg-slate-100 dark:hover:bg-[#2a2515] transition-all"
+                            title="Back to Landing"
+                        >
+                            <span className="material-symbols-outlined text-xl">arrow_back</span>
+                        </button>
+                    )}
                     <button
                         onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
                         className="absolute top-4 right-4 p-2 rounded-full text-slate-400 hover:text-primary hover:bg-slate-100 dark:hover:bg-[#2a2515] transition-all"
