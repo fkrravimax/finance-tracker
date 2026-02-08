@@ -7,6 +7,7 @@ import SavingsVault from './components/SavingsVault'
 import Transactions from './components/Transactions'
 import Settings from './components/Settings'
 import Login from './components/Login'
+import LandingPage from './components/LandingPage'
 import TradingDashboard from './components/TradingDashboard'
 import AdminDashboard from './components/AdminDashboard'
 import { authService } from './services/authService'
@@ -15,6 +16,8 @@ import { authClient } from './lib/auth-client';
 function App() {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [isAuthChecking, setIsAuthChecking] = useState(true);
+    const [showAuth, setShowAuth] = useState(false);
+    const [isSignUpMode, setIsSignUpMode] = useState(false);
 
     // Check for saved auth session
     useEffect(() => {
@@ -43,11 +46,13 @@ function App() {
 
     const handleLogin = () => {
         setIsAuthenticated(true);
+        setShowAuth(false);
     };
 
     const handleLogout = () => {
         authService.logout();
         setIsAuthenticated(false);
+        setShowAuth(false);
     };
 
     if (isAuthChecking) {
@@ -58,9 +63,27 @@ function App() {
         );
     }
 
-    if (!isAuthenticated) {
-        return <Login onLogin={handleLogin} />;
+    // Show Landing Page first if not authenticated and not in auth mode
+    if (!isAuthenticated && !showAuth) {
+        return (
+            <LandingPage
+                onSignUp={() => { setIsSignUpMode(true); setShowAuth(true); }}
+                onSignIn={() => { setIsSignUpMode(false); setShowAuth(true); }}
+            />
+        );
     }
+
+    // Show Login/SignUp page
+    if (!isAuthenticated && showAuth) {
+        return (
+            <Login
+                onLogin={handleLogin}
+                onBack={() => setShowAuth(false)}
+                defaultSignUp={isSignUpMode}
+            />
+        );
+    }
+
 
     return (
         <DashboardLayout onLogout={handleLogout}>
