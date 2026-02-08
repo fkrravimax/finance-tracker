@@ -110,6 +110,14 @@ const QuickAddTransactionModal: React.FC<QuickAddTransactionModalProps> = ({ isO
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" onClick={onClose}>
             <div className="relative w-full max-w-[960px] bg-white dark:bg-[#2a2515] rounded-xl shadow-2xl overflow-hidden flex flex-col md:flex-row border border-slate-200 dark:border-[#493f22] max-h-[90vh] overflow-y-auto md:overflow-visible" onClick={e => e.stopPropagation()}>
+                {/* Close Button */}
+                <button
+                    onClick={onClose}
+                    className="absolute top-3 right-3 z-10 w-8 h-8 rounded-full bg-slate-100 dark:bg-[#39321c] hover:bg-slate-200 dark:hover:bg-[#4a4225] flex items-center justify-center text-slate-500 dark:text-[#cbbc90] transition-colors"
+                    aria-label="Close"
+                >
+                    <span className="material-symbols-outlined text-xl">close</span>
+                </button>
                 {/* Left Column: Input and Keypad */}
                 <div className="flex-1 flex flex-col border-r border-slate-200 dark:border-[#493f22]">
                     {/* Segmented Control (Income/Expense) */}
