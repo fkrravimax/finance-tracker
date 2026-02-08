@@ -47,7 +47,15 @@ router.patch('/users/:id', async (req: Request, res: Response) => {
             .set(updateData)
             .where(eq(users.id, id as string));
 
-        const updatedUser = await db.select().from(users).where(eq(users.id, id as string)).limit(1);
+        const updatedUser = await db.select({
+            id: users.id,
+            name: users.name,
+            email: users.email,
+            role: users.role,
+            plan: users.plan,
+            createdAt: users.createdAt,
+            image: users.image,
+        }).from(users).where(eq(users.id, id as string)).limit(1);
 
         res.json(updatedUser[0]);
     } catch (error) {
