@@ -59,6 +59,13 @@ const Dashboard: React.FC = () => {
         ? ((stats.income - stats.expense) / stats.totalBalance) * 100
         : 0;
 
+    // Date Logic
+    const today = new Date();
+    const currentDay = today.getDate();
+    const daysInMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
+    const daysRemaining = daysInMonth - currentDay;
+    const formattedDate = today.toLocaleDateString('en-US', { day: 'numeric', month: 'short' });
+
     return (
 
         <div className="max-w-7xl mx-auto w-full p-4 md:p-6 lg:p-8 flex flex-col gap-8">
@@ -156,7 +163,13 @@ const Dashboard: React.FC = () => {
                     <div className="absolute top-0 right-0 w-32 h-32 bg-peach/10 rounded-bl-full -mr-4 -mt-4"></div>
 
                     <div className="flex items-center justify-between mb-4 relative z-10">
-                        <p className="text-slate-800 dark:text-white text-xl font-extrabold">Monthly Budget</p>
+                        <div>
+                            <p className="text-slate-800 dark:text-white text-xl font-extrabold">Monthly Budget</p>
+                            <p className="text-xs font-bold text-slate-500 dark:text-[#cbbc90] mt-1 flex items-center gap-1">
+                                <span className="material-symbols-outlined text-[14px]">calendar_today</span>
+                                {formattedDate} • {daysRemaining} days left
+                            </p>
+                        </div>
                         <button
                             onClick={() => setIsBudgetModalOpen(true)}
                             className="p-3 rounded-2xl bg-peach/20 text-peach-dark hover:bg-peach/30 transition-colors"
