@@ -29,7 +29,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, onLogout })
                 onClose={() => setIsSidebarOpen(false)}
             />
 
-            <main className="flex-1 h-full overflow-y-auto relative flex flex-col w-full">
+            <main className="flex-1 h-full overflow-y-auto overflow-x-hidden relative flex flex-col w-full max-w-full">
                 {/* Mobile Header (Visible only on small screens) */}
                 <div className="md:hidden flex items-center justify-between p-4 border-b border-slate-200 dark:border-white/5 bg-surface-light dark:bg-background-dark sticky top-0 z-50 shadow-sm">
                     <div className="flex items-center gap-2">
