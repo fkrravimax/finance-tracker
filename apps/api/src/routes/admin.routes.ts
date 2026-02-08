@@ -1,8 +1,8 @@
 
 import { Router, Request, Response } from 'express';
 import { db } from '../db/index.js';
-import { users } from '../db/schema.js';
-import { eq } from 'drizzle-orm';
+import { users, upgradeRequests } from '../db/schema.js';
+import { eq, desc } from 'drizzle-orm';
 import { adminMiddleware } from '../middleware/admin.middleware.js';
 
 const router = Router();
@@ -61,6 +61,89 @@ router.patch('/users/:id', async (req: Request, res: Response) => {
     } catch (error) {
         console.error("Error updating user:", error);
         res.status(500).json({ error: "Failed to update user" });
+    }
+});
+
+// GET /api/admin/upgrade-requests - Get all pending upgrade requests
+router.get('/upgrade-requests', async (req: Request, res: Response) => {
+    try {
+        const requests = await db.select({
+            id: upgradeRequests.id,
+            userId: upgradeRequests.userId,
+            currentPlan: upgradeRequests.currentPlan,
+            requestedPlan: upgradeRequests.requestedPlan,
+            status: upgradeRequests.status,
+            createdAt: upgradeRequests.createdAt,
+            userName: users.name,
+            userEmail: users.email,
+        })
+            .from(upgradeRequests)
+            .leftJoin(users, eq(upgradeRequests.userId, users.id))
+            .where(eq(upgradeRequests.status, 'PENDING'))
+            .orderBy(desc(upgradeRequests.createdAt));
+
+        res.json(requests);
+    } catch (error) {
+        console.error("Error fetching upgrade requests:", error);
+        res.status(500).json({ error: "Failed to fetch upgrade requests" });
+    }
+});
+
+// PATCH /api/admin/upgrade-requests/:id - Approve or reject upgrade request
+router.patch('/upgrade-requests/:id', async (req: Request, res: Response) => {
+    try {
+        const { id } = req.params;
+        const { action } = req.body; // 'approve' or 'reject'
+
+        if (!action || !['approve', 'reject'].includes(action)) {
+            return res.status(400).json({ error: "Action must be 'approve' or 'reject'" });
+        }
+
+        // Get the upgrade request
+        const request = await db.select()
+            .from(upgradeRequests)
+            .where(eq(upgradeRequests.id, id as string))
+            .limit(1);
+
+        if (request.length === 0) {
+            return res.status(404).json({ error: "Upgrade request not found" });
+        }
+
+        const upgradeRequest = request[0];
+
+        if (upgradeRequest.status !== 'PENDING') {
+            return res.status(400).json({ error: "This request has already been processed" });
+        }
+
+        const newStatus = action === 'approve' ? 'APPROVED' : 'REJECTED';
+
+        // Update the upgrade request status
+        await db.update(upgradeRequests)
+            .set({
+                status: newStatus,
+                updatedAt: new Date()
+            })
+            .where(eq(upgradeRequests.id, id as string));
+
+        // If approved, update the user's plan
+        if (action === 'approve') {
+            await db.update(users)
+                .set({
+                    plan: upgradeRequest.requestedPlan,
+                    updatedAt: new Date()
+                })
+                .where(eq(users.id, upgradeRequest.userId));
+        }
+
+        res.json({
+            success: true,
+            message: action === 'approve'
+                ? 'User has been upgraded to ' + upgradeRequest.requestedPlan
+                : 'Upgrade request has been rejected'
+        });
+    } catch (error) {
+        console.error("Error processing upgrade request:", error);
+        res.status(500).json({ error: "Failed to process upgrade request" });
     }
 });
 

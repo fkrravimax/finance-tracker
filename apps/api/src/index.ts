@@ -47,6 +47,9 @@ app.use('/api/trading', authMiddleware, tradingRoutes);
 import adminRoutes from './routes/admin.routes.js';
 app.use('/api/admin', authMiddleware, adminRoutes);
 
+import upgradeRoutes from './routes/upgrade.routes.js';
+app.use('/api/upgrade-requests', authMiddleware, upgradeRoutes);
+
 // Helper to keep cron alive
 import { startCronJobs } from './cron.js';
 // Only start cron in non-serverless environment or use Vercel Cron (different topic)

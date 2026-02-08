@@ -124,3 +124,15 @@ export const trades = pgTable("trade", {
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
+
+// --- Upgrade Requests Table ---
+
+export const upgradeRequests = pgTable("upgrade_request", {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: text("user_id").notNull().references(() => users.id),
+    currentPlan: text("current_plan").notNull(),
+    requestedPlan: text("requested_plan").notNull(),
+    status: text("status").notNull().default("PENDING"), // PENDING | APPROVED | REJECTED
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
