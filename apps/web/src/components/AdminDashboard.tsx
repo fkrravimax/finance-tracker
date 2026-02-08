@@ -83,7 +83,7 @@ const AdminDashboard = () => {
             </div>
 
             <div className="overflow-hidden bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
-                <div className="overflow-x-auto">
+                <div className="overflow-x-auto hidden md:block">
                     <table className="w-full text-left text-sm text-gray-600 dark:text-gray-300">
                         <thead className="bg-gray-50 dark:bg-gray-700/50 text-gray-900 dark:text-white border-b border-gray-100 dark:border-gray-700">
                             <tr>
@@ -146,6 +146,59 @@ const AdminDashboard = () => {
                             ))}
                         </tbody>
                     </table>
+                </div>
+
+                {/* Mobile Card View */}
+                <div className="md:hidden flex flex-col divide-y divide-gray-100 dark:divide-gray-700">
+                    {users.map(user => (
+                        <div key={user.id} className="p-4 space-y-3">
+                            <div className="flex items-start justify-between">
+                                <div className="flex flex-col">
+                                    <span className="font-medium text-gray-900 dark:text-white text-base">{user.name}</span>
+                                    <span className="text-xs text-gray-500">{user.email}</span>
+                                </div>
+                                <span className="text-xs text-gray-400">
+                                    {new Date(user.createdAt).toLocaleDateString(undefined, {
+                                        month: 'short',
+                                        day: 'numeric'
+                                    })}
+                                </span>
+                            </div>
+
+                            <div className="flex items-center gap-2 pt-1">
+                                <select
+                                    value={user.role}
+                                    onChange={(e) => handleUpdate(user.id, 'role', e.target.value)}
+                                    className={`
+                                        flex-1 px-3 py-2 rounded-lg text-xs font-medium border outline-none transition-colors
+                                        ${user.role === 'ADMIN'
+                                            ? 'bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-900/20 dark:text-purple-300 dark:border-purple-800'
+                                            : 'bg-gray-50 text-gray-700 border-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600'}
+                                    `}
+                                >
+                                    <option value="USER">User</option>
+                                    <option value="ADMIN">Admin</option>
+                                </select>
+
+                                <select
+                                    value={user.plan}
+                                    onChange={(e) => handleUpdate(user.id, 'plan', e.target.value)}
+                                    className={`
+                                        flex-1 px-3 py-2 rounded-lg text-xs font-medium border outline-none transition-colors
+                                        ${user.plan === 'PLATINUM'
+                                            ? 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/20 dark:text-amber-300 dark:border-amber-800'
+                                            : user.plan === 'PREMIUM'
+                                                ? 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/20 dark:text-blue-300 dark:border-blue-800'
+                                                : 'bg-gray-50 text-gray-700 border-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600'}
+                                    `}
+                                >
+                                    <option value="FREE">Free</option>
+                                    <option value="PREMIUM">Premium</option>
+                                    <option value="PLATINUM">Platinum</option>
+                                </select>
+                            </div>
+                        </div>
+                    ))}
                 </div>
             </div>
         </div>
