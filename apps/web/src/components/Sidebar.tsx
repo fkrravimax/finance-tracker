@@ -87,7 +87,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onLogout, isOpen = false, onClose }) 
                                 <p className="text-sm font-black text-slate-800 dark:text-white truncate">{user?.name || 'User'}</p>
                                 <div className="flex items-center gap-1">
                                     <span className="w-2 h-2 rounded-full bg-mint-dark"></span>
-                                    <p className="text-xs font-bold text-slate-500 dark:text-text-muted">{user?.plan ? `${user.plan} Plan` : 'Free Plan'}</p>
+                                    <p className="text-xs font-bold text-slate-500 dark:text-text-muted">{user?.plan ? `${user.plan}` : 'Free Plan'}</p>
                                 </div>
                             </div>
                             <button
