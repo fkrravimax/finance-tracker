@@ -4,12 +4,20 @@ import ExpensesByCategory from './ExpensesByCategory';
 
 import ReportsSkeleton from './skeletons/ReportsSkeleton';
 
+import { useLanguage } from '../contexts/LanguageContext';
+
 const Reports: React.FC = () => {
+    const { t } = useLanguage();
     const [timeRange, setTimeRange] = useState('Monthly');
     const [reportData, setReportData] = useState<any>(null);
     const [loading, setLoading] = useState(true);
 
-    const timeOptions = ['Daily', 'Weekly', 'Monthly', 'Yearly'];
+    const timeOptions = [
+        { value: 'Daily', label: t('common.daily') },
+        { value: 'Weekly', label: t('common.weekly') },
+        { value: 'Monthly', label: t('common.monthly') },
+        { value: 'Yearly', label: t('common.yearly') }
+    ];
 
     const formatPeriod = (dateStr: string) => {
         const date = new Date(dateStr);
@@ -45,28 +53,28 @@ const Reports: React.FC = () => {
         <div className="max-w-7xl mx-auto w-full p-4 md:p-8 lg:p-12 flex flex-col gap-8">
             {/* Header */}
             <header className="flex flex-wrap justify-between items-center gap-4">
-                <h2 className="text-xl font-bold text-slate-900 dark:text-white">Reports & Analytics</h2>
+                <h2 className="text-xl font-bold text-slate-900 dark:text-white">{t('reports.title')}</h2>
             </header>
 
             {/* Title Section */}
             <div className="flex flex-col gap-1">
                 <div className="flex justify-between items-end">
                     <div>
-                        <h1 className="text-4xl font-black tracking-tight text-slate-900 dark:text-white mb-2">Spending Overview</h1>
-                        <p className="text-slate-500 dark:text-[#cbbc90] text-base">Track your financial health over time.</p>
+                        <h1 className="text-4xl font-black tracking-tight text-slate-900 dark:text-white mb-2">{t('reports.spendingOverview')}</h1>
+                        <p className="text-slate-500 dark:text-[#cbbc90] text-base">{t('reports.spendingSubtitle')}</p>
                     </div>
                     {/* Time Range Filter */}
                     <div className="flex bg-white dark:bg-[#2b2616] border border-slate-200 dark:border-[#493f22] rounded-xl p-1 overflow-x-auto max-w-full">
                         {timeOptions.map((option) => (
                             <button
-                                key={option}
-                                onClick={() => setTimeRange(option)}
-                                className={`px-4 py-2 text-sm font-bold rounded-lg transition-all whitespace-nowrap ${timeRange === option
+                                key={option.value}
+                                onClick={() => setTimeRange(option.value)}
+                                className={`px-4 py-2 text-sm font-bold rounded-lg transition-all whitespace-nowrap ${timeRange === option.value
                                     ? 'bg-primary text-slate-900 shadow-sm'
                                     : 'text-slate-500 dark:text-[#cbbc90] hover:bg-slate-50 dark:hover:bg-[#342d18]'
                                     }`}
                             >
-                                {option}
+                                {option.label}
                             </button>
                         ))}
                     </div>
@@ -77,15 +85,15 @@ const Reports: React.FC = () => {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* History Table */}
                 <div className="lg:col-span-2 bg-white dark:bg-[#2a2515] border border-slate-200 dark:border-[#493f22] rounded-2xl p-6 flex flex-col gap-4">
-                    <h3 className="text-lg font-bold text-slate-900 dark:text-white">{timeRange} History</h3>
+                    <h3 className="text-lg font-bold text-slate-900 dark:text-white">{t('reports.history').replace('{period}', timeRange)}</h3>
                     <div className="overflow-x-auto">
                         <table className="w-full text-left text-sm">
                             <thead>
                                 <tr className="border-b border-slate-200 dark:border-[#493f22]">
-                                    <th className="pb-3 font-semibold text-slate-500 dark:text-[#cbbc90]">Period</th>
-                                    <th className="pb-3 font-semibold text-slate-500 dark:text-[#cbbc90]">Income</th>
-                                    <th className="pb-3 font-semibold text-slate-500 dark:text-[#cbbc90]">Expense</th>
-                                    <th className="pb-3 font-semibold text-slate-500 dark:text-[#cbbc90]">Status</th>
+                                    <th className="pb-3 font-semibold text-slate-500 dark:text-[#cbbc90]">{t('reports.period')}</th>
+                                    <th className="pb-3 font-semibold text-slate-500 dark:text-[#cbbc90]">{t('reports.income')}</th>
+                                    <th className="pb-3 font-semibold text-slate-500 dark:text-[#cbbc90]">{t('reports.expense')}</th>
+                                    <th className="pb-3 font-semibold text-slate-500 dark:text-[#cbbc90]">{t('reports.status')}</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-100 dark:divide-[#342d18]">
@@ -105,7 +113,7 @@ const Reports: React.FC = () => {
                                                 ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
                                                 : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
                                                 }`}>
-                                                {row.income > row.expense ? 'Saved' : 'Overspent'}
+                                                {row.income > row.expense ? t('reports.saved') : t('reports.overspent')}
                                             </span>
                                         </td>
                                     </tr>
@@ -121,7 +129,7 @@ const Reports: React.FC = () => {
                     <div className="bg-white dark:bg-[#2a2515] border border-slate-200 dark:border-[#493f22] rounded-2xl p-6 flex flex-col gap-4">
                         <div className="flex items-center gap-2 mb-2">
                             <span className="material-symbols-outlined text-primary">fact_check</span>
-                            <h3 className="text-lg font-bold text-slate-900 dark:text-white">The Reality Check (Monthly)</h3>
+                            <h3 className="text-lg font-bold text-slate-900 dark:text-white">{t('reports.realityCheck')} ({timeRange})</h3>
                         </div>
                         <div className="flex flex-col gap-4">
                             {reportData?.budgetVsReality?.map((item: any) => {
@@ -131,11 +139,11 @@ const Reports: React.FC = () => {
                                 return (
                                     <div key={item.category} className="flex flex-col gap-1">
                                         <div className="flex justify-between items-end">
-                                            <span className="text-sm font-bold text-slate-700 dark:text-[#cbbc90]">Total Monthly Spending</span>
+                                            <span className="text-sm font-bold text-slate-700 dark:text-[#cbbc90]">{t('reports.totalPeriodSpending').replace('{period}', t('common.monthly'))}</span>
                                             <span className="text-xs font-medium text-slate-500 dark:text-[#8e8568]">
                                                 {Number(item.actual).toLocaleString('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 })}
                                                 <span className="text-slate-300 dark:text-[#493f22] mx-1">/</span>
-                                                {item.limit > 0 ? Number(item.limit).toLocaleString('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }) : 'No Limit'}
+                                                {item.limit > 0 ? Number(item.limit).toLocaleString('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }) : t('reports.noLimit')}
                                             </span>
                                         </div>
                                         <div className="relative w-full h-4 bg-slate-100 dark:bg-[#342d18] rounded-full overflow-hidden mt-1">
@@ -145,13 +153,13 @@ const Reports: React.FC = () => {
                                             ></div>
                                         </div>
                                         <p className="text-xs text-right mt-1 font-bold text-slate-500 dark:text-[#cbbc90]">
-                                            {percentage.toFixed(1)}% Used
+                                            {percentage.toFixed(1)}% {t('reports.used')}
                                         </p>
                                     </div>
                                 );
                             })}
                             {(!reportData?.budgetVsReality || reportData.budgetVsReality.length === 0) && (
-                                <p className="text-sm text-slate-400 italic">No spending data yet for this month.</p>
+                                <p className="text-sm text-slate-400 italic">{t('reports.noSpendingData')}</p>
                             )}
                         </div>
                     </div>
@@ -160,7 +168,7 @@ const Reports: React.FC = () => {
                     {reportData?.history?.length > 0 && (
                         <div className="bg-white dark:bg-[#2a2515] border border-slate-200 dark:border-[#493f22] rounded-2xl p-6 flex items-center justify-between">
                             <div>
-                                <p className="text-sm text-slate-500 dark:text-[#cbbc90] font-medium mb-1">Total Savings ({timeRange})</p>
+                                <p className="text-sm text-slate-500 dark:text-[#cbbc90] font-medium mb-1">{t('reports.totalSavings')} ({timeRange})</p>
                                 <h3 className="text-3xl font-black text-slate-900 dark:text-white">
                                     {reportData.history.reduce((acc: number, curr: any) => acc + (curr.income - curr.expense), 0).toLocaleString('id-ID', { style: 'currency', currency: 'IDR' })}
                                 </h3>
@@ -176,10 +184,10 @@ const Reports: React.FC = () => {
             {/* Middle Row: Cumulative Cash Flow (New Feature) */}
             <div className="bg-white dark:bg-[#2a2515] border border-slate-200 dark:border-[#493f22] rounded-2xl p-6 md:p-8">
                 <div className="flex justify-between items-center mb-6">
-                    <h3 className="text-lg font-bold text-slate-900 dark:text-white">Cumulative Cash Flow</h3>
+                    <h3 className="text-lg font-bold text-slate-900 dark:text-white">{t('reports.cumulativeCashFlow')}</h3>
                     <div className="flex items-center gap-2">
                         <span className="material-symbols-outlined text-primary">show_chart</span>
-                        <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-[#cbbc90]">This Month Trend</span>
+                        <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-[#cbbc90]">{t('reports.trend')}</span>
                     </div>
                 </div>
                 <div className="relative h-64 w-full">
@@ -221,8 +229,8 @@ const Reports: React.FC = () => {
                     </svg>
                 </div>
                 <div className="flex justify-between mt-2 text-xs text-slate-400 dark:text-[#685a31] font-medium">
-                    <span>Start of Month</span>
-                    <span>End of Month</span>
+                    <span>{t('reports.start')}</span>
+                    <span>{t('reports.end')}</span>
                 </div>
             </div>
 
@@ -232,7 +240,7 @@ const Reports: React.FC = () => {
             <div className="bg-white dark:bg-[#2a2515] border border-slate-200 dark:border-[#493f22] rounded-2xl p-6 md:p-8">
                 <ExpensesByCategory />
             </div>
-        </div>
+        </div >
     );
 };
 

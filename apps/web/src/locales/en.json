@@ -18,7 +18,13 @@
         "all": "All",
         "none": "None",
         "yes": "Yes",
-        "no": "No"
+        "no": "No",
+        "daily": "Daily",
+        "weekly": "Weekly",
+        "monthly": "Monthly",
+        "yearly": "Yearly",
+        "month": "Month",
+        "year": "Year"
     },
     "sidebar": {
         "overview": "Overview",
@@ -32,9 +38,27 @@
         "freePlan": "Free Plan"
     },
     "dashboard": {
-        "greeting": "Hello",
+        "greeting": "Hello, {name}",
+        "overview": "Dashboard",
+        "overviewSuffix": "Overview",
+        "export": "Export Data",
+        "addNew": "Add New",
         "summary": "Here's your financial summary",
         "totalBalance": "Total Balance",
+        "updatedJustNow": "Updated just now",
+        "monthlyBudget": "Monthly Budget",
+        "daysLeft": "{days} days left",
+        "usedOf": "used of",
+        "budgetWarnings": {
+            "critical": "Critical: You've exceeded 90% of your budget!",
+            "warning": "Warning: You've used over 65% of your budget.",
+            "good": "Good job! You're well within your budget."
+        },
+        "noBudget": "No monthly budget set yet.",
+        "buttons": {
+            "addBalance": "Add Balance",
+            "setBudget": "Set Budget"
+        },
         "monthlyIncome": "Monthly Income",
         "monthlyExpense": "Monthly Expense",
         "budgetUsed": "Budget Used",
@@ -81,22 +105,6 @@
             "year": "This Year"
         }
     },
-    "reports": {
-        "title": "Reports",
-        "subtitle": "Analyze your financial data",
-        "monthlyOverview": "Monthly Overview",
-        "categoryBreakdown": "Category Breakdown",
-        "incomeVsExpense": "Income vs Expense",
-        "trends": "Trends",
-        "export": "Export",
-        "selectPeriod": "Select Period",
-        "thisMonth": "This Month",
-        "lastMonth": "Last Month",
-        "last3Months": "Last 3 Months",
-        "last6Months": "Last 6 Months",
-        "thisYear": "This Year",
-        "custom": "Custom Range"
-    },
     "trading": {
         "title": "Trading Terminal",
         "subtitle": "Track your trading performance",
@@ -135,7 +143,8 @@
         "featureWinRate": "Win Rate Analytics",
         "featureBalanceTracking": "Balance Tracking",
         "adminReview": "Admin will review your upgrade request",
-        "notifyWhenProcessed": "You will be notified when your request is processed"
+        "notifyWhenProcessed": "You will be notified when your request is processed",
+        "noTrades": "No trades logged yet. Start your journey!"
     },
     "savings": {
         "title": "Savings Vault",
@@ -152,7 +161,22 @@
         "deposit": "Deposit",
         "withdraw": "Withdraw",
         "noGoals": "No savings goals yet",
-        "createFirst": "Create your first savings goal"
+        "createFirst": "Create your first savings goal",
+        "totalSaved": "Total Saved",
+        "activeGoals": "Active Goals",
+        "monthlyTarget": "Monthly Target",
+        "onTrack": "On Track",
+        "completed": "Completed",
+        "neededForTargets": "Needed to hit targets",
+        "createGoal": "Create New Goal",
+        "addAnother": "Add Another Goal",
+        "startNew": "Start saving for something new",
+        "confirmDeposit": "Confirm Deposit",
+        "confirmWithdraw": "Confirm Withdrawal",
+        "addFunds": "Add Funds",
+        "withdrawFunds": "Withdraw Funds",
+        "deleteConfirmation": "Are you sure you want to delete this goal? All your progress and history for this goal will be removed permanently.",
+        "keepGoal": "Keep Goal"
     },
     "settings": {
         "title": "Settings",
@@ -263,5 +287,31 @@
         "plan": "Plan",
         "joinedDate": "Joined",
         "actions": "Actions"
+    },
+    "reports": {
+        "title": "Reports & Analytics",
+        "spendingOverview": "Spending Overview",
+        "spendingSubtitle": "Track your financial health over time.",
+        "history": "{period} History",
+        "period": "Period",
+        "income": "Income",
+        "expense": "Expense",
+        "status": "Status",
+        "saved": "Saved",
+        "overspent": "Overspent",
+        "realityCheck": "The Reality Check",
+        "totalSpending": "Total Annual Spending",
+        "totalPeriodSpending": "Total {period} Spending",
+        "noLimit": "No Limit",
+        "used": "Used",
+        "noSpendingData": "No spending data yet for this period.",
+        "totalSavings": "Total Savings",
+        "cumulativeCashFlow": "Cumulative Cash Flow",
+        "trend": "Trend",
+        "start": "Start",
+        "end": "End",
+        "expensesByCategory": "Expenses by Category",
+        "noExpenses": "No expenses found for this period.",
+        "totalExpensesPeriod": "Total Expenses in Period"
     }
 }

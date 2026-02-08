@@ -5,6 +5,8 @@ import ConfirmationModal from './ConfirmationModal';
 import { useNotification } from '../contexts/NotificationContext';
 import SavingsVaultSkeleton from './skeletons/SavingsVaultSkeleton';
 
+import { useLanguage } from '../contexts/LanguageContext';
+
 // Helper to get dynamic image based on name using Bing Images (More reliable for search terms)
 const getGoalImage = (name: string): string => {
     const firstWord = name.trim().split(' ')[0] || 'savings';
@@ -15,6 +17,7 @@ const getGoalImage = (name: string): string => {
 };
 
 const SavingsVault: React.FC = () => {
+    const { t } = useLanguage();
     const [goals, setGoals] = useState<SavingsGoal[]>([]);
     const [loading, setLoading] = useState(true);
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -189,11 +192,11 @@ const SavingsVault: React.FC = () => {
                 isOpen={confirmation.isOpen}
                 onClose={() => setConfirmation({ ...confirmation, isOpen: false })}
                 onConfirm={handleConfirmDelete}
-                title="Delete Saving Goal?"
-                message="Are you sure you want to delete this goal? All your progress and history for this goal will be removed permanently."
+                title={t('savings.deleteGoal')}
+                message={t('savings.deleteConfirmation')}
                 variant="danger"
-                cancelText="Keep Goal"
-                confirmText="Delete"
+                cancelText={t('common.cancel')}
+                confirmText={t('common.delete')}
                 isLoading={confirmation.isLoading}
             />
 
@@ -204,14 +207,14 @@ const SavingsVault: React.FC = () => {
                         <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={handleCloseCreateModal}></div>
                         <div className="relative bg-white dark:bg-[#2a2515] w-full max-w-md rounded-2xl shadow-2xl overflow-hidden flex flex-col animate-scale-in">
                             <div className="p-6 border-b border-slate-100 dark:border-[#493f22] flex justify-between items-center bg-surface-light dark:bg-[#342d18]">
-                                <h3 className="text-xl font-bold text-slate-900 dark:text-white">Create New Goal</h3>
+                                <h3 className="text-xl font-bold text-slate-900 dark:text-white">{t('savings.createGoal')}</h3>
                                 <button onClick={handleCloseCreateModal} className="text-slate-400 hover:text-slate-600 dark:text-[#cbbc90] dark:hover:text-white transition-colors">
                                     <span className="material-symbols-outlined">close</span>
                                 </button>
                             </div>
                             <form onSubmit={handleCreateSubmit} className="p-6 flex flex-col gap-6">
                                 <div className="flex flex-col gap-2">
-                                    <label className="text-sm font-bold text-slate-700 dark:text-[#cbbc90]">Goal Name</label>
+                                    <label className="text-sm font-bold text-slate-700 dark:text-[#cbbc90]">{t('savings.goalName')}</label>
                                     <input
                                         type="text"
                                         name="name"
@@ -223,7 +226,7 @@ const SavingsVault: React.FC = () => {
                                     />
                                 </div>
                                 <div className="flex flex-col gap-2">
-                                    <label className="text-sm font-bold text-slate-700 dark:text-[#cbbc90]">Target Amount</label>
+                                    <label className="text-sm font-bold text-slate-700 dark:text-[#cbbc90]">{t('savings.targetAmount')}</label>
                                     <div className="relative">
                                         <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-600 font-bold">Rp</span>
                                         <CurrencyInput
@@ -237,7 +240,7 @@ const SavingsVault: React.FC = () => {
                                     </div>
                                 </div>
                                 <div className="flex flex-col gap-2">
-                                    <label className="text-sm font-bold text-slate-700 dark:text-[#cbbc90]">Target Date</label>
+                                    <label className="text-sm font-bold text-slate-700 dark:text-[#cbbc90]">{t('savings.targetDate')}</label>
                                     <div className="flex gap-2 mb-1">
                                         {[3, 6, 12].map((months) => (
                                             <button
@@ -266,7 +269,7 @@ const SavingsVault: React.FC = () => {
                                 </div>
                                 <div className="pt-2">
                                     <button type="submit" className="w-full bg-primary hover:bg-[#dca60e] text-slate-900 font-bold py-4 rounded-xl transition-all shadow-lg hover:shadow-primary/25 active:scale-95">
-                                        Create Goal
+                                        {t('savings.createGoal')}
                                     </button>
                                 </div>
                             </form>
@@ -283,7 +286,7 @@ const SavingsVault: React.FC = () => {
                         <div className="relative bg-white dark:bg-[#2a2515] w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden flex flex-col animate-scale-in">
                             <div className="p-6 border-b border-slate-100 dark:border-[#493f22] flex justify-between items-center bg-surface-light dark:bg-[#342d18]">
                                 <h3 className="text-xl font-bold text-slate-900 dark:text-white">
-                                    {updateType === 'deposit' ? 'Add Savings' : 'Withdraw Funds'}
+                                    {updateType === 'deposit' ? t('savings.addFunds') : t('savings.withdrawFunds')}
                                 </h3>
                                 <button onClick={handleCloseUpdateModal} className="text-slate-400 hover:text-slate-600 dark:text-[#cbbc90] dark:hover:text-white transition-colors">
                                     <span className="material-symbols-outlined">close</span>
@@ -291,7 +294,7 @@ const SavingsVault: React.FC = () => {
                             </div>
                             <form onSubmit={handleUpdateSavings} className="p-6 flex flex-col gap-6">
                                 <div className="flex flex-col gap-2">
-                                    <label className="text-sm font-bold text-slate-700 dark:text-[#cbbc90]">Amount</label>
+                                    <label className="text-sm font-bold text-slate-700 dark:text-[#cbbc90]">{t('settings.amount')}</label>
                                     <div className="relative">
                                         <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-600 font-bold">Rp</span>
                                         <CurrencyInput
@@ -308,7 +311,7 @@ const SavingsVault: React.FC = () => {
                                         type="submit"
                                         className={`w-full font-bold py-4 rounded-xl transition-all shadow-lg active:scale-95 ${updateType === 'deposit' ? 'bg-green-500 hover:bg-green-600 text-white shadow-green-500/25' : 'bg-red-500 hover:bg-red-600 text-white shadow-red-500/25'}`}
                                     >
-                                        {updateType === 'deposit' ? 'Confirm Deposit' : 'Confirm Withdrawal'}
+                                        {updateType === 'deposit' ? t('savings.confirmDeposit') : t('savings.confirmWithdraw')}
                                     </button>
                                 </div>
                             </form>
@@ -320,15 +323,15 @@ const SavingsVault: React.FC = () => {
             {/* Page Heading & Actions */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
                 <div className="flex flex-col gap-1">
-                    <h1 className="text-3xl md:text-4xl font-black text-slate-900 dark:text-white tracking-tight">My Goals</h1>
-                    <p className="text-slate-500 dark:text-[#cbbc90] text-base">Track your dreams and hit your targets faster.</p>
+                    <h1 className="text-3xl md:text-4xl font-black text-slate-900 dark:text-white tracking-tight">{t('savings.title')}</h1>
+                    <p className="text-slate-500 dark:text-[#cbbc90] text-base">{t('savings.subtitle')}</p>
                 </div>
                 <button
                     onClick={handleOpenCreateModal}
                     className="group flex items-center justify-center gap-2 bg-primary hover:bg-[#dca60e] text-black px-6 py-3 rounded-xl font-bold transition-all shadow-lg hover:shadow-primary/20 active:scale-95"
                 >
                     <span className="material-symbols-outlined group-hover:rotate-90 transition-transform">add</span>
-                    <span>Create New Goal</span>
+                    <span>{t('savings.createGoal')}</span>
                 </button>
             </div>
 
@@ -340,13 +343,13 @@ const SavingsVault: React.FC = () => {
                         <div className="p-2 rounded-lg bg-green-500/10 text-green-500">
                             <span className="material-symbols-outlined">account_balance_wallet</span>
                         </div>
-                        <p className="text-slate-500 dark:text-[#cbbc90] font-medium">Total Saved</p>
+                        <p className="text-slate-500 dark:text-[#cbbc90] font-medium">{t('savings.totalSaved')}</p>
                     </div>
                     <div>
                         <p className="text-3xl font-bold text-slate-900 dark:text-white">{formatCurrency(totalSaved)}</p>
                         <div className="flex items-center gap-1 mt-1 text-sm font-medium text-green-500">
                             <span className="material-symbols-outlined text-base">trending_up</span>
-                            <span>On Track</span>
+                            <span>{t('savings.onTrack')}</span>
                         </div>
                     </div>
                 </div>
@@ -356,10 +359,10 @@ const SavingsVault: React.FC = () => {
                         <div className="p-2 rounded-lg bg-blue-500/10 text-blue-500">
                             <span className="material-symbols-outlined">flag</span>
                         </div>
-                        <p className="text-slate-500 dark:text-[#cbbc90] font-medium">Active Goals</p>
+                        <p className="text-slate-500 dark:text-[#cbbc90] font-medium">{t('savings.activeGoals')}</p>
                     </div>
                     <div>
-                        <p className="text-3xl font-bold text-slate-900 dark:text-white">{activeGoalsCount} Goals</p>
+                        <p className="text-3xl font-bold text-slate-900 dark:text-white">{activeGoalsCount} {t('savings.title')}</p>
                         <p className="text-sm mt-1 text-slate-400 dark:text-[#cbbc90]">Keep it up!</p>
                     </div>
                 </div>
@@ -369,11 +372,11 @@ const SavingsVault: React.FC = () => {
                         <div className="p-2 rounded-lg bg-primary/10 text-primary">
                             <span className="material-symbols-outlined">calendar_month</span>
                         </div>
-                        <p className="text-slate-500 dark:text-[#cbbc90] font-medium">Monthly Target</p>
+                        <p className="text-slate-500 dark:text-[#cbbc90] font-medium">{t('savings.monthlyTarget')}</p>
                     </div>
                     <div>
                         <p className="text-3xl font-bold text-slate-900 dark:text-white">{formatCurrency(monthlySavings)}</p>
-                        <p className="text-sm mt-1 text-slate-400 dark:text-[#cbbc90]">Needed to hit targets</p>
+                        <p className="text-sm mt-1 text-slate-400 dark:text-[#cbbc90]">{t('savings.neededForTargets')}</p>
                     </div>
                 </div>
             </div>
@@ -409,20 +412,20 @@ const SavingsVault: React.FC = () => {
                                                     onClick={() => handleOpenUpdateModal(goal.id, 'deposit')}
                                                     className="w-full text-left px-4 py-3 text-sm font-medium text-slate-700 dark:text-[#cbbc90] hover:bg-slate-50 dark:hover:bg-[#3f3823] flex items-center gap-2"
                                                 >
-                                                    <span className="material-symbols-outlined text-green-500">add_circle</span> Add Funds
+                                                    <span className="material-symbols-outlined text-green-500">add_circle</span> {t('savings.addFunds')}
                                                 </button>
                                                 <button
                                                     onClick={() => handleOpenUpdateModal(goal.id, 'withdraw')}
                                                     className="w-full text-left px-4 py-3 text-sm font-medium text-slate-700 dark:text-[#cbbc90] hover:bg-slate-50 dark:hover:bg-[#3f3823] flex items-center gap-2"
                                                 >
-                                                    <span className="material-symbols-outlined text-orange-500">remove_circle</span> Withdraw Funds
+                                                    <span className="material-symbols-outlined text-orange-500">remove_circle</span> {t('savings.withdrawFunds')}
                                                 </button>
                                                 <div className="h-px bg-slate-100 dark:bg-[#3f3823] mx-3 my-1"></div>
                                                 <button
                                                     onClick={() => handleDeleteGoalClick(goal.id)}
                                                     className="w-full text-left px-4 py-3 text-sm font-medium text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center gap-2 transition-colors"
                                                 >
-                                                    <span className="material-symbols-outlined">delete</span> Delete Goal
+                                                    <span className="material-symbols-outlined">delete</span> {t('savings.deleteGoal')}
                                                 </button>
                                             </div>
                                         )}
@@ -441,8 +444,8 @@ const SavingsVault: React.FC = () => {
                                         ></div>
                                     </div>
                                     <div className="flex justify-between text-xs font-medium mt-1">
-                                        <span className={`${percentage >= 100 ? 'text-green-500' : 'text-primary'}`}>{percentage}% Saved</span>
-                                        <span className="text-slate-400 dark:text-[#8e8568]">{percentage >= 100 ? 'Completed' : 'On Track'}</span>
+                                        <span className={`${percentage >= 100 ? 'text-green-500' : 'text-primary'}`}>{percentage}% {t('savings.totalSaved')}</span>
+                                        <span className="text-slate-400 dark:text-[#8e8568]">{percentage >= 100 ? t('savings.completed') : t('savings.onTrack')}</span>
                                     </div>
                                 </div>
                             </div>
@@ -459,8 +462,8 @@ const SavingsVault: React.FC = () => {
                         <span className="material-symbols-outlined text-3xl">add_circle</span>
                     </div>
                     <div>
-                        <h3 className="text-lg font-bold text-slate-900 dark:text-white">Add Another Goal</h3>
-                        <p className="text-sm text-slate-500 dark:text-[#cbbc90]">Start saving for something new</p>
+                        <h3 className="text-lg font-bold text-slate-900 dark:text-white">{t('savings.addAnother')}</h3>
+                        <p className="text-sm text-slate-500 dark:text-[#cbbc90]">{t('savings.startNew')}</p>
                     </div>
                 </button>
             </div>
