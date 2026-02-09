@@ -12,9 +12,8 @@ export const categorize = async (req: Request, res: Response) => {
         }
 
         const category = await categorizeTransaction(merchant, description);
-        console.log(`[API v2.0] Categorized '${merchant}' as '${category}'`); // Log for server side debugging
-        // Append version for debugging
-        res.json({ category: `${category} (v2.0)` });
+        console.log(`Categorized '${merchant}' as '${category}'`);
+        res.json({ category });
 
     } catch (error) {
         console.error('Error in categorize controller:', error);

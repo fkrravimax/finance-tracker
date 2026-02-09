@@ -20,32 +20,31 @@ export const categorizeTransaction = async (merchant: string, description?: stri
 
 
     const prompt = `
-    You are a financial classifier. Analyze the merchant name and description to categorize the transaction.
+    Role: Financial Transaction Classifier
+    Task: Categorize the transaction into exactly ONE of the following categories.
     
-    Target Categories (Return exactly one of these strings):
+    Allowed Categories:
     - Food
     - Transport
     - Fun
     - Health
     - Bills
     - Shopping
-    - Others
 
-    Input:
-    Merchant: "${merchant}"
-    Description: "${description || ""}"
+    Rules:
+    - "Makan", "Warung", "Kopi", "Cafe", "Starbucks", "KFC", "Bread", "Sate" -> Food
+    - "Gojek", "Grab", "Bensin", "Pertamina", "Isi Bensin", "SPBU", "Shell", "Parkir", "Tol" -> Transport
+    - "Bioskop", "Cinema", "Netflix", "Spotify", "Steam", "Game" -> Fun
+    - "Doctor", "Apotek", "Obat", "RS", "Hospital" -> Health
+    - "PLN", "Listrik", "Token", "Air", "Pulsa", "Data", "Internet", "Wifi", "Topup" -> Bills
+    - "Tokopedia", "Shopee", "Indomaret", "Alfamart", "Superindo", "Mall", "Belanja" -> Shopping
+    
+    If unsure, choose the closest match (e.g., "Jajan" -> Food, "Taxi" -> Transport).
+    
+    Input Merchant: "${merchant}"
+    Input Description: "${description || ""}"
 
-    Context & Rules:
-    1. Detect language (supports Indonesian/English).
-    2. "Makan", "Warung", "Resto", "Cafe", "Starbucks", "KFC", "Sate", "Nasi" -> Food
-    3. "Gojek", "Grab", "Bensin", "Pertamina", "Uber", "Train", "Bus", "Parkir", "Isi Bensin", "SPBU" -> Transport
-    4. "Bioskop", "Netflix", "Spotify", "Game", "Hobby", "Steam" -> Fun
-    5. "Doctor", "Apotek", "Obat", "Hospital", "Gym" -> Health
-    6. "PLN", "Listrik", "Air", "Wifi", "Pulsa", "Telkomsel", "Topup Emoney", "E-money", "Topup", "Internet" -> Bills
-    7. "Tokopedia", "Shopee", "Amazon", "Indomaret", "Alfamart", "Mall", "Clothes", "Belanja" -> Shopping
-    8. If no clear match found -> Others
-
-    Return ONLY the Category string.
+    Response: (Just the category name)
   `;
 
     try {
