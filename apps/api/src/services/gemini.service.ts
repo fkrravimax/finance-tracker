@@ -10,7 +10,8 @@ if (!apiKey) {
 }
 
 const genAI = new GoogleGenerativeAI(apiKey || "");
-const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+// Verified available model for this API Key
+const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
 export const categorizeTransaction = async (merchant: string, description?: string): Promise<string> => {
     if (!apiKey) {
