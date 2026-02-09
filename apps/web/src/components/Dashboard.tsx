@@ -101,7 +101,7 @@ const Dashboard: React.FC = () => {
             />
 
             {/* Page Heading - Glassmorphism */}
-            <header className="flex flex-wrap justify-between items-center md:items-end gap-4 md:gap-6 bg-transparent md:bg-white/60 dark:bg-transparent md:dark:bg-white/5 p-0 md:p-6 rounded-none md:rounded-bubbly shadow-none md:shadow-sm backdrop-blur-none md:backdrop-blur-sm border-none md:border md:border-white/60 md:dark:border-white/5">
+            <header className="flex flex-wrap justify-between items-center md:items-end gap-4 md:gap-6 bg-transparent md:bg-white/60 dark:bg-transparent md:dark:bg-white/5 pt-[calc(env(safe-area-inset-top)+2rem)] md:pt-6 p-0 md:p-6 rounded-none md:rounded-bubbly shadow-none md:shadow-sm backdrop-blur-none md:backdrop-blur-sm border-none md:border md:border-white/60 md:dark:border-white/5">
                 <div className="flex flex-col gap-2">
                     <h2 className="hidden md:block text-3xl md:text-4xl font-black leading-tight tracking-tight text-slate-800 dark:text-white">
                         {t('dashboard.overview')} <span className="text-primary">{t('dashboard.overviewSuffix')}</span>
