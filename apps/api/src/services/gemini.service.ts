@@ -53,8 +53,9 @@ export const categorizeTransaction = async (merchant: string, description?: stri
         const text = response.text();
         console.log("Gemini Output:", text); // Debug log
         return text.trim();
-    } catch (error) {
+    } catch (error: any) {
         console.error("Error categorizing transaction with Gemini:", error);
-        return "Others"; // Fallback
+        // Return the actual error so we can see it in the frontend
+        return `Error: ${error.message || "Unknown Error"}`;
     }
 };
