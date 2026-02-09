@@ -46,8 +46,8 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
     return (
         <NotificationContext.Provider value={{ showNotification }}>
             {children}
-            {/* Notification Container */}
-            <div className="fixed top-4 right-4 z-[200] flex flex-col gap-2 pointer-events-none">
+            {/* Notification Container - Adjusted for Dynamic Island */}
+            <div className="fixed top-[calc(env(safe-area-inset-top)+1rem)] right-4 left-4 md:left-auto md:w-auto z-[200] flex flex-col gap-2 pointer-events-none items-center md:items-end">
                 {notifications.map(notification => (
                     <div
                         key={notification.id}

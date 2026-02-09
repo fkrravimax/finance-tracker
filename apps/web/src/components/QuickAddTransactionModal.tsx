@@ -178,8 +178,8 @@ const QuickAddTransactionModal: React.FC<QuickAddTransactionModalProps> = ({ isO
                 {/* Left Column: Input and Keypad */}
                 <div className="flex-1 flex flex-col border-r border-slate-200 dark:border-[#493f22]">
                     {/* Segmented Control (Income/Expense) */}
-                    <div className="p-6 pb-2">
-                        <div className="flex h-12 w-full items-center justify-center rounded-lg bg-slate-100 dark:bg-[#39321c] p-1">
+                    <div className="p-4 md:p-6 pb-2">
+                        <div className="flex h-10 md:h-12 w-full items-center justify-center rounded-lg bg-slate-100 dark:bg-[#39321c] p-1">
                             <label className="group flex cursor-pointer h-full grow items-center justify-center overflow-hidden rounded-md transition-all has-[:checked]:bg-white dark:has-[:checked]:bg-[#4a4225] has-[:checked]:shadow-sm">
                                 <span className={`truncate text-slate-600 dark:text-[#cbbc90] font-bold text-sm ${transactionType === 'Expense' ? 'text-primary' : ''}`}>Expense</span>
                                 <input
@@ -205,18 +205,18 @@ const QuickAddTransactionModal: React.FC<QuickAddTransactionModalProps> = ({ isO
                         </div>
                     </div>
                     {/* Amount Display */}
-                    <div className="px-6 py-4 text-center">
-                        <p className="text-slate-500 dark:text-[#8e8568] text-sm font-medium mb-1">Enter Amount</p>
-                        <h1 className="text-slate-900 dark:text-white tracking-tight text-[48px] font-bold leading-tight">{formatCurrency(amount)}</h1>
+                    <div className="px-4 py-2 md:px-6 md:py-4 text-center">
+                        <p className="text-slate-500 dark:text-[#8e8568] text-xs md:text-sm font-medium mb-1">Enter Amount</p>
+                        <h1 className="text-slate-900 dark:text-white tracking-tight text-[36px] md:text-[48px] font-bold leading-tight">{formatCurrency(amount)}</h1>
                     </div>
                     {/* Keypad */}
-                    <div className="flex-1 bg-slate-50 dark:bg-[#231e10] p-6">
-                        <div className="grid grid-cols-3 gap-3 h-full">
+                    <div className="flex-1 bg-slate-50 dark:bg-[#231e10] p-4 md:p-6">
+                        <div className="grid grid-cols-3 gap-2 md:gap-3 h-full">
                             {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
                                 <button
                                     onClick={() => handleNumberClick(num)}
                                     key={num}
-                                    className="flex items-center justify-center h-16 rounded-lg bg-white dark:bg-[#342d18] text-xl font-bold text-slate-700 dark:text-[#cbbc90] shadow-sm hover:bg-slate-50 dark:hover:bg-[#3f361d] active:scale-95 transition-transform"
+                                    className="flex items-center justify-center h-12 md:h-16 rounded-lg bg-white dark:bg-[#342d18] text-xl font-bold text-slate-700 dark:text-[#cbbc90] shadow-sm hover:bg-slate-50 dark:hover:bg-[#3f361d] active:scale-95 transition-transform"
                                 >
                                     {num}
                                 </button>
@@ -224,13 +224,13 @@ const QuickAddTransactionModal: React.FC<QuickAddTransactionModalProps> = ({ isO
                             <button className="flex items-center justify-center h-16 rounded-lg bg-transparent text-xl font-bold text-slate-400 dark:text-[#685a31]"></button>
                             <button
                                 onClick={() => handleNumberClick(0)}
-                                className="flex items-center justify-center h-16 rounded-lg bg-white dark:bg-[#342d18] text-xl font-bold text-slate-700 dark:text-[#cbbc90] shadow-sm hover:bg-slate-50 dark:hover:bg-[#3f361d] active:scale-95 transition-transform"
+                                className="flex items-center justify-center h-12 md:h-16 rounded-lg bg-white dark:bg-[#342d18] text-xl font-bold text-slate-700 dark:text-[#cbbc90] shadow-sm hover:bg-slate-50 dark:hover:bg-[#3f361d] active:scale-95 transition-transform"
                             >
                                 0
                             </button>
                             <button
                                 onClick={handleBackspace}
-                                className="flex items-center justify-center h-16 rounded-lg bg-transparent text-xl font-bold text-slate-700 dark:text-[#cbbc90] hover:bg-slate-100 dark:hover:bg-[#3f361d] active:scale-95 transition-transform"
+                                className="flex items-center justify-center h-12 md:h-16 rounded-lg bg-white dark:bg-[#342d18] text-xl font-bold text-slate-700 dark:text-[#cbbc90] shadow-sm hover:bg-slate-100 dark:hover:bg-[#3f361d] active:scale-95 transition-transform"
                             >
                                 <span className="material-symbols-outlined">backspace</span>
                             </button>
