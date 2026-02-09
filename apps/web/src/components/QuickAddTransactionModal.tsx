@@ -143,6 +143,10 @@ const QuickAddTransactionModal: React.FC<QuickAddTransactionModalProps> = ({ isO
             });
 
             showNotification("Transaction successfully saved!");
+
+            // Dispatch global event for other components to refresh
+            window.dispatchEvent(new Event('transaction-updated'));
+
             if (onTransactionAdded) onTransactionAdded();
             onClose();
         } catch (error) {
