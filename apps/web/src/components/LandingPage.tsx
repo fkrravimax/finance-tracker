@@ -24,9 +24,9 @@ const LandingPage: React.FC<LandingPageProps> = ({ onSignUp, onSignIn }) => {
         return () => clearInterval(interval);
     }, []);
 
-    // Auto-rotate features every 4 seconds when on slide 0
+    // Auto-rotate features every 4 seconds when on slide 1 (Features)
     useEffect(() => {
-        if (currentSlide !== 0) return;
+        if (currentSlide !== 1) return;
         const interval = setInterval(() => {
             setActiveFeature((prev) => (prev + 1) % features.length);
         }, 4000);
@@ -135,11 +135,37 @@ const LandingPage: React.FC<LandingPageProps> = ({ onSignUp, onSignIn }) => {
                 </button>
 
                 <div className="w-full max-w-5xl h-[480px] md:h-[420px] lg:h-[480px] relative overflow-hidden">
-                    {/* ===== SLIDE 1 - FEATURES (Interactive) ===== */}
+                    {/* ===== SLIDE 1 - HERO (Now First) ===== */}
                     <div
                         className={`absolute inset-0 flex items-center justify-center transition-all duration-500 ease-in-out ${currentSlide === 0
                             ? 'opacity-100 translate-x-0'
                             : currentSlide > 0
+                                ? 'opacity-0 -translate-x-full'
+                                : 'opacity-0 translate-x-full'
+                            }`}
+                    >
+                        <div className="flex flex-col items-center text-center px-4">
+                            <h1 className="text-3xl md:text-5xl lg:text-6xl font-black text-slate-900 dark:text-white mb-4 md:mb-6">
+                                {t('landing.hero.title')} <span className="text-primary">{t('landing.hero.titleHighlight')}</span>
+                            </h1>
+                            <p className="text-base md:text-xl text-slate-500 dark:text-[#cbbc90] max-w-xl">
+                                {t('landing.hero.subtitle')}
+                            </p>
+                            <a
+                                href="/privacy"
+                                className="mt-6 md:hidden text-xs font-bold text-slate-400 dark:text-[#cbbc90]/70 hover:text-primary transition-colors flex items-center gap-1"
+                            >
+                                <span className="material-symbols-outlined text-sm">verified_user</span>
+                                {language === 'en' ? 'View Privacy Policy' : 'Lihat Kebijakan Privasi'}
+                            </a>
+                        </div>
+                    </div>
+
+                    {/* ===== SLIDE 2 - FEATURES (Now Second) ===== */}
+                    <div
+                        className={`absolute inset-0 flex items-center justify-center transition-all duration-500 ease-in-out ${currentSlide === 1
+                            ? 'opacity-100 translate-x-0'
+                            : currentSlide > 1
                                 ? 'opacity-0 -translate-x-full'
                                 : 'opacity-0 translate-x-full'
                             }`}
@@ -202,32 +228,6 @@ const LandingPage: React.FC<LandingPageProps> = ({ onSignUp, onSignIn }) => {
                                     </button>
                                 ))}
                             </div>
-                        </div>
-                    </div>
-
-                    {/* ===== SLIDE 2 - HERO ===== */}
-                    <div
-                        className={`absolute inset-0 flex items-center justify-center transition-all duration-500 ease-in-out ${currentSlide === 1
-                            ? 'opacity-100 translate-x-0'
-                            : currentSlide > 1
-                                ? 'opacity-0 -translate-x-full'
-                                : 'opacity-0 translate-x-full'
-                            }`}
-                    >
-                        <div className="flex flex-col items-center text-center px-4">
-                            <h1 className="text-3xl md:text-5xl lg:text-6xl font-black text-slate-900 dark:text-white mb-4 md:mb-6">
-                                {t('landing.hero.title')} <span className="text-primary">{t('landing.hero.titleHighlight')}</span>
-                            </h1>
-                            <p className="text-base md:text-xl text-slate-500 dark:text-[#cbbc90] max-w-xl">
-                                {t('landing.hero.subtitle')}
-                            </p>
-                            <a
-                                href="/privacy"
-                                className="mt-6 md:hidden text-xs font-bold text-slate-400 dark:text-[#cbbc90]/70 hover:text-primary transition-colors flex items-center gap-1"
-                            >
-                                <span className="material-symbols-outlined text-sm">verified_user</span>
-                                {language === 'en' ? 'View Privacy Policy' : 'Lihat Kebijakan Privasi'}
-                            </a>
                         </div>
                     </div>
 
