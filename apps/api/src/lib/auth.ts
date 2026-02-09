@@ -40,6 +40,7 @@ export const auth = betterAuth({
     },
     trustedOrigins: [
         process.env.FRONTEND_URL || "http://localhost:5173",
+        "https://rupiku.vercel.app",
         "https://finance-web-five-coral.vercel.app",
         "https://financetrx.vercel.app",
         "https://finance-web-git-main-rafis-projects-acb0d393.vercel.app",
