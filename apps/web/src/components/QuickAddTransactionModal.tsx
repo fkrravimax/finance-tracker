@@ -32,13 +32,14 @@ const QuickAddTransactionModal: React.FC<QuickAddTransactionModalProps> = ({ isO
 
     // ... useEffects
 
+
     // Debounce Auto-Categorize
     useEffect(() => {
         const timeoutId = setTimeout(() => {
             if (notes && notes.length > 2) { // Minimum length check
                 handleAutoCategorize();
             }
-        }, 2000); // 2 seconds debounce
+        }, 1500); // 1.5 seconds debounce
 
         return () => clearTimeout(timeoutId);
     }, [notes]);

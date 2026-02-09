@@ -18,6 +18,7 @@ export const categorizeTransaction = async (merchant: string, description?: stri
     }
 
 
+
     const prompt = `
     You are a financial classifier. Analyze the merchant name and description to categorize the transaction.
     
@@ -35,12 +36,12 @@ export const categorizeTransaction = async (merchant: string, description?: stri
 
     Context & Rules:
     1. Detect language (supports Indonesian/English).
-    2. "Makan", "Warung", "Resto", "Cafe", "Starbucks", "KFC" -> Food
-    3. "Gojek", "Grab", "Bensin", "Pertamina", "Uber", "Train", "Bus", "Parkir" -> Transport
-    4. "Bioskop", "Netflix", "Spotify", "Game", "Hobby" -> Fun
+    2. "Makan", "Warung", "Resto", "Cafe", "Starbucks", "KFC", "Sate", "Nasi" -> Food
+    3. "Gojek", "Grab", "Bensin", "Pertamina", "Uber", "Train", "Bus", "Parkir", "Isi Bensin", "SPBU" -> Transport
+    4. "Bioskop", "Netflix", "Spotify", "Game", "Hobby", "Steam" -> Fun
     5. "Doctor", "Apotek", "Obat", "Hospital", "Gym" -> Health
-    6. "PLN", "Listrik", "Air", "Wifi", "Pulsa", "Telkomsel", "Topup Emoney" -> Bills
-    7. "Tokopedia", "Shopee", "Amazon", "Indomaret", "Alfamart", "Mall", "Clothes" -> Shopping
+    6. "PLN", "Listrik", "Air", "Wifi", "Pulsa", "Telkomsel", "Topup Emoney", "E-money", "Topup", "Internet" -> Bills
+    7. "Tokopedia", "Shopee", "Amazon", "Indomaret", "Alfamart", "Mall", "Clothes", "Belanja" -> Shopping
 
     Return ONLY the Category string.
   `;
