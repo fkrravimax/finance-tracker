@@ -221,6 +221,13 @@ const LandingPage: React.FC<LandingPageProps> = ({ onSignUp, onSignIn }) => {
                             <p className="text-base md:text-xl text-slate-500 dark:text-[#cbbc90] max-w-xl">
                                 {t('landing.hero.subtitle')}
                             </p>
+                            <a
+                                href="/privacy"
+                                className="mt-6 md:hidden text-xs font-bold text-slate-400 dark:text-[#cbbc90]/70 hover:text-primary transition-colors flex items-center gap-1"
+                            >
+                                <span className="material-symbols-outlined text-sm">verified_user</span>
+                                {language === 'en' ? 'View Privacy Policy' : 'Lihat Kebijakan Privasi'}
+                            </a>
                         </div>
                     </div>
 
