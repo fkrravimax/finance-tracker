@@ -10,7 +10,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(cors({
-    origin: process.env.FRONTEND_URL ? [process.env.FRONTEND_URL, "https://finance-web-five-coral.vercel.app", "https://financetrx.vercel.app", "https://finance-web-git-main-rafis-projects-acb0d393.vercel.app", "http://localhost:5173", "http://localhost:5174"] : ["https://financetrx.vercel.app", "https://finance-web-git-main-rafis-projects-acb0d393.vercel.app", "http://localhost:5173", "http://localhost:5174"],
+    origin: process.env.FRONTEND_URL ? [process.env.FRONTEND_URL, "https://rupiku.vercel.app", "https://finance-web-five-coral.vercel.app", "https://financetrx.vercel.app", "https://finance-web-git-main-rafis-projects-acb0d393.vercel.app", "http://localhost:5173", "http://localhost:5174"] : ["https://rupiku.vercel.app", "https://financetrx.vercel.app", "https://finance-web-git-main-rafis-projects-acb0d393.vercel.app", "http://localhost:5173", "http://localhost:5174"],
     credentials: true,
     allowedHeaders: ["Content-Type", "Authorization"],
 }));
