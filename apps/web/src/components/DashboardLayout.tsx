@@ -22,7 +22,7 @@ const DashboardContent: React.FC<DashboardLayoutProps> = ({ children, onLogout }
             {/* Sidebar Overlay (Mobile) */}
             {isSidebarOpen && (
                 <div
-                    className="fixed inset-0 z-20 bg-black/50 backdrop-blur-sm md:hidden"
+                    className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm md:hidden"
                     onClick={() => setIsSidebarOpen(false)}
                 />
             )}
