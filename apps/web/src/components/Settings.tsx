@@ -474,10 +474,6 @@ const Settings: React.FC = () => {
                                         <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-[#2b2616] flex items-center justify-center group-hover:bg-primary/20 transition-all">
                                             <span className="material-symbols-outlined text-slate-500 dark:text-[#cbbc90] group-hover:text-primary">verified_user</span>
                                         </div>
-                                        <div className="flex flex-col">
-                                            <span className="font-bold text-slate-700 dark:text-slate-300 group-hover:text-primary">{t('privacy.title')}</span>
-                                            <span className="text-xs text-slate-500 dark:text-[#cbbc90]">View our privacy policy</span>
-                                        </div>
                                     </div>
                                     <span className="material-symbols-outlined text-slate-400 group-hover:text-primary group-hover:translate-x-1 transition-all">arrow_forward_ios</span>
                                 </Link>
