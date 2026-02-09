@@ -25,22 +25,33 @@ const Transactions: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [sortConfig, setSortConfig] = useState<{ key: SortKey; direction: SortDirection } | null>(null);
 
+    const fetchTransactions = async () => {
+        try {
+            // Add artificial delay ensuring skeleton is visible for UX smooth transition (optional)
+            const [response] = await Promise.all([
+                api.get('/transactions'),
+                new Promise(resolve => setTimeout(resolve, 500))
+            ]);
+            setTransactions(response.data);
+        } catch (error) {
+            console.error("Failed to fetch transactions", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     useEffect(() => {
-        const fetchTransactions = async () => {
-            try {
-                // Add artificial delay ensuring skeleton is visible for UX smooth transition (optional)
-                const [response] = await Promise.all([
-                    api.get('/transactions'),
-                    new Promise(resolve => setTimeout(resolve, 500))
-                ]);
-                setTransactions(response.data);
-            } catch (error) {
-                console.error("Failed to fetch transactions", error);
-            } finally {
-                setLoading(false);
-            }
-        };
         fetchTransactions();
+
+        // Listen for global transaction updates
+        const handleTransactionUpdate = () => {
+            fetchTransactions();
+        };
+        window.addEventListener('transaction-updated', handleTransactionUpdate);
+
+        return () => {
+            window.removeEventListener('transaction-updated', handleTransactionUpdate);
+        };
     }, []);
 
     const handleSort = (key: SortKey) => {

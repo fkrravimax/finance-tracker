@@ -3,7 +3,7 @@ import DashboardSkeleton from './skeletons/DashboardSkeleton';
 import CashFlowChart from './CashFlowChart';
 import TransactionList from './TransactionList';
 import HiddenAmount from './HiddenAmount';
-import QuickAddTransactionModal from './QuickAddTransactionModal';
+// QuickAddTransactionModal removed (global)
 import OnboardingModal from './OnboardingModal';
 import InitialBalanceModal from './InitialBalanceModal';
 import ExportModal from './ExportModal';
@@ -11,9 +11,11 @@ import BudgetBreakdownModal from './BudgetBreakdownModal';
 import { dashboardService, type DashboardStats } from '../services/dashboardService';
 import { authService } from '../services/authService';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useUI } from '../contexts/UIContext';
 
 const Dashboard: React.FC = () => {
-    const [isModalOpen, setIsModalOpen] = useState(false);
+    // isModalOpen removed (global)
+    const { openQuickAdd } = useUI();
     const [isOnboardingOpen, setIsOnboardingOpen] = useState(false);
     const [isBalanceModalOpen, setIsBalanceModalOpen] = useState(false);
     const [isExportModalOpen, setIsExportModalOpen] = useState(false);
@@ -47,11 +49,17 @@ const Dashboard: React.FC = () => {
         const currentUser = authService.getCurrentUser();
         setUser(currentUser);
         fetchStats();
-    }, []);
 
-    const handleTransactionAdded = () => {
-        fetchStats(); // Refresh stats when transaction is added
-    };
+        // Listen for global transaction updates
+        const handleTransactionUpdate = () => {
+            fetchStats();
+        };
+        window.addEventListener('transaction-updated', handleTransactionUpdate);
+
+        return () => {
+            window.removeEventListener('transaction-updated', handleTransactionUpdate);
+        };
+    }, []);
 
     if (loading) {
         return <DashboardSkeleton />;
@@ -71,11 +79,7 @@ const Dashboard: React.FC = () => {
     return (
 
         <div className="max-w-7xl mx-auto w-full p-4 md:p-6 lg:p-8 flex flex-col gap-8">
-            <QuickAddTransactionModal
-                isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
-                onTransactionAdded={handleTransactionAdded}
-            />
+            {/* QuickAddTransactionModal removed (global) */}
 
             <OnboardingModal
                 isOpen={isOnboardingOpen}
@@ -115,7 +119,7 @@ const Dashboard: React.FC = () => {
                         {t('dashboard.export')}
                     </button>
                     <button
-                        onClick={() => setIsModalOpen(true)}
+                        onClick={openQuickAdd}
                         className="flex items-center gap-2 px-6 py-3 bg-slate-800 dark:bg-primary text-white dark:text-slate-900 rounded-2xl text-sm font-bold shadow-lg shadow-slate-300 dark:shadow-primary/30 hover:bg-slate-900 dark:hover:bg-primary-hover transition-all hover:-translate-y-1"
                     >
                         <span className="material-symbols-outlined text-[22px]">add_circle</span>

@@ -1,13 +1,17 @@
 import React from 'react';
 import Sidebar from './Sidebar';
+import BottomNavbar from './BottomNavbar';
+import QuickAddTransactionModal from './QuickAddTransactionModal';
+import { UIProvider, useUI } from '../contexts/UIContext';
 
 interface DashboardLayoutProps {
     children: React.ReactNode;
     onLogout: () => void;
 }
 
-const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, onLogout }) => {
+const DashboardContent: React.FC<DashboardLayoutProps> = ({ children, onLogout }) => {
     const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);
+    const { isQuickAddOpen, closeQuickAdd } = useUI();
 
     const toggleSidebar = () => {
         setIsSidebarOpen(!isSidebarOpen);
@@ -29,9 +33,9 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, onLogout })
                 onClose={() => setIsSidebarOpen(false)}
             />
 
-            <main className="flex-1 h-full overflow-y-auto overflow-x-hidden relative flex flex-col w-full max-w-full">
+            <main className="flex-1 h-full overflow-y-auto overflow-x-hidden relative flex flex-col w-full max-w-full pb-[calc(80px+env(safe-area-inset-bottom))] md:pb-0">
                 {/* Mobile Header (Visible only on small screens) */}
-                <div className="md:hidden flex items-center justify-between p-4 border-b border-slate-200 dark:border-white/5 bg-surface-light dark:bg-background-dark sticky top-0 z-50 shadow-sm">
+                <div className="md:hidden flex items-center justify-between p-4 border-b border-slate-200 dark:border-white/5 bg-surface-light dark:bg-background-dark sticky top-0 z-30 shadow-sm">
                     <div className="flex items-center gap-2">
                         <span className="w-8 h-8 bg-primary text-white rounded-xl flex items-center justify-center shadow-md shadow-primary/30 transform rotate-3">
                             <img src="/logo.png" alt="Logo" className="w-5 h-5 object-contain" />
@@ -47,7 +51,22 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, onLogout })
                 </div>
                 {children}
             </main>
+
+            <BottomNavbar />
+
+            <QuickAddTransactionModal
+                isOpen={isQuickAddOpen}
+                onClose={closeQuickAdd}
+            />
         </div>
+    );
+};
+
+const DashboardLayout: React.FC<DashboardLayoutProps> = (props) => {
+    return (
+        <UIProvider>
+            <DashboardContent {...props} />
+        </UIProvider>
     );
 };
 
