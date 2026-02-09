@@ -230,9 +230,9 @@ const QuickAddTransactionModal: React.FC<QuickAddTransactionModalProps> = ({ isO
                             </button>
                             <button
                                 onClick={handleBackspace}
-                                className="flex items-center justify-center h-12 md:h-16 rounded-lg bg-white dark:bg-[#342d18] text-xl font-bold text-slate-700 dark:text-[#cbbc90] shadow-sm hover:bg-slate-100 dark:hover:bg-[#3f361d] active:scale-95 transition-transform"
+                                className="flex items-center justify-center h-12 md:h-16 rounded-lg bg-transparent hover:bg-slate-100 dark:hover:bg-[#3f361d] text-slate-700 dark:text-[#cbbc90] active:scale-95 transition-transform"
                             >
-                                <span className="material-symbols-outlined">backspace</span>
+                                <span className="material-symbols-outlined text-2xl">backspace</span>
                             </button>
                         </div>
                     </div>
