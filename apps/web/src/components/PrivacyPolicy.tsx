@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
-import { useAppearance } from '../contexts/AppearanceContext';
 import { Link } from 'react-router-dom';
 
 const PrivacyPolicy: React.FC = () => {
