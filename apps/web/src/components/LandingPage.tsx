@@ -247,9 +247,6 @@ const LandingPage: React.FC<LandingPageProps> = ({ onSignUp, onSignIn }) => {
                             <h2 className="text-lg md:text-3xl lg:text-4xl font-black text-slate-900 dark:text-white text-center mb-1 md:mb-3">
                                 {t('landing.howItWorks.title')}
                             </h2>
-                            <p className="text-[10px] md:text-base text-slate-500 dark:text-[#cbbc90] text-center mb-3 md:mb-10 max-w-lg hidden md:block">
-                                {t('landing.howItWorks.title')}
-                            </p>
 
                             {/* Mobile: Horizontal compact cards */}
                             <div className="flex md:hidden gap-2 w-full max-w-sm justify-center items-stretch">
