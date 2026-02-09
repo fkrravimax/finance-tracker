@@ -90,7 +90,7 @@ const QuickAddTransactionModal: React.FC<QuickAddTransactionModalProps> = ({ isO
         setIsCategorizing(true);
         try {
             const categoryName = await aiService.categorize(notes);
-            console.log("AI Suggested:", categoryName);
+            console.log("RAW AI RESPONSE:", categoryName); // Debugging line
 
 
             // Strict mapping based on new prompt

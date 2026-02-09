@@ -52,6 +52,7 @@ export const categorizeTransaction = async (merchant: string, description?: stri
         const result = await model.generateContent(prompt);
         const response = await result.response;
         const text = response.text();
+        console.log("Gemini Output:", text); // Debug log
         return text.trim();
     } catch (error) {
         console.error("Error categorizing transaction with Gemini:", error);
