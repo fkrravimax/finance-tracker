@@ -106,13 +106,15 @@ const QuickAddTransactionModal: React.FC<QuickAddTransactionModalProps> = ({ isO
             else if (lowerCat.includes('health')) matchedId = 'health';
             else if (lowerCat.includes('bill')) matchedId = 'bills';
             else if (lowerCat.includes('shop') || lowerCat.includes('belanja')) matchedId = 'shopping';
+            else if (lowerCat.includes('other')) matchedId = 'shopping'; // Fallback for "Others"
 
             if (matchedId) {
                 setSelectedCategory(matchedId);
                 const categoryName = CATEGORIES.find(c => c.id === matchedId)?.name;
                 showNotification(`Category set to ${categoryName}`, 'success');
             } else {
-                showNotification(`Could not categorize: "${categoryName}"`, 'error');
+                showNotification(`Could not categorize: "${categoryName}". Creating as Shopping.`, 'warning');
+                setSelectedCategory('shopping');
             }
         } catch (error) {
             console.error("Auto-categorization failed", error);

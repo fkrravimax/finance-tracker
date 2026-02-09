@@ -29,6 +29,7 @@ export const categorizeTransaction = async (merchant: string, description?: stri
     - Health
     - Bills
     - Shopping
+    - Others
 
     Input:
     Merchant: "${merchant}"
@@ -42,6 +43,7 @@ export const categorizeTransaction = async (merchant: string, description?: stri
     5. "Doctor", "Apotek", "Obat", "Hospital", "Gym" -> Health
     6. "PLN", "Listrik", "Air", "Wifi", "Pulsa", "Telkomsel", "Topup Emoney", "E-money", "Topup", "Internet" -> Bills
     7. "Tokopedia", "Shopee", "Amazon", "Indomaret", "Alfamart", "Mall", "Clothes", "Belanja" -> Shopping
+    8. If no clear match found -> Others
 
     Return ONLY the Category string.
   `;
