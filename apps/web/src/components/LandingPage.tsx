@@ -90,9 +90,12 @@ const LandingPage: React.FC<LandingPageProps> = ({ onSignUp, onSignIn }) => {
 
 
                 <div className="flex items-center gap-2 md:gap-4">
-                    <span className="hidden md:inline text-slate-500 dark:text-[#cbbc90] hover:text-primary cursor-pointer transition-all font-medium">
+                    <a
+                        href="mailto:ahmadfikriraf@gmail.com"
+                        className="hidden md:inline text-slate-500 dark:text-[#cbbc90] hover:text-primary cursor-pointer transition-all font-medium"
+                    >
                         Help Center
-                    </span>
+                    </a>
                     {/* Language Toggle */}
                     <button
                         onClick={() => setLanguage(language === 'en' ? 'id' : 'en')}
