@@ -94,18 +94,26 @@ const QuickAddTransactionModal: React.FC<QuickAddTransactionModalProps> = ({ isO
 
 
             // Strict mapping based on new prompt
+
+            // Strict mapping based on new prompt
             const lowerCat = categoryName.toLowerCase();
-            let matchedId = 'shopping'; // Default fallback
+
+            let matchedId = ''; // No default yet
 
             if (lowerCat.includes('food')) matchedId = 'food';
             else if (lowerCat.includes('transport')) matchedId = 'transport';
             else if (lowerCat.includes('fun')) matchedId = 'fun';
             else if (lowerCat.includes('health')) matchedId = 'health';
             else if (lowerCat.includes('bill')) matchedId = 'bills';
-            else if (lowerCat.includes('shop')) matchedId = 'shopping';
+            else if (lowerCat.includes('shop') || lowerCat.includes('belanja')) matchedId = 'shopping';
 
-            setSelectedCategory(matchedId);
-            showNotification(`Category set to ${CATEGORIES.find(c => c.id === matchedId)?.name}`, 'success');
+            if (matchedId) {
+                setSelectedCategory(matchedId);
+                const categoryName = CATEGORIES.find(c => c.id === matchedId)?.name;
+                showNotification(`Category set to ${categoryName}`, 'success');
+            } else {
+                showNotification(`Could not categorize: "${categoryName}"`, 'error');
+            }
         } catch (error) {
             console.error("Auto-categorization failed", error);
             showNotification("Failed to auto-categorize", "error");
