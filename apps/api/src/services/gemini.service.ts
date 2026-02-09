@@ -17,30 +17,32 @@ export const categorizeTransaction = async (merchant: string, description?: stri
         throw new Error("GEMINI_API_KEY is missing.");
     }
 
+
     const prompt = `
-    You are a financial assistant. Categorize the transaction based on the merchant name and description.
+    You are a financial classifier. Analyze the merchant name and description to categorize the transaction.
     
-    Categories:
-    - Food & Drink
-    - Transportation
-    - Shopping
-    - Entertainment
+    Target Categories (Return exactly one of these strings):
+    - Food
+    - Transport
+    - Fun
     - Health
-    - Education
-    - Bills & Utilities
-    - housing
-    - Salaries
-    - Investments
-    - Others
+    - Bills
+    - Shopping
 
     Input:
     Merchant: "${merchant}"
     Description: "${description || ""}"
 
-    Instructions:
-    1. Detect the language automatically (supports Indonesian/English).
-    2. Understand local context (e.g., "Warung", "Gojek", "Tokopedia").
-    3. Return ONLY the category name from the list above. Do not act like a chatbot. Just return the string.
+    Context & Rules:
+    1. Detect language (supports Indonesian/English).
+    2. "Makan", "Warung", "Resto", "Cafe", "Starbucks", "KFC" -> Food
+    3. "Gojek", "Grab", "Bensin", "Pertamina", "Uber", "Train", "Bus", "Parkir" -> Transport
+    4. "Bioskop", "Netflix", "Spotify", "Game", "Hobby" -> Fun
+    5. "Doctor", "Apotek", "Obat", "Hospital", "Gym" -> Health
+    6. "PLN", "Listrik", "Air", "Wifi", "Pulsa", "Telkomsel", "Topup Emoney" -> Bills
+    7. "Tokopedia", "Shopee", "Amazon", "Indomaret", "Alfamart", "Mall", "Clothes" -> Shopping
+
+    Return ONLY the Category string.
   `;
 
     try {
