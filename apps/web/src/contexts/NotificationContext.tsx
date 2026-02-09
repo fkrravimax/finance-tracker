@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, type ReactNode, useCallback } from 'react';
 
-type NotificationType = 'success' | 'error' | 'info';
+type NotificationType = 'success' | 'error' | 'info' | 'warning';
 
 interface Notification {
     id: string;
