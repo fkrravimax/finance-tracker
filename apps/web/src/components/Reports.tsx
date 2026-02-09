@@ -68,20 +68,22 @@ const Reports: React.FC = () => {
                         <h1 className="text-4xl font-black tracking-tight text-slate-900 dark:text-white mb-2">{t('reports.spendingOverview')}</h1>
                         <p className="text-slate-500 dark:text-[#cbbc90] text-base">{t('reports.spendingSubtitle')}</p>
                     </div>
-                    {/* Time Range Filter */}
-                    <div className="flex bg-white dark:bg-[#2b2616] border border-slate-200 dark:border-[#493f22] rounded-xl p-1 overflow-x-auto max-w-full">
-                        {timeOptions.map((option) => (
-                            <button
-                                key={option.value}
-                                onClick={() => setTimeRange(option.value)}
-                                className={`px-4 py-2 text-sm font-bold rounded-lg transition-all whitespace-nowrap ${timeRange === option.value
-                                    ? 'bg-primary text-slate-900 shadow-sm'
-                                    : 'text-slate-500 dark:text-[#cbbc90] hover:bg-slate-50 dark:hover:bg-[#342d18]'
-                                    }`}
-                            >
-                                {option.label}
-                            </button>
-                        ))}
+                    {/* Time Range Filter (Dropdown) */}
+                    <div className="relative z-10">
+                        <select
+                            value={timeRange}
+                            onChange={(e) => setTimeRange(e.target.value)}
+                            className="appearance-none bg-white dark:bg-[#2b2616] border border-slate-200 dark:border-[#493f22] text-slate-900 dark:text-white py-2 pl-4 pr-10 rounded-xl font-bold text-sm cursor-pointer shadow-sm hover:bg-slate-50 dark:hover:bg-[#342d18] focus:outline-none focus:ring-2 focus:ring-primary/50 transition-colors"
+                        >
+                            {timeOptions.map((option) => (
+                                <option key={option.value} value={option.value}>
+                                    {option.label}
+                                </option>
+                            ))}
+                        </select>
+                        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-slate-500 dark:text-[#cbbc90]">
+                            <span className="material-symbols-outlined text-xl">expand_more</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -92,28 +94,28 @@ const Reports: React.FC = () => {
                 <div className="lg:col-span-2 bg-white dark:bg-[#2a2515] border border-slate-200 dark:border-[#493f22] rounded-2xl p-6 flex flex-col gap-4">
                     <h3 className="text-lg font-bold text-slate-900 dark:text-white">{t('reports.history').replace('{period}', getLocalizedPeriodLabel(timeRange))}</h3>
                     <div className="overflow-x-auto">
-                        <table className="w-full text-left text-sm">
+                        <table className="w-full text-left text-sm whitespace-nowrap">
                             <thead>
                                 <tr className="border-b border-slate-200 dark:border-[#493f22]">
-                                    <th className="pb-3 font-semibold text-slate-500 dark:text-[#cbbc90]">{t('reports.period')}</th>
-                                    <th className="pb-3 font-semibold text-slate-500 dark:text-[#cbbc90]">{t('reports.income')}</th>
-                                    <th className="pb-3 font-semibold text-slate-500 dark:text-[#cbbc90]">{t('reports.expense')}</th>
-                                    <th className="pb-3 font-semibold text-slate-500 dark:text-[#cbbc90]">{t('reports.status')}</th>
+                                    <th className="pb-3 px-4 first:pl-2 font-semibold text-slate-500 dark:text-[#cbbc90]">{t('reports.period')}</th>
+                                    <th className="pb-3 px-4 font-semibold text-slate-500 dark:text-[#cbbc90]">{t('reports.income')}</th>
+                                    <th className="pb-3 px-4 font-semibold text-slate-500 dark:text-[#cbbc90]">{t('reports.expense')}</th>
+                                    <th className="pb-3 px-4 last:pr-2 font-semibold text-slate-500 dark:text-[#cbbc90]">{t('reports.status')}</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-100 dark:divide-[#342d18]">
                                 {reportData?.history?.map((row: any) => (
                                     <tr key={row.period} className="group hover:bg-slate-50 dark:hover:bg-[#342d18/50]">
-                                        <td className="py-3 font-medium text-slate-900 dark:text-white">
+                                        <td className="py-3 px-4 first:pl-2 font-medium text-slate-900 dark:text-white">
                                             {formatPeriod(row.period)}
                                         </td>
-                                        <td className="py-3 text-green-600 dark:text-green-400">
+                                        <td className="py-3 px-4 text-green-600 dark:text-green-400 font-medium">
                                             +{row.income.toLocaleString('id-ID', { style: 'currency', currency: 'IDR' })}
                                         </td>
-                                        <td className="py-3 text-red-600 dark:text-red-400">
+                                        <td className="py-3 px-4 text-red-600 dark:text-red-400 font-medium">
                                             -{row.expense.toLocaleString('id-ID', { style: 'currency', currency: 'IDR' })}
                                         </td>
-                                        <td className="py-3">
+                                        <td className="py-3 px-4 last:pr-2">
                                             <span className={`px-2 py-1 rounded-md text-xs font-bold ${row.income > row.expense
                                                 ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
                                                 : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
