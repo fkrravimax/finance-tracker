@@ -28,7 +28,6 @@ export const categorizeTransaction = async (merchant: string, description?: stri
     - Fun
     - Health
     - Bills
-    - Shopping
 
     Input:
     Merchant: "${merchant}"
@@ -41,7 +40,6 @@ export const categorizeTransaction = async (merchant: string, description?: stri
     4. "Bioskop", "Netflix", "Spotify", "Game", "Hobby", "Steam" masuk kedalam kategori Fun
     5. "Doctor", "Apotek", "Obat", "Hospital", "Gym" masuk kedalam kategori Health
     6. "PLN", "Listrik", "Air", "Wifi", "Pulsa", "Telkomsel", "Topup Emoney", "E-money", "Topup", "Internet" masuk kedalam kategori Bills
-    7. "Tokopedia", "Shopee", "Amazon", "Indomaret", "Alfamart", "Mall", "Clothes", "Belanja" masuk kedalam kategori Shopping
 
     Return ONLY the Category string.
   `;
