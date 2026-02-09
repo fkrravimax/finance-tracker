@@ -252,7 +252,7 @@ const TradingDashboard = () => {
                         </ResponsiveContainer>
                         <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
                             <span className="text-4xl font-bold text-slate-800 dark:text-white">{isNaN(Number(winRate)) ? 0 : winRate}%</span>
-                            <span className="text-xs text-slate-500 dark:text-[#cbbc90] mt-1 tracking-widest uppercase">High</span>
+                            <span className="text-xs text-slate-500 dark:text-[#cbbc90] mt-1 tracking-widest uppercase">{t('trading.high')}</span>
                         </div>
                     </div>
                 </div>
@@ -262,17 +262,17 @@ const TradingDashboard = () => {
                     <div className="flex flex-col md:flex-row justify-between items-start mb-6 gap-4">
                         <div>
                             <h3 className="text-slate-800 dark:text-white font-bold text-lg">{t('trading.equityCurve')}</h3>
-                            <p className="text-xs text-slate-500 dark:text-[#cbbc90]">{t('trading.performance') || 'Performance over last 30 days'}</p>
+                            <p className="text-xs text-slate-500 dark:text-[#cbbc90]">{t('trading.performance')}</p>
                         </div>
                         <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
                             <div className="flex-1 md:flex-none bg-slate-50 dark:bg-[#1e1b10] px-4 py-2 rounded-lg border border-slate-200 dark:border-[#f4c025]/10 flex justify-between sm:block items-center">
-                                <p className="text-[10px] text-slate-500 dark:text-[#cbbc90] uppercase">Total PnL</p>
+                                <p className="text-[10px] text-slate-500 dark:text-[#cbbc90] uppercase">{t('trading.totalPnL')}</p>
                                 <p className={`text-xl font-bold ${stats?.totalPnl >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
                                     {stats?.totalPnl >= 0 ? '+' : ''}${stats?.totalPnl?.toLocaleString()}
                                 </p>
                             </div>
                             <div className="flex-1 md:flex-none bg-slate-50 dark:bg-[#1e1b10] px-4 py-2 rounded-lg border border-slate-200 dark:border-[#f4c025]/10 flex justify-between sm:block items-center">
-                                <p className="text-[10px] text-slate-500 dark:text-[#cbbc90] uppercase">Best Pair</p>
+                                <p className="text-[10px] text-slate-500 dark:text-[#cbbc90] uppercase">{t('trading.bestPair')}</p>
                                 <div className="flex items-center gap-1">
                                     <span className="text-xl font-bold text-amber-600 dark:text-[#f4c025]">{stats?.bestPair}</span>
                                 </div>

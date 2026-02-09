@@ -19,6 +19,11 @@ const Reports: React.FC = () => {
         { value: 'Yearly', label: t('common.yearly') }
     ];
 
+    const getLocalizedPeriodLabel = (val: string) => {
+        const option = timeOptions.find(o => o.value === val);
+        return option ? option.label : val;
+    };
+
     const formatPeriod = (dateStr: string) => {
         const date = new Date(dateStr);
         if (timeRange === 'Daily') return date.toLocaleDateString('en-US', { day: 'numeric', month: 'short' });
@@ -85,7 +90,7 @@ const Reports: React.FC = () => {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* History Table */}
                 <div className="lg:col-span-2 bg-white dark:bg-[#2a2515] border border-slate-200 dark:border-[#493f22] rounded-2xl p-6 flex flex-col gap-4">
-                    <h3 className="text-lg font-bold text-slate-900 dark:text-white">{t('reports.history').replace('{period}', timeRange)}</h3>
+                    <h3 className="text-lg font-bold text-slate-900 dark:text-white">{t('reports.history').replace('{period}', getLocalizedPeriodLabel(timeRange))}</h3>
                     <div className="overflow-x-auto">
                         <table className="w-full text-left text-sm">
                             <thead>
@@ -129,7 +134,7 @@ const Reports: React.FC = () => {
                     <div className="bg-white dark:bg-[#2a2515] border border-slate-200 dark:border-[#493f22] rounded-2xl p-6 flex flex-col gap-4">
                         <div className="flex items-center gap-2 mb-2">
                             <span className="material-symbols-outlined text-primary">fact_check</span>
-                            <h3 className="text-lg font-bold text-slate-900 dark:text-white">{t('reports.realityCheck')} ({timeRange})</h3>
+                            <h3 className="text-lg font-bold text-slate-900 dark:text-white">{t('reports.realityCheck')} ({getLocalizedPeriodLabel(timeRange)})</h3>
                         </div>
                         <div className="flex flex-col gap-4">
                             {reportData?.budgetVsReality?.map((item: any) => {
@@ -168,7 +173,7 @@ const Reports: React.FC = () => {
                     {reportData?.history?.length > 0 && (
                         <div className="bg-white dark:bg-[#2a2515] border border-slate-200 dark:border-[#493f22] rounded-2xl p-6 flex items-center justify-between">
                             <div>
-                                <p className="text-sm text-slate-500 dark:text-[#cbbc90] font-medium mb-1">{t('reports.totalSavings')} ({timeRange})</p>
+                                <p className="text-sm text-slate-500 dark:text-[#cbbc90] font-medium mb-1">{t('reports.totalSavings')} ({getLocalizedPeriodLabel(timeRange)})</p>
                                 <h3 className="text-3xl font-black text-slate-900 dark:text-white">
                                     {reportData.history.reduce((acc: number, curr: any) => acc + (curr.income - curr.expense), 0).toLocaleString('id-ID', { style: 'currency', currency: 'IDR' })}
                                 </h3>

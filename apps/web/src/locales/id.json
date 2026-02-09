@@ -72,7 +72,12 @@
         "income": "Pemasukan",
         "expense": "Pengeluaran",
         "savingsProgress": "Progres Tabungan",
-        "topCategories": "Kategori Teratas"
+        "topCategories": "Kategori Teratas",
+        "cashFlow": "Arus Kas",
+        "incomeVsExpense": "Pemasukan vs Pengeluaran",
+        "netFlow": "Arus Bersih",
+        "savingsRate": "Tingkat Tabungan",
+        "budgetBreakdown": "Rincian Anggaran Bulanan"
     },
     "transactions": {
         "title": "Transaksi",
@@ -144,7 +149,12 @@
         "featureBalanceTracking": "Pelacakan Saldo",
         "adminReview": "Admin akan meninjau permintaan upgrade Anda",
         "notifyWhenProcessed": "Anda akan diberi tahu saat permintaan diproses",
-        "noTrades": "Belum ada trade yang dicatat. Mulai perjalanan Anda!"
+        "noTrades": "Belum ada trade yang dicatat. Mulai perjalanan Anda!",
+        "date": "Tanggal",
+        "status": "Status",
+        "high": "Tinggi",
+        "bestPair": "Pair Terbaik",
+        "performance": "Performa 30 hari terakhir"
     },
     "savings": {
         "title": "Tabungan",

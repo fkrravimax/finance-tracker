@@ -72,7 +72,12 @@
         "income": "Income",
         "expense": "Expense",
         "savingsProgress": "Savings Progress",
-        "topCategories": "Top Categories"
+        "topCategories": "Top Categories",
+        "cashFlow": "Cash Flow",
+        "incomeVsExpense": "Income vs Expenses",
+        "netFlow": "Net Flow",
+        "savingsRate": "Savings Rate",
+        "budgetBreakdown": "Monthly Budget Breakdown"
     },
     "transactions": {
         "title": "Transactions",
@@ -144,7 +149,12 @@
         "featureBalanceTracking": "Balance Tracking",
         "adminReview": "Admin will review your upgrade request",
         "notifyWhenProcessed": "You will be notified when your request is processed",
-        "noTrades": "No trades logged yet. Start your journey!"
+        "noTrades": "No trades logged yet. Start your journey!",
+        "date": "Date",
+        "status": "Status",
+        "high": "High",
+        "bestPair": "Best Pair",
+        "performance": "Performance over last 30 days"
     },
     "savings": {
         "title": "Savings Vault",
