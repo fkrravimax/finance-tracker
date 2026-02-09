@@ -29,19 +29,25 @@ const QuickAddTransactionModal: React.FC<QuickAddTransactionModalProps> = ({ isO
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isCategorizing, setIsCategorizing] = useState(false);
 
-    // Reset state when modal opens
+
+    // ... useEffects
+
+    // Debounce Auto-Categorize
     useEffect(() => {
-        if (isOpen) {
-            setAmount('0');
-            setSelectedCategory('food');
-            setTransactionType('Expense');
-            setNotes('');
-        }
-    }, [isOpen]);
+        const timeoutId = setTimeout(() => {
+            if (notes && notes.length > 2) { // Minimum length check
+                handleAutoCategorize();
+            }
+        }, 2000); // 2 seconds debounce
+
+        return () => clearTimeout(timeoutId);
+    }, [notes]);
 
     // Handle keyboard input
     useEffect(() => {
         if (!isOpen) return;
+        // ... existing handleKeyDown logic
+
 
         const handleKeyDown = (e: KeyboardEvent) => {
             if (e.key >= '0' && e.key <= '9') {
@@ -238,23 +244,17 @@ const QuickAddTransactionModal: React.FC<QuickAddTransactionModalProps> = ({ isO
                             </div>
                             {/* Notes Input + AI Button */}
                             <div>
+
                                 <div className="flex justify-between items-center mb-2">
                                     <label className="block text-slate-500 dark:text-[#cbbc90] text-sm font-medium">Notes / Merchant</label>
-                                    {transactionType === 'Expense' && (
-                                        <button
-                                            onClick={handleAutoCategorize}
-                                            disabled={isCategorizing || !notes}
-                                            className="text-xs flex items-center gap-1 text-primary hover:text-primary/80 disabled:opacity-50 transition-colors"
-                                        >
-                                            {isCategorizing ? (
-                                                <span className="animate-spin material-symbols-outlined text-xs">refresh</span>
-                                            ) : (
-                                                <span className="material-symbols-outlined text-xs">auto_awesome</span>
-                                            )}
-                                            Auto-Cat
-                                        </button>
+                                    {isCategorizing && (
+                                        <span className="text-xs flex items-center gap-1 text-primary animate-pulse">
+                                            <span className="material-symbols-outlined text-xs animate-spin">refresh</span>
+                                            Auto-Cat...
+                                        </span>
                                     )}
                                 </div>
+
                                 <input
                                     className="w-full rounded-lg border border-slate-200 dark:border-[#685a31] bg-slate-50 dark:bg-[#342d18] text-slate-900 dark:text-white p-4 text-base font-normal placeholder:text-slate-400 dark:placeholder:text-[#685a31] focus:outline-none focus:ring-2 focus:ring-primary/50 transition-shadow"
                                     placeholder="e.g. Starbucks, Gojek, Tokopedia..."
