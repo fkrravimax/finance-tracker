@@ -80,7 +80,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onLogout, isOpen = false, onClose }) 
                     </nav>
 
                     {/* User Profile */}
-                    <div className="mt-auto">
+                    <div className="mt-auto hidden md:block">
                         <div className="flex items-center gap-3 px-3 py-3 rounded-2xl bg-lavender-100/50 dark:bg-white/5 border border-lavender-200 dark:border-white/5 hover:bg-lavender-200 dark:hover:bg-white/10 transition-colors cursor-pointer group">
                             <div className="w-12 h-12 rounded-full border-2 border-white dark:border-white/10 shadow-sm overflow-hidden flex items-center justify-center bg-primary/20 text-primary">
                                 <span className="material-symbols-outlined">person</span>
