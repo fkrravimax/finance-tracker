@@ -87,14 +87,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onSignUp, onSignIn }) => {
                     <span className="text-lg md:text-xl font-black text-slate-900 dark:text-white">Rupiku</span>
                 </div>
 
-                <nav className="hidden md:flex items-center gap-8">
-                    <button
-                        onClick={() => goToSlide(2)}
-                        className="text-slate-500 dark:text-[#cbbc90] hover:text-primary transition-all font-medium"
-                    >
-                        {t('common.next')}
-                    </button>
-                </nav>
+
 
                 <div className="flex items-center gap-2 md:gap-4">
                     <span className="hidden md:inline text-slate-500 dark:text-[#cbbc90] hover:text-primary cursor-pointer transition-all font-medium">
