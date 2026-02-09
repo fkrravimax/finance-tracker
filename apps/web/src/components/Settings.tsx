@@ -8,12 +8,14 @@ import { authClient } from '../lib/auth-client';
 import ConfirmationModal from './ConfirmationModal';
 
 import { useNotification } from '../contexts/NotificationContext';
+import { authService } from '../services/authService';
 
 const Settings: React.FC = () => {
     const { theme, setTheme, privacyMode, setPrivacyMode } = useAppearance();
     const { language, setLanguage, t } = useLanguage();
     const [budgetLimit, setBudgetLimit] = useState('');
     const [loading, setLoading] = useState(false);
+    const [currentUser, setCurrentUser] = useState<any>(null);
 
     const navigate = useNavigate();
     const { showNotification } = useNotification();
@@ -46,6 +48,11 @@ const Settings: React.FC = () => {
                     // console.log("Session Data", sessionCtx.data);
                     // Set initial name form value
                     setNameForm({ name: sessionCtx.data.user.name || '' });
+                    setCurrentUser(sessionCtx.data.user);
+                } else {
+                    // Fallback to local auth service if session is null (e.g. dev mode)
+                    const localUser = authService.getCurrentUser();
+                    if (localUser) setCurrentUser(localUser);
                 }
 
                 // Recurring
@@ -183,6 +190,16 @@ const Settings: React.FC = () => {
             showNotification(error.message || "Failed to update name", 'error');
         } finally {
             setIsUpdatingName(false);
+        }
+    };
+
+    const handleLogout = async () => {
+        try {
+            await authService.logout();
+            // Force reload to trigger App.tsx auth check and redirect to login
+            window.location.href = '/';
+        } catch (error) {
+            console.error("Logout failed", error);
         }
     };
 
@@ -339,6 +356,34 @@ const Settings: React.FC = () => {
                     </div>
                 </div>
             )}
+
+            {/* Mobile Profile & Logout Section (Visible only on mobile) */}
+            <div className="md:hidden mb-2 p-6 bg-white dark:bg-[#342d18] rounded-2xl border border-slate-100 dark:border-[#493f22] flex flex-col items-center gap-4 shadow-sm relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-full h-24 bg-gradient-to-b from-primary/10 to-transparent"></div>
+                <div className="relative z-10 w-24 h-24 rounded-full border-4 border-white dark:border-[#342d18] shadow-lg flex items-center justify-center bg-primary/20 text-primary mb-2">
+                    {currentUser?.image ? (
+                        <img src={currentUser.image} alt="Profile" className="w-full h-full rounded-full object-cover" />
+                    ) : (
+                        <span className="material-symbols-outlined text-5xl">person</span>
+                    )}
+                </div>
+                <div className="text-center relative z-10">
+                    <h2 className="text-2xl font-black text-slate-800 dark:text-white">{currentUser?.name || 'User'}</h2>
+                    <p className="text-slate-500 dark:text-[#cbbc90] font-medium">{currentUser?.email || 'user@example.com'}</p>
+                    {currentUser?.plan && (
+                        <span className="inline-block mt-2 px-3 py-1 rounded-full bg-mint/20 text-mint-dark text-xs font-bold uppercase tracking-wider">
+                            {currentUser.plan} Plan
+                        </span>
+                    )}
+                </div>
+                <button
+                    onClick={handleLogout}
+                    className="w-full py-4 rounded-xl bg-red-50 dark:bg-red-900/10 text-red-600 dark:text-red-400 font-bold border border-red-100 dark:border-red-900/30 hover:bg-red-100 dark:hover:bg-red-900/20 transition-all flex items-center justify-center gap-2 mt-2 active:scale-95"
+                >
+                    <span className="material-symbols-outlined">logout</span>
+                    {t('sidebar.logout')}
+                </button>
+            </div>
 
             {/* Page Header */}
             <div className="flex flex-col gap-1">
