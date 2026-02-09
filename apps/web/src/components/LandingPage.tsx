@@ -96,6 +96,12 @@ const LandingPage: React.FC<LandingPageProps> = ({ onSignUp, onSignIn }) => {
                     >
                         Help Center
                     </a>
+                    <a
+                        href="/privacy"
+                        className="hidden md:inline text-slate-500 dark:text-[#cbbc90] hover:text-primary cursor-pointer transition-all font-medium"
+                    >
+                        {language === 'en' ? 'Privacy' : 'Privasi'}
+                    </a>
                     {/* Language Toggle */}
                     <button
                         onClick={() => setLanguage(language === 'en' ? 'id' : 'en')}

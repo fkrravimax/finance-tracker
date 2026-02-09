@@ -324,5 +324,34 @@
         "expensesByCategory": "Pengeluaran per Kategori",
         "noExpenses": "Tidak ada pengeluaran untuk periode ini.",
         "totalExpensesPeriod": "Total Pengeluaran Periode Ini"
+    },
+    "privacy": {
+        "title": "Kebijakan Privasi",
+        "intro": {
+            "title": "Pendahuluan",
+            "content": "Selamat datang di Rupiku. Kami menghargai privasi Anda dan berkomitmen untuk melindungi data pribadi Anda. Kebijakan privasi ini menjelaskan bagaimana kami mengumpulkan, menggunakan, dan membagikan informasi tentang Anda saat Anda menggunakan situs web dan layanan kami."
+        },
+        "collection": {
+            "title": "Informasi yang Kami Kumpulkan",
+            "personal": "Informasi Pribadi",
+            "financial": "Data Keuangan",
+            "usage": "Data Penggunaan"
+        },
+        "usage": {
+            "title": "Bagaimana Kami Menggunakan Informasi Anda",
+            "desc": "Kami menggunakan data yang dikumpulkan untuk:"
+        },
+        "sharing": {
+            "title": "Pembagian Data",
+            "content": "Kami tidak menjual data pribadi Anda. Kami mungkin membagikan informasi dengan penyedia layanan pihak ketiga yang membantu kami dalam mengoperasikan situs web kami, menjalankan bisnis kami, atau melayani pengguna kami, selama pihak-pihak tersebut setuju untuk merahasiakan informasi ini."
+        },
+        "security": {
+            "title": "Keamanan Data",
+            "content": "Kami menerapkan langkah-langkah teknis dan organisasi yang sesuai untuk melindungi data pribadi Anda dari akses, perubahan, pengungkapan, atau penghancuran yang tidak sah."
+        },
+        "contact": {
+            "title": "Hubungi Kami",
+            "content": "Jika Anda memiliki pertanyaan tentang Kebijakan Privasi ini, silakan hubungi kami di:"
+        }
     }
 }

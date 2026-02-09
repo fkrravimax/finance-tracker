@@ -324,5 +324,34 @@
         "expensesByCategory": "Expenses by Category",
         "noExpenses": "No expenses found for this period.",
         "totalExpensesPeriod": "Total Expenses in Period"
+    },
+    "privacy": {
+        "title": "Privacy Policy",
+        "intro": {
+            "title": "Introduction",
+            "content": "Welcome to Rupiku. We value your privacy and are committed to protecting your personal data. This privacy policy explains how we collect, use, and share information about you when you use our website and services."
+        },
+        "collection": {
+            "title": "Information We Collect",
+            "personal": "Personal Information",
+            "financial": "Financial Data",
+            "usage": "Usage Data"
+        },
+        "usage": {
+            "title": "How We Use Your Information",
+            "desc": "We use the collected data to:"
+        },
+        "sharing": {
+            "title": "Data Sharing",
+            "content": "We do not sell your personal data. We may share information with third-party service providers who assist us in operating our website, conducting our business, or serving our users, so long as those parties agree to keep this information confidential."
+        },
+        "security": {
+            "title": "Data Security",
+            "content": "We implement appropriate technical and organizational measures to protect your personal data against unauthorized access, alteration, disclosure, or destruction."
+        },
+        "contact": {
+            "title": "Contact Us",
+            "content": "If you have any questions about this Privacy Policy, please contact us at:"
+        }
     }
 }

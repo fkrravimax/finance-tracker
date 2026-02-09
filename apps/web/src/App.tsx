@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Routes, Route, Navigate } from 'react-router-dom'
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import DashboardLayout from './components/DashboardLayout'
 import Dashboard from './components/Dashboard'
 import Reports from './components/Reports'
@@ -12,6 +12,7 @@ import TradingDashboard from './components/TradingDashboard'
 import AdminDashboard from './components/AdminDashboard'
 import { authService } from './services/authService'
 import { authClient } from './lib/auth-client';
+import PrivacyPolicy from './components/PrivacyPolicy';
 
 function App() {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -54,6 +55,15 @@ function App() {
         setIsAuthenticated(false);
         setShowAuth(false);
     };
+
+
+
+    const location = useLocation();
+
+    // Allow public access to Privacy Policy
+    if (location.pathname === '/privacy') {
+        return <PrivacyPolicy />;
+    }
 
     if (isAuthChecking) {
         return (
