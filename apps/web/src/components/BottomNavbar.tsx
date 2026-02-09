@@ -41,35 +41,35 @@ const BottomNavbar: React.FC = () => {
                 <NavLink
                     to="/savings"
                     onClick={() => setIsMenuOpen(false)}
-                    className="flex items-center gap-3 bg-white dark:bg-[#2b2616] pl-4 pr-6 py-3 rounded-full shadow-xl border border-slate-100 dark:border-white/10"
+                    className="flex items-center gap-4 bg-white dark:bg-[#2b2616] pl-4 pr-6 py-4 w-64 rounded-2xl shadow-xl border border-slate-100 dark:border-white/10 active:scale-95 transition-transform"
                 >
-                    <div className="w-10 h-10 rounded-full bg-peach/20 text-peach-dark flex items-center justify-center">
+                    <div className="w-10 h-10 rounded-full bg-peach/20 text-peach-dark flex items-center justify-center shrink-0">
                         <span className="material-symbols-outlined">savings</span>
                     </div>
-                    <span className="font-bold text-slate-800 dark:text-white">Savings Vault</span>
+                    <span className="font-bold text-slate-800 dark:text-white text-base">Savings Vault</span>
                 </NavLink>
 
                 {/* Option 2: Trading */}
                 <NavLink
                     to="/trading"
                     onClick={() => setIsMenuOpen(false)}
-                    className="flex items-center gap-3 bg-white dark:bg-[#2b2616] pl-4 pr-6 py-3 rounded-full shadow-xl border border-slate-100 dark:border-white/10"
+                    className="flex items-center gap-4 bg-white dark:bg-[#2b2616] pl-4 pr-6 py-4 w-64 rounded-2xl shadow-xl border border-slate-100 dark:border-white/10 active:scale-95 transition-transform"
                 >
-                    <div className="w-10 h-10 rounded-full bg-sky/20 text-sky-dark flex items-center justify-center">
+                    <div className="w-10 h-10 rounded-full bg-sky/20 text-sky-dark flex items-center justify-center shrink-0">
                         <span className="material-symbols-outlined">candlestick_chart</span>
                     </div>
-                    <span className="font-bold text-slate-800 dark:text-white">Trading Terminal</span>
+                    <span className="font-bold text-slate-800 dark:text-white text-base">Trading Terminal</span>
                 </NavLink>
 
                 {/* Option 1: Add Transaction */}
                 <button
                     onClick={handleQuickAdd}
-                    className="flex items-center gap-3 bg-white dark:bg-[#2b2616] pl-4 pr-6 py-3 rounded-full shadow-xl border border-slate-100 dark:border-white/10"
+                    className="flex items-center gap-4 bg-white dark:bg-[#2b2616] pl-4 pr-6 py-4 w-64 rounded-2xl shadow-xl border border-slate-100 dark:border-white/10 active:scale-95 transition-transform text-left"
                 >
-                    <div className="w-10 h-10 rounded-full bg-primary/20 text-primary flex items-center justify-center">
+                    <div className="w-10 h-10 rounded-full bg-primary/20 text-primary flex items-center justify-center shrink-0">
                         <span className="material-symbols-outlined">receipt_long</span>
                     </div>
-                    <span className="font-bold text-slate-800 dark:text-white">Add Transaction</span>
+                    <span className="font-bold text-slate-800 dark:text-white text-base">Add Transaction</span>
                 </button>
             </div>
 
