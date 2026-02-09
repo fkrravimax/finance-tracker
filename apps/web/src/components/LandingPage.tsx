@@ -214,7 +214,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onSignUp, onSignIn }) => {
                     >
                         <div className="flex flex-col items-center text-center px-4">
                             <h1 className="text-3xl md:text-5xl lg:text-6xl font-black text-slate-900 dark:text-white mb-4 md:mb-6">
-                                {t('landing.hero.title')}
+                                {t('landing.hero.title')} <span className="text-primary">{t('landing.hero.titleHighlight')}</span>
                             </h1>
                             <p className="text-base md:text-xl text-slate-500 dark:text-[#cbbc90] max-w-xl">
                                 {t('landing.hero.subtitle')}

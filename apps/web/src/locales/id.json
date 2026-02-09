@@ -243,7 +243,8 @@
     },
     "landing": {
         "hero": {
-            "title": "Kelola Keuangan dengan Ceria",
+            "title": "Kelola Keuangan",
+            "titleHighlight": "dengan Ceria",
             "subtitle": "Pelacak keuangan yang indah dan intuitif, membuat pengelolaan uang jadi sederhana dan menyenangkan.",
             "getStarted": "Mulai Sekarang",
             "signIn": "Masuk"
