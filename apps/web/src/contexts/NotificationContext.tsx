@@ -55,13 +55,15 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
                             pointer-events-auto flex items-center gap-3 px-6 py-4 rounded-xl shadow-2xl animate-slide-in-right max-w-sm
                             ${notification.type === 'success' ? 'bg-green-500 text-white' : ''}
                             ${notification.type === 'error' ? 'bg-red-500 text-white' : ''}
+                            ${notification.type === 'warning' ? 'bg-yellow-500 text-black' : ''}
                             ${notification.type === 'info' ? 'bg-slate-900 dark:bg-slate-700 text-white' : ''}
                         `}
                     >
                         <div className="p-1 rounded-full bg-white/20">
                             <span className="material-symbols-outlined text-sm font-bold">
                                 {notification.type === 'success' ? 'check' :
-                                    notification.type === 'error' ? 'warning' : 'info'}
+                                    notification.type === 'error' ? 'error' :
+                                        notification.type === 'warning' ? 'warning' : 'info'}
                             </span>
                         </div>
                         <div className="flex-1">
