@@ -334,12 +334,19 @@
         "collection": {
             "title": "Informasi yang Kami Kumpulkan",
             "personal": "Informasi Pribadi",
+            "personalDesc": "Nama, alamat email, dan detail kontak lainnya yang Anda berikan.",
             "financial": "Data Keuangan",
-            "usage": "Data Penggunaan"
+            "financialDesc": "Riwayat transaksi, detail anggaran, dan target tabungan yang Anda masukkan ke dalam aplikasi.",
+            "usage": "Data Penggunaan",
+            "usageDesc": "Informasi tentang bagaimana Anda berinteraksi dengan aplikasi, informasi perangkat, dan data log."
         },
         "usage": {
             "title": "Bagaimana Kami Menggunakan Informasi Anda",
-            "desc": "Kami menggunakan data yang dikumpulkan untuk:"
+            "desc": "Kami menggunakan data yang dikumpulkan untuk:",
+            "item1": "Menyediakan dan memelihara layanan Rupiku.",
+            "item2": "Mempersonalisasi pengalaman dan dashboard Anda.",
+            "item3": "Meningkatkan fungsionalitas aplikasi dan antarmuka pengguna kami.",
+            "item4": "Berkomunikasi dengan Anda mengenai pembaruan atau dukungan."
         },
         "sharing": {
             "title": "Pembagian Data",
@@ -348,6 +355,10 @@
         "security": {
             "title": "Keamanan Data",
             "content": "Kami menerapkan langkah-langkah teknis dan organisasi yang sesuai untuk melindungi data pribadi Anda dari akses, perubahan, pengungkapan, atau penghancuran yang tidak sah."
+        },
+        "encryption": {
+            "title": "Enkripsi & Privasi Data",
+            "content": "Keamanan data Anda adalah prioritas utama kami. Total saldo dan semua pencatatan transaksi Anda terenkripsi dengan baik, sehingga hanya Anda sendiri yang bisa melihatnya. Developer maupun pihak lain tidak mengetahuinya karena data Anda terjamin kerahasiaannya."
         },
         "contact": {
             "title": "Hubungi Kami",

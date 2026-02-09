@@ -334,12 +334,19 @@
         "collection": {
             "title": "Information We Collect",
             "personal": "Personal Information",
+            "personalDesc": "Name, email address, and other contact details you provide.",
             "financial": "Financial Data",
-            "usage": "Usage Data"
+            "financialDesc": "Transaction history, budget details, and savings goals you input into the app.",
+            "usage": "Usage Data",
+            "usageDesc": "Information on how you interact with the app, device information, and log data."
         },
         "usage": {
             "title": "How We Use Your Information",
-            "desc": "We use the collected data to:"
+            "desc": "We use the collected data to:",
+            "item1": "Provide and maintain the Rupiku service.",
+            "item2": "Personalize your experience and dashboard.",
+            "item3": "Improve our app functionality and user interface.",
+            "item4": "Communicate with you regarding updates or support."
         },
         "sharing": {
             "title": "Data Sharing",
@@ -348,6 +355,10 @@
         "security": {
             "title": "Data Security",
             "content": "We implement appropriate technical and organizational measures to protect your personal data against unauthorized access, alteration, disclosure, or destruction."
+        },
+        "encryption": {
+            "title": "Encryption & Data Privacy",
+            "content": "Your data security is our top priority. Your total balance and all transaction records are fully encrypted, ensuring that only you can view them. Neither the developers nor any third parties have access to your detailed financial information."
         },
         "contact": {
             "title": "Contact Us",
