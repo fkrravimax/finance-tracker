@@ -61,9 +61,14 @@ const Settings: React.FC = () => {
 
     // Accordion State
     const [openSection, setOpenSection] = useState<string | null>(''); // Default open 'account'
+    const [openSubSection, setOpenSubSection] = useState<string | null>(null);
 
     const toggleSection = (section: string) => {
         setOpenSection(openSection === section ? null : section);
+    };
+
+    const toggleSubSection = (sub: string) => {
+        setOpenSubSection(openSubSection === sub ? null : sub);
     };
 
     const handleSaveBudget = async () => {
@@ -506,97 +511,145 @@ const Settings: React.FC = () => {
                                 </div>
 
                                 {/* Profile Name */}
-                                <form onSubmit={handleUpdateName} className="flex flex-col gap-3">
-                                    <h3 className="font-bold text-slate-900 dark:text-white border-b border-slate-100 dark:border-[#493f22] pb-2">{t('settings.profileDetails')}</h3>
-                                    <div className="flex flex-col gap-2">
-                                        <label className="text-sm font-bold text-slate-700 dark:text-[#cbbc90]">{t('settings.displayName')}</label>
-                                        <div className="flex gap-2">
-                                            <input
-                                                type="text"
-                                                placeholder="Your Name"
-                                                value={nameForm.name}
-                                                onChange={e => setNameForm({ ...nameForm, name: e.target.value })}
-                                                className="w-full bg-slate-50 dark:bg-[#1a160b] border border-slate-200 dark:border-[#493f22] rounded-xl px-4 py-2 text-sm"
-                                                required
-                                            />
-                                            <button
-                                                type="submit"
-                                                disabled={isUpdatingName}
-                                                className="whitespace-nowrap bg-slate-900 dark:bg-slate-700 text-white font-bold px-4 py-2 rounded-xl text-sm hover:opacity-90 transition-opacity"
-                                            >
-                                                {isUpdatingName ? t('common.loading') : t('common.save')}
-                                            </button>
+                                <div className="border border-slate-200 dark:border-[#493f22] rounded-xl overflow-hidden">
+                                    <button
+                                        onClick={() => toggleSubSection('profile')}
+                                        className="w-full flex items-center justify-between p-4 bg-slate-50 dark:bg-[#2b2616] hover:bg-slate-100 dark:hover:bg-[#36301d] transition-colors"
+                                    >
+                                        <div className="flex items-center gap-3">
+                                            <span className="material-symbols-outlined text-slate-500 dark:text-[#cbbc90]">badge</span>
+                                            <span className="font-bold text-slate-900 dark:text-white">{t('settings.profileDetails')}</span>
                                         </div>
-                                    </div>
-                                </form>
+                                        <span className={`material-symbols-outlined text-slate-400 transition-transform ${openSubSection === 'profile' ? 'rotate-180' : ''}`}>expand_more</span>
+                                    </button>
+
+                                    {openSubSection === 'profile' && (
+                                        <div className="p-4 border-t border-slate-200 dark:border-[#493f22] bg-white dark:bg-[#1a160b] animate-fade-in">
+                                            <form onSubmit={handleUpdateName} className="flex flex-col gap-3">
+                                                <div className="flex flex-col gap-2">
+                                                    <label className="text-sm font-bold text-slate-700 dark:text-[#cbbc90]">{t('settings.displayName')}</label>
+                                                    <div className="flex gap-2">
+                                                        <input
+                                                            type="text"
+                                                            placeholder="Your Name"
+                                                            value={nameForm.name}
+                                                            onChange={e => setNameForm({ ...nameForm, name: e.target.value })}
+                                                            className="w-full bg-slate-50 dark:bg-[#2b2616] border border-slate-200 dark:border-[#493f22] rounded-xl px-4 py-2 text-sm"
+                                                            required
+                                                        />
+                                                        <button
+                                                            type="submit"
+                                                            disabled={isUpdatingName}
+                                                            className="whitespace-nowrap bg-slate-900 dark:bg-slate-700 text-white font-bold px-4 py-2 rounded-xl text-sm hover:opacity-90 transition-opacity"
+                                                        >
+                                                            {isUpdatingName ? t('common.loading') : t('common.save')}
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    )}
+                                </div>
 
                                 {/* Change Password */}
-                                <form onSubmit={handleChangePassword} className="flex flex-col gap-3">
-                                    <h3 className="font-bold text-slate-900 dark:text-white border-b border-slate-100 dark:border-[#493f22] pb-2">{t('settings.changePassword')}</h3>
-                                    <div className="flex flex-col gap-2">
-                                        <input
-                                            type="password"
-                                            placeholder={t('settings.currentPassword')}
-                                            value={passwordForm.currentPassword}
-                                            onChange={e => setPasswordForm({ ...passwordForm, currentPassword: e.target.value })}
-                                            className="w-full bg-slate-50 dark:bg-[#1a160b] border border-slate-200 dark:border-[#493f22] rounded-xl px-4 py-2 text-sm"
-                                            required
-                                        />
-                                        <input
-                                            type="password"
-                                            placeholder={t('settings.newPassword')}
-                                            value={passwordForm.newPassword}
-                                            onChange={e => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
-                                            className="w-full bg-slate-50 dark:bg-[#1a160b] border border-slate-200 dark:border-[#493f22] rounded-xl px-4 py-2 text-sm"
-                                            required
-                                        />
-                                        <input
-                                            type="password"
-                                            placeholder={t('settings.confirmPassword')}
-                                            value={passwordForm.confirmPassword}
-                                            onChange={e => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
-                                            className="w-full bg-slate-50 dark:bg-[#1a160b] border border-slate-200 dark:border-[#493f22] rounded-xl px-4 py-2 text-sm"
-                                            required
-                                        />
-                                        <button
-                                            type="submit"
-                                            disabled={isChangingPassword}
-                                            className="bg-slate-900 dark:bg-slate-700 text-white font-bold py-2 rounded-xl text-sm hover:opacity-90 transition-opacity"
-                                        >
-                                            {isChangingPassword ? t('common.loading') : t('settings.updatePassword')}
-                                        </button>
-                                    </div>
-                                </form>
+                                <div className="border border-slate-200 dark:border-[#493f22] rounded-xl overflow-hidden">
+                                    <button
+                                        onClick={() => toggleSubSection('password')}
+                                        className="w-full flex items-center justify-between p-4 bg-slate-50 dark:bg-[#2b2616] hover:bg-slate-100 dark:hover:bg-[#36301d] transition-colors"
+                                    >
+                                        <div className="flex items-center gap-3">
+                                            <span className="material-symbols-outlined text-slate-500 dark:text-[#cbbc90]">lock</span>
+                                            <span className="font-bold text-slate-900 dark:text-white">{t('settings.changePassword')}</span>
+                                        </div>
+                                        <span className={`material-symbols-outlined text-slate-400 transition-transform ${openSubSection === 'password' ? 'rotate-180' : ''}`}>expand_more</span>
+                                    </button>
+
+                                    {openSubSection === 'password' && (
+                                        <div className="p-4 border-t border-slate-200 dark:border-[#493f22] bg-white dark:bg-[#1a160b] animate-fade-in">
+                                            <form onSubmit={handleChangePassword} className="flex flex-col gap-3">
+                                                <div className="flex flex-col gap-2">
+                                                    <input
+                                                        type="password"
+                                                        placeholder={t('settings.currentPassword')}
+                                                        value={passwordForm.currentPassword}
+                                                        onChange={e => setPasswordForm({ ...passwordForm, currentPassword: e.target.value })}
+                                                        className="w-full bg-slate-50 dark:bg-[#2b2616] border border-slate-200 dark:border-[#493f22] rounded-xl px-4 py-2 text-sm"
+                                                        required
+                                                    />
+                                                    <input
+                                                        type="password"
+                                                        placeholder={t('settings.newPassword')}
+                                                        value={passwordForm.newPassword}
+                                                        onChange={e => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
+                                                        className="w-full bg-slate-50 dark:bg-[#2b2616] border border-slate-200 dark:border-[#493f22] rounded-xl px-4 py-2 text-sm"
+                                                        required
+                                                    />
+                                                    <input
+                                                        type="password"
+                                                        placeholder={t('settings.confirmPassword')}
+                                                        value={passwordForm.confirmPassword}
+                                                        onChange={e => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
+                                                        className="w-full bg-slate-50 dark:bg-[#2b2616] border border-slate-200 dark:border-[#493f22] rounded-xl px-4 py-2 text-sm"
+                                                        required
+                                                    />
+                                                    <button
+                                                        type="submit"
+                                                        disabled={isChangingPassword}
+                                                        className="bg-slate-900 dark:bg-slate-700 text-white font-bold py-2 rounded-xl text-sm hover:opacity-90 transition-opacity mt-2"
+                                                    >
+                                                        {isChangingPassword ? t('common.loading') : t('settings.updatePassword')}
+                                                    </button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    )}
+                                </div>
 
                                 {/* Change Email */}
-                                <form onSubmit={handleChangeEmail} className="flex flex-col gap-3 pt-4 border-t border-slate-100 dark:border-[#493f22]">
-                                    <h3 className="font-bold text-slate-900 dark:text-white border-b border-slate-100 dark:border-[#493f22] pb-2">{t('settings.changeEmail')}</h3>
-                                    <div className="flex flex-col gap-2">
-                                        <input
-                                            type="email"
-                                            placeholder={t('settings.newEmail')}
-                                            value={emailForm.newEmail}
-                                            onChange={e => setEmailForm({ ...emailForm, newEmail: e.target.value })}
-                                            className="w-full bg-slate-50 dark:bg-[#1a160b] border border-slate-200 dark:border-[#493f22] rounded-xl px-4 py-2 text-sm"
-                                            required
-                                        />
-                                        <input
-                                            type="password"
-                                            placeholder="Current Password (to verify)"
-                                            value={emailForm.password}
-                                            onChange={e => setEmailForm({ ...emailForm, password: e.target.value })}
-                                            className="w-full bg-slate-50 dark:bg-[#1a160b] border border-slate-200 dark:border-[#493f22] rounded-xl px-4 py-2 text-sm"
-                                            required
-                                        />
-                                        <button
-                                            type="submit"
-                                            disabled={isChangingEmail}
-                                            className="bg-slate-900 dark:bg-slate-700 text-white font-bold py-2 rounded-xl text-sm hover:opacity-90 transition-opacity"
-                                        >
-                                            {isChangingEmail ? t('common.loading') : t('settings.updateEmail')}
-                                        </button>
-                                    </div>
-                                </form>
+                                <div className="border border-slate-200 dark:border-[#493f22] rounded-xl overflow-hidden">
+                                    <button
+                                        onClick={() => toggleSubSection('email')}
+                                        className="w-full flex items-center justify-between p-4 bg-slate-50 dark:bg-[#2b2616] hover:bg-slate-100 dark:hover:bg-[#36301d] transition-colors"
+                                    >
+                                        <div className="flex items-center gap-3">
+                                            <span className="material-symbols-outlined text-slate-500 dark:text-[#cbbc90]">mail</span>
+                                            <span className="font-bold text-slate-900 dark:text-white">{t('settings.changeEmail')}</span>
+                                        </div>
+                                        <span className={`material-symbols-outlined text-slate-400 transition-transform ${openSubSection === 'email' ? 'rotate-180' : ''}`}>expand_more</span>
+                                    </button>
+
+                                    {openSubSection === 'email' && (
+                                        <div className="p-4 border-t border-slate-200 dark:border-[#493f22] bg-white dark:bg-[#1a160b] animate-fade-in">
+                                            <form onSubmit={handleChangeEmail} className="flex flex-col gap-3">
+                                                <div className="flex flex-col gap-2">
+                                                    <input
+                                                        type="email"
+                                                        placeholder={t('settings.newEmail')}
+                                                        value={emailForm.newEmail}
+                                                        onChange={e => setEmailForm({ ...emailForm, newEmail: e.target.value })}
+                                                        className="w-full bg-slate-50 dark:bg-[#2b2616] border border-slate-200 dark:border-[#493f22] rounded-xl px-4 py-2 text-sm"
+                                                        required
+                                                    />
+                                                    <input
+                                                        type="password"
+                                                        placeholder="Current Password (to verify)"
+                                                        value={emailForm.password}
+                                                        onChange={e => setEmailForm({ ...emailForm, password: e.target.value })}
+                                                        className="w-full bg-slate-50 dark:bg-[#2b2616] border border-slate-200 dark:border-[#493f22] rounded-xl px-4 py-2 text-sm"
+                                                        required
+                                                    />
+                                                    <button
+                                                        type="submit"
+                                                        disabled={isChangingEmail}
+                                                        className="bg-slate-900 dark:bg-slate-700 text-white font-bold py-2 rounded-xl text-sm hover:opacity-90 transition-opacity mt-2"
+                                                    >
+                                                        {isChangingEmail ? t('common.loading') : t('settings.updateEmail')}
+                                                    </button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    )}
+                                </div>
 
                                 {/* Danger Zone */}
                                 <div className="pt-8 border-t border-slate-200 dark:border-[#493f22]">
