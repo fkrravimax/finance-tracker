@@ -36,12 +36,12 @@ export const categorizeTransaction = async (merchant: string, description?: stri
 
     Context & Rules:
     1. Detect language (supports Indonesian/English).
-    2. "Makan", "Warung", "Resto", "Cafe", "Starbucks", "KFC", "Sate", "Nasi" -> Food
-    3. "Gojek", "Grab", "Bensin", "Pertamina", "Uber", "Train", "Bus", "Parkir", "Isi Bensin", "SPBU" -> Transport
-    4. "Bioskop", "Netflix", "Spotify", "Game", "Hobby", "Steam" -> Fun
-    5. "Doctor", "Apotek", "Obat", "Hospital", "Gym" -> Health
-    6. "PLN", "Listrik", "Air", "Wifi", "Pulsa", "Telkomsel", "Topup Emoney", "E-money", "Topup", "Internet" -> Bills
-    7. "Tokopedia", "Shopee", "Amazon", "Indomaret", "Alfamart", "Mall", "Clothes", "Belanja" -> Shopping
+    2. "Makan", "Warung", "Resto", "Cafe", "Starbucks", "KFC", "Sate", "Nasi" masuk kedalam kategori Food
+    3. "Gojek", "Grab", "Bensin", "Pertamina", "Uber", "Train", "Bus", "Parkir", "Isi Bensin", "SPBU" masuk kedalam kategori Transport
+    4. "Bioskop", "Netflix", "Spotify", "Game", "Hobby", "Steam" masuk kedalam kategori Fun
+    5. "Doctor", "Apotek", "Obat", "Hospital", "Gym" masuk kedalam kategori Health
+    6. "PLN", "Listrik", "Air", "Wifi", "Pulsa", "Telkomsel", "Topup Emoney", "E-money", "Topup", "Internet" masuk kedalam kategori Bills
+    7. "Tokopedia", "Shopee", "Amazon", "Indomaret", "Alfamart", "Mall", "Clothes", "Belanja" masuk kedalam kategori Shopping
 
     Return ONLY the Category string.
   `;
