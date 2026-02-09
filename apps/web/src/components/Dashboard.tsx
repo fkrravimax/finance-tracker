@@ -101,9 +101,9 @@ const Dashboard: React.FC = () => {
             />
 
             {/* Page Heading - Glassmorphism */}
-            <header className="flex flex-wrap justify-between items-end gap-6 bg-white/60 dark:bg-white/5 p-6 rounded-bubbly shadow-sm backdrop-blur-sm border border-white/60 dark:border-white/5">
+            <header className="flex flex-wrap justify-between items-center md:items-end gap-4 md:gap-6 bg-transparent md:bg-white/60 dark:bg-transparent md:dark:bg-white/5 p-0 md:p-6 rounded-none md:rounded-bubbly shadow-none md:shadow-sm backdrop-blur-none md:backdrop-blur-sm border-none md:border md:border-white/60 md:dark:border-white/5">
                 <div className="flex flex-col gap-2">
-                    <h2 className="text-3xl md:text-4xl font-black leading-tight tracking-tight text-slate-800 dark:text-white">
+                    <h2 className="hidden md:block text-3xl md:text-4xl font-black leading-tight tracking-tight text-slate-800 dark:text-white">
                         {t('dashboard.overview')} <span className="text-primary">{t('dashboard.overviewSuffix')}</span>
                     </h2>
                     <p className="text-slate-500 dark:text-[#cbbc90] text-lg font-bold flex items-center gap-2">
@@ -113,14 +113,14 @@ const Dashboard: React.FC = () => {
                 <div className="flex gap-4">
                     <button
                         onClick={() => setIsExportModalOpen(true)}
-                        className="flex items-center gap-2 px-6 py-3 bg-white dark:bg-white/10 text-slate-600 dark:text-white border-2 border-lavender-200 dark:border-white/20 rounded-2xl text-sm font-bold hover:bg-lavender-50 dark:hover:bg-white/20 hover:border-lavender-300 transition-all hover:-translate-y-1 shadow-sm"
+                        className="flex items-center gap-2 px-3 py-2 md:px-6 md:py-3 bg-white dark:bg-white/10 text-slate-600 dark:text-white border md:border-2 border-lavender-200 dark:border-white/20 rounded-xl md:rounded-2xl text-sm font-bold hover:bg-lavender-50 dark:hover:bg-white/20 hover:border-lavender-300 transition-all hover:-translate-y-1 shadow-sm"
                     >
-                        <span className="material-symbols-outlined text-[22px]">download</span>
-                        {t('dashboard.export')}
+                        <span className="material-symbols-outlined text-[20px] md:text-[22px]">download</span>
+                        <span className="hidden md:inline">{t('dashboard.export')}</span>
                     </button>
                     <button
                         onClick={openQuickAdd}
-                        className="flex items-center gap-2 px-6 py-3 bg-slate-800 dark:bg-primary text-white dark:text-slate-900 rounded-2xl text-sm font-bold shadow-lg shadow-slate-300 dark:shadow-primary/30 hover:bg-slate-900 dark:hover:bg-primary-hover transition-all hover:-translate-y-1"
+                        className="hidden md:flex items-center gap-2 px-6 py-3 bg-slate-800 dark:bg-primary text-white dark:text-slate-900 rounded-2xl text-sm font-bold shadow-lg shadow-slate-300 dark:shadow-primary/30 hover:bg-slate-900 dark:hover:bg-primary-hover transition-all hover:-translate-y-1"
                     >
                         <span className="material-symbols-outlined text-[22px]">add_circle</span>
                         {t('dashboard.addNew')}
