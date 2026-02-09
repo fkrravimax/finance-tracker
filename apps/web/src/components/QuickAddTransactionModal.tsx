@@ -1,6 +1,8 @@
+
 import React, { useState, useEffect } from 'react';
 import { transactionService } from '../services/transactionService';
 import { useNotification } from '../contexts/NotificationContext';
+import { aiService } from '../services/aiService';
 
 interface QuickAddTransactionModalProps {
     isOpen: boolean;
@@ -25,6 +27,7 @@ const QuickAddTransactionModal: React.FC<QuickAddTransactionModalProps> = ({ isO
     const [notes, setNotes] = useState('');
     const [walletSource, setWalletSource] = useState('Bank');
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isCategorizing, setIsCategorizing] = useState(false);
 
     // Reset state when modal opens
     useEffect(() => {
@@ -54,7 +57,7 @@ const QuickAddTransactionModal: React.FC<QuickAddTransactionModalProps> = ({ isO
 
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [isOpen, amount, selectedCategory, transactionType, notes]); // Added State dependencies
+    }, [isOpen, amount, selectedCategory, transactionType, notes]);
 
     const handleNumberClick = (num: number) => {
         setAmount(prev => {
@@ -69,6 +72,38 @@ const QuickAddTransactionModal: React.FC<QuickAddTransactionModalProps> = ({ isO
             if (prev.length <= 1) return '0';
             return prev.slice(0, -1);
         });
+    };
+
+    const handleAutoCategorize = async () => {
+        if (!notes) {
+            showNotification("Please enter a merchant name in notes first", "error");
+            return;
+        }
+
+        setIsCategorizing(true);
+        try {
+            const categoryName = await aiService.categorize(notes);
+            console.log("AI Suggested:", categoryName);
+
+            // Simple mapping logic
+            const lowerCat = categoryName.toLowerCase();
+            let matchedId = 'shopping'; // Default fallback
+
+            if (lowerCat.includes('food') || lowerCat.includes('drink')) matchedId = 'food';
+            else if (lowerCat.includes('transport')) matchedId = 'transport';
+            else if (lowerCat.includes('fun') || lowerCat.includes('entertainment')) matchedId = 'fun';
+            else if (lowerCat.includes('health')) matchedId = 'health';
+            else if (lowerCat.includes('bill') || lowerCat.includes('utility') || lowerCat.includes('housing') || lowerCat.includes('education')) matchedId = 'bills';
+            else if (lowerCat.includes('shop')) matchedId = 'shopping';
+
+            setSelectedCategory(matchedId);
+            showNotification(`Category set to ${CATEGORIES.find(c => c.id === matchedId)?.name}`, 'success');
+        } catch (error) {
+            console.error("Auto-categorization failed", error);
+            showNotification("Failed to auto-categorize", "error");
+        } finally {
+            setIsCategorizing(false);
+        }
     };
 
     const handleSave = async () => {
@@ -201,12 +236,28 @@ const QuickAddTransactionModal: React.FC<QuickAddTransactionModalProps> = ({ isO
                                     </div>
                                 </div>
                             </div>
-                            {/* Notes Input */}
+                            {/* Notes Input + AI Button */}
                             <div>
-                                <label className="block text-slate-500 dark:text-[#cbbc90] text-sm font-medium mb-2">Notes</label>
+                                <div className="flex justify-between items-center mb-2">
+                                    <label className="block text-slate-500 dark:text-[#cbbc90] text-sm font-medium">Notes / Merchant</label>
+                                    {transactionType === 'Expense' && (
+                                        <button
+                                            onClick={handleAutoCategorize}
+                                            disabled={isCategorizing || !notes}
+                                            className="text-xs flex items-center gap-1 text-primary hover:text-primary/80 disabled:opacity-50 transition-colors"
+                                        >
+                                            {isCategorizing ? (
+                                                <span className="animate-spin material-symbols-outlined text-xs">refresh</span>
+                                            ) : (
+                                                <span className="material-symbols-outlined text-xs">auto_awesome</span>
+                                            )}
+                                            Auto-Cat
+                                        </button>
+                                    )}
+                                </div>
                                 <input
                                     className="w-full rounded-lg border border-slate-200 dark:border-[#685a31] bg-slate-50 dark:bg-[#342d18] text-slate-900 dark:text-white p-4 text-base font-normal placeholder:text-slate-400 dark:placeholder:text-[#685a31] focus:outline-none focus:ring-2 focus:ring-primary/50 transition-shadow"
-                                    placeholder="Lunch at Jakarta..."
+                                    placeholder="e.g. Starbucks, Gojek, Tokopedia..."
                                     type="text"
                                     value={notes}
                                     onChange={(e) => setNotes(e.target.value)}

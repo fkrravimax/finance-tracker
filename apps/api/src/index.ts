@@ -58,6 +58,10 @@ if (!process.env.VERCEL) {
     startCronJobs();
 }
 
+
+import aiRoutes from './routes/ai.routes.js';
+app.use('/api/ai', authMiddleware, aiRoutes);
+
 // Health Check
 app.get('/api/health', (req, res) => {
     res.json({ status: 'ok', timestamp: new Date() });
