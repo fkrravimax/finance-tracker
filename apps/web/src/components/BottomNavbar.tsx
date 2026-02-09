@@ -35,7 +35,7 @@ const BottomNavbar: React.FC = () => {
             )}
 
             {/* Floating Menu Items */}
-            <div className={`fixed bottom-24 left-1/2 -translate-x-1/2 flex flex-col items-center gap-4 z-50 transition-all duration-300 md:hidden ${isMenuOpen ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 translate-y-10 pointer-events-none'}`}>
+            <div className={`fixed bottom-32 left-1/2 -translate-x-1/2 flex flex-col items-center gap-4 z-50 transition-all duration-300 md:hidden ${isMenuOpen ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 translate-y-10 pointer-events-none'}`}>
 
                 {/* Option 3: Savings */}
                 <NavLink
