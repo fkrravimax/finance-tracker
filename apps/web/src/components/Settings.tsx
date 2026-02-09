@@ -3,7 +3,7 @@ import { settingsService, type RecurringTransaction } from '../services/settings
 import { useAppearance } from '../contexts/AppearanceContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import CurrencyInput from './CurrencyInput';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { authClient } from '../lib/auth-client';
 import ConfirmationModal from './ConfirmationModal';
 
@@ -460,6 +460,23 @@ const Settings: React.FC = () => {
                                     </button>
                                 </div>
                             </div>
+
+                            {/* Privacy Policy Link */}
+                            <div className="flex flex-col gap-3">
+                                <h3 className="font-bold text-slate-900 dark:text-white">{t('privacy.title')}</h3>
+                                <Link to="/privacy" className="flex items-center justify-between p-4 rounded-xl bg-slate-50 dark:bg-[#1a160b] border border-slate-200 dark:border-[#493f22] hover:border-primary/50 hover:bg-white dark:hover:bg-[#2b2616] transition-all group">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-[#2b2616] flex items-center justify-center group-hover:bg-primary/20 transition-all">
+                                            <span className="material-symbols-outlined text-slate-500 dark:text-[#cbbc90] group-hover:text-primary">verified_user</span>
+                                        </div>
+                                        <div className="flex flex-col">
+                                            <span className="font-bold text-slate-700 dark:text-slate-300 group-hover:text-primary">{t('privacy.title')}</span>
+                                            <span className="text-xs text-slate-500 dark:text-[#cbbc90]">View our privacy policy</span>
+                                        </div>
+                                    </div>
+                                    <span className="material-symbols-outlined text-slate-400 group-hover:text-primary group-hover:translate-x-1 transition-all">arrow_forward_ios</span>
+                                </Link>
+                            </div>
                         </div>
                     )}
                 </div>
@@ -584,6 +601,16 @@ const Settings: React.FC = () => {
                                 {/* Danger Zone */}
                                 <div className="pt-8 border-t border-slate-200 dark:border-[#493f22]">
                                     <div className="flex flex-col gap-2">
+                                        <div className="pb-8 mb-8 border-b border-slate-100 dark:border-[#493f22]">
+                                            <Link to="/privacy" className="flex items-center justify-between p-4 rounded-xl bg-slate-50 dark:bg-[#1a160b] border border-slate-100 dark:border-[#493f22] hover:border-primary/50 hover:bg-white dark:hover:bg-[#2b2616] transition-all group">
+                                                <div className="flex items-center gap-3">
+                                                    <span className="material-symbols-outlined text-slate-500 dark:text-[#cbbc90] group-hover:text-primary">verified_user</span>
+                                                    <span className="font-bold text-slate-700 dark:text-slate-300 group-hover:text-primary">{t('privacy.title')}</span>
+                                                </div>
+                                                <span className="material-symbols-outlined text-slate-400 group-hover:text-primary group-hover:translate-x-1 transition-all">arrow_forward</span>
+                                            </Link>
+                                        </div>
+
                                         <h3 className="font-bold text-slate-900 dark:text-white">{t('settings.dangerZone')}</h3>
                                         <div className="flex flex-col md:flex-row items-start md:items-center justify-between p-4 rounded-xl bg-red-50 dark:bg-red-900/10 border border-red-100 dark:border-red-900/30 gap-4 md:gap-0">
                                             <div>
