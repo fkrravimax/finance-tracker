@@ -327,6 +327,7 @@
     },
     "privacy": {
         "title": "Kebijakan Privasi",
+        "viewPolicy": "Lihat Kebijakan Privasi",
         "intro": {
             "title": "Pendahuluan",
             "content": "Selamat datang di Rupiku. Kami menghargai privasi Anda dan berkomitmen untuk melindungi data pribadi Anda. Kebijakan privasi ini menjelaskan bagaimana kami mengumpulkan, menggunakan, dan membagikan informasi tentang Anda saat Anda menggunakan situs web dan layanan kami."
