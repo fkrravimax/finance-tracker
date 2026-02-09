@@ -34,9 +34,9 @@ const PrivacyPolicy: React.FC = () => {
                     <section>
                         <h2 className="text-2xl font-bold mb-4 text-slate-900 dark:text-white">{t('privacy.collection.title') || 'Information We Collect'}</h2>
                         <ul className="list-disc pl-6 space-y-2">
-                            <li><strong>{t('privacy.collection.personal') || 'Personal Information'}:</strong> Name, email address, and other contact details you provide.</li>
-                            <li><strong>{t('privacy.collection.financial') || 'Financial Data'}:</strong> Transaction history, budget details, and savings goals you input into the app.</li>
-                            <li><strong>{t('privacy.collection.usage') || 'Usage Data'}:</strong> Information on how you interact with the app, device information, and log data.</li>
+                            <li><strong>{t('privacy.collection.personal')}:</strong> {t('privacy.collection.personalDesc')}</li>
+                            <li><strong>{t('privacy.collection.financial')}:</strong> {t('privacy.collection.financialDesc')}</li>
+                            <li><strong>{t('privacy.collection.usage')}:</strong> {t('privacy.collection.usageDesc')}</li>
                         </ul>
                     </section>
 
@@ -44,16 +44,23 @@ const PrivacyPolicy: React.FC = () => {
                         <h2 className="text-2xl font-bold mb-4 text-slate-900 dark:text-white">{t('privacy.usage.title') || 'How We Use Your Information'}</h2>
                         <p>{t('privacy.usage.desc') || 'We use the collected data to:'}</p>
                         <ul className="list-disc pl-6 mt-2 space-y-2">
-                            <li>Provide and maintain the Rupiku service.</li>
-                            <li>Personalize your experience and dashboard.</li>
-                            <li>Improve our app functionality and user interface.</li>
-                            <li>Communicate with you regarding updates or support.</li>
+                            <li>{t('privacy.usage.item1')}</li>
+                            <li>{t('privacy.usage.item2')}</li>
+                            <li>{t('privacy.usage.item3')}</li>
+                            <li>{t('privacy.usage.item4')}</li>
                         </ul>
                     </section>
 
                     <section>
                         <h2 className="text-2xl font-bold mb-4 text-slate-900 dark:text-white">{t('privacy.sharing.title') || 'Data Sharing'}</h2>
                         <p>{t('privacy.sharing.content') || 'We do not sell your personal data. We may share information with third-party service providers who assist us in operating our website, conducting our business, or serving our users, so long as those parties agree to keep this information confidential.'}</p>
+                    </section>
+
+                    <section>
+                        <h2 className="text-2xl font-bold mb-4 text-slate-900 dark:text-white">{t('privacy.encryption.title')}</h2>
+                        <p className="p-4 bg-primary/10 border border-primary/20 rounded-xl text-slate-700 dark:text-slate-200">
+                            {t('privacy.encryption.content')}
+                        </p>
                     </section>
 
                     <section>
