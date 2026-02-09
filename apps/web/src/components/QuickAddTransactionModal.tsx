@@ -91,15 +91,16 @@ const QuickAddTransactionModal: React.FC<QuickAddTransactionModalProps> = ({ isO
             const categoryName = await aiService.categorize(notes);
             console.log("AI Suggested:", categoryName);
 
-            // Simple mapping logic
+
+            // Strict mapping based on new prompt
             const lowerCat = categoryName.toLowerCase();
             let matchedId = 'shopping'; // Default fallback
 
-            if (lowerCat.includes('food') || lowerCat.includes('drink')) matchedId = 'food';
+            if (lowerCat.includes('food')) matchedId = 'food';
             else if (lowerCat.includes('transport')) matchedId = 'transport';
-            else if (lowerCat.includes('fun') || lowerCat.includes('entertainment')) matchedId = 'fun';
+            else if (lowerCat.includes('fun')) matchedId = 'fun';
             else if (lowerCat.includes('health')) matchedId = 'health';
-            else if (lowerCat.includes('bill') || lowerCat.includes('utility') || lowerCat.includes('housing') || lowerCat.includes('education')) matchedId = 'bills';
+            else if (lowerCat.includes('bill')) matchedId = 'bills';
             else if (lowerCat.includes('shop')) matchedId = 'shopping';
 
             setSelectedCategory(matchedId);
