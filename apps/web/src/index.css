@@ -51,18 +51,18 @@
     --color-primary: var(--color-primary-val);
     --color-primary-hover: var(--color-primary-hover-val);
 
-    --color-background-light: #f3f0ff;
+    --color-background-light: #f8fafc;
     /* In dark mode, we want background-dark to be the main bg */
     --color-background-dark: #221e10;
 
     /* Helper colors */
-    --color-lavender-50: #fdfbff;
+    --color-lavender-50: #f1f5f9;
     --color-lavender-100: var(--color-lavender-100-val);
     --color-lavender-200: var(--color-lavender-200-val);
-    --color-lavender-300: #ddd6fe;
+    --color-lavender-300: #cbd5e1;
     /* Used for borders mostly, might need override if used extensively */
-    --color-lavender-500: #e0d4fc;
-    --color-lavender-900: #581c87;
+    --color-lavender-500: #94a3b8;
+    --color-lavender-900: #1e293b;
 
     /* Mint */
     --color-mint: #86efac;
@@ -122,8 +122,8 @@
 /* Light mode scrollbar override */
 .light ::-webkit-scrollbar-thumb,
 :root:not(.dark) ::-webkit-scrollbar-thumb {
-    background: #c4b5fd;
-    /* lavender-400 roughly */
+    background: #94a3b8;
+    /* Slate-400 roughly */
 }
 
 /* Material Symbols alignment helper */
