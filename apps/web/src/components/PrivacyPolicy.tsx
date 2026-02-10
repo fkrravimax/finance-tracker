@@ -12,7 +12,7 @@ const PrivacyPolicy: React.FC = () => {
     return (
         <div className="h-screen w-full overflow-y-auto bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-sans transition-colors duration-300">
             {/* Header */}
-            <header className="sticky top-0 z-50 backdrop-blur-md bg-white/80 dark:bg-[#1e1b10]/80 border-b border-slate-200 dark:border-[#493f22] px-6 py-4 flex items-center justify-between">
+            <header className="sticky top-0 z-50 backdrop-blur-md bg-white/80 dark:bg-[#1e1b10]/80 border-b border-slate-200 dark:border-[#493f22] px-6 pt-[calc(env(safe-area-inset-top)+1rem)] pb-4 md:py-4 flex items-center justify-between">
                 <div className="flex items-center gap-3">
                     <img src="/logo.png" alt="Rupiku" className="w-8 h-8" />
                     <span className="text-xl font-black tracking-tight">Rupiku</span>
