@@ -2,20 +2,26 @@
 
 @layer base {
     :root {
-        /* Light Theme (Lavander/Purple Playful) */
-        --color-primary-val: #8b5cf6;
-        /* Violet */
-        --color-primary-hover-val: #7c3aed;
-        --color-bg-light: #f3f0ff;
+        /* Light Theme (Blue/Slate Professional) */
+        --color-primary-val: #3b82f6;
+        /* Blue-500 */
+        --color-primary-hover-val: #2563eb;
+        /* Blue-600 */
+        --color-bg-light: #f8fafc;
+        /* Slate-50 */
         --color-bg-dark: #221e10;
         --color-surface-light-val: #ffffff;
         --color-surface-dark-val: #2b2616;
 
-        --color-lavender-100-val: #f7f5ff;
-        --color-lavender-200-val: #ede9fe;
+        --color-lavender-100-val: #f1f5f9;
+        /* Slate-100 (using 'lavender' var name for compatibility) */
+        --color-lavender-200-val: #e2e8f0;
+        /* Slate-200 */
 
-        --color-text-main: #1e293b;
+        --color-text-main: #0f172a;
+        /* Slate-900 */
         --color-text-muted: #64748b;
+        /* Slate-500 */
     }
 
     .dark {
