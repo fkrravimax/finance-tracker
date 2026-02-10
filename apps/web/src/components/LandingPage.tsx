@@ -81,27 +81,29 @@ const LandingPage: React.FC<LandingPageProps> = ({ onSignUp, onSignIn }) => {
     return (
         <div className="h-screen w-full flex flex-col bg-background-light dark:bg-background-dark font-display overflow-hidden">
             {/* Header */}
-            <header className="flex items-center justify-between px-4 md:px-12 lg:px-20 py-4 md:py-6 shrink-0 border-b border-transparent md:border-slate-200/10">
+            <header className="relative flex items-center justify-between px-4 md:px-12 lg:px-20 py-4 md:py-6 shrink-0 border-b border-transparent md:border-slate-200/10">
                 <div className="flex items-center gap-2 md:gap-3">
                     <img src="/logo.png" alt="Rupiku" className="w-8 h-8 md:w-10 md:h-10" />
                     <span className="text-lg md:text-xl font-black text-slate-900 dark:text-white">Rupiku</span>
                 </div>
 
-
-
-                <div className="flex items-center gap-2 md:gap-4">
+                {/* Centered Links (Desktop) */}
+                <nav className="absolute left-1/2 top-1/2 -translate-y-1/2 -translate-x-1/2 hidden md:flex items-center gap-8">
                     <a
                         href="mailto:ahmadfikriraf@gmail.com"
-                        className="hidden md:inline text-slate-500 dark:text-[#cbbc90] hover:text-primary cursor-pointer transition-all font-medium"
+                        className="text-slate-500 dark:text-[#cbbc90] hover:text-primary cursor-pointer transition-all font-bold text-sm"
                     >
                         Help Center
                     </a>
                     <a
                         href="/privacy"
-                        className="hidden md:inline text-slate-500 dark:text-[#cbbc90] hover:text-primary cursor-pointer transition-all font-medium"
+                        className="text-slate-500 dark:text-[#cbbc90] hover:text-primary cursor-pointer transition-all font-bold text-sm"
                     >
                         {language === 'en' ? 'Privacy' : 'Privasi'}
                     </a>
+                </nav>
+
+                <div className="flex items-center gap-2 md:gap-4">
                     {/* Language Toggle */}
                     <button
                         onClick={() => setLanguage(language === 'en' ? 'id' : 'en')}
