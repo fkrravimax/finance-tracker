@@ -65,8 +65,8 @@ const Dashboard: React.FC = () => {
         return <DashboardSkeleton />;
     }
 
-    const trend = stats && stats.totalBalance > 0
-        ? ((stats.income - stats.expense) / stats.totalBalance) * 100
+    const trend = stats && stats.income > 0
+        ? ((stats.totalBalance - stats.income) / stats.income) * 100
         : 0;
 
     // Date Logic
