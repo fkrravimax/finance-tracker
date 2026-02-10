@@ -376,6 +376,15 @@ const Settings: React.FC = () => {
                         </span>
                     )}
                 </div>
+                {currentUser?.role === 'ADMIN' && (
+                    <Link
+                        to="/admin"
+                        className="w-full py-4 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold border border-slate-900 dark:border-white hover:opacity-90 transition-all flex items-center justify-center gap-2 mt-4 active:scale-95"
+                    >
+                        <span className="material-symbols-outlined">admin_panel_settings</span>
+                        {t('sidebar.admin')}
+                    </Link>
+                )}
                 <button
                     onClick={handleLogout}
                     className="w-full py-4 rounded-xl bg-red-50 dark:bg-red-900/10 text-red-600 dark:text-red-400 font-bold border border-red-100 dark:border-red-900/30 hover:bg-red-100 dark:hover:bg-red-900/20 transition-all flex items-center justify-center gap-2 mt-2 active:scale-95"
