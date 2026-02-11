@@ -72,10 +72,16 @@ const Login: React.FC<LoginProps> = ({ onLogin, onBack, defaultSignUp = false })
     };
 
     return (
-        <div className="min-h-screen w-full flex items-center justify-center bg-background-light dark:bg-background-dark p-4 font-display">
-            <div className="w-full max-w-md bg-white dark:bg-[#2a2515] rounded-3xl shadow-2xl overflow-hidden border border-slate-200 dark:border-[#493f22]">
+        <div className="min-h-screen w-full flex items-center justify-center font-display relative overflow-hidden py-8 px-4 md:px-0">
+            {/* Background Image & Overlay */}
+            <div className="absolute inset-0 z-0">
+                <img src="/bg.png" alt="Background" className="w-full h-full object-cover object-center opacity-50 dark:opacity-40" />
+                <div className="absolute inset-0 bg-background-light/45 dark:bg-background-dark/60 backdrop-blur-sm"></div>
+            </div>
+
+            <div className="w-full max-w-sm md:max-w-md bg-white dark:bg-[#2a2515] rounded-3xl shadow-2xl overflow-hidden border border-slate-200 dark:border-[#493f22] relative z-10 my-auto">
                 {/* Header */}
-                <div className="bg-surface-light dark:bg-[#342d18] p-8 text-center border-b border-slate-100 dark:border-[#493f22] relative">
+                <div className="bg-surface-light dark:bg-[#342d18] p-6 md:p-8 text-center border-b border-slate-100 dark:border-[#493f22] relative">
                     {onBack && (
                         <button
                             onClick={onBack}
