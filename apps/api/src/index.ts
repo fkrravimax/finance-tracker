@@ -9,8 +9,6 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Trust Proxy for Vercel/Heroku/Render - trust all to ensure protocol detection
-app.set('trust proxy', true);
 
 app.use(cors({
     origin: process.env.FRONTEND_URL ? [process.env.FRONTEND_URL, "https://rupiku.vercel.app", "https://finance-web-five-coral.vercel.app", "https://financetrx.vercel.app", "https://finance-web-git-main-rafis-projects-acb0d393.vercel.app", "http://localhost:5173", "http://localhost:5174"] : ["https://rupiku.vercel.app", "https://financetrx.vercel.app", "https://finance-web-git-main-rafis-projects-acb0d393.vercel.app", "http://localhost:5173", "http://localhost:5174"],
@@ -19,10 +17,6 @@ app.use(cors({
 }));
 app.use(express.json());
 
-// Root Route to prevent "Cannot GET /"
-app.get('/', (req, res) => {
-    res.status(200).json({ status: 'ok', message: 'Rupiku Finance API is running.', timestamp: new Date() });
-});
 
 // Auth Routes
 app.all("/api/auth/*splat", toNodeHandler(auth));

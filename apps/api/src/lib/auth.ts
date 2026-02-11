@@ -51,9 +51,7 @@ export const auth = betterAuth({
     advanced: {
         defaultCookieAttributes: {
             sameSite: "none",
-            secure: true,
-            httpOnly: true
-        },
-        useSecureCookies: true // Force secure cookies
+            secure: true
+        }
     }
 });
