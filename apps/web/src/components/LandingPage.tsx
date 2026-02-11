@@ -83,7 +83,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onSignUp, onSignIn }) => {
             {/* Background Image & Overlay */}
             <div className="absolute inset-0 z-0">
                 <img src="/bg.png" alt="Background" className="w-full h-full object-cover object-center translate-y-20 md:translate-y-0 opacity-50 dark:opacity-40" />
-                <div className="absolute inset-0 bg-background-light/90 dark:bg-background-dark/95 backdrop-blur-sm"></div>
+                <div className="absolute inset-0 bg-background-light/45 dark:bg-background-dark/60 backdrop-blur-sm"></div>
             </div>
 
             {/* Content Wrapper */}
