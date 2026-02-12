@@ -178,18 +178,39 @@ const Settings: React.FC = () => {
             });
             showNotification("Profile name updated successfully!");
             // Update local storage if we use it for sync
-            const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
-            currentUser.name = nameForm.name;
-            localStorage.setItem('user', JSON.stringify(currentUser));
-
-            // Reload to reflect changes in dashboard (since Dashboard might read from local storage or context)
-            // Or typically, context updates automatically. But for safety:
-            window.location.reload();
+            const currentUserData = JSON.parse(localStorage.getItem('user') || '{}');
+            currentUserData.name = nameForm.name;
+            localStorage.setItem('user', JSON.stringify(currentUserData));
+            setCurrentUser(prev => ({ ...prev, name: nameForm.name }));
         } catch (error: any) {
             console.error("Failed to update name", error);
             showNotification(error.message || "Failed to update name", 'error');
         } finally {
             setIsUpdatingName(false);
+        }
+    };
+
+    const handleUpdateProfilePicture = async (imagePath: string) => {
+        try {
+            await authClient.updateUser({
+                image: imagePath
+            });
+
+            // Optimistic update
+            setCurrentUser(prev => ({ ...prev, image: imagePath }));
+
+            // Update local storage
+            const currentUserData = JSON.parse(localStorage.getItem('user') || '{}');
+            currentUserData.image = imagePath;
+            localStorage.setItem('user', JSON.stringify(currentUserData));
+
+            showNotification("Profile picture updated!");
+
+            // Force reload to update sidebar/header if they don't listen to context yet
+            // window.location.reload(); // Context usually handles it, let's try without reload first or use a context refresher
+        } catch (error: any) {
+            console.error("Failed to update profile picture", error);
+            showNotification(error.message || "Failed to update profile picture", 'error');
         }
     };
 
@@ -562,7 +583,49 @@ const Settings: React.FC = () => {
 
                                     {openSubSection === 'profile' && (
                                         <div className="p-4 border-t border-slate-200 dark:border-[#493f22] bg-white dark:bg-[#1a160b] animate-fade-in">
-                                            <form onSubmit={handleUpdateName} className="flex flex-col gap-3">
+                                            <form onSubmit={handleUpdateName} className="flex flex-col gap-6">
+                                                {/* Profile Picture Selection */}
+                                                <div className="flex flex-col gap-3">
+                                                    <label className="text-sm font-bold text-slate-700 dark:text-[#cbbc90]">{t('settings.profilePicture')}</label>
+                                                    <div className="flex flex-wrap gap-4">
+                                                        {currentUser?.image && !currentUser.image.startsWith('/default-profiles/') && (
+                                                            <div className="relative group cursor-pointer">
+                                                                <img
+                                                                    src={currentUser.image}
+                                                                    alt="Current"
+                                                                    className="w-16 h-16 rounded-full object-cover border-2 border-primary"
+                                                                />
+                                                                <div className="absolute inset-0 bg-black/50 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                                                    <span className="text-white text-xs font-bold">Current</span>
+                                                                </div>
+                                                            </div>
+                                                        )}
+                                                        {[1, 2, 3, 4].map((num) => {
+                                                            const imgPath = `/default-profiles/profilepict${num}.png`;
+                                                            const isSelected = currentUser?.image === imgPath;
+                                                            return (
+                                                                <button
+                                                                    key={num}
+                                                                    type="button"
+                                                                    onClick={() => handleUpdateProfilePicture(imgPath)}
+                                                                    className={`relative w-16 h-16 rounded-full overflow-hidden border-2 transition-all ${isSelected ? 'border-primary ring-2 ring-primary/30 scale-105' : 'border-transparent hover:border-slate-300 dark:hover:border-slate-600'}`}
+                                                                >
+                                                                    <img
+                                                                        src={imgPath}
+                                                                        alt={`Profile ${num}`}
+                                                                        className="w-full h-full object-cover"
+                                                                    />
+                                                                    {isSelected && (
+                                                                        <div className="absolute inset-0 bg-primary/20 flex items-center justify-center">
+                                                                            <span className="material-symbols-outlined text-white drop-shadow-md">check</span>
+                                                                        </div>
+                                                                    )}
+                                                                </button>
+                                                            );
+                                                        })}
+                                                    </div>
+                                                </div>
+
                                                 <div className="flex flex-col gap-2">
                                                     <label className="text-sm font-bold text-slate-700 dark:text-[#cbbc90]">{t('settings.displayName')}</label>
                                                     <div className="flex gap-2">
