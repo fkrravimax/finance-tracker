@@ -10,7 +10,9 @@ const LandingHeader: React.FC = () => {
         <header className="relative flex items-center justify-between px-4 md:px-12 lg:px-20 pt-[calc(env(safe-area-inset-top)+1rem)] pb-4 md:py-6 shrink-0 border-b border-transparent md:border-slate-200/10">
             <div className="flex items-center gap-2 md:gap-3">
                 <img src="/logo.png" alt="Rupiku" className="w-8 h-8 md:w-10 md:h-10" />
-                <span className="text-lg md:text-xl font-black text-slate-900 dark:text-white">Rupiku</span>
+                <span className="text-xl md:text-2xl font-black tracking-tighter bg-gradient-to-br from-slate-900 via-slate-700 to-slate-500 dark:from-white dark:via-slate-200 dark:to-slate-400 bg-clip-text text-transparent transition-all">
+                    Rupiku<span className="text-primary inline-block transform translate-y-[2px]">.</span>
+                </span>
             </div>
 
             {/* Centered Links (Desktop) */}
