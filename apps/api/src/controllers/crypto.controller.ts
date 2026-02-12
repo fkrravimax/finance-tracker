@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { cryptoService } from '../services/crypto.service.js';
+import { cryptoService } from '../services/market.service.js';
 
 export const cryptoController = {
     getListings: async (req: Request, res: Response) => {
