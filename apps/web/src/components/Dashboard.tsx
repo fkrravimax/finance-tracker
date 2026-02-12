@@ -14,8 +14,9 @@ import { useLanguage } from '../contexts/LanguageContext';
 import { useUI } from '../contexts/UIContext';
 import { useAppearance } from '../contexts/AppearanceContext';
 
+import { transactionService } from '../services/transactionService';
+
 const Dashboard: React.FC = () => {
-    // isModalOpen removed (global)
     const { openQuickAdd } = useUI();
     const [isOnboardingOpen, setIsOnboardingOpen] = useState(false);
     const [isBalanceModalOpen, setIsBalanceModalOpen] = useState(false);
@@ -23,6 +24,8 @@ const Dashboard: React.FC = () => {
     const [isBudgetModalOpen, setIsBudgetModalOpen] = useState(false);
     const [stats, setStats] = useState<DashboardStats | null>(null);
     const [loading, setLoading] = useState(true);
+    const [transactions, setTransactions] = useState<any[]>([]);
+
     const [user, setUser] = useState<any>(null);
     const { t } = useLanguage();
 
@@ -46,14 +49,25 @@ const Dashboard: React.FC = () => {
         }
     };
 
+    const fetchTransactions = async () => {
+        try {
+            const data = await transactionService.getAll();
+            setTransactions(data);
+        } catch (error) {
+            console.error("Failed to fetch transactions", error);
+        }
+    };
+
     useEffect(() => {
         const currentUser = authService.getCurrentUser();
         setUser(currentUser);
         fetchStats();
+        fetchTransactions();
 
         // Listen for global transaction updates
         const handleTransactionUpdate = () => {
             fetchStats();
+            fetchTransactions();
         };
         window.addEventListener('transaction-updated', handleTransactionUpdate);
 
@@ -249,7 +263,7 @@ const Dashboard: React.FC = () => {
 
             {/* Middle Row: Charts & Lists */}
             <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-                <CashFlowChart income={stats?.income || 0} expense={stats?.expense || 0} />
+                <CashFlowChart income={stats?.income || 0} expense={stats?.expense || 0} transactions={transactions} />
                 <TransactionList limit={4} />
             </div>
 
