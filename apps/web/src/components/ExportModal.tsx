@@ -71,10 +71,11 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
                     <div className="bg-slate-50 dark:bg-[#1f1b10] p-4 rounded-xl text-xs text-slate-500 dark:text-[#cbbc90]">
                         <p className="font-bold mb-2">Report Includes:</p>
                         <ul className="list-disc list-inside space-y-1">
-                            <li>Bocor Halus Analysis ({'<'} 20k)</li>
+                            <li>Micro-Spending Analysis ({'<'} 15k)</li>
                             <li>Full Audit Trail</li>
                             <li>Savings Milestones</li>
                             <li>Budget Performance</li>
+                            <li>Daily Average Analysis</li>
                         </ul>
                     </div>
 
