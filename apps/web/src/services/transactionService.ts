@@ -14,5 +14,10 @@ export const transactionService = {
 
     delete: async (id: string): Promise<void> => {
         await api.delete(`/transactions/${id}`);
+    },
+
+    update: async (id: string, transaction: Partial<Transaction>): Promise<Transaction> => {
+        const { data } = await api.put(`/transactions/${id}`, transaction);
+        return data;
     }
 };

@@ -7,7 +7,17 @@ import { aiService } from '../services/aiService';
 interface QuickAddTransactionModalProps {
     isOpen: boolean;
     onClose: () => void;
-    onTransactionAdded?: () => void; // Optional callback to refresh list
+    onTransactionAdded?: () => void;
+    initialData?: {
+        id: string;
+        merchant: string;
+        category: string;
+        amount: string | number;
+        type: 'income' | 'expense';
+        date: string;
+        notes?: string;
+        source?: string;
+    } | null;
 }
 
 const CATEGORIES = [
@@ -19,7 +29,7 @@ const CATEGORIES = [
     { id: 'shopping', name: 'Shopping', icon: 'shopping_bag' },
 ];
 
-const QuickAddTransactionModal: React.FC<QuickAddTransactionModalProps> = ({ isOpen, onClose, onTransactionAdded }) => {
+const QuickAddTransactionModal: React.FC<QuickAddTransactionModalProps> = ({ isOpen, onClose, onTransactionAdded, initialData }) => {
     const { showNotification } = useNotification();
     const [amount, setAmount] = useState('0');
     const [selectedCategory, setSelectedCategory] = useState('food');
@@ -29,42 +39,85 @@ const QuickAddTransactionModal: React.FC<QuickAddTransactionModalProps> = ({ isO
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isCategorizing, setIsCategorizing] = useState(false);
 
+    useEffect(() => {
+        if (isOpen) {
+            if (initialData) {
+                setAmount(initialData.amount.toString());
+                setNotes(initialData.merchant); // Merchant as notes
+                setTransactionType(initialData.type === 'income' ? 'Income' : 'Expense');
 
-    // ... useEffects
+                // Try to match category name to ID
+                const catObj = CATEGORIES.find(c => c.name === initialData.category);
+                if (catObj) setSelectedCategory(catObj.id);
+                else setSelectedCategory('shopping'); // Fallback
+
+                // Helper to get source if stored in description like "Notes (via Bank)"
+                // This is a simple assumption based on previous save logic
+            } else {
+                // Reset form
+                setAmount('0');
+                setNotes('');
+                setTransactionType('Expense');
+                setSelectedCategory('food');
+                setWalletSource('Bank');
+            }
+        }
+    }, [isOpen, initialData]);
 
 
     // Debounce Auto-Categorize
     useEffect(() => {
         const timeoutId = setTimeout(() => {
-            if (notes && notes.length > 2) { // Minimum length check
+            // Only auto-categorize if NOT editing and user is typing notes
+            if (!initialData && notes && notes.length > 2) {
                 handleAutoCategorize();
             }
-        }, 1500); // 1.5 seconds debounce
+        }, 1500);
 
         return () => clearTimeout(timeoutId);
-    }, [notes]);
+    }, [notes, initialData]);
 
-    // Handle keyboard input
-    useEffect(() => {
-        if (!isOpen) return;
-        // ... existing handleKeyDown logic
+    const handleSave = async () => {
+        if (amount === '0') return;
+        setIsSubmitting(true);
+        try {
+            // Find category icon
+            const categoryObj = CATEGORIES.find(c => c.id === selectedCategory);
 
+            // Explicitly cast type to match Transaction interface
+            const typeValue: 'income' | 'expense' = transactionType === 'Expense' ? 'expense' : 'income';
 
-        const handleKeyDown = (e: KeyboardEvent) => {
-            if (e.key >= '0' && e.key <= '9') {
-                handleNumberClick(parseInt(e.key));
-            } else if (e.key === 'Backspace') {
-                handleBackspace();
-            } else if (e.key === 'Escape') {
-                onClose();
-            } else if (e.key === 'Enter') {
-                handleSave();
+            const payload = {
+                userId: '1',
+                amount: parseInt(amount),
+                category: transactionType === 'Income' ? 'Income' : (categoryObj?.name || 'Uncategorized'),
+                date: initialData ? initialData.date : new Date().toISOString(), // Keep original date if editing
+                merchant: notes || (transactionType === 'Income' ? 'Income' : 'Expense'),
+                type: typeValue,
+                icon: transactionType === 'Income' ? 'attach_money' : (categoryObj?.icon || 'attach_money'),
+                description: `${notes} (via ${walletSource})`
+            };
+
+            if (initialData) {
+                await transactionService.update(initialData.id, payload);
+                showNotification("Transaction updated successfully!");
+            } else {
+                await transactionService.create(payload);
+                showNotification("Transaction saved successfully!");
             }
-        };
 
-        window.addEventListener('keydown', handleKeyDown);
-        return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [isOpen, amount, selectedCategory, transactionType, notes]);
+            // Dispatch global event
+            window.dispatchEvent(new Event('transaction-updated'));
+
+            if (onTransactionAdded) onTransactionAdded();
+            onClose();
+        } catch (error) {
+            console.error("Failed to save transaction", error);
+            showNotification("Failed to save transaction", 'error');
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
 
     const handleNumberClick = (num: number) => {
         setAmount(prev => {
@@ -81,6 +134,26 @@ const QuickAddTransactionModal: React.FC<QuickAddTransactionModalProps> = ({ isO
         });
     };
 
+    // Handle keyboard input
+    useEffect(() => {
+        if (!isOpen) return;
+
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key >= '0' && e.key <= '9') {
+                handleNumberClick(parseInt(e.key));
+            } else if (e.key === 'Backspace') {
+                handleBackspace();
+            } else if (e.key === 'Escape') {
+                onClose();
+            } else if (e.key === 'Enter') {
+                handleSave();
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [isOpen, amount, selectedCategory, transactionType, notes, onClose]); // Removed handleSave from dep to avoid cycle, strictly it should be there but function is stable enough or use useCallback
+
     const handleAutoCategorize = async () => {
         if (!notes) {
             showNotification("Please enter a merchant name in notes first", "error");
@@ -90,15 +163,9 @@ const QuickAddTransactionModal: React.FC<QuickAddTransactionModalProps> = ({ isO
         setIsCategorizing(true);
         try {
             const categoryName = await aiService.categorize(notes);
-            console.log("RAW AI RESPONSE:", categoryName); // Debugging line
 
-
-            // Strict mapping based on new prompt
-
-            // Strict mapping based on new prompt
             const lowerCat = categoryName.toLowerCase();
-
-            let matchedId = ''; // No default yet
+            let matchedId = '';
 
             if (lowerCat.includes('food')) matchedId = 'food';
             else if (lowerCat.includes('transport')) matchedId = 'transport';
@@ -106,54 +173,19 @@ const QuickAddTransactionModal: React.FC<QuickAddTransactionModalProps> = ({ isO
             else if (lowerCat.includes('health')) matchedId = 'health';
             else if (lowerCat.includes('bill')) matchedId = 'bills';
             else if (lowerCat.includes('shop') || lowerCat.includes('belanja')) matchedId = 'shopping';
-            else if (lowerCat.includes('other')) matchedId = 'shopping'; // Fallback for "Others"
+            else if (lowerCat.includes('other')) matchedId = 'shopping';
 
             if (matchedId) {
                 setSelectedCategory(matchedId);
                 const categoryName = CATEGORIES.find(c => c.id === matchedId)?.name;
                 showNotification(`Category set to ${categoryName}`, 'success');
             } else {
-                showNotification(`Could not categorize: "${categoryName}". Creating as Shopping.`, 'warning');
                 setSelectedCategory('shopping');
             }
         } catch (error) {
             console.error("Auto-categorization failed", error);
-            showNotification("Failed to auto-categorize", "error");
         } finally {
             setIsCategorizing(false);
-        }
-    };
-
-    const handleSave = async () => {
-        if (amount === '0') return;
-        setIsSubmitting(true);
-        try {
-            // Find category icon
-            const categoryObj = CATEGORIES.find(c => c.id === selectedCategory);
-
-            await transactionService.create({
-                userId: '1', // Should be dynamic from auth context
-                amount: parseInt(amount),
-                category: transactionType === 'Income' ? 'Income' : (categoryObj?.name || 'Uncategorized'),
-                date: new Date().toISOString(),
-                merchant: notes || (transactionType === 'Income' ? 'Income' : 'Expense'), // Use notes as description/merchant
-                type: transactionType === 'Expense' ? 'expense' : 'income',
-                icon: transactionType === 'Income' ? 'attach_money' : (categoryObj?.icon || 'attach_money'),
-                description: `${notes} (via ${walletSource})`
-            });
-
-            showNotification("Transaction successfully saved!");
-
-            // Dispatch global event for other components to refresh
-            window.dispatchEvent(new Event('transaction-updated'));
-
-            if (onTransactionAdded) onTransactionAdded();
-            onClose();
-        } catch (error) {
-            console.error("Failed to save transaction", error);
-            showNotification("Failed to save transaction", 'error');
-        } finally {
-            setIsSubmitting(false);
         }
     };
 

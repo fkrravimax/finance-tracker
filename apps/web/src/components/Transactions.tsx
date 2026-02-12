@@ -2,6 +2,9 @@ import React, { useState, useMemo, useEffect } from 'react';
 import api from '../services/api';
 import TransactionTableSkeleton from './skeletons/TransactionTableSkeleton';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useUI } from '../contexts/UIContext';
+import { useNotification } from '../contexts/NotificationContext';
+import { transactionService } from '../services/transactionService';
 
 type TimeRange = 'day' | 'week' | 'month' | 'year';
 type SortKey = 'category' | 'date' | 'amount';
@@ -64,6 +67,28 @@ const Transactions: React.FC = () => {
             direction = 'desc';
         }
         setSortConfig({ key, direction });
+    };
+
+    const { openQuickAdd } = useUI();
+    const { showNotification } = useNotification();
+
+    const handleEdit = (transaction: Transaction) => {
+        openQuickAdd(transaction);
+    };
+
+    const handleDelete = async (id: string) => {
+        if (confirm(t('transactions.confirmDelete'))) {
+            try {
+                await transactionService.delete(id);
+                showNotification(t('transactions.deleteSuccess'));
+                fetchTransactions();
+                // Trigger global update
+                window.dispatchEvent(new Event('transaction-updated'));
+            } catch (error) {
+                console.error("Delete failed", error);
+                showNotification(t('transactions.deleteError'), 'error');
+            }
+        }
     };
 
     const filteredTransactions = useMemo(() => {
@@ -235,6 +260,7 @@ const Transactions: React.FC = () => {
                                     </div>
                                 </th>
                                 <th className="p-4 pr-6 text-sm font-bold text-slate-600 dark:text-[#cbbc90] whitespace-nowrap text-right">{t('transactions.status')}</th>
+                                <th className="p-4 pr-6 text-sm font-bold text-slate-600 dark:text-[#cbbc90] whitespace-nowrap text-right">Actions</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100 dark:divide-[#493f22]">
@@ -258,6 +284,24 @@ const Transactions: React.FC = () => {
                                             <span className="inline-block px-2 py-1 text-xs font-bold rounded-md bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
                                                 {t('transactions.completed')}
                                             </span>
+                                        </td>
+                                        <td className="p-4 pr-6 text-right">
+                                            <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <button
+                                                    onClick={() => handleEdit(transaction)}
+                                                    className="p-2 text-slate-400 hover:text-primary hover:bg-slate-100 dark:hover:bg-[#3f361d] rounded-full transition-colors"
+                                                    title="Edit"
+                                                >
+                                                    <span className="material-symbols-outlined text-[20px]">edit</span>
+                                                </button>
+                                                <button
+                                                    onClick={() => handleDelete(transaction.id)}
+                                                    className="p-2 text-slate-400 hover:text-red-500 hover:bg-slate-100 dark:hover:bg-[#3f361d] rounded-full transition-colors"
+                                                    title="Delete"
+                                                >
+                                                    <span className="material-symbols-outlined text-[20px]">delete</span>
+                                                </button>
+                                            </div>
                                         </td>
                                     </tr>
                                 ))
