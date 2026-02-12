@@ -70,6 +70,8 @@ export const createSavingsGoalSchema = z.object({
         .transform((v) => Number(v))
         .pipe(z.number().positive('Target amount must be positive')),
     targetDate: z.string().min(1, 'Target date is required'),
+    category: z.string().min(1, 'Category is required').max(100),
+    image: z.string().optional(),
     icon: z.string().optional(),
 });
 
