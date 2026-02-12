@@ -2,29 +2,38 @@
 import { db } from '../db/index.js';
 import { wallets, transactions } from '../db/schema.js';
 import { eq, and, sql } from "drizzle-orm";
+import { cryptoService } from './crypto.service.js';
 
 export const walletService = {
     async getAll(userId: string) {
         // 1. Get all wallets
         const userWallets = await db.select().from(wallets).where(eq(wallets.userId, userId));
 
-        // 2. Calculate balance for each wallet
-        const walletsWithBalance = await Promise.all(userWallets.map(async (wallet) => {
-            const balanceResult = await db.execute(sql`
-                SELECT 
-                    SUM(CASE WHEN type = 'income' THEN amount ELSE 0 END) as income,
-                    SUM(CASE WHEN type = 'expense' THEN amount ELSE 0 END) as expense
-                FROM transaction 
-                WHERE wallet_id = ${wallet.id}
-            `);
+        // 2. Fetch all transactions for user (optimization: fetch once and filter in memory if userId matches, 
+        // but here we might do it per wallet or fetch all user transactions once. 
+        // Fetching all user transactions is better than N queries.)
+        const allTransactions = await db.select().from(transactions).where(eq(transactions.userId, userId));
 
-            const income = Number(balanceResult.rows[0].income || 0);
-            const expense = Number(balanceResult.rows[0].expense || 0);
+        // 3. Calculate balance for each wallet in memory
+        const walletsWithBalance = userWallets.map(wallet => {
+            let income = 0;
+            let expense = 0;
+
+            allTransactions.forEach(t => {
+                if (t.walletId === wallet.id) {
+                    const amount = cryptoService.decryptToNumber(t.amount);
+                    if (t.type === 'income') income += amount;
+                    if (t.type === 'expense') expense += amount;
+                }
+            });
+
             return {
                 ...wallet,
-                balance: income - expense
+                name: cryptoService.decrypt(wallet.name),
+                type: wallet.type, // Type is not encrypted
+                balance: income - expense // Calculated fresh
             };
-        }));
+        });
 
         return walletsWithBalance;
     },
@@ -32,19 +41,33 @@ export const walletService = {
     async create(userId: string, name: string, type: 'BANK' | 'CASH' | 'E_WALLET' | 'OTHER' | string) {
         const [newWallet] = await db.insert(wallets).values({
             userId,
-            name,
+            name: cryptoService.encrypt(name),
             type,
-            balance: "0",
+            balance: cryptoService.encrypt("0"), // Encrypted initial balance
         }).returning();
-        return newWallet;
+
+        return {
+            ...newWallet,
+            name: cryptoService.decrypt(newWallet.name),
+            balance: 0
+        };
     },
 
     async update(walletId: string, userId: string, data: Partial<typeof wallets.$inferInsert>) {
+        const updateData: any = { ...data, updatedAt: new Date() };
+        if (data.name) updateData.name = cryptoService.encrypt(data.name);
+        if (data.balance) updateData.balance = cryptoService.encrypt(data.balance);
+
         const [updated] = await db.update(wallets)
-            .set({ ...data, updatedAt: new Date() })
+            .set(updateData)
             .where(and(eq(wallets.id, walletId), eq(wallets.userId, userId)))
             .returning();
-        return updated;
+
+        return {
+            ...updated,
+            name: cryptoService.decrypt(updated.name),
+            balance: cryptoService.decryptToNumber(updated.balance)
+        };
     },
 
     async delete(walletId: string, userId: string) {
@@ -53,7 +76,6 @@ export const walletService = {
             .returning();
     },
 
-    // Ensure default wallets exist and migrate old transactions
     async ensureDefaultWallets(userId: string) {
         const existing = await this.getAll(userId);
 
@@ -64,13 +86,14 @@ export const walletService = {
             const mainBank = await this.create(userId, "Main Bank", "BANK");
 
             // Migration: Update ALL null-wallet transactions to this new wallet
+            // Note: This SQL query still works because walletId is a UUID and not encrypted.
             const result = await db.update(transactions)
                 .set({ walletId: mainBank.id })
                 .where(and(eq(transactions.userId, userId), sql`wallet_id IS NULL`));
 
             console.log(`[Migration] Assigned ${result.rowCount} transactions to 'Main Bank'.`);
 
-            return [{ ...mainBank, balance: 0 }]; // Approximation, refetch for real balance
+            return [{ ...mainBank, balance: 0 }];
         }
         return existing;
     }

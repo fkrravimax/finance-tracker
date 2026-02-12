@@ -13,7 +13,7 @@ export const users = pgTable("user", {
     notifyBudget50: boolean("notify_budget_50").default(true),
     notifyBudget80: boolean("notify_budget_80").default(true),
     notifyDaily: boolean("notify_daily").default(false),
-    tradingBalance: decimal("trading_balance", { precision: 12, scale: 2 }).default("0").notNull(),
+    tradingBalance: text("trading_balance").default("0").notNull(),
     createdAt: timestamp("created_at").notNull(),
     updatedAt: timestamp("updated_at").notNull(),
 });
@@ -59,14 +59,9 @@ export const verifications = pgTable("verification", {
 export const wallets = pgTable("wallet", {
     id: uuid("id").defaultRandom().primaryKey(),
     userId: text("user_id").notNull().references(() => users.id),
-    name: text("name").notNull(), // 'Bank', 'Cash', 'Gopay', etc.
+    name: text("name").notNull(), // Encrypted
     type: text("type").notNull(), // 'BANK', 'CASH', 'E_WALLET', 'OTHER'
-    balance: decimal("balance", { precision: 12, scale: 2 }).default("0").notNull(), // Initial/Adjustment balance? Or computed? Let's use it as current cached balance for speed, or just initial. 
-    // Re-reading plan: "derived from transactions". But we might need a way to store "Initial Balance" distinct from transactions. 
-    // Actually, "Initial Balance" is best modeled as a transaction of type 'INCOME' / 'ADJUSTMENT'. 
-    // So this 'balance' column might be redundancy or a cache. 
-    // Let's keep it simple: Real-time aggregation is safer. 
-    // BUT we need a list of wallets.
+    balance: text("balance").default("0").notNull(), // Encrypted
     isDefault: boolean("is_default").default(false),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
@@ -77,13 +72,13 @@ export const transactions = pgTable("transaction", {
     id: uuid("id").defaultRandom().primaryKey(),
     userId: text("user_id").notNull().references(() => users.id),
     walletId: uuid("wallet_id").references(() => wallets.id), // Nullable for migration
-    merchant: text("merchant").notNull(),
+    merchant: text("merchant").notNull(), // Encrypted
     category: text("category").notNull(),
     date: timestamp("date").notNull(),
-    amount: decimal("amount", { precision: 12, scale: 2 }).notNull(), // using decimal for money
-    type: text("type").notNull(), // 'income' | 'expense'
+    amount: text("amount").notNull(), // Encrypted
+    type: text("type").notNull(),
     icon: text("icon"),
-    description: text("description"),
+    description: text("description"), // Encrypted
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
@@ -91,9 +86,9 @@ export const transactions = pgTable("transaction", {
 export const savingsGoals = pgTable("savings_goal", {
     id: uuid("id").defaultRandom().primaryKey(),
     userId: text("user_id").notNull().references(() => users.id),
-    name: text("name").notNull(),
-    targetAmount: decimal("target_amount", { precision: 12, scale: 2 }).notNull(),
-    currentAmount: decimal("current_amount", { precision: 12, scale: 2 }).default("0").notNull(),
+    name: text("name").notNull(), // Encrypted
+    targetAmount: text("target_amount").notNull(), // Encrypted
+    currentAmount: text("current_amount").default("0").notNull(), // Encrypted
     targetDate: timestamp("target_date").notNull(),
     category: text("category").notNull(),
     image: text("image"),
@@ -105,7 +100,7 @@ export const budgets = pgTable("budget", {
     id: uuid("id").defaultRandom().primaryKey(),
     userId: text("user_id").notNull().references(() => users.id),
     name: text("name").notNull(),
-    limit: decimal("limit", { precision: 12, scale: 2 }).notNull(),
+    limit: text("limit").notNull(), // Encrypted
     icon: text("icon"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
@@ -114,10 +109,10 @@ export const budgets = pgTable("budget", {
 export const recurringTransactions = pgTable("recurring_transaction", {
     id: uuid("id").defaultRandom().primaryKey(),
     userId: text("user_id").notNull().references(() => users.id),
-    name: text("name").notNull(),
-    amount: decimal("amount", { precision: 12, scale: 2 }).notNull(),
-    frequency: text("frequency").notNull(), // 'Monthly' | 'Weekly' | 'Yearly'
-    date: integer("date").notNull(), // Day of month/week
+    name: text("name").notNull(), // Encrypted
+    amount: text("amount").notNull(), // Encrypted
+    frequency: text("frequency").notNull(),
+    date: integer("date").notNull(),
     icon: text("icon"),
     nextDueDate: timestamp("next_due_date"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -127,16 +122,16 @@ export const recurringTransactions = pgTable("recurring_transaction", {
 export const trades = pgTable("trade", {
     id: uuid("id").defaultRandom().primaryKey(),
     userId: text("user_id").notNull().references(() => users.id),
-    pair: text("pair").notNull(), // e.g. BTC/USDT
-    type: text("type").notNull(), // 'LONG' | 'SHORT'
-    amount: decimal("amount", { precision: 12, scale: 2 }).notNull(), // Margin amount
-    entryPrice: decimal("entry_price", { precision: 12, scale: 2 }).notNull(),
-    closePrice: decimal("close_price", { precision: 12, scale: 2 }),
+    pair: text("pair").notNull(),
+    type: text("type").notNull(),
+    amount: text("amount").notNull(), // Encrypted
+    entryPrice: text("entry_price").notNull(), // Encrypted
+    closePrice: text("close_price"), // Encrypted
     leverage: integer("leverage").notNull(),
-    pnl: decimal("pnl", { precision: 12, scale: 2 }), // Realized PnL
-    outcome: text("outcome"), // 'WIN' | 'LOSS' | 'BE'
-    status: text("status").notNull().default("OPEN"), // 'OPEN' | 'CLOSED'
-    notes: text("notes"),
+    pnl: text("pnl"), // Encrypted
+    outcome: text("outcome"),
+    status: text("status").notNull().default("OPEN"),
+    notes: text("notes"), // Encrypted
     openedAt: timestamp("opened_at").defaultNow().notNull(),
     closedAt: timestamp("closed_at"),
     createdAt: timestamp("created_at").defaultNow().notNull(),

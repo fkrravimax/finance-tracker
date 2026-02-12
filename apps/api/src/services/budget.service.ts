@@ -3,12 +3,20 @@ import { db } from '../db/index.js';
 import { budgets } from '../db/schema.js';
 import { eq } from "drizzle-orm";
 import { randomUUID } from "crypto";
+import { cryptoService } from './crypto.service.js';
 
 export const budgetService = {
     async get(userId: string) {
-        // Assuming single budget per user for now based on "Monthly Budget" UI
         const result = await db.select().from(budgets).where(eq(budgets.userId, userId));
-        return result[0]; // Return the first budget found
+        const budget = result[0];
+        if (!budget) return null;
+
+        return {
+            ...budget,
+            limit: cryptoService.decryptToNumber(budget.limit),
+            name: budget.name // Name not encrypted in plan, but schema update had "limit" as encrypted. 
+            // Wait, I should check schema. "name" was NOT marked encrypted in my plan for budgets, only "limit".
+        };
     },
 
     async createOrUpdate(userId: string, data: { limit: number }) {
@@ -17,21 +25,29 @@ export const budgetService = {
         if (existing) {
             const result = await db.update(budgets)
                 .set({
-                    limit: data.limit.toString(),
+                    limit: cryptoService.encrypt(data.limit), // Encrypt
                     updatedAt: new Date()
                 })
                 .where(eq(budgets.id, existing.id))
                 .returning();
-            return result[0];
+
+            return {
+                ...result[0],
+                limit: cryptoService.decryptToNumber(result[0].limit)
+            };
         } else {
             const result = await db.insert(budgets).values({
                 id: randomUUID(),
                 userId,
                 name: "Monthly Budget",
-                limit: data.limit.toString(),
+                limit: cryptoService.encrypt(data.limit), // Encrypt
                 icon: "account_balance_wallet",
             }).returning();
-            return result[0];
+
+            return {
+                ...result[0],
+                limit: cryptoService.decryptToNumber(result[0].limit)
+            };
         }
     }
 };
