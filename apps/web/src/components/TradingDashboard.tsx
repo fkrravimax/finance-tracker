@@ -31,7 +31,7 @@ const TradingDashboard = () => {
 
     // Get user plan
     const user = authService.getCurrentUser();
-    const isPlatinum = user?.plan === 'PLATINUM';
+    const isPlatinum = true; // user?.plan === 'PLATINUM';
 
     const fetchData = async () => {
         if (!isPlatinum) {

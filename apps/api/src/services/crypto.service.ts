@@ -258,4 +258,30 @@ export const cryptoService = {
         setCache(cacheKey, data);
         return data;
     },
+
+
+    /**
+     * Get Bitcoin Fear and Greed Index from Alternative.me
+     */
+    async getFearGreedIndex() {
+        const cacheKey = 'fear_greed_index';
+        const cached = getCached(cacheKey, CACHE_TTL.GLOBAL); // Cache for 5 mins
+        if (cached) return cached;
+
+        try {
+            const response = await fetch('https://api.alternative.me/fng/?limit=1');
+            if (!response.ok) throw new Error('Failed to fetch Fear & Greed Index');
+
+            const result = await response.json();
+            const data = result.data?.[0] || null;
+
+            if (data) {
+                setCache(cacheKey, data);
+            }
+            return data;
+        } catch (error) {
+            console.error('Fear & Greed API Error:', error);
+            return null;
+        }
+    }
 };

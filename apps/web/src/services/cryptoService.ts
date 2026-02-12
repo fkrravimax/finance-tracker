@@ -81,6 +81,13 @@ export interface PriceConversion {
     converted_currency: string;
 }
 
+export interface FearGreedIndex {
+    value: string;
+    value_classification: string;
+    timestamp: string;
+    time_until_update: string;
+}
+
 export const cryptoService = {
     getListings: async (limit: number = 50, convert: string = 'USD'): Promise<CryptoListing[]> => {
         const { data } = await api.get(`/crypto/listings?limit=${limit}&convert=${convert}`);
@@ -90,6 +97,11 @@ export const cryptoService = {
     getGlobalMetrics: async (convert: string = 'USD'): Promise<GlobalMetrics> => {
         const { data } = await api.get(`/crypto/global?convert=${convert}`);
         return data;
+    },
+
+    getFearGreedIndex: async () => {
+        const { data } = await api.get('/crypto/fear-greed');
+        return data as FearGreedIndex;
     },
 
     getQuotes: async (symbols: string, convert: string = 'USD'): Promise<Record<string, CryptoQuote>> => {

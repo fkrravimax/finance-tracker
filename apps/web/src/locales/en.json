@@ -189,7 +189,12 @@
         "sentimentBullish": "Bullish",
         "sentimentOptimistic": "Optimistic",
         "sentimentCautious": "Cautious",
-        "sentimentBearish": "Bearish"
+        "sentimentBearish": "Bearish",
+        "sentimentExtremeFear": "Extreme Fear",
+        "sentimentFear": "Fear",
+        "sentimentNeutral": "Neutral",
+        "sentimentGreed": "Greed",
+        "sentimentExtremeGreed": "Extreme Greed"
     },
     "savings": {
         "title": "Savings Vault",
