@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import BottomNavbar from './BottomNavbar';
 import QuickAddTransactionModal from './QuickAddTransactionModal';
@@ -18,9 +19,44 @@ const DashboardContent: React.FC<DashboardLayoutProps> = ({ children, onLogout }
         setIsSidebarOpen(!isSidebarOpen);
     };
 
+    const navigate = useNavigate();
+    const location = useLocation();
+
+    const handleSwipeRight = () => {
+        if (isSidebarOpen) return; // Already leftmost
+
+        const path = location.pathname;
+        if (path === '/dashboard') {
+            setIsSidebarOpen(true);
+        } else if (path === '/transactions') {
+            navigate('/dashboard');
+        } else if (path === '/reports') {
+            navigate('/transactions');
+        } else if (path === '/settings') {
+            navigate('/reports');
+        }
+    };
+
+    const handleSwipeLeft = () => {
+        if (isSidebarOpen) {
+            setIsSidebarOpen(false);
+            return;
+        }
+
+        const path = location.pathname;
+        if (path === '/dashboard') {
+            navigate('/transactions');
+        } else if (path === '/transactions') {
+            navigate('/reports');
+        } else if (path === '/reports') {
+            navigate('/settings');
+        }
+        // Settings is rightmost, do nothing
+    };
+
     const handlers = useSwipeable({
-        onSwipedRight: () => setIsSidebarOpen(true),
-        onSwipedLeft: () => setIsSidebarOpen(false),
+        onSwipedRight: handleSwipeRight,
+        onSwipedLeft: handleSwipeLeft,
         trackMouse: false,
         trackTouch: true,
         delta: 50, // Min distance to trigger swipe
