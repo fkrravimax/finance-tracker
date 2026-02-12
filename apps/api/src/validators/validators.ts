@@ -33,16 +33,22 @@ export const updateTransactionSchema = z.object({
 
 export const createTradeSchema = z.object({
     pair: z.string().min(1, 'Trading pair is required').max(50),
-    type: z.enum(['buy', 'sell'], { message: "Type must be 'buy' or 'sell'" }),
+    type: z.enum(['LONG', 'SHORT'], { message: "Type must be 'LONG' or 'SHORT'" }),
     entryPrice: z.union([z.number(), z.string()])
         .transform((v) => Number(v))
         .pipe(z.number().positive('Entry price must be positive')),
-    exitPrice: z.union([z.number(), z.string()])
+    closePrice: z.union([z.number(), z.string()])
         .transform((v) => Number(v))
-        .pipe(z.number().positive('Exit price must be positive')),
+        .pipe(z.number().positive('Close price must be positive'))
+        .optional(),
     amount: z.union([z.number(), z.string()])
         .transform((v) => Number(v))
         .pipe(z.number().positive('Amount must be positive')),
+    leverage: z.union([z.number(), z.string()])
+        .transform((v) => Number(v))
+        .pipe(z.number().min(1, 'Leverage must be at least 1')),
+    pnl: z.union([z.number(), z.string()])
+        .transform((v) => Number(v)),
     notes: z.string().max(500).optional(),
 });
 
