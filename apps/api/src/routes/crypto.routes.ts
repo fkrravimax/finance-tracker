@@ -9,6 +9,9 @@ router.get('/listings', cryptoController.getListings);
 // GET /api/crypto/global?convert=USD
 router.get('/global', cryptoController.getGlobalMetrics);
 
+// GET /api/crypto/fear-greed
+router.get('/fear-greed', cryptoController.getFearGreedIndex);
+
 // GET /api/crypto/quotes?symbols=BTC,ETH&convert=USD
 router.get('/quotes', cryptoController.getQuotes);
 

@@ -189,7 +189,12 @@
         "sentimentBullish": "Bullish",
         "sentimentOptimistic": "Optimis",
         "sentimentCautious": "Hati-hati",
-        "sentimentBearish": "Bearish"
+        "sentimentBearish": "Bearish",
+        "sentimentExtremeFear": "Ketakutan Ekstrem",
+        "sentimentFear": "Ketakutan",
+        "sentimentNeutral": "Netral",
+        "sentimentGreed": "Keserakahan",
+        "sentimentExtremeGreed": "Keserakahan Ekstrem"
     },
     "savings": {
         "title": "Tabungan",

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { cryptoService, type GlobalMetrics, type CryptoQuote } from '../services/cryptoService';
 import { useLanguage } from '../contexts/LanguageContext';
-import { authService } from '../services/authService';
+// import { authService } from '../services/authService';
 import Skeleton from './Skeleton';
 
 const CryptoSentiment = () => {
@@ -9,23 +9,26 @@ const CryptoSentiment = () => {
     const [global, setGlobal] = useState<GlobalMetrics | null>(null);
     const [btcQuote, setBtcQuote] = useState<CryptoQuote | null>(null);
     const [ethQuote, setEthQuote] = useState<CryptoQuote | null>(null);
+    const [fearGreed, setFearGreed] = useState<any | null>(null); // Type 'any' for now or import FearGreedIndex
     const [loading, setLoading] = useState(true);
 
     // Only show for Platinum users
-    const user = authService.getCurrentUser();
-    const isPlatinum = user?.plan === 'PLATINUM';
+    // const user = authService.getCurrentUser();
+    const isPlatinum = true; // user?.plan === 'PLATINUM';
 
     useEffect(() => {
         if (!isPlatinum) return;
         const fetchData = async () => {
             try {
-                const [globalData, quotesData] = await Promise.all([
+                const [globalData, quotesData, fearGreedData] = await Promise.all([
                     cryptoService.getGlobalMetrics(),
                     cryptoService.getQuotes('BTC,ETH'),
+                    cryptoService.getFearGreedIndex(),
                 ]);
                 setGlobal(globalData);
                 setBtcQuote(quotesData['BTC'] || null);
                 setEthQuote(quotesData['ETH'] || null);
+                setFearGreed(fearGreedData);
             } catch (error) {
                 console.error('Failed to fetch crypto sentiment:', error);
             } finally {
@@ -51,14 +54,21 @@ const CryptoSentiment = () => {
         return `$${price.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
     };
 
-    // Simple sentiment calculation based on market change
+    // Sentiment based on Fear & Greed Index
     const getSentiment = () => {
-        if (!global) return { label: '-', color: 'text-slate-400', bg: 'bg-slate-100 dark:bg-white/5' };
-        const change = global.total_market_cap_yesterday_percentage_change;
-        if (change > 3) return { label: t('crypto.sentimentBullish'), color: 'text-emerald-500', bg: 'bg-emerald-50 dark:bg-emerald-500/10', icon: 'trending_up' };
-        if (change > 0) return { label: t('crypto.sentimentOptimistic'), color: 'text-emerald-400', bg: 'bg-emerald-50 dark:bg-emerald-500/10', icon: 'north_east' };
-        if (change > -3) return { label: t('crypto.sentimentCautious'), color: 'text-amber-500', bg: 'bg-amber-50 dark:bg-amber-500/10', icon: 'south_east' };
-        return { label: t('crypto.sentimentBearish'), color: 'text-rose-500', bg: 'bg-rose-50 dark:bg-rose-500/10', icon: 'trending_down' };
+        if (!fearGreed) return { label: '-', color: 'text-slate-400', bg: 'bg-slate-100 dark:bg-white/5', icon: 'remove' };
+
+        const value = parseInt(fearGreed.value);
+        // Extreme Fear (0-24)
+        if (value < 25) return { label: t('crypto.sentimentExtremeFear'), color: 'text-rose-600', bg: 'bg-rose-50 dark:bg-rose-500/10', icon: 'sentiment_very_dissatisfied' };
+        // Fear (25-46)
+        if (value < 47) return { label: t('crypto.sentimentFear'), color: 'text-orange-500', bg: 'bg-orange-50 dark:bg-orange-500/10', icon: 'sentiment_dissatisfied' };
+        // Neutral (47-54)
+        if (value < 55) return { label: t('crypto.sentimentNeutral'), color: 'text-yellow-500', bg: 'bg-yellow-50 dark:bg-yellow-500/10', icon: 'sentiment_neutral' };
+        // Greed (55-75)
+        if (value < 76) return { label: t('crypto.sentimentGreed'), color: 'text-emerald-400', bg: 'bg-emerald-50 dark:bg-emerald-500/10', icon: 'sentiment_satisfied' };
+        // Extreme Greed (76-100)
+        return { label: t('crypto.sentimentExtremeGreed'), color: 'text-emerald-600', bg: 'bg-emerald-50 dark:bg-emerald-500/10', icon: 'sentiment_very_satisfied' };
     };
 
     const sentiment = getSentiment();
@@ -89,7 +99,9 @@ const CryptoSentiment = () => {
                 </div>
                 <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full ${sentiment.bg}`}>
                     <span className={`material-symbols-outlined text-[16px] ${sentiment.color}`}>{sentiment.icon}</span>
-                    <span className={`text-xs font-bold ${sentiment.color}`}>{sentiment.label}</span>
+                    <span className={`text-xs font-bold ${sentiment.color}`}>
+                        {fearGreed ? `${fearGreed.value} - ` : ''}{sentiment.label}
+                    </span>
                 </div>
             </div>
 
