@@ -56,9 +56,27 @@ export const verifications = pgTable("verification", {
 
 // --- Finance App Tables ---
 
+export const wallets = pgTable("wallet", {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: text("user_id").notNull().references(() => users.id),
+    name: text("name").notNull(), // 'Bank', 'Cash', 'Gopay', etc.
+    type: text("type").notNull(), // 'BANK', 'CASH', 'E_WALLET', 'OTHER'
+    balance: decimal("balance", { precision: 12, scale: 2 }).default("0").notNull(), // Initial/Adjustment balance? Or computed? Let's use it as current cached balance for speed, or just initial. 
+    // Re-reading plan: "derived from transactions". But we might need a way to store "Initial Balance" distinct from transactions. 
+    // Actually, "Initial Balance" is best modeled as a transaction of type 'INCOME' / 'ADJUSTMENT'. 
+    // So this 'balance' column might be redundancy or a cache. 
+    // Let's keep it simple: Real-time aggregation is safer. 
+    // BUT we need a list of wallets.
+    isDefault: boolean("is_default").default(false),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// Update transactions table to include walletId
 export const transactions = pgTable("transaction", {
     id: uuid("id").defaultRandom().primaryKey(),
     userId: text("user_id").notNull().references(() => users.id),
+    walletId: uuid("wallet_id").references(() => wallets.id), // Nullable for migration
     merchant: text("merchant").notNull(),
     category: text("category").notNull(),
     date: timestamp("date").notNull(),

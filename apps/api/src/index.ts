@@ -67,6 +67,9 @@ if (!process.env.VERCEL) {
 import aiRoutes from './routes/ai.routes.js';
 app.use('/api/ai', authMiddleware, aiRoutes);
 
+import walletRoutes from './routes/wallet.routes.js';
+app.use('/api/wallets', authMiddleware, walletRoutes);
+
 // Health Check
 app.get('/api/health', (req, res) => {
     res.json({ status: 'ok', timestamp: new Date() });

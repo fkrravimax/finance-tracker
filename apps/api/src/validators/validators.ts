@@ -12,6 +12,7 @@ export const createTransactionSchema = z.object({
     date: z.string().min(1, 'Date is required'),
     icon: z.string().optional(),
     description: z.string().max(500).optional(),
+    walletId: z.string().uuid().optional(),
 });
 
 export const updateTransactionSchema = z.object({
@@ -25,6 +26,7 @@ export const updateTransactionSchema = z.object({
     date: z.string().optional(),
     icon: z.string().optional(),
     description: z.string().max(500).optional(),
+    walletId: z.string().uuid().optional(),
 }).refine((data) => Object.keys(data).length > 0, {
     message: 'At least one field must be provided for update',
 });

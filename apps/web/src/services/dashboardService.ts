@@ -6,6 +6,7 @@ export interface DashboardStats {
     income: number;
     expense: number;
     monthlyExpense: number;
+    wallets?: { id: string; name: string; type: string; balance: number }[];
     budget: {
         limit: number;
         used: number;

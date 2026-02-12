@@ -26,6 +26,7 @@ export interface Transaction {
     type: TransactionType;
     icon: string;
     description?: string;
+    walletId?: string;
 }
 
 export interface SavingsGoal {
