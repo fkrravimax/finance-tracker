@@ -58,5 +58,15 @@ export const auth = betterAuth({
             path: "/",
         },
         useSecureCookies: true,
+        cookies: {
+            session_token: {
+                name: "better-auth.session_token",
+                attributes: {
+                    sameSite: "none" as const,
+                    secure: true,
+                    path: "/",
+                },
+            },
+        },
     }
 });
