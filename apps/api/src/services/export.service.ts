@@ -13,14 +13,17 @@ export const exportService = {
         // 1. Audit Trail (Log)
         await this.addAuditTrail(workbook, userId, filters);
 
-        // 2. Bocor Halus Analysis (< 20k expense)
-        await this.addBocorHalus(workbook, userId, filters);
+        // 2. Micro-Spending Analysis (< 15k expense)
+        await this.addMicroSpending(workbook, userId, filters);
 
         // 3. Savings Milestone
         await this.addSavingsMilestone(workbook, userId);
 
         // 4. Budget Performance
         await this.addBudgetPerformance(workbook, userId, filters);
+
+        // 5. Daily Average Analysis
+        await this.addDailyAverage(workbook, userId, filters);
 
         return workbook;
     },
@@ -65,19 +68,19 @@ export const exportService = {
         sheet.getRow(1).font = { bold: true };
     },
 
-    async addBocorHalus(workbook: ExcelJS.Workbook, userId: string, filters: any) {
-        const sheet = workbook.addWorksheet('Bocor Halus Analysis');
+    async addMicroSpending(workbook: ExcelJS.Workbook, userId: string, filters: any) {
+        const sheet = workbook.addWorksheet('Micro-Spending Analysis');
         sheet.columns = [
             { header: 'Date', key: 'date', width: 15 },
             { header: 'Category', key: 'category', width: 15 },
             { header: 'Item', key: 'merchant', width: 20 },
-            { header: 'Amount (< 20k)', key: 'amount', width: 15 },
+            { header: 'Amount (< 15k)', key: 'amount', width: 15 },
         ];
 
         const conditions = [
             eq(transactions.userId, userId),
             eq(transactions.type, 'expense'),
-            sql`CAST(${transactions.amount} AS DECIMAL) < 20000`
+            sql`CAST(${transactions.amount} AS DECIMAL) < 15000`
         ];
 
         if (filters.wallet) {
@@ -177,6 +180,78 @@ export const exportService = {
                 spent: categorySummary[cat].total,
                 count: categorySummary[cat].count
             });
+        });
+
+        sheet.getRow(1).font = { bold: true };
+    },
+
+    async addDailyAverage(workbook: ExcelJS.Workbook, userId: string, filters: any) {
+        const sheet = workbook.addWorksheet('Daily Average');
+        sheet.columns = [
+            { header: 'Date', key: 'date', width: 15 },
+            { header: 'Total Spent (Rp)', key: 'spent', width: 20 },
+            { header: 'Status', key: 'status', width: 15 },
+        ];
+
+        const conditions = [
+            eq(transactions.userId, userId),
+            eq(transactions.type, 'expense')
+        ];
+
+        if (filters.wallet) {
+            conditions.push(like(transactions.description, `%via ${filters.wallet}%`));
+        }
+
+        const whereClause = and(...conditions);
+
+        // Fetch all expenses to calculate daily totals
+        const expenses = await db.select({
+            date: transactions.date,
+            amount: transactions.amount,
+        }).from(transactions).where(whereClause).orderBy(transactions.date);
+
+        if (expenses.length === 0) return;
+
+        // Group by Date
+        const dailyTotals: Record<string, number> = {};
+        expenses.forEach(e => {
+            const dateStr = e.date.toISOString().split('T')[0];
+            if (!dailyTotals[dateStr]) dailyTotals[dateStr] = 0;
+            dailyTotals[dateStr] += Number(e.amount);
+        });
+
+        // Calculate Range Stats
+        const dates = Object.keys(dailyTotals).sort();
+        const totalOverall = expenses.reduce((sum, e) => sum + Number(e.amount), 0);
+        // We calculate average based on the number of days with spending for now, 
+        // to avoid skewing if the user didn't use the app for a month. A more strict average 
+        // would use (EndDate - StartDate) days.
+        const daysWithSpending = dates.length;
+        const average = daysWithSpending > 0 ? totalOverall / daysWithSpending : 0;
+
+        // Populate Sheet
+        sheet.addRow({ date: 'SUMMARY', spent: '', status: '' }).font = { bold: true };
+        sheet.addRow({ date: 'Average / Day', spent: average }).font = { bold: true };
+        sheet.addRow([]); // spacer
+        sheet.addRow({ date: 'DAILY BREAKDOWN', spent: '', status: '' }).font = { bold: true };
+
+        dates.forEach(date => {
+            const amount = dailyTotals[date];
+            let status = 'Normal';
+            if (amount > average * 1.5) status = 'High';
+            else if (amount < average * 0.5) status = 'Low';
+
+            const row = sheet.addRow({
+                date: date,
+                spent: amount,
+                status: status
+            });
+
+            if (status === 'High') {
+                row.getCell('status').font = { color: { argb: 'FFFF0000' } }; // Red
+            } else if (status === 'Low') {
+                row.getCell('status').font = { color: { argb: 'FF00AA00' } }; // Green
+            }
         });
 
         sheet.getRow(1).font = { bold: true };
