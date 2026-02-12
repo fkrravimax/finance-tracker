@@ -133,7 +133,15 @@ const Dashboard: React.FC = () => {
                         {t('dashboard.overview')} <span className="text-primary">{t('dashboard.overviewSuffix')}</span>
                     </h2>
                     <p className="text-slate-500 dark:text-[#cbbc90] text-lg font-bold flex items-center gap-2">
-                        {t('dashboard.greeting').replace('{name}', user?.name || 'User')}
+                        {t('dashboard.greeting').replace('{name}', '')}
+                        <span className={`
+                            ${user?.plan === 'PREMIUM' ? 'text-gold' : ''}
+                            ${user?.plan === 'PLATINUM' ? 'text-platinum text-xl' : ''}
+                            ${!user?.plan || user?.plan === 'FREE' ? 'text-slate-900 dark:text-white' : ''}
+                        `}>
+                            {user?.name || 'User'}
+                        </span>
+                        {user?.plan === 'PLATINUM' && <span className="text-xl animate-pulse">✨</span>}
                     </p>
                 </div>
                 <div className="flex gap-4">
