@@ -49,6 +49,15 @@ const WalletListModal: React.FC<WalletListModalProps> = ({ isOpen, onClose, wall
         }
     };
 
+    const getTypeLabel = (type: string) => {
+        switch (type) {
+            case 'BANK': return 'Bank';
+            case 'CASH': return 'Cash';
+            case 'E_WALLET': return 'E-Wallet';
+            default: return type;
+        }
+    };
+
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" onClick={onClose}>
             <div className="bg-white dark:bg-surface-dark w-full max-w-md rounded-2xl shadow-xl overflow-hidden border border-slate-100 dark:border-white/10" onClick={e => e.stopPropagation()}>
@@ -68,7 +77,7 @@ const WalletListModal: React.FC<WalletListModalProps> = ({ isOpen, onClose, wall
                                 </div>
                                 <div>
                                     <p className="font-bold text-slate-800 dark:text-white">{wallet.name}</p>
-                                    <p className="text-xs text-slate-500">{wallet.type}</p>
+                                    <p className="text-xs text-slate-500">{getTypeLabel(wallet.type)}</p>
                                 </div>
                             </div>
                             <div className="font-black text-slate-800 dark:text-white">
@@ -94,7 +103,7 @@ const WalletListModal: React.FC<WalletListModalProps> = ({ isOpen, onClose, wall
                                         onClick={() => setNewWalletType(type)}
                                         className={`px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap border transition-colors ${newWalletType === type ? 'bg-primary text-white border-primary' : 'bg-white dark:bg-white/5 border-slate-200 dark:border-white/10 text-slate-500'}`}
                                     >
-                                        {type}
+                                        {getTypeLabel(type)}
                                     </button>
                                 ))}
                             </div>
