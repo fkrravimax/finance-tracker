@@ -3,7 +3,7 @@ import { db } from '../db/index.js';
 import { budgets } from '../db/schema.js';
 import { eq } from "drizzle-orm";
 import { randomUUID } from "crypto";
-import { cryptoService } from './crypto.service.js';
+import { cryptoService } from './encryption.service.js';
 
 export const budgetService = {
     async get(userId: string) {

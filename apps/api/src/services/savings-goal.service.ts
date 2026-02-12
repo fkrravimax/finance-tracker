@@ -3,7 +3,7 @@ import { db } from '../db/index.js';
 import { savingsGoals } from '../db/schema.js';
 import { eq, and } from "drizzle-orm";
 import { randomUUID } from "crypto";
-import { cryptoService } from './crypto.service.js';
+import { cryptoService } from './encryption.service.js';
 
 export const savingsGoalService = {
     async getAll(userId: string) {
