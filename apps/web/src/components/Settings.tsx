@@ -181,7 +181,7 @@ const Settings: React.FC = () => {
             const currentUserData = JSON.parse(localStorage.getItem('user') || '{}');
             currentUserData.name = nameForm.name;
             localStorage.setItem('user', JSON.stringify(currentUserData));
-            setCurrentUser(prev => ({ ...prev, name: nameForm.name }));
+            setCurrentUser((prev: any) => ({ ...prev, name: nameForm.name }));
         } catch (error: any) {
             console.error("Failed to update name", error);
             showNotification(error.message || "Failed to update name", 'error');
