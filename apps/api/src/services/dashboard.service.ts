@@ -52,47 +52,67 @@ export const dashboardService = {
     },
 
     async getMonthlyReport(userId: string, range: 'daily' | 'weekly' | 'monthly' | 'yearly' = 'monthly') {
-        let groupBy, interval, limit, dateFormat;
+        // Each range variant uses a hardcoded safe query with parameterized userId
+        let result;
 
         switch (range) {
             case 'daily':
-                groupBy = "TO_CHAR(date, 'YYYY-MM-DD')";
-                interval = "30 days";
-                dateFormat = "YYYY-MM-DD";
-                // limit handled by date filter
+                result = await db.execute(sql`
+                    SELECT 
+                        TO_CHAR(date, 'YYYY-MM-DD') as period,
+                        SUM(CASE WHEN type = 'income' THEN amount ELSE 0 END) as income,
+                        SUM(CASE WHEN type = 'expense' THEN amount ELSE 0 END) as expense
+                    FROM transaction
+                    WHERE user_id = ${userId}
+                    AND date >= NOW() - INTERVAL '30 days'
+                    GROUP BY 1
+                    ORDER BY 1 DESC
+                `);
                 break;
             case 'weekly':
-                groupBy = "TO_CHAR(date_trunc('week', date), 'YYYY-MM-DD')";
-                interval = "3 months"; // Roughly 12 weeks
-                dateFormat = "YYYY-MM-DD";
+                result = await db.execute(sql`
+                    SELECT 
+                        TO_CHAR(date_trunc('week', date), 'YYYY-MM-DD') as period,
+                        SUM(CASE WHEN type = 'income' THEN amount ELSE 0 END) as income,
+                        SUM(CASE WHEN type = 'expense' THEN amount ELSE 0 END) as expense
+                    FROM transaction
+                    WHERE user_id = ${userId}
+                    AND date >= NOW() - INTERVAL '3 months'
+                    GROUP BY 1
+                    ORDER BY 1 DESC
+                `);
                 break;
             case 'yearly':
-                groupBy = "TO_CHAR(date, 'YYYY')";
-                interval = "5 years";
-                dateFormat = "YYYY";
+                result = await db.execute(sql`
+                    SELECT 
+                        TO_CHAR(date, 'YYYY') as period,
+                        SUM(CASE WHEN type = 'income' THEN amount ELSE 0 END) as income,
+                        SUM(CASE WHEN type = 'expense' THEN amount ELSE 0 END) as expense
+                    FROM transaction
+                    WHERE user_id = ${userId}
+                    AND date >= NOW() - INTERVAL '5 years'
+                    GROUP BY 1
+                    ORDER BY 1 DESC
+                `);
                 break;
             case 'monthly':
             default:
-                groupBy = "TO_CHAR(date, 'YYYY-MM')";
-                interval = "1 year";
-                dateFormat = "YYYY-MM";
+                result = await db.execute(sql`
+                    SELECT 
+                        TO_CHAR(date, 'YYYY-MM') as period,
+                        SUM(CASE WHEN type = 'income' THEN amount ELSE 0 END) as income,
+                        SUM(CASE WHEN type = 'expense' THEN amount ELSE 0 END) as expense
+                    FROM transaction
+                    WHERE user_id = ${userId}
+                    AND date >= NOW() - INTERVAL '1 year'
+                    GROUP BY 1
+                    ORDER BY 1 DESC
+                `);
                 break;
         }
 
-        const result = await db.execute(sql.raw(`
-            SELECT 
-                ${groupBy} as period,
-                SUM(CASE WHEN type = 'income' THEN amount ELSE 0 END) as income,
-                SUM(CASE WHEN type = 'expense' THEN amount ELSE 0 END) as expense
-            FROM transaction
-            WHERE user_id = '${userId}'
-            AND date >= NOW() - INTERVAL '${interval}'
-            GROUP BY 1
-            ORDER BY 1 DESC
-        `));
-
         return result.rows.map(row => ({
-            month: row.period, // Keeping key 'month' for compatibility or rename to 'period'
+            month: row.period,
             period: row.period,
             income: Number(row.income),
             expense: Number(row.expense)

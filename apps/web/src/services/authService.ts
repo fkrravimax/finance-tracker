@@ -5,22 +5,21 @@ import { authClient } from '../lib/auth-client';
 export const authService = {
     login: async (email: string, password: string): Promise<AuthResponse> => {
         try {
-            // Better Auth Sign In
+            // Better Auth Sign In — session is managed via httpOnly cookies
             const { data } = await api.post('/auth/sign-in/email', { email, password });
 
             const responseData = data as any;
             const user = responseData.user;
             const token = responseData.token || responseData.session?.token;
 
-            if (user && token) {
+            if (user) {
                 const authResponse = {
                     user: user,
-                    token: token
+                    token: token || ''
                 };
-                localStorage.setItem('token', token);
-                // Also store user info if needed
+                // Store only non-sensitive user display data (name, email, etc.)
+                // Auth session is managed via httpOnly cookies — NOT localStorage
                 localStorage.setItem('user', JSON.stringify(user));
-                localStorage.setItem('isAuthenticated', 'true'); // Helper
 
                 return authResponse;
             }
@@ -45,14 +44,13 @@ export const authService = {
             const user = responseData.user;
             const token = responseData.token || responseData.session?.token;
 
-            if (user && token) {
+            if (user) {
                 const authResponse = {
                     user: user,
-                    token: token
+                    token: token || ''
                 };
-                localStorage.setItem('token', token);
+                // Store only non-sensitive user display data
                 localStorage.setItem('user', JSON.stringify(user));
-                localStorage.setItem('isAuthenticated', 'true');
 
                 return authResponse;
             }
@@ -70,11 +68,10 @@ export const authService = {
         } catch (error) {
             console.error("Logout failed to clear better-auth session", error);
         } finally {
+            // Clean up all localStorage data (backward compat + user data)
             localStorage.removeItem('token');
             localStorage.removeItem('user');
             localStorage.removeItem('isAuthenticated');
-
-            // Cleanup multi-account leftovers just in case
             localStorage.removeItem('finance_sessions');
             localStorage.removeItem('finance_active_user_id');
 
@@ -90,28 +87,23 @@ export const authService = {
         return null;
     },
 
-    getToken: (): string | null => {
-        return localStorage.getItem('token');
-    },
-
     isAuthenticated: (): boolean => {
-        return !!localStorage.getItem('token');
+        // Check if user data exists — actual session validity is verified by
+        // the server via httpOnly cookies on every API request
+        return !!localStorage.getItem('user');
     },
 
-    // Include other necessary methods if they were used elsewhere
-    // In multi-account version we had getAccounts, switchAccount, getActiveUserId - remove these. 
-
+    // Cookie-based fetch helper — session is authenticated via httpOnly cookies
     fetchWithAuth: async (url: string, options: RequestInit = {}) => {
-        const token = localStorage.getItem('token');
         const headers = {
             'Content-Type': 'application/json',
-            ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
             ...options.headers,
         };
 
         const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000'}${url}`, {
             ...options,
             headers,
+            credentials: 'include', // Send cookies for auth
         });
 
         if (response.status === 401) {

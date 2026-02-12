@@ -4,19 +4,11 @@ import { recurringService } from './services/recurring.service.js';
 export const startCronJobs = () => {
     console.log('[CRON] Initializing Cron Jobs...');
 
-    // Run every day at midnight
-    // For testing/demo purposes, we can run it every minute: '* * * * *'
-    // But for production logic: '0 0 * * *'
-    // The user asked for "setiap tanggalnya" (on each date), so daily check is correct.
-
-    // I will set it to run every minute for verifyability, as requested in the plan "Simulation".
-    // But logically it should check if it already ran today? 
-    // The service logic "lte(nextDueDate, now)" handles "is it due?". 
-    // If it runs every minute, it will catch it the moment it becomes due.
-    // Ideally it should update nextDueDate immediately so it doesn't double process.
-    // My service does update nextDueDate. So running every minute is safe and responsive.
-
-    cron.schedule('* * * * *', async () => {
+    // Run every day at midnight to process due recurring transactions.
+    // The service logic uses "lte(nextDueDate, now)" to check if a transaction is due,
+    // and immediately updates nextDueDate after processing to prevent double execution.
+    cron.schedule('0 0 * * *', async () => {
+        console.log('[CRON] Running daily recurring transaction check...');
         try {
             await recurringService.processDueTransactions();
         } catch (error) {
@@ -24,5 +16,6 @@ export const startCronJobs = () => {
         }
     });
 
-    console.log('[CRON] Jobs scheduled: Recurring Transactions (Every Minute check)');
+    console.log('[CRON] Jobs scheduled: Recurring Transactions (Daily at midnight)');
 };
+
