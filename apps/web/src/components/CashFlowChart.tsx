@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { useAppearance } from '../contexts/AppearanceContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import HiddenAmount from './HiddenAmount';
 import type { Transaction } from '../types';
@@ -11,7 +12,11 @@ interface CashFlowChartProps {
 
 const CashFlowChart: React.FC<CashFlowChartProps> = ({ income, expense, transactions = [] }) => {
     const { t } = useLanguage();
+    const { privacyMode } = useAppearance();
     const [viewMode, setViewMode] = useState<'chart' | 'calendar'>('chart');
+
+    // ... (inside map)
+
     const [currentDate, setCurrentDate] = useState(new Date());
 
     // Chart Logic
@@ -178,7 +183,7 @@ const CashFlowChart: React.FC<CashFlowChartProps> = ({ income, expense, transact
                                     <span className={`text-xs font-bold mb-1 ${isToday ? 'text-primary' : 'text-slate-500'}`}>{day}</span>
                                     {stat && (
                                         <span className={`text-[10px] md:text-xs font-extrabold ${stat.net >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                                            {formatCompact(Math.abs(stat.net))}
+                                            {privacyMode === 'extreme' ? '•••••' : formatCompact(Math.abs(stat.net))}
                                         </span>
                                     )}
                                 </div>
