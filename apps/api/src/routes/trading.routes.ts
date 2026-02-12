@@ -1,15 +1,17 @@
 import { Router } from 'express';
 import { tradingController } from '../controllers/trading.controller.js';
 import { authMiddleware } from '../middleware/auth.middleware.js';
+import { validate } from '../middleware/validate.middleware.js';
+import { createTradeSchema, depositWithdrawSchema } from '../validators/validators.js';
 
 const router = Router();
 
 router.use(authMiddleware);
 
-router.post('/', tradingController.createTrade);
+router.post('/', validate(createTradeSchema), tradingController.createTrade);
 router.get('/', tradingController.getTrades);
 router.get('/stats', tradingController.getStats);
-router.post('/withdraw', tradingController.withdraw);
-router.post('/deposit', tradingController.deposit);
+router.post('/withdraw', validate(depositWithdrawSchema), tradingController.withdraw);
+router.post('/deposit', validate(depositWithdrawSchema), tradingController.deposit);
 
 export default router;

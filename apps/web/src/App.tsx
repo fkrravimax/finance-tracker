@@ -10,6 +10,7 @@ import Login from './components/Login'
 import LandingPage from './components/LandingPage'
 import TradingDashboard from './components/TradingDashboard'
 import AdminDashboard from './components/AdminDashboard'
+import ErrorBoundary from './components/ErrorBoundary'
 import { authService } from './services/authService'
 import { authClient } from './lib/auth-client';
 import PrivacyPolicy from './components/PrivacyPolicy';
@@ -96,26 +97,28 @@ function App() {
 
 
     return (
-        <DashboardLayout onLogout={handleLogout}>
-            <Routes>
-                <Route path="/" element={<Navigate to="/dashboard" replace />} />
-                <Route path="/login" element={<Navigate to="/dashboard" replace />} />
-                <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/transactions" element={<Transactions />} />
-                <Route path="/reports" element={<Reports />} />
-                <Route path="/savings" element={<SavingsVault />} />
-                <Route path="/trading" element={<TradingDashboard />} />
-                <Route path="/settings" element={<Settings />} />
-                <Route path="/admin" element={<AdminDashboard />} />
-                <Route path="*" element={
-                    <div className="flex flex-col items-center justify-center h-full text-slate-500 dark:text-[#cbbc90]">
-                        <span className="material-symbols-outlined text-6xl mb-4">construction</span>
-                        <h2 className="text-2xl font-bold mb-2">Coming Soon</h2>
-                        <p>This page is currently under construction.</p>
-                    </div>
-                } />
-            </Routes>
-        </DashboardLayout>
+        <ErrorBoundary>
+            <DashboardLayout onLogout={handleLogout}>
+                <Routes>
+                    <Route path="/" element={<Navigate to="/dashboard" replace />} />
+                    <Route path="/login" element={<Navigate to="/dashboard" replace />} />
+                    <Route path="/dashboard" element={<Dashboard />} />
+                    <Route path="/transactions" element={<Transactions />} />
+                    <Route path="/reports" element={<Reports />} />
+                    <Route path="/savings" element={<SavingsVault />} />
+                    <Route path="/trading" element={<TradingDashboard />} />
+                    <Route path="/settings" element={<Settings />} />
+                    <Route path="/admin" element={<AdminDashboard />} />
+                    <Route path="*" element={
+                        <div className="flex flex-col items-center justify-center h-full text-slate-500 dark:text-[#cbbc90]">
+                            <span className="material-symbols-outlined text-6xl mb-4">construction</span>
+                            <h2 className="text-2xl font-bold mb-2">Coming Soon</h2>
+                            <p>This page is currently under construction.</p>
+                        </div>
+                    } />
+                </Routes>
+            </DashboardLayout>
+        </ErrorBoundary>
     )
 }
 

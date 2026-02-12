@@ -5,7 +5,7 @@ import { useLanguage } from '../contexts/LanguageContext';
 import { useUI } from '../contexts/UIContext';
 import { useNotification } from '../contexts/NotificationContext';
 import { transactionService } from '../services/transactionService';
-import ConfirmModal from './ConfirmModal';
+import ConfirmationModal from './ConfirmationModal';
 
 type TimeRange = 'day' | 'week' | 'month' | 'year';
 type SortKey = 'category' | 'date' | 'amount';
@@ -193,14 +193,14 @@ const Transactions: React.FC = () => {
 
     return (
         <div className="max-w-7xl mx-auto w-full p-4 md:p-8 lg:p-12 flex flex-col gap-8">
-            <ConfirmModal
+            <ConfirmationModal
                 isOpen={isConfirmOpen}
                 onClose={() => setIsConfirmOpen(false)}
                 onConfirm={handleDelete}
                 title={t('transactions.confirmDeleteTitle') || "Delete Transaction"}
                 message={t('transactions.confirmDelete') || "Are you sure you want to delete this transaction?"}
                 confirmText={t('transactions.delete') || "Delete"}
-                isDestructive
+                variant="danger"
             />
 
             {/* Header */}
