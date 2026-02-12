@@ -12,6 +12,7 @@ import { dashboardService, type DashboardStats } from '../services/dashboardServ
 import { authService } from '../services/authService';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useUI } from '../contexts/UIContext';
+import { useAppearance } from '../contexts/AppearanceContext';
 
 const Dashboard: React.FC = () => {
     // isModalOpen removed (global)
@@ -60,6 +61,16 @@ const Dashboard: React.FC = () => {
             window.removeEventListener('transaction-updated', handleTransactionUpdate);
         };
     }, []);
+
+    const { privacyMode, setPrivacyMode } = useAppearance();
+
+    const togglePrivacy = () => {
+        if (privacyMode === 'none') {
+            setPrivacyMode('hidden');
+        } else {
+            setPrivacyMode('none');
+        }
+    };
 
     if (loading) {
         return <DashboardSkeleton />;
@@ -147,10 +158,19 @@ const Dashboard: React.FC = () => {
 
                     <div className="relative z-10">
                         <p className="text-sky-100 text-base font-bold mb-2">{t('dashboard.totalBalance')}</p>
-                        <div className="flex items-baseline gap-2 overflow-hidden">
+                        <div className="flex items-center gap-4 overflow-hidden">
                             <p className="text-4xl md:text-5xl font-black tracking-tight drop-shadow-sm whitespace-nowrap truncate">
                                 <HiddenAmount value={stats?.totalBalance || 0} prefix="Rp " isImportant className="" />
                             </p>
+                            <button
+                                onClick={togglePrivacy}
+                                className="p-2 rounded-full bg-white/20 hover:bg-white/30 transition-colors backdrop-blur-sm"
+                                title={privacyMode === 'none' ? "Hide balance" : "Show balance"}
+                            >
+                                <span className="material-symbols-outlined text-white">
+                                    {privacyMode === 'none' ? 'visibility' : 'visibility_off'}
+                                </span>
+                            </button>
                         </div>
                         {stats?.totalBalance === 0 && (
                             <button
