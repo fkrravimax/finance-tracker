@@ -1,156 +1,154 @@
 
 import { db } from '../db/index.js';
 import { transactions, budgets } from '../db/schema.js';
-import { eq, sql } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { walletService } from './wallet.service.js';
+import { cryptoService } from './crypto.service.js';
 
 export const dashboardService = {
     async getStats(userId: string) {
-        // 0. Ensure Wallets Exist (Migration Hook)
-        // This will create 'Main Bank' if no wallets exist and move old transactions there.
-        // We do this here because getStats is the main entry point for the dashboard.
+        // 0. Ensure Wallets Exist
         await walletService.ensureDefaultWallets(userId);
 
-        // 0.5 Fetch Wallets with Balances
-        const wallets = await walletService.getAll(userId);
+        // 1. Fetch ALL transactions for the user (we must decrypt to aggregate)
+        const allTransactions = await db.select().from(transactions).where(eq(transactions.userId, userId));
 
-        // 1. Calculate Total Balance (Income - Expense)
-        // using raw SQL for aggregation efficiently
-        const balanceResult = await db.execute(sql`
-            SELECT 
-                SUM(CASE WHEN type = 'income' THEN amount ELSE 0 END) as income,
-                SUM(CASE WHEN type = 'expense' THEN amount ELSE 0 END) as expense
-            FROM transaction 
-            WHERE user_id = ${userId}
-        `);
+        // 2. Decrypt and Process
+        const decryptedTransactions = allTransactions.map(t => ({
+            ...t,
+            amount: cryptoService.decryptToNumber(t.amount),
+            type: t.type,
+            date: new Date(t.date)
+        }));
 
-        const income = Number(balanceResult.rows[0].income || 0);
-        const expense = Number(balanceResult.rows[0].expense || 0);
+        // 3. Calculate Global Totals
+        let income = 0;
+        let expense = 0;
+
+        decryptedTransactions.forEach(t => {
+            if (t.type === 'income') income += t.amount;
+            if (t.type === 'expense') expense += t.amount;
+        });
+
         const totalBalance = income - expense;
 
-        // 2. Get Budget Info
+        // 4. Monthly Stats
+        const now = new Date();
+        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+        const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+
+        let monthlyIncome = 0;
+        let monthlyExpense = 0;
+
+        decryptedTransactions.forEach(t => {
+            if (t.date >= startOfMonth && t.date <= endOfMonth) {
+                if (t.type === 'income') monthlyIncome += t.amount;
+                if (t.type === 'expense') monthlyExpense += t.amount;
+            }
+        });
+
+        const cashFlow = monthlyIncome - monthlyExpense;
+        const savingsRate = monthlyIncome > 0 ? ((monthlyIncome - monthlyExpense) / monthlyIncome) * 100 : 0;
+
+        // 5. Get Budget
         const budgetResult = await db.select().from(budgets).where(eq(budgets.userId, userId));
         const budget = budgetResult[0] || null;
+        const budgetLimit = budget ? cryptoService.decryptToNumber(budget.limit) : 0;
 
-        // 3. Calculate Budget Usage
-        // Assuming budget is monthly, calculate expenses for current month
-        const now = new Date();
-        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
-
-        const monthlyExpenseResult = await db.execute(sql`
-            SELECT SUM(amount) as total
-            FROM transaction 
-            WHERE user_id = ${userId} 
-            AND type = 'expense'
-            AND date >= ${startOfMonth}::timestamp
-        `);
-
-        const monthlyExpense = Number(monthlyExpenseResult.rows[0].total || 0);
+        // 6. Get Wallets (which now need to recalculate their balances)
+        // walletService.getAll will also need to be refactored to not use SQL SUM
+        // For now, let's call it, assuming we will fix it next.
+        const wallets = await walletService.getAll(userId);
 
         return {
             totalBalance,
             income,
             expense,
             monthlyExpense,
-            wallets, // Return wallets breakdown
+            wallets,
             budget: budget ? {
-                limit: Number(budget.limit),
+                limit: budgetLimit,
                 used: monthlyExpense,
-                percentage: budget.limit ? Math.min(Math.round((monthlyExpense / Number(budget.limit)) * 100), 100) : 0
-            } : null
+                percentage: budgetLimit > 0 ? Math.min(Math.round((monthlyExpense / budgetLimit) * 100), 100) : 0
+            } : null,
+            savingsRate: Math.max(0, savingsRate),
+            cashFlow
         };
     },
 
     async getMonthlyReport(userId: string, range: 'daily' | 'weekly' | 'monthly' | 'yearly' = 'monthly') {
-        // Each range variant uses a hardcoded safe query with parameterized userId
-        let result;
+        // Fetch all transactions
+        const allTransactions = await db.select().from(transactions).where(eq(transactions.userId, userId));
 
-        switch (range) {
-            case 'daily':
-                result = await db.execute(sql`
-                    SELECT 
-                        TO_CHAR(date, 'YYYY-MM-DD') as period,
-                        SUM(CASE WHEN type = 'income' THEN amount ELSE 0 END) as income,
-                        SUM(CASE WHEN type = 'expense' THEN amount ELSE 0 END) as expense
-                    FROM transaction
-                    WHERE user_id = ${userId}
-                    AND date >= NOW() - INTERVAL '30 days'
-                    GROUP BY 1
-                    ORDER BY 1 DESC
-                `);
-                break;
-            case 'weekly':
-                result = await db.execute(sql`
-                    SELECT 
-                        TO_CHAR(date_trunc('week', date), 'YYYY-MM-DD') as period,
-                        SUM(CASE WHEN type = 'income' THEN amount ELSE 0 END) as income,
-                        SUM(CASE WHEN type = 'expense' THEN amount ELSE 0 END) as expense
-                    FROM transaction
-                    WHERE user_id = ${userId}
-                    AND date >= NOW() - INTERVAL '3 months'
-                    GROUP BY 1
-                    ORDER BY 1 DESC
-                `);
-                break;
-            case 'yearly':
-                result = await db.execute(sql`
-                    SELECT 
-                        TO_CHAR(date, 'YYYY') as period,
-                        SUM(CASE WHEN type = 'income' THEN amount ELSE 0 END) as income,
-                        SUM(CASE WHEN type = 'expense' THEN amount ELSE 0 END) as expense
-                    FROM transaction
-                    WHERE user_id = ${userId}
-                    AND date >= NOW() - INTERVAL '5 years'
-                    GROUP BY 1
-                    ORDER BY 1 DESC
-                `);
-                break;
-            case 'monthly':
-            default:
-                result = await db.execute(sql`
-                    SELECT 
-                        TO_CHAR(date, 'YYYY-MM') as period,
-                        SUM(CASE WHEN type = 'income' THEN amount ELSE 0 END) as income,
-                        SUM(CASE WHEN type = 'expense' THEN amount ELSE 0 END) as expense
-                    FROM transaction
-                    WHERE user_id = ${userId}
-                    AND date >= NOW() - INTERVAL '1 year'
-                    GROUP BY 1
-                    ORDER BY 1 DESC
-                `);
-                break;
-        }
+        const decrypted = allTransactions.map(t => ({
+            ...t,
+            amount: cryptoService.decryptToNumber(t.amount),
+            date: new Date(t.date)
+        }));
 
-        return result.rows.map(row => ({
-            month: row.period,
-            period: row.period,
-            income: Number(row.income),
-            expense: Number(row.expense)
-        })).reverse();
+        const now = new Date();
+        const map = new Map<string, { income: number, expense: number }>();
+
+        // Determine filter start date
+        let startDate = new Date();
+        if (range === 'daily') startDate.setDate(now.getDate() - 30);
+        if (range === 'weekly') startDate.setMonth(now.getMonth() - 3);
+        if (range === 'monthly') startDate.setFullYear(now.getFullYear() - 1);
+        if (range === 'yearly') startDate.setFullYear(now.getFullYear() - 5);
+
+        decrypted.forEach(t => {
+            if (t.date < startDate) return;
+
+            let key = '';
+            // Format Key
+            if (range === 'daily') key = t.date.toISOString().split('T')[0]; // YYYY-MM-DD
+            if (range === 'weekly') {
+                // Approximate week bucket
+                const d = new Date(t.date);
+                const day = d.getDay(),
+                    diff = d.getDate() - day + (day == 0 ? -6 : 1); // adjust when day is sunday
+                const monday = new Date(d.setDate(diff));
+                key = monday.toISOString().split('T')[0];
+            }
+            if (range === 'monthly') key = t.date.toISOString().slice(0, 7); // YYYY-MM
+            if (range === 'yearly') key = t.date.toISOString().slice(0, 4); // YYYY
+
+            if (!map.has(key)) map.set(key, { income: 0, expense: 0 });
+            const entry = map.get(key)!;
+
+            if (t.type === 'income') entry.income += t.amount;
+            if (t.type === 'expense') entry.expense += t.amount;
+        });
+
+        // Convert map to array and update sorting
+        return Array.from(map.entries()).map(([period, val]) => ({
+            month: period,
+            period,
+            income: val.income,
+            expense: val.expense
+        })).sort((a, b) => a.period.localeCompare(b.period));
     },
 
     async getBudgetVsReality(userId: string) {
-        // GLOBAL BUDGET COMPARISON ONLY
-
         // 1. Get Global Budget
         const budgetResult = await db.select().from(budgets).where(eq(budgets.userId, userId));
-        const budgetLimit = budgetResult[0]?.limit ? Number(budgetResult[0].limit) : 0;
+        const budgetLimit = budgetResult[0] ? cryptoService.decryptToNumber(budgetResult[0].limit) : 0;
 
-        // 2. Get Total Expenses for Current Month
+        // 2. Fetch Transactions for Month
         const now = new Date();
-        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+        const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
 
-        const expenseResult = await db.execute(sql`
-            SELECT SUM(amount) as total
-            FROM transaction
-            WHERE user_id = ${userId}
-            AND type = 'expense'
-            AND date >= ${startOfMonth}::timestamp
-        `);
+        const transactionsRes = await db.select().from(transactions).where(eq(transactions.userId, userId));
 
-        const totalSpent = Number(expenseResult.rows[0].total || 0);
+        const totalSpent = transactionsRes.reduce((acc, t) => {
+            const date = new Date(t.date);
+            if (date >= startOfMonth && date <= endOfMonth && t.type === 'expense') {
+                return acc + cryptoService.decryptToNumber(t.amount);
+            }
+            return acc;
+        }, 0);
 
-        // Return simpler structure
         return [{
             category: 'Total Monthly Budget',
             limit: budgetLimit,
@@ -159,23 +157,24 @@ export const dashboardService = {
     },
 
     async getCumulativeCashFlow(userId: string) {
-        // Get all transactions for current month ordered by date
         const now = new Date();
-        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
 
-        const transactions = await db.execute(sql`
-            SELECT date, amount, type
-            FROM transaction
-            WHERE user_id = ${userId}
-            AND date >= ${startOfMonth}::timestamp
-            ORDER BY date ASC
-        `);
+        const transactionsRes = await db.select().from(transactions).where(eq(transactions.userId, userId));
+
+        const sorted = transactionsRes
+            .map(t => ({
+                ...t,
+                amount: cryptoService.decryptToNumber(t.amount),
+                date: new Date(t.date)
+            }))
+            .filter(t => t.date >= startOfMonth)
+            .sort((a, b) => a.date.getTime() - b.date.getTime());
 
         let cumulativeBalance = 0;
-        return transactions.rows.map(t => {
-            const amount = Number(t.amount);
-            if (t.type === 'income') cumulativeBalance += amount;
-            else cumulativeBalance -= amount;
+        return sorted.map(t => {
+            if (t.type === 'income') cumulativeBalance += t.amount;
+            else cumulativeBalance -= t.amount;
 
             return {
                 date: t.date,

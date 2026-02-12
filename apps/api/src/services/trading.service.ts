@@ -1,7 +1,9 @@
+
 import { db } from '../db/index.js';
 import { trades, users, transactions } from '../db/schema.js';
-import { eq, desc, and, sql } from "drizzle-orm";
+import { eq, desc } from "drizzle-orm";
 import { randomUUID } from "crypto";
+import { cryptoService } from './crypto.service.js';
 
 export const tradingService = {
     async createTrade(userId: string, data: any) {
@@ -9,38 +11,54 @@ export const tradingService = {
             const tradeId = randomUUID();
             const pnl = parseFloat(data.pnl);
 
-            // 1. Insert Trade
+            // 1. Insert Trade (Encrypt sensitive fields)
             const [newTrade] = await tx.insert(trades).values({
                 id: tradeId,
                 userId,
                 pair: data.pair,
                 type: data.type,
-                amount: data.amount.toString(),
-                entryPrice: data.entryPrice.toString(),
-                closePrice: data.closePrice?.toString(),
+                amount: cryptoService.encrypt(data.amount),
+                entryPrice: cryptoService.encrypt(data.entryPrice),
+                closePrice: data.closePrice ? cryptoService.encrypt(data.closePrice) : null,
                 leverage: parseInt(data.leverage),
-                pnl: pnl.toString(),
+                pnl: cryptoService.encrypt(pnl),
                 outcome: pnl > 0 ? 'WIN' : pnl < 0 ? 'LOSS' : 'BE',
-                status: 'CLOSED', // Assuming logged trades are closed
-                notes: data.notes,
-                openedAt: new Date(), // Or use provided date from data.date if exists
+                status: 'CLOSED',
+                notes: data.notes ? cryptoService.encrypt(data.notes) : null,
+                openedAt: new Date(),
             }).returning();
 
-            // 2. Update User Trading Balance
-            // We use sql increment to avoid race conditions roughly, though raw sql update is safer
-            // Drizzle doesn't have a simple increment(), so we do a raw sql update
-            await tx.execute(
-                sql`UPDATE "user" SET trading_balance = trading_balance + ${pnl} WHERE id = ${userId}`
-            );
+            // 2. Update User Trading Balance (Manual Fetch -> Decrypt -> Calc -> Encrypt -> Update)
+            const [user] = await tx.select().from(users).where(eq(users.id, userId));
+            const currentBalance = cryptoService.decryptToNumber(user.tradingBalance || '0');
+            const newBalance = currentBalance + pnl;
 
-            return newTrade;
+            await tx.update(users)
+                .set({ tradingBalance: cryptoService.encrypt(newBalance) })
+                .where(eq(users.id, userId));
+
+            return {
+                ...newTrade,
+                amount: cryptoService.decryptToNumber(newTrade.amount),
+                entryPrice: cryptoService.decryptToNumber(newTrade.entryPrice),
+                pnl: cryptoService.decryptToNumber(newTrade.pnl || '0')
+            };
         });
     },
 
     async getTrades(userId: string) {
-        return await db.select().from(trades)
+        const raw = await db.select().from(trades)
             .where(eq(trades.userId, userId))
             .orderBy(desc(trades.createdAt));
+
+        return raw.map(t => ({
+            ...t,
+            amount: cryptoService.decryptToNumber(t.amount),
+            entryPrice: cryptoService.decryptToNumber(t.entryPrice),
+            closePrice: t.closePrice ? cryptoService.decryptToNumber(t.closePrice) : null,
+            pnl: t.pnl ? cryptoService.decryptToNumber(t.pnl) : null,
+            notes: t.notes ? cryptoService.decrypt(t.notes) : null
+        }));
     },
 
     async getStats(userId: string) {
@@ -51,30 +69,36 @@ export const tradingService = {
         let totalPnl = 0;
         let bestPair = { pair: 'N/A', pnl: -Infinity };
         const pairStats: Record<string, number> = {};
+        const equityCurve: any[] = [];
 
-        // Equity Curve Calculation (simplified)
-        // We ideally want daily snapshots, but for now we'll just return the running total of PnL over trades
-        const equityCurve = userTrades
-            .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
-            .reduce((acc: any[], trade) => {
-                const pnl = parseFloat(trade.pnl || '0');
-                const lastBalance = acc.length > 0 ? acc[acc.length - 1].value : 0;
+        // Need to sort by date to build equity curve
+        const sortedTrades = userTrades.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
 
-                // Track stats
-                totalPnl += pnl;
-                if (pnl > 0) wins++;
-                if (pnl < 0) losses++;
+        // Get current balance
+        const [user] = await db.select({ tradingBalance: users.tradingBalance }).from(users).where(eq(users.id, userId));
+        const currentBalance = cryptoService.decryptToNumber(user?.tradingBalance || '0');
 
-                // Track pair stats
-                if (!pairStats[trade.pair]) pairStats[trade.pair] = 0;
-                pairStats[trade.pair] += pnl;
+        // Note: Equity curve usually starts from 0 or initial deposit. 
+        // Here we just track cumulative PnL.
+        let runningPnl = 0;
 
-                acc.push({
-                    date: trade.createdAt,
-                    value: lastBalance + pnl
-                });
-                return acc;
-            }, []);
+        for (const trade of sortedTrades) {
+            const pnl = cryptoService.decryptToNumber(trade.pnl || '0');
+
+            totalPnl += pnl;
+            runningPnl += pnl;
+
+            if (pnl > 0) wins++;
+            if (pnl < 0) losses++;
+
+            if (!pairStats[trade.pair]) pairStats[trade.pair] = 0;
+            pairStats[trade.pair] += pnl;
+
+            equityCurve.push({
+                date: trade.createdAt,
+                value: runningPnl // accurate relative performance
+            });
+        }
 
         // Find best pair
         for (const [pair, pnl] of Object.entries(pairStats)) {
@@ -83,16 +107,13 @@ export const tradingService = {
             }
         }
 
-        // Get current balance
-        const [user] = await db.select({ tradingBalance: users.tradingBalance }).from(users).where(eq(users.id, userId));
-
         return {
             wins,
             losses,
             totalPnl,
             bestPair: bestPair.pair === 'N/A' ? '-' : bestPair.pair,
             equityCurve,
-            currentBalance: parseFloat(user?.tradingBalance || '0')
+            currentBalance
         };
     },
 
@@ -100,62 +121,77 @@ export const tradingService = {
         return await db.transaction(async (tx) => {
             // 1. Check Balance
             const [user] = await tx.select().from(users).where(eq(users.id, userId));
-            const currentBalance = parseFloat(user.tradingBalance || '0');
+            const currentBalance = cryptoService.decryptToNumber(user.tradingBalance || '0');
 
             if (currentBalance < amount) {
                 throw new Error("Insufficient trading balance");
             }
 
-            // 2. Deduct from Trading Wallet (USD)
-            await tx.execute(
-                sql`UPDATE "user" SET trading_balance = trading_balance - ${amount} WHERE id = ${userId}`
-            );
+            // 2. Deduct from Trading Wallet
+            const newBalance = currentBalance - amount;
+            await tx.update(users)
+                .set({ tradingBalance: cryptoService.encrypt(newBalance) })
+                .where(eq(users.id, userId));
 
             // 3. Add to Main Transactions (Income in IDR if converted)
-            const transactionAmount = convertedAmount || amount; // Use converted amount if provided, else USD amount
+            const transactionAmount = convertedAmount || amount;
+            const description = convertedAmount ? `Withdrawal from Trading Wallet ($${amount})` : 'Withdrawal from Trading Wallet';
+
             const [transaction] = await tx.insert(transactions).values({
                 id: randomUUID(),
                 userId,
-                merchant: 'Trading Wallet',
-                category: 'Investments', // or Income
+                merchant: cryptoService.encrypt('Trading Wallet'),
+                category: 'Investments',
                 date: new Date(),
-                amount: transactionAmount.toString(),
+                amount: cryptoService.encrypt(transactionAmount),
                 type: 'income',
                 icon: 'candlestick_chart',
-                description: convertedAmount ? `Withdrawal from Trading Wallet ($${amount})` : 'Withdrawal from Trading Wallet'
+                description: cryptoService.encrypt(description)
             }).returning();
 
-            return transaction;
+            // Decrypt result for frontend
+            return {
+                ...transaction,
+                merchant: 'Trading Wallet',
+                amount: transactionAmount,
+                description
+            };
         });
     },
 
     async deposit(userId: string, amount: number, convertedAmount?: number) {
         return await db.transaction(async (tx) => {
-            // 1. Add to Trading Wallet (USD)
-            await tx.execute(
-                sql`UPDATE "user" SET trading_balance = trading_balance + ${amount} WHERE id = ${userId}`
-            );
+            // 1. Add to Trading Wallet
+            const [user] = await tx.select().from(users).where(eq(users.id, userId));
+            const currentBalance = cryptoService.decryptToNumber(user.tradingBalance || '0');
+            const newBalance = currentBalance + amount;
 
-            // 2. Deduct from Main Transactions (Expense in IDR if converted)
-            const transactionAmount = convertedAmount || amount; // Use converted amount if provided, else USD amount
+            await tx.update(users)
+                .set({ tradingBalance: cryptoService.encrypt(newBalance) })
+                .where(eq(users.id, userId));
 
-            // Note: We don't strictly check main balance here as this is a simple expense logging in the current architecture.
-            // If main balance is strictly tracked in a 'balances' table, we would check it.
-            // But currently main balance is a sum of transactions.
+            // 2. Deduct from Main Transactions (Expense)
+            const transactionAmount = convertedAmount || amount;
+            const description = convertedAmount ? `Deposit to Trading Wallet ($${amount})` : 'Deposit to Trading Wallet';
 
             const [transaction] = await tx.insert(transactions).values({
                 id: randomUUID(),
                 userId,
-                merchant: 'Trading Wallet',
+                merchant: cryptoService.encrypt('Trading Wallet'),
                 category: 'Investments',
                 date: new Date(),
-                amount: transactionAmount.toString(),
+                amount: cryptoService.encrypt(transactionAmount),
                 type: 'expense',
                 icon: 'candlestick_chart',
-                description: convertedAmount ? `Deposit to Trading Wallet ($${amount})` : 'Deposit to Trading Wallet'
+                description: cryptoService.encrypt(description)
             }).returning();
 
-            return transaction;
+            return {
+                ...transaction,
+                merchant: 'Trading Wallet',
+                amount: transactionAmount,
+                description
+            };
         });
     }
 };
