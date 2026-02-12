@@ -6,6 +6,7 @@ import CurrencyInput from './CurrencyInput';
 import { useNavigate, Link } from 'react-router-dom';
 import { authClient } from '../lib/auth-client';
 import ConfirmationModal from './ConfirmationModal';
+import ProfilePictureModal from './modals/ProfilePictureModal';
 
 import { useNotification } from '../contexts/NotificationContext';
 import { authService } from '../services/authService';
@@ -16,6 +17,7 @@ const Settings: React.FC = () => {
     const [budgetLimit, setBudgetLimit] = useState('');
     const [loading, setLoading] = useState(false);
     const [currentUser, setCurrentUser] = useState<any>(null);
+    const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
 
     const navigate = useNavigate();
     const { showNotification } = useNotification();
@@ -381,12 +383,24 @@ const Settings: React.FC = () => {
             {/* Mobile Profile & Logout Section (Visible only on mobile) */}
             <div className="md:hidden mb-2 p-6 bg-white dark:bg-[#342d18] rounded-2xl border border-slate-100 dark:border-[#493f22] flex flex-col items-center gap-4 shadow-sm relative overflow-hidden">
                 <div className="absolute top-0 left-0 w-full h-24 bg-gradient-to-b from-primary/10 to-transparent"></div>
-                <div className="relative z-10 w-24 h-24 rounded-full border-4 border-white dark:border-[#342d18] shadow-lg flex items-center justify-center bg-primary/20 text-primary mb-2">
+                <div
+                    className="relative z-10 w-24 h-24 rounded-full border-4 border-white dark:border-[#342d18] shadow-lg flex items-center justify-center bg-primary/20 text-primary mb-2 cursor-pointer group"
+                    onClick={() => setIsProfileModalOpen(true)}
+                >
                     {currentUser?.image ? (
                         <img src={currentUser.image} alt="Profile" className="w-full h-full rounded-full object-cover" />
                     ) : (
                         <span className="material-symbols-outlined text-5xl">person</span>
                     )}
+                    {/* Pencil Overlay */}
+                    <div className="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                        <span className="material-symbols-outlined text-white text-2xl">edit</span>
+                    </div>
+                    <div className="absolute bottom-0 right-0 bg-white dark:bg-[#342d18] rounded-full p-1 shadow-sm md:hidden">
+                        <div className="bg-slate-100 dark:bg-[#493f22] rounded-full p-1.5 flex items-center justify-center">
+                            <span className="material-symbols-outlined text-slate-600 dark:text-[#cbbc90] text-sm">edit</span>
+                        </div>
+                    </div>
                 </div>
                 <div className="text-center relative z-10">
                     <h2 className="text-2xl font-black text-slate-800 dark:text-white">{currentUser?.name || 'User'}</h2>
@@ -414,6 +428,13 @@ const Settings: React.FC = () => {
                     {t('sidebar.logout')}
                 </button>
             </div>
+
+            <ProfilePictureModal
+                isOpen={isProfileModalOpen}
+                onClose={() => setIsProfileModalOpen(false)}
+                currentUser={currentUser}
+                onUpdate={(newImage) => setCurrentUser((prev: any) => ({ ...prev, image: newImage }))}
+            />
 
             {/* Page Header */}
             <div className="flex flex-col gap-1">

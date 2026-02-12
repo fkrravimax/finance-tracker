@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
 import { authService } from '../services/authService';
 import { useLanguage } from '../contexts/LanguageContext';
 import LogoText from './LogoText';
+import ProfilePictureModal from './modals/ProfilePictureModal';
 
 interface SidebarProps {
     onLogout: () => void;
@@ -11,7 +12,22 @@ interface SidebarProps {
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ onLogout, isOpen = false, onClose }) => {
-    const user = authService.getCurrentUser();
+    // Local state to force re-render when user updates profile
+    const [user, setUser] = useState(authService.getCurrentUser());
+    const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+
+    // Listen for user updates
+    useEffect(() => {
+        const handleUserUpdate = () => {
+            setUser(authService.getCurrentUser());
+        };
+
+        window.addEventListener('user-updated', handleUserUpdate);
+        return () => {
+            window.removeEventListener('user-updated', handleUserUpdate);
+        };
+    }, []);
+
     const isAdmin = user?.role === 'ADMIN';
     const { t } = useLanguage();
 
@@ -30,6 +46,12 @@ const Sidebar: React.FC<SidebarProps> = ({ onLogout, isOpen = false, onClose }) 
 
     return (
         <>
+            <ProfilePictureModal
+                isOpen={isProfileModalOpen}
+                onClose={() => setIsProfileModalOpen(false)}
+                currentUser={user}
+            />
+
             <aside className={`
                 fixed inset-y-0 left-0 z-50 w-72 bg-white/80 backdrop-blur-xl border border-white/50 dark:bg-background-dark dark:border-white/5 pt-6 px-6 pb-6 md:p-6 flex flex-col justify-between transition-transform duration-300 ease-in-out md:static md:translate-x-0 md:m-4 md:rounded-3xl shadow-soft
                 ${isOpen ? 'translate-x-0' : '-translate-x-full'}
@@ -82,13 +104,23 @@ const Sidebar: React.FC<SidebarProps> = ({ onLogout, isOpen = false, onClose }) 
 
                     {/* User Profile */}
                     <div className="mt-auto hidden md:block">
-                        <div className="flex items-center gap-3 px-3 py-3 rounded-2xl bg-lavender-100/50 dark:bg-white/5 border border-lavender-200 dark:border-white/5 hover:bg-lavender-200 dark:hover:bg-white/10 transition-colors cursor-pointer group">
-                            <div className="w-12 h-12 rounded-full border-2 border-white dark:border-white/10 shadow-sm overflow-hidden flex items-center justify-center bg-primary/20 text-primary">
+                        <div className="flex items-center gap-3 px-3 py-3 rounded-2xl bg-lavender-100/50 dark:bg-white/5 border border-lavender-200 dark:border-white/5 hover:bg-lavender-200 dark:hover:bg-white/10 transition-colors group relative">
+                            <div
+                                className="relative w-12 h-12 rounded-full border-2 border-white dark:border-white/10 shadow-sm overflow-hidden flex items-center justify-center bg-primary/20 text-primary cursor-pointer"
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setIsProfileModalOpen(true);
+                                }}
+                            >
                                 {user?.image ? (
                                     <img src={user.image} alt="Profile" className="w-full h-full object-cover" />
                                 ) : (
                                     <span className="material-symbols-outlined">person</span>
                                 )}
+                                {/* Pencil Overlay */}
+                                <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <span className="material-symbols-outlined text-white text-sm">edit</span>
+                                </div>
                             </div>
                             <div className="flex flex-col flex-1 min-w-0">
                                 <p className="text-sm font-black text-slate-800 dark:text-white truncate">{user?.name || 'User'}</p>
