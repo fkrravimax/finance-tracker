@@ -32,11 +32,15 @@ export const transactionController = {
         try {
             const userId = (req as any).user.id;
             const { id } = req.params as { id: string };
-            const payload = {
-                ...req.body,
-                date: req.body.date ? new Date(req.body.date) : undefined,
-                amount: req.body.amount ? req.body.amount.toString() : undefined,
-            };
+            const payload: any = {};
+            if (req.body.merchant) payload.merchant = req.body.merchant;
+            if (req.body.category) payload.category = req.body.category;
+            if (req.body.amount) payload.amount = req.body.amount.toString();
+            if (req.body.date) payload.date = new Date(req.body.date);
+            if (req.body.type) payload.type = req.body.type;
+            if (req.body.icon) payload.icon = req.body.icon;
+            if (req.body.description) payload.description = req.body.description;
+            // Do not allow updating id, userId, createdAt, etc.
 
             const result = await transactionService.update(userId, id, payload);
 
