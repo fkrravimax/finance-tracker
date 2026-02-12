@@ -197,7 +197,7 @@ const Settings: React.FC = () => {
             });
 
             // Optimistic update
-            setCurrentUser(prev => ({ ...prev, image: imagePath }));
+            setCurrentUser((prev: any) => ({ ...prev, image: imagePath }));
 
             // Update local storage
             const currentUserData = JSON.parse(localStorage.getItem('user') || '{}');
