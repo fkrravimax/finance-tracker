@@ -46,6 +46,9 @@ app.use('/api/reset', authMiddleware, resetRoutes);
 import tradingRoutes from './routes/trading.routes.js';
 app.use('/api/trading', authMiddleware, tradingRoutes);
 
+import cryptoRoutes from './routes/crypto.routes.js';
+app.use('/api/crypto', authMiddleware, cryptoRoutes);
+
 import adminRoutes from './routes/admin.routes.js';
 app.use('/api/admin', authMiddleware, adminRoutes);
 
