@@ -108,7 +108,12 @@
             "week": "Minggu Ini",
             "month": "Bulan Ini",
             "year": "Tahun Ini"
-        }
+        },
+        "confirmDeleteTitle": "Konfirmasi Hapus",
+        "confirmDelete": "Apakah Anda yakin ingin menghapus transaksi ini?",
+        "delete": "Hapus",
+        "deleteSuccess": "Transaksi berhasil dihapus",
+        "deleteError": "Gagal menghapus transaksi"
     },
     "trading": {
         "title": "Terminal Trading",
