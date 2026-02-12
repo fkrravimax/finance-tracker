@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { cryptoService, type GlobalMetrics, type CryptoQuote } from '../services/cryptoService';
 import { useLanguage } from '../contexts/LanguageContext';
-// import { authService } from '../services/authService';
+import { authService } from '../services/authService';
 import Skeleton from './Skeleton';
 
 const CryptoSentiment = () => {
@@ -13,8 +13,8 @@ const CryptoSentiment = () => {
     const [loading, setLoading] = useState(true);
 
     // Only show for Platinum users
-    // const user = authService.getCurrentUser();
-    const isPlatinum = true; // user?.plan === 'PLATINUM';
+    const user = authService.getCurrentUser();
+    const isPlatinum = user?.plan === 'PLATINUM';
 
     useEffect(() => {
         if (!isPlatinum) return;
