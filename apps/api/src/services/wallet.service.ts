@@ -2,7 +2,7 @@
 import { db } from '../db/index.js';
 import { wallets, transactions } from '../db/schema.js';
 import { eq, and, sql } from "drizzle-orm";
-import { cryptoService } from './crypto.service.js';
+import { cryptoService } from './encryption.service.js';
 
 export const walletService = {
     async getAll(userId: string) {
