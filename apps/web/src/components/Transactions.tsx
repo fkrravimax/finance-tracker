@@ -154,6 +154,19 @@ const Transactions: React.FC = () => {
         return result;
     }, [timeRange, transactions, sortConfig]);
 
+    // Pagination Logic
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 10;
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentItems = filteredTransactions.slice(indexOfFirstItem, indexOfLastItem);
+    const totalPages = Math.ceil(filteredTransactions.length / itemsPerPage);
+
+    // Reset to page 1 when filter changes
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [timeRange, transactions]);
+
     const formatCurrency = (amount: number | string) => {
         return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'IDR' }).format(Number(amount));
     };
@@ -287,8 +300,8 @@ const Transactions: React.FC = () => {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100 dark:divide-[#493f22]">
-                            {filteredTransactions.length > 0 ? (
-                                filteredTransactions.map((transaction) => (
+                            {currentItems.length > 0 ? (
+                                currentItems.map((transaction) => (
                                     <tr key={transaction.id} className="hover:bg-slate-50 dark:hover:bg-[#493f22]/30 transition-colors group">
                                         <td className="p-4 pl-6">
                                             <div className="flex items-center gap-3">
@@ -341,6 +354,47 @@ const Transactions: React.FC = () => {
                         </tbody>
                     </table>
                 </div>
+
+                {/* Pagination Controls */}
+                {totalPages > 1 && (
+                    <div className="flex items-center justify-between p-4 border-t border-slate-100 dark:border-[#493f22] bg-slate-50/50 dark:bg-[#2b2616]/50">
+                        <div className="text-sm text-slate-500 dark:text-[#cbbc90]">
+                            Showing <span className="font-bold">{indexOfFirstItem + 1}</span> to <span className="font-bold">{Math.min(indexOfLastItem, filteredTransactions.length)}</span> of <span className="font-bold">{filteredTransactions.length}</span> results
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <button
+                                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                                disabled={currentPage === 1}
+                                className="p-2 rounded-lg hover:bg-white dark:hover:bg-[#3f361d] disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-slate-600 dark:text-[#cbbc90]"
+                            >
+                                <span className="material-symbols-outlined text-[20px]">chevron_left</span>
+                            </button>
+
+                            <div className="flex items-center gap-1">
+                                {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                                    <button
+                                        key={page}
+                                        onClick={() => setCurrentPage(page)}
+                                        className={`w-8 h-8 rounded-lg text-sm font-bold transition-all ${currentPage === page
+                                            ? 'bg-primary text-white shadow-md shadow-primary/30'
+                                            : 'text-slate-600 dark:text-[#cbbc90] hover:bg-white dark:hover:bg-[#3f361d]'
+                                            }`}
+                                    >
+                                        {page}
+                                    </button>
+                                ))}
+                            </div>
+
+                            <button
+                                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                                disabled={currentPage === totalPages}
+                                className="p-2 rounded-lg hover:bg-white dark:hover:bg-[#3f361d] disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-slate-600 dark:text-[#cbbc90]"
+                            >
+                                <span className="material-symbols-outlined text-[20px]">chevron_right</span>
+                            </button>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );
