@@ -7,6 +7,7 @@ export interface User {
     avatar?: string;
     role?: 'USER' | 'ADMIN';
     plan?: 'FREE' | 'PREMIUM' | 'PLATINUM';
+    image?: string;
 }
 
 export interface AuthResponse {
