@@ -119,7 +119,7 @@ const Dashboard: React.FC = () => {
                         <span className="hidden md:inline">{t('dashboard.export')}</span>
                     </button>
                     <button
-                        onClick={openQuickAdd}
+                        onClick={() => openQuickAdd()}
                         className="hidden md:flex items-center gap-2 px-6 py-3 bg-slate-800 dark:bg-primary text-white dark:text-slate-900 rounded-2xl text-sm font-bold shadow-lg shadow-slate-300 dark:shadow-primary/30 hover:bg-slate-900 dark:hover:bg-primary-hover transition-all hover:-translate-y-1"
                     >
                         <span className="material-symbols-outlined text-[22px]">add_circle</span>
