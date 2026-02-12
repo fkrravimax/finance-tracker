@@ -3,7 +3,7 @@ import { db } from '../db/index.js';
 import { transactions, budgets } from '../db/schema.js';
 import { eq } from "drizzle-orm";
 import { walletService } from './wallet.service.js';
-import { cryptoService } from './crypto.service.js';
+import { cryptoService } from './encryption.service.js';
 
 export const dashboardService = {
     async getStats(userId: string) {

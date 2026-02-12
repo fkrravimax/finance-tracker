@@ -3,7 +3,7 @@ import { db } from '../db/index.js';
 import { recurringTransactions, transactions } from '../db/schema.js';
 import { eq, and, lte } from 'drizzle-orm';
 import { randomUUID } from "crypto";
-import { cryptoService } from './crypto.service.js';
+import { cryptoService } from './encryption.service.js';
 
 export const recurringService = {
     async getAll(userId: string) {

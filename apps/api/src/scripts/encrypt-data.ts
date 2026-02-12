@@ -2,7 +2,7 @@
 import { db } from '../db/index.js';
 import { transactions, budgets, wallets, savingsGoals, recurringTransactions, trades, users } from '../db/schema.js';
 import { eq } from 'drizzle-orm';
-import { cryptoService } from '../services/crypto.service.js';
+import { cryptoService } from '../services/encryption.service.js';
 
 async function migrate() {
     console.log("Starting encryption migration...");
