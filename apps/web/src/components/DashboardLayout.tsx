@@ -2,6 +2,7 @@ import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import BottomNavbar from './BottomNavbar';
+import LogoText from './LogoText';
 import QuickAddTransactionModal from './QuickAddTransactionModal';
 import { UIProvider, useUI } from '../contexts/UIContext';
 import { useSwipeable, type SwipeEventData } from 'react-swipeable';
@@ -90,7 +91,7 @@ const DashboardContent: React.FC<DashboardLayoutProps> = ({ children, onLogout }
                         <span className="w-8 h-8 bg-slate-900 dark:bg-slate-800 text-white rounded-xl flex items-center justify-center shadow-md shadow-slate-900/30 transform rotate-3">
                             <img src="/logo.png" alt="Logo" className="w-5 h-5 object-contain" />
                         </span>
-                        <span className="font-black text-xl tracking-tight text-slate-800 dark:text-white">Rupiku</span>
+                        <LogoText className="text-xl" />
                     </div>
                     <button
                         onClick={toggleSidebar}

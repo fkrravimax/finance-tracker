@@ -2,6 +2,7 @@ import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { authService } from '../services/authService';
 import { useLanguage } from '../contexts/LanguageContext';
+import LogoText from './LogoText';
 
 interface SidebarProps {
     onLogout: () => void;
@@ -41,7 +42,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onLogout, isOpen = false, onClose }) 
                                 <span className="w-10 h-10 bg-slate-900 dark:bg-slate-800 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-slate-900/30 rotate-3">
                                     <img src="/logo.png" alt="Logo" className="w-6 h-6 object-contain" />
                                 </span>
-                                Rupiku
+                                <LogoText className="text-3xl" />
                             </h1>
                             <p className="text-slate-400 dark:text-text-muted text-sm font-bold ml-12 -mt-1">Joyful Finance Tracker</p>
                         </div>

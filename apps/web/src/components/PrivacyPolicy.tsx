@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { Link } from 'react-router-dom';
+import LogoText from './LogoText';
 
 const PrivacyPolicy: React.FC = () => {
     const { t } = useLanguage();
@@ -15,7 +16,7 @@ const PrivacyPolicy: React.FC = () => {
             <header className="sticky top-0 z-50 backdrop-blur-md bg-white/80 dark:bg-[#1e1b10]/80 border-b border-slate-200 dark:border-[#493f22] px-6 pt-[calc(env(safe-area-inset-top)+1rem)] pb-4 md:py-4 flex items-center justify-between">
                 <div className="flex items-center gap-3">
                     <img src="/logo.png" alt="Rupiku" className="w-8 h-8" />
-                    <span className="text-xl font-black tracking-tight">Rupiku</span>
+                    <LogoText className="text-xl" />
                 </div>
                 <Link to="/" className="text-sm font-bold text-primary hover:text-primary-hover transition-colors">
                     {t('common.back') || 'Back'}
