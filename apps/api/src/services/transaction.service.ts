@@ -14,6 +14,7 @@ export const transactionService = {
             ...data,
             userId,
             id: randomUUID(),
+            // Ensure walletId is present if possible, or it will be null and caught by migration later
         };
         const result = await db.insert(transactions).values(newTransaction).returning();
         return result[0];

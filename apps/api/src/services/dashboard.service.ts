@@ -2,9 +2,18 @@
 import { db } from '../db/index.js';
 import { transactions, budgets } from '../db/schema.js';
 import { eq, sql } from "drizzle-orm";
+import { walletService } from './wallet.service.js';
 
 export const dashboardService = {
     async getStats(userId: string) {
+        // 0. Ensure Wallets Exist (Migration Hook)
+        // This will create 'Main Bank' if no wallets exist and move old transactions there.
+        // We do this here because getStats is the main entry point for the dashboard.
+        await walletService.ensureDefaultWallets(userId);
+
+        // 0.5 Fetch Wallets with Balances
+        const wallets = await walletService.getAll(userId);
+
         // 1. Calculate Total Balance (Income - Expense)
         // using raw SQL for aggregation efficiently
         const balanceResult = await db.execute(sql`
@@ -43,6 +52,7 @@ export const dashboardService = {
             income,
             expense,
             monthlyExpense,
+            wallets, // Return wallets breakdown
             budget: budget ? {
                 limit: Number(budget.limit),
                 used: monthlyExpense,

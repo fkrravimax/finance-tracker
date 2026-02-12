@@ -3,6 +3,8 @@ import React, { useState, useEffect } from 'react';
 import { transactionService } from '../services/transactionService';
 import { useNotification } from '../contexts/NotificationContext';
 import { aiService } from '../services/aiService';
+import api from '../services/api';
+import { Transaction } from '../types';
 
 interface QuickAddTransactionModalProps {
     isOpen: boolean;
@@ -17,6 +19,7 @@ interface QuickAddTransactionModalProps {
         date: string;
         notes?: string;
         source?: string;
+        walletId?: string;
     } | null;
 }
 
@@ -35,31 +38,53 @@ const QuickAddTransactionModal: React.FC<QuickAddTransactionModalProps> = ({ isO
     const [selectedCategory, setSelectedCategory] = useState('food');
     const [transactionType, setTransactionType] = useState<'Expense' | 'Income'>('Expense');
     const [notes, setNotes] = useState('');
-    const [walletSource, setWalletSource] = useState('Bank');
+    const [wallets, setWallets] = useState<{ id: string, name: string }[]>([]);
+    const [isLoadingWallets, setIsLoadingWallets] = useState(false);
+    const [walletSource, setWalletSource] = useState<string>('');
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isCategorizing, setIsCategorizing] = useState(false);
 
     useEffect(() => {
         if (isOpen) {
+            // Fetch wallets
+            const fetchWallets = async () => {
+                setIsLoadingWallets(true);
+                try {
+                    const { data } = await api.get('/wallets');
+                    setWallets(data);
+
+                    // Set default if not set
+                    if (!initialData && data.length > 0 && !data.find((w: any) => w.id === walletSource)) {
+                        setWalletSource(data[0].id);
+                    }
+                } catch (error) {
+                    console.error("Failed to fetch wallets", error);
+                } finally {
+                    setIsLoadingWallets(false);
+                }
+            };
+            fetchWallets();
+
             if (initialData) {
                 setAmount(initialData.amount.toString());
                 setNotes(initialData.merchant); // Merchant as notes
                 setTransactionType(initialData.type === 'income' ? 'Income' : 'Expense');
+                // walletSource should be in initialData if we supported editing wallet, but for now we might default or parse description?
+                // For now, let's leave it or try to find it. 
+                // If backend provided walletId in transaction, we'd use it. 
+                // Since initialData structure might need update, let's assume default for now or matches one.
 
                 // Try to match category name to ID
                 const catObj = CATEGORIES.find(c => c.name === initialData.category);
                 if (catObj) setSelectedCategory(catObj.id);
                 else setSelectedCategory('shopping'); // Fallback
-
-                // Helper to get source if stored in description like "Notes (via Bank)"
-                // This is a simple assumption based on previous save logic
             } else {
                 // Reset form
                 setAmount('0');
                 setNotes('');
                 setTransactionType('Expense');
                 setSelectedCategory('food');
-                setWalletSource('Bank');
+                // walletSource set after fetch
             }
         }
     }, [isOpen, initialData]);
@@ -88,14 +113,14 @@ const QuickAddTransactionModal: React.FC<QuickAddTransactionModalProps> = ({ isO
             const typeValue: 'income' | 'expense' = transactionType === 'Expense' ? 'expense' : 'income';
 
             const payload = {
-                userId: '1',
                 amount: parseInt(amount),
                 category: transactionType === 'Income' ? 'Income' : (categoryObj?.name || 'Uncategorized'),
                 date: initialData ? initialData.date : new Date().toISOString(), // Keep original date if editing
                 merchant: notes || (transactionType === 'Income' ? 'Income' : 'Expense'),
                 type: typeValue,
                 icon: transactionType === 'Income' ? 'attach_money' : (categoryObj?.icon || 'attach_money'),
-                description: `${notes} (via ${walletSource})`
+                description: notes,
+                walletId: walletSource // Send the ID directly
             };
 
             if (initialData) {
@@ -280,10 +305,12 @@ const QuickAddTransactionModal: React.FC<QuickAddTransactionModalProps> = ({ isO
                                     <select
                                         value={walletSource}
                                         onChange={(e) => setWalletSource(e.target.value)}
-                                        className="appearance-none w-full rounded-lg border border-slate-200 dark:border-[#685a31] bg-slate-50 dark:bg-[#342d18] text-slate-900 dark:text-white p-4 pr-10 text-base font-normal focus:outline-none focus:ring-2 focus:ring-primary/50 transition-shadow">
-                                        <option value="Bank">Bank</option>
-                                        <option value="Cash">Cash</option>
-                                        <option value="E-wallet">E-wallet</option>
+                                        disabled={isLoadingWallets}
+                                        className="appearance-none w-full rounded-lg border border-slate-200 dark:border-[#685a31] bg-slate-50 dark:bg-[#342d18] text-slate-900 dark:text-white p-4 pr-10 text-base font-normal focus:outline-none focus:ring-2 focus:ring-primary/50 transition-shadow disabled:opacity-50">
+                                        {wallets.map(w => (
+                                            <option key={w.id} value={w.id}>{w.name}</option>
+                                        ))}
+                                        {wallets.length === 0 && <option disabled>Loading wallets...</option>}
                                     </select>
                                     <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-500 dark:text-[#cbbc90]">
                                         <span className="material-symbols-outlined">expand_more</span>

@@ -7,7 +7,7 @@ export const transactionService = {
         return data;
     },
 
-    create: async (transaction: Omit<Transaction, 'id'>): Promise<Transaction> => {
+    create: async (transaction: Omit<Transaction, 'id' | 'userId'>): Promise<Transaction> => {
         const { data } = await api.post('/transactions', transaction);
         return data;
     },

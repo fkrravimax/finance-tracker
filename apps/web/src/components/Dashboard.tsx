@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import DashboardSkeleton from './skeletons/DashboardSkeleton';
 import CashFlowChart from './CashFlowChart';
@@ -9,11 +10,13 @@ import OnboardingModal from './OnboardingModal';
 import InitialBalanceModal from './InitialBalanceModal';
 import ExportModal from './ExportModal';
 import BudgetBreakdownModal from './BudgetBreakdownModal';
+import WalletListModal from './WalletListModal';
 import { dashboardService, type DashboardStats } from '../services/dashboardService';
 import { authService } from '../services/authService';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useUI } from '../contexts/UIContext';
 import { useAppearance } from '../contexts/AppearanceContext';
+import api from '../services/api';
 
 import { transactionService } from '../services/transactionService';
 
@@ -23,6 +26,7 @@ const Dashboard: React.FC = () => {
     const [isBalanceModalOpen, setIsBalanceModalOpen] = useState(false);
     const [isExportModalOpen, setIsExportModalOpen] = useState(false);
     const [isBudgetModalOpen, setIsBudgetModalOpen] = useState(false);
+    const [isWalletModalOpen, setIsWalletModalOpen] = useState(false);
     const [stats, setStats] = useState<DashboardStats | null>(null);
     const [loading, setLoading] = useState(true);
     const [transactions, setTransactions] = useState<any[]>([]);
@@ -56,6 +60,15 @@ const Dashboard: React.FC = () => {
             setTransactions(data);
         } catch (error) {
             console.error("Failed to fetch transactions", error);
+        }
+    };
+
+    const handleAddWallet = async (name: string, type: string) => {
+        try {
+            await api.post('/wallets', { name, type });
+            fetchStats(); // Refresh to show new wallet
+        } catch (error) {
+            console.error("Failed to add wallet", error);
         }
     };
 
@@ -105,8 +118,6 @@ const Dashboard: React.FC = () => {
     return (
 
         <div className="max-w-7xl mx-auto w-full p-4 md:p-6 lg:p-8 flex flex-col gap-8">
-            {/* QuickAddTransactionModal removed (global) */}
-
             <OnboardingModal
                 isOpen={isOnboardingOpen}
                 onClose={() => setIsOnboardingOpen(false)}
@@ -124,6 +135,13 @@ const Dashboard: React.FC = () => {
             <ExportModal
                 isOpen={isExportModalOpen}
                 onClose={() => setIsExportModalOpen(false)}
+            />
+
+            <WalletListModal
+                isOpen={isWalletModalOpen}
+                onClose={() => setIsWalletModalOpen(false)}
+                wallets={stats?.wallets || []}
+                onAddWallet={handleAddWallet}
             />
 
             {/* Page Heading - Glassmorphism */}
@@ -170,7 +188,10 @@ const Dashboard: React.FC = () => {
                     <div className="absolute -left-10 -bottom-10 w-32 h-32 bg-sky/20 rounded-full blur-xl"></div>
 
                     <div className="flex justify-between items-start mb-6 relative z-10">
-                        <div className="p-4 rounded-2xl bg-white/20 backdrop-blur-md text-white border border-white/20">
+                        <div
+                            onClick={() => setIsWalletModalOpen(true)}
+                            className="p-4 rounded-2xl bg-white/20 backdrop-blur-md text-white border border-white/20 cursor-pointer hover:bg-white/30 transition-colors"
+                        >
                             <span className="material-symbols-outlined text-3xl">account_balance_wallet</span>
                         </div>
                         <span className={`inline-flex items-center gap-1 rounded-full px-4 py-1.5 text-sm font-extrabold shadow-sm ${trend >= 0 ? 'bg-white text-sky-dark' : 'bg-red-100 text-red-600'}`}>
