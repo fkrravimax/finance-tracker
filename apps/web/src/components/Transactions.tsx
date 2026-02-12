@@ -5,6 +5,7 @@ import { useLanguage } from '../contexts/LanguageContext';
 import { useUI } from '../contexts/UIContext';
 import { useNotification } from '../contexts/NotificationContext';
 import { transactionService } from '../services/transactionService';
+import ConfirmModal from './ConfirmModal';
 
 type TimeRange = 'day' | 'week' | 'month' | 'year';
 type SortKey = 'category' | 'date' | 'amount';
@@ -27,6 +28,10 @@ const Transactions: React.FC = () => {
     const [transactions, setTransactions] = useState<Transaction[]>([]);
     const [loading, setLoading] = useState(true);
     const [sortConfig, setSortConfig] = useState<{ key: SortKey; direction: SortDirection } | null>(null);
+
+    // Confirmation Modal State
+    const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+    const [transactionToDelete, setTransactionToDelete] = useState<string | null>(null);
 
     const fetchTransactions = async () => {
         try {
@@ -76,18 +81,26 @@ const Transactions: React.FC = () => {
         openQuickAdd(transaction);
     };
 
-    const handleDelete = async (id: string) => {
-        if (confirm(t('transactions.confirmDelete'))) {
-            try {
-                await transactionService.delete(id);
-                showNotification(t('transactions.deleteSuccess'));
-                fetchTransactions();
-                // Trigger global update
-                window.dispatchEvent(new Event('transaction-updated'));
-            } catch (error) {
-                console.error("Delete failed", error);
-                showNotification(t('transactions.deleteError'), 'error');
-            }
+    const confirmDelete = (id: string) => {
+        setTransactionToDelete(id);
+        setIsConfirmOpen(true);
+    };
+
+    const handleDelete = async () => {
+        if (!transactionToDelete) return;
+
+        try {
+            await transactionService.delete(transactionToDelete);
+            showNotification(t('transactions.deleteSuccess'));
+            fetchTransactions();
+            // Trigger global update
+            window.dispatchEvent(new Event('transaction-updated'));
+        } catch (error) {
+            console.error("Delete failed", error);
+            showNotification(t('transactions.deleteError'), 'error');
+        } finally {
+            setIsConfirmOpen(false);
+            setTransactionToDelete(null);
         }
     };
 
@@ -167,6 +180,16 @@ const Transactions: React.FC = () => {
 
     return (
         <div className="max-w-7xl mx-auto w-full p-4 md:p-8 lg:p-12 flex flex-col gap-8">
+            <ConfirmModal
+                isOpen={isConfirmOpen}
+                onClose={() => setIsConfirmOpen(false)}
+                onConfirm={handleDelete}
+                title={t('transactions.confirmDeleteTitle') || "Delete Transaction"}
+                message={t('transactions.confirmDelete') || "Are you sure you want to delete this transaction?"}
+                confirmText={t('transactions.delete') || "Delete"}
+                isDestructive
+            />
+
             {/* Header */}
             <header className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 overflow-hidden">
                 <div className="flex flex-col gap-1">
@@ -286,7 +309,7 @@ const Transactions: React.FC = () => {
                                             </span>
                                         </td>
                                         <td className="p-4 pr-6 text-right">
-                                            <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <div className="flex items-center justify-end gap-2 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
                                                 <button
                                                     onClick={() => handleEdit(transaction)}
                                                     className="p-2 text-slate-400 hover:text-primary hover:bg-slate-100 dark:hover:bg-[#3f361d] rounded-full transition-colors"
@@ -295,7 +318,7 @@ const Transactions: React.FC = () => {
                                                     <span className="material-symbols-outlined text-[20px]">edit</span>
                                                 </button>
                                                 <button
-                                                    onClick={() => handleDelete(transaction.id)}
+                                                    onClick={() => confirmDelete(transaction.id)}
                                                     className="p-2 text-slate-400 hover:text-red-500 hover:bg-slate-100 dark:hover:bg-[#3f361d] rounded-full transition-colors"
                                                     title="Delete"
                                                 >
@@ -307,7 +330,7 @@ const Transactions: React.FC = () => {
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan={5} className="p-12 text-center text-slate-500 dark:text-[#cbbc90]">
+                                    <td colSpan={6} className="p-12 text-center text-slate-500 dark:text-[#cbbc90]">
                                         <div className="flex flex-col items-center gap-2">
                                             <span className="material-symbols-outlined text-4xl opacity-50">receipt_long</span>
                                             <p>{t('transactions.noTransactions')}</p>
