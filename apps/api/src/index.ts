@@ -12,17 +12,21 @@ const PORT = process.env.PORT || 3000;
 // Trust Vercel's reverse proxy (required for secure cookies behind proxy)
 app.set('trust proxy', 1);
 
-
-app.use(cors({
+// CORS configuration
+const corsOptions = {
     origin: process.env.FRONTEND_URL ? [process.env.FRONTEND_URL, "https://rupiku.vercel.app", "https://finance-web-five-coral.vercel.app", "https://financetrx.vercel.app", "https://finance-web-git-main-rafis-projects-acb0d393.vercel.app", "http://localhost:5173", "http://localhost:5174"] : ["https://rupiku.vercel.app", "https://financetrx.vercel.app", "https://finance-web-git-main-rafis-projects-acb0d393.vercel.app", "http://localhost:5173", "http://localhost:5174"],
     credentials: true,
     allowedHeaders: ["Content-Type", "Authorization"],
-}));
-app.use(express.json());
+};
 
+app.use(cors(corsOptions));
 
-// Auth Routes
+// IMPORTANT: Auth routes MUST be registered BEFORE express.json() body parser
+// The body parser can consume the request stream and interfere with Better Auth's processing
 app.all("/api/auth/*splat", toNodeHandler(auth));
+
+// Body parser for all other routes
+app.use(express.json());
 
 import transactionRoutes from './routes/transaction.routes.js';
 import { authMiddleware } from './middleware/auth.middleware.js';
