@@ -4,7 +4,6 @@ import { transactionService } from '../services/transactionService';
 import { useNotification } from '../contexts/NotificationContext';
 import { aiService } from '../services/aiService';
 import api from '../services/api';
-import { Transaction } from '../types';
 
 interface QuickAddTransactionModalProps {
     isOpen: boolean;
