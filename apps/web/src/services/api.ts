@@ -1,44 +1,24 @@
 import axios from 'axios';
 
 // Create Axios Instance
-// Create Axios Instance
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-
-console.log("API Base URL:", API_URL); // Debugging connection
 
 const api = axios.create({
     baseURL: `${API_URL}/api`,
     headers: {
         'Content-Type': 'application/json',
     },
+    // Cookies are sent automatically with every request for auth
     withCredentials: true,
 });
 
-// Request Interceptor: Attach Token
-api.interceptors.request.use(
-    (config) => {
-        const token = localStorage.getItem('token');
-        if (token) {
-            config.headers.Authorization = `Bearer ${token}`;
-        }
-        return config;
-    },
-    (error) => {
-        return Promise.reject(error);
-    }
-);
-
-// Response Interceptor: Handle Errors (e.g., 401 Logout)
+// Response Interceptor: Handle auth errors (e.g., expired session)
 api.interceptors.response.use(
     (response) => response,
     (error) => {
         if (error.response?.status === 401) {
-            // Unauthenticated - Clear token and redirect to login
-            localStorage.removeItem('token');
-            localStorage.removeItem('isAuthenticated');
-            // We might want to trigger a global event or redirect here
-            // window.location.href = '/'; 
-            // For now, let the app handle the state change naturally via AuthContext/Service
+            // Session expired or invalid — clean up local state
+            localStorage.removeItem('user');
         }
         return Promise.reject(error);
     }
