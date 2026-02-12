@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { authService } from '../services/authService';
 import { authClient } from '../lib/auth-client';
 import { useAppearance } from '../contexts/AppearanceContext';
+import LogoText from './LogoText';
 
 interface LoginProps {
     onLogin: () => void;
@@ -104,7 +105,9 @@ const Login: React.FC<LoginProps> = ({ onLogin, onBack, defaultSignUp = false })
                     <div className="inline-flex items-center justify-center w-20 h-20 mb-4">
                         <img src="/logo.png" alt="Rupiku Logo" className="w-full h-full object-contain" />
                     </div>
-                    <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">Rupiku</h1>
+                    <div className="mb-1">
+                        <LogoText className="text-3xl" />
+                    </div>
                     <p className="text-sm text-slate-500 dark:text-[#cbbc90]">Joyful Finance Tracker</p>
                     <p className="text-slate-500 dark:text-[#cbbc90] mt-2">
                         {isSignUp ? 'Create an account to get started' : 'Welcome back! Please sign in.'}
