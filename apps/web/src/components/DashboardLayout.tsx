@@ -11,7 +11,7 @@ interface DashboardLayoutProps {
 
 const DashboardContent: React.FC<DashboardLayoutProps> = ({ children, onLogout }) => {
     const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);
-    const { isQuickAddOpen, closeQuickAdd } = useUI();
+    const { isQuickAddOpen, closeQuickAdd, editingTransaction } = useUI();
 
     const toggleSidebar = () => {
         setIsSidebarOpen(!isSidebarOpen);
@@ -57,6 +57,7 @@ const DashboardContent: React.FC<DashboardLayoutProps> = ({ children, onLogout }
             <QuickAddTransactionModal
                 isOpen={isQuickAddOpen}
                 onClose={closeQuickAdd}
+                initialData={editingTransaction}
             />
         </div>
     );

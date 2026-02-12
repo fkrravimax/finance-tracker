@@ -19,6 +19,14 @@ export const transactionService = {
         return result[0];
     },
 
+    async update(userId: string, id: string, data: Partial<typeof transactions.$inferInsert>) {
+        const result = await db.update(transactions)
+            .set({ ...data, updatedAt: new Date() })
+            .where(and(eq(transactions.id, id), eq(transactions.userId, userId)))
+            .returning();
+        return result[0];
+    },
+
     async delete(userId: string, id: string) {
         const result = await db.delete(transactions)
             .where(and(eq(transactions.id, id), eq(transactions.userId, userId)))
