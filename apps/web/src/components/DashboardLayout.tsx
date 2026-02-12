@@ -4,7 +4,7 @@ import Sidebar from './Sidebar';
 import BottomNavbar from './BottomNavbar';
 import QuickAddTransactionModal from './QuickAddTransactionModal';
 import { UIProvider, useUI } from '../contexts/UIContext';
-import { useSwipeable } from 'react-swipeable';
+import { useSwipeable, type SwipeEventData } from 'react-swipeable';
 
 interface DashboardLayoutProps {
     children: React.ReactNode;
@@ -22,7 +22,8 @@ const DashboardContent: React.FC<DashboardLayoutProps> = ({ children, onLogout }
     const navigate = useNavigate();
     const location = useLocation();
 
-    const handleSwipeRight = () => {
+    const handleSwipeRight = (eventData: SwipeEventData) => {
+        if ((eventData.event.target as HTMLElement).closest('[data-no-swipe="true"]')) return;
         if (isSidebarOpen) return; // Already leftmost
 
         const path = location.pathname;
@@ -37,7 +38,8 @@ const DashboardContent: React.FC<DashboardLayoutProps> = ({ children, onLogout }
         }
     };
 
-    const handleSwipeLeft = () => {
+    const handleSwipeLeft = (eventData: SwipeEventData) => {
+        if ((eventData.event.target as HTMLElement).closest('[data-no-swipe="true"]')) return;
         if (isSidebarOpen) {
             setIsSidebarOpen(false);
             return;

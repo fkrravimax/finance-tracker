@@ -211,7 +211,7 @@ const Transactions: React.FC = () => {
                 </div>
 
                 {/* Filter Controls */}
-                <div className="flex w-full md:w-auto bg-slate-100 dark:bg-[#2b2616] p-1 rounded-xl border border-slate-200 dark:border-[#493f22] overflow-x-auto no-scrollbar">
+                <div className="flex w-full md:w-auto bg-slate-100 dark:bg-[#2b2616] p-1 rounded-xl border border-slate-200 dark:border-[#493f22] overflow-x-auto no-scrollbar" data-no-swipe="true">
                     {(['day', 'week', 'month', 'year'] as TimeRange[]).map((range) => (
                         <button
                             key={range}
@@ -266,7 +266,7 @@ const Transactions: React.FC = () => {
 
             {/* Transactions List */}
             <div className="bg-white dark:bg-[#342d18] rounded-2xl border border-slate-100 dark:border-[#493f22] shadow-sm overflow-hidden">
-                <div className="overflow-x-auto">
+                <div className="overflow-x-auto" data-no-swipe="true">
                     <table className="w-full text-left border-collapse">
                         <thead>
                             <tr className="bg-slate-50 dark:bg-[#2b2616] border-b border-slate-200 dark:border-[#493f22] select-none">
