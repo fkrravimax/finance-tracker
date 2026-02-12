@@ -14,6 +14,7 @@ import ErrorBoundary from './components/ErrorBoundary'
 import { authService } from './services/authService'
 import { authClient } from './lib/auth-client';
 import PrivacyPolicy from './components/PrivacyPolicy';
+import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -108,7 +109,9 @@ function App() {
                     <Route path="/savings" element={<SavingsVault />} />
                     <Route path="/trading" element={<TradingDashboard />} />
                     <Route path="/settings" element={<Settings />} />
-                    <Route path="/admin" element={<AdminDashboard />} />
+                    <Route element={<ProtectedRoute allowedRoles={['ADMIN']} />}>
+                        <Route path="/admin" element={<AdminDashboard />} />
+                    </Route>
                     <Route path="*" element={
                         <div className="flex flex-col items-center justify-center h-full text-slate-500 dark:text-[#cbbc90]">
                             <span className="material-symbols-outlined text-6xl mb-4">construction</span>

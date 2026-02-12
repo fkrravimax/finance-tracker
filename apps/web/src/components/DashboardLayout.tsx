@@ -3,6 +3,7 @@ import Sidebar from './Sidebar';
 import BottomNavbar from './BottomNavbar';
 import QuickAddTransactionModal from './QuickAddTransactionModal';
 import { UIProvider, useUI } from '../contexts/UIContext';
+import { useSwipeable } from 'react-swipeable';
 
 interface DashboardLayoutProps {
     children: React.ReactNode;
@@ -17,8 +18,19 @@ const DashboardContent: React.FC<DashboardLayoutProps> = ({ children, onLogout }
         setIsSidebarOpen(!isSidebarOpen);
     };
 
+    const handlers = useSwipeable({
+        onSwipedRight: () => setIsSidebarOpen(true),
+        onSwipedLeft: () => setIsSidebarOpen(false),
+        trackMouse: false,
+        trackTouch: true,
+        delta: 50, // Min distance to trigger swipe
+    });
+
     return (
-        <div className="flex h-screen overflow-hidden bg-background-light dark:bg-background-dark text-slate-900 dark:text-white relative">
+        <div
+            {...handlers}
+            className="flex h-screen overflow-hidden bg-background-light dark:bg-background-dark text-slate-900 dark:text-white relative"
+        >
             {/* Sidebar Overlay (Mobile) */}
             {isSidebarOpen && (
                 <div
