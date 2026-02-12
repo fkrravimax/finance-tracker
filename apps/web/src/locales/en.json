@@ -108,7 +108,12 @@
             "week": "This Week",
             "month": "This Month",
             "year": "This Year"
-        }
+        },
+        "confirmDeleteTitle": "Confirm Delete",
+        "confirmDelete": "Are you sure you want to delete this transaction?",
+        "delete": "Delete",
+        "deleteSuccess": "Transaction deleted successfully",
+        "deleteError": "Failed to delete transaction"
     },
     "trading": {
         "title": "Trading Terminal",
