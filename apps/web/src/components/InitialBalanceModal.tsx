@@ -26,7 +26,6 @@ const InitialBalanceModal: React.FC<InitialBalanceModalProps> = ({ isOpen, onClo
         try {
             // Treat as an Income Transaction
             await transactionService.create({
-                userId: '1',
                 amount: Number(amount),
                 type: 'income',
                 category: 'Income',
