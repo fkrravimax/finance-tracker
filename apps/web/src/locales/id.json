@@ -286,9 +286,13 @@
         "enablePush": "Aktifkan Notifikasi Push",
         "enablePushDesc": "Dapatkan info terbaru tentang keuangan Anda",
         "notifyRecurring": "Tagihan Berulang",
+        "notifyRecurringDesc": "Dapatkan pengingat harian untuk tagihan yang akan datang",
         "notifyBudget": "Peringatan Anggaran",
+        "notifyBudgetDesc": "Peringatan saat mencapai 50% dan 80% dari anggaran",
         "notifyDaily": "Ringkasan Harian",
-        "notifyLunch": "Pengingat Makan Siang"
+        "notifyDailyDesc": "Terima ringkasan harian pemasukan dan pengeluaran",
+        "notifyLunch": "Pengingat Makan Siang",
+        "notifyLunchDesc": "Dapatkan pengingat makan siang jam 12:00 siang"
     },
     "landing": {
         "hero": {

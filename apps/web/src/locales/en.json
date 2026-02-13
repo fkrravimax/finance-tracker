@@ -286,9 +286,13 @@
         "enablePush": "Enable Push Notifications",
         "enablePushDesc": "Receive updates about your finances",
         "notifyRecurring": "Recurring Bills",
+        "notifyRecurringDesc": "Get daily reminders for upcoming bill payments",
         "notifyBudget": "Budget Alerts",
+        "notifyBudgetDesc": "Alert when you reach 50% and 80% of your budget",
         "notifyDaily": "Daily Summary",
-        "notifyLunch": "Lunch Reminder"
+        "notifyDailyDesc": "Receive a daily summary of your income and expenses",
+        "notifyLunch": "Lunch Reminder",
+        "notifyLunchDesc": "Get a friendly lunch reminder at 12:00 PM"
     },
     "landing": {
         "hero": {
