@@ -26,7 +26,12 @@ export const auth = betterAuth({
                 required: false,
                 defaultValue: "FREE",
                 input: false // Don't allow user to set this
-            }
+            },
+            notifyBudget50: { type: "boolean", required: false, defaultValue: true },
+            notifyBudget80: { type: "boolean", required: false, defaultValue: true },
+            notifyDaily: { type: "boolean", required: false, defaultValue: false },
+            notifyLunch: { type: "boolean", required: false, defaultValue: true },
+            notifyRecurring: { type: "boolean", required: false, defaultValue: true },
         }
     },
     emailAndPassword: {

@@ -1,10 +1,17 @@
 {
     "name": "Rupiku - Joyful Finance Tracker",
     "short_name": "Rupiku",
+    "description": "Track your finances joyfully",
     "start_url": "/",
+    "id": "/",
+    "scope": "/",
     "display": "standalone",
+    "orientation": "portrait",
     "background_color": "#09090b",
     "theme_color": "#09090b",
+    "categories": [
+        "finance"
+    ],
     "icons": [
         {
             "src": "/icon-192.png",

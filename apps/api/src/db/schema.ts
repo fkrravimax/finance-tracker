@@ -13,6 +13,8 @@ export const users = pgTable("user", {
     notifyBudget50: boolean("notify_budget_50").default(true),
     notifyBudget80: boolean("notify_budget_80").default(true),
     notifyDaily: boolean("notify_daily").default(false),
+    notifyLunch: boolean("notify_lunch").default(true),
+    notifyRecurring: boolean("notify_recurring").default(true),
     tradingBalance: text("trading_balance").default("0").notNull(),
     createdAt: timestamp("created_at").notNull(),
     updatedAt: timestamp("updated_at").notNull(),
@@ -148,4 +150,15 @@ export const upgradeRequests = pgTable("upgrade_request", {
     status: text("status").notNull().default("PENDING"), // PENDING | APPROVED | REJECTED
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// --- Push Subscriptions Table ---
+
+export const pushSubscriptions = pgTable("push_subscription", {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: text("user_id").notNull().references(() => users.id),
+    endpoint: text("endpoint").notNull(),
+    p256dh: text("p256dh").notNull(),
+    auth: text("auth").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
 });
