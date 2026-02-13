@@ -70,8 +70,8 @@ const ClosePositionModal: React.FC<ClosePositionModalProps> = ({ isOpen, onClose
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-            <div className="w-full max-w-md bg-white dark:bg-[#2b2616] border border-slate-200 dark:border-[#f4c025]/20 rounded-2xl shadow-[0_0_40px_-10px_rgba(0,0,0,0.1)] dark:shadow-[0_0_40px_-10px_rgba(244,192,37,0.1)] overflow-hidden">
-                <div className="flex items-center justify-between p-6 border-b border-slate-200 dark:border-[#f4c025]/10">
+            <div className="w-full max-w-md bg-white dark:bg-[#2b2616] border border-slate-200 dark:border-[#f4c025]/20 rounded-2xl shadow-[0_0_40px_-10px_rgba(0,0,0,0.1)] dark:shadow-[0_0_40px_-10px_rgba(244,192,37,0.1)] overflow-hidden flex flex-col max-h-[85vh]">
+                <div className="flex items-center justify-between p-4 md:p-6 border-b border-slate-200 dark:border-[#f4c025]/10">
                     <div>
                         <h2 className="text-xl font-bold text-slate-800 dark:text-white">Close Position</h2>
                         <p className="text-xs text-slate-500 dark:text-[#cbbc90] mt-1">Enter the close price to finalize this trade.</p>
@@ -81,7 +81,7 @@ const ClosePositionModal: React.FC<ClosePositionModalProps> = ({ isOpen, onClose
                     </button>
                 </div>
 
-                <div className="p-6 space-y-5">
+                <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-4">
                     {/* Position Summary */}
                     <div className="bg-slate-50 dark:bg-[#1e1b10] rounded-xl p-4 border border-slate-200 dark:border-[#f4c025]/10 space-y-3">
                         <div className="flex items-center justify-between">

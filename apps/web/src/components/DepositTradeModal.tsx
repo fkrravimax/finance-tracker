@@ -44,8 +44,8 @@ const DepositTradeModal: React.FC<DepositTradeModalProps> = ({ isOpen, onClose, 
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-            <div className="w-full max-w-md bg-white dark:bg-[#2b2616] border border-slate-200 dark:border-[#f4c025]/20 rounded-2xl shadow-[0_0_40px_-10px_rgba(0,0,0,0.1)] dark:shadow-[0_0_40px_-10px_rgba(244,192,37,0.1)] overflow-hidden flex flex-col max-h-[90vh]">
-                <div className="flex items-center justify-between p-6 border-b border-slate-200 dark:border-[#f4c025]/10">
+            <div className="w-full max-w-md bg-white dark:bg-[#2b2616] border border-slate-200 dark:border-[#f4c025]/20 rounded-2xl shadow-[0_0_40px_-10px_rgba(0,0,0,0.1)] dark:shadow-[0_0_40px_-10px_rgba(244,192,37,0.1)] overflow-hidden flex flex-col max-h-[85vh]">
+                <div className="flex items-center justify-between p-4 md:p-6 border-b border-slate-200 dark:border-[#f4c025]/10">
                     <div>
                         <h2 className="text-xl font-bold text-slate-800 dark:text-white">Deposit Funds</h2>
                         <p className="text-xs text-slate-500 dark:text-[#cbbc90] mt-1">Add funds to trading wallet</p>
@@ -56,7 +56,7 @@ const DepositTradeModal: React.FC<DepositTradeModalProps> = ({ isOpen, onClose, 
                 </div>
 
                 <div className="flex-1 overflow-y-auto">
-                    <form onSubmit={handleDeposit} className="p-6 space-y-8">
+                    <form onSubmit={handleDeposit} className="p-4 md:p-6 space-y-4 md:space-y-6">
                         {/* From -> To Visualization */}
                         <div className="bg-slate-50 dark:bg-[#1e1b10] rounded-xl p-4 border border-slate-200 dark:border-[#f4c025]/20 flex flex-col md:flex-row items-center justify-between gap-4 md:gap-0">
                             <div className="flex flex-col items-center space-y-2">
@@ -93,7 +93,7 @@ const DepositTradeModal: React.FC<DepositTradeModalProps> = ({ isOpen, onClose, 
                                     value={amount}
                                     onChange={(e) => setAmount(e.target.value)}
                                     placeholder="0.00"
-                                    className="w-full bg-transparent text-center text-5xl font-bold text-slate-800 dark:text-white focus:outline-none placeholder-slate-200 dark:placeholder-[#cbbc90]/20 pb-2"
+                                    className="w-full bg-transparent text-center text-4xl md:text-5xl font-bold text-slate-800 dark:text-white focus:outline-none placeholder-slate-200 dark:placeholder-[#cbbc90]/20 pb-2"
                                 />
                             </div>
                         </div>
@@ -125,7 +125,7 @@ const DepositTradeModal: React.FC<DepositTradeModalProps> = ({ isOpen, onClose, 
                             <button
                                 type="submit"
                                 disabled={loading || !amount || parseFloat(amount) <= 0}
-                                className="flex items-center justify-center space-x-2 w-full py-4 rounded-xl bg-amber-500 dark:bg-[#f4c025] text-white dark:text-[#2b2616] font-bold text-lg hover:bg-amber-600 dark:hover:bg-[#dca60e] transition-all transform hover:scale-[1.02] shadow-[0_4px_10px_rgba(0,0,0,0.1)] dark:shadow-[0_0_20px_-5px_rgba(244,192,37,0.5)] disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="flex items-center justify-center space-x-2 w-full py-3 md:py-4 rounded-xl bg-amber-500 dark:bg-[#f4c025] text-white dark:text-[#2b2616] font-bold text-base md:text-lg hover:bg-amber-600 dark:hover:bg-[#dca60e] transition-all transform hover:scale-[1.02] shadow-[0_4px_10px_rgba(0,0,0,0.1)] dark:shadow-[0_0_20px_-5px_rgba(244,192,37,0.5)] disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 <Wallet size={20} />
                                 <span>Confirm Deposit</span>
