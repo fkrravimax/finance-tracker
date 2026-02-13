@@ -93,12 +93,18 @@ export const authService = {
         return !!localStorage.getItem('user');
     },
 
-    // Cookie-based fetch helper — session is authenticated via httpOnly cookies
+    // Cookie-based fetch helper — also supports Bearer token for manual OAuth sessions
     fetchWithAuth: async (url: string, options: RequestInit = {}) => {
-        const headers = {
+        const token = localStorage.getItem('token');
+        const headers: Record<string, string> = {
             'Content-Type': 'application/json',
-            ...options.headers,
+            ...(options.headers as Record<string, string> || {}),
         };
+
+        // Add Bearer token if available (manual Google OAuth sessions)
+        if (token) {
+            headers['Authorization'] = `Bearer ${token}`;
+        }
 
         const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000'}${url}`, {
             ...options,
@@ -107,7 +113,10 @@ export const authService = {
         });
 
         if (response.status === 401) {
-            authService.logout();
+            // Only logout if we have no valid token at all
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = '/login';
             throw new Error('Unauthorized');
         }
 
