@@ -11,5 +11,27 @@
             "src": "/(.*)",
             "dest": "src/index.ts"
         }
+    ],
+    "crons": [
+        {
+            "path": "/api/cron?job=process-recurring",
+            "schedule": "0 17 * * *"
+        },
+        {
+            "path": "/api/cron?job=recurring-reminder",
+            "schedule": "0 1 * * *"
+        },
+        {
+            "path": "/api/cron?job=budget-alert",
+            "schedule": "0 2 * * *"
+        },
+        {
+            "path": "/api/cron?job=lunch-reminder",
+            "schedule": "0 5 * * *"
+        },
+        {
+            "path": "/api/cron?job=daily-summary",
+            "schedule": "0 13 * * *"
+        }
     ]
 }
