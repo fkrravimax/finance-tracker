@@ -82,8 +82,8 @@ const LogTradeModal: React.FC<LogTradeModalProps> = ({ isOpen, onClose, onSave, 
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-            <div className="w-full max-w-lg bg-white dark:bg-[#2b2616] border border-slate-200 dark:border-[#f4c025]/20 rounded-2xl shadow-[0_0_40px_-10px_rgba(0,0,0,0.1)] dark:shadow-[0_0_40px_-10px_rgba(244,192,37,0.1)] overflow-hidden flex flex-col max-h-[85vh]">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 pb-20 md:pb-4">
+            <div className="w-full max-w-lg bg-white dark:bg-[#2b2616] border border-slate-200 dark:border-[#f4c025]/20 rounded-2xl shadow-[0_0_40px_-10px_rgba(0,0,0,0.1)] dark:shadow-[0_0_40px_-10px_rgba(244,192,37,0.1)] overflow-hidden flex flex-col max-h-[80vh] md:max-h-[85vh]">
                 <div className="flex items-center justify-between p-4 md:p-6 border-b border-slate-200 dark:border-[#f4c025]/10">
                     <div>
                         <h2 className="text-xl font-bold text-slate-800 dark:text-white">
@@ -98,8 +98,8 @@ const LogTradeModal: React.FC<LogTradeModalProps> = ({ isOpen, onClose, onSave, 
                     </button>
                 </div>
 
-                <div className="flex-1 overflow-y-auto">
-                    <form onSubmit={handleSubmit} className="p-4 md:p-6 space-y-4 md:space-y-6">
+                <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0">
+                    <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-4 md:space-y-6">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="space-y-2">
                                 <label className="text-xs font-semibold text-slate-500 dark:text-[#cbbc90] uppercase tracking-wider">Trading Pair</label>
@@ -107,7 +107,7 @@ const LogTradeModal: React.FC<LogTradeModalProps> = ({ isOpen, onClose, onSave, 
                                     type="text"
                                     value={pair}
                                     onChange={(e) => setPair(e.target.value)}
-                                    className="w-full bg-slate-50 dark:bg-[#1e1b10] border border-slate-200 dark:border-[#f4c025]/20 rounded-lg px-4 py-3 text-slate-800 dark:text-white focus:outline-none focus:border-amber-400 dark:focus:border-[#f4c025] transition-colors font-mono"
+                                    className="w-full bg-slate-50 dark:bg-[#1e1b10] border border-slate-200 dark:border-[#f4c025]/20 rounded-lg px-4 py-2.5 text-slate-800 dark:text-white focus:outline-none focus:border-amber-400 dark:focus:border-[#f4c025] transition-colors font-mono"
                                     placeholder="BTC/USDT"
                                 />
                             </div>
@@ -217,25 +217,25 @@ const LogTradeModal: React.FC<LogTradeModalProps> = ({ isOpen, onClose, onSave, 
                                 className="w-full bg-transparent text-sm text-slate-800 dark:text-white placeholder-slate-400 dark:placeholder-[#cbbc90] resize-none focus:outline-none h-12 md:h-16"
                             />
                         </div>
+                    </div>
 
-                        <div className="pt-2 flex justify-end space-x-3">
-                            <button
-                                type="button"
-                                onClick={onClose}
-                                className="px-6 py-3 rounded-lg border border-slate-200 dark:border-[#f4c025]/30 text-slate-500 hover:text-slate-800 dark:text-[#f4c025] dark:hover:bg-[#f4c025]/10 transition-colors"
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                type="submit"
-                                disabled={loading}
-                                className="px-6 py-3 rounded-lg bg-amber-500 dark:bg-[#f4c025] text-white dark:text-[#2b2616] font-bold hover:bg-amber-600 dark:hover:bg-[#dca60e] transition-all transform hover:scale-[1.02] shadow-[0_4px_10px_rgba(0,0,0,0.1)] dark:shadow-[0_0_20px_-5px_rgba(244,192,37,0.5)] disabled:opacity-50"
-                            >
-                                {loading ? 'Saving...' : mode === 'open' ? 'Open Position' : 'Save Trade'}
-                            </button>
-                        </div>
-                    </form>
-                </div>
+                    <div className="flex justify-end space-x-3 p-4 md:p-6 border-t border-slate-200 dark:border-[#f4c025]/10 bg-white dark:bg-[#2b2616]">
+                        <button
+                            type="button"
+                            onClick={onClose}
+                            className="px-5 py-2.5 rounded-lg border border-slate-200 dark:border-[#f4c025]/30 text-slate-500 hover:text-slate-800 dark:text-[#f4c025] dark:hover:bg-[#f4c025]/10 transition-colors"
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            type="submit"
+                            disabled={loading}
+                            className="px-5 py-2.5 rounded-lg bg-amber-500 dark:bg-[#f4c025] text-white dark:text-[#2b2616] font-bold hover:bg-amber-600 dark:hover:bg-[#dca60e] transition-all shadow-[0_4px_10px_rgba(0,0,0,0.1)] dark:shadow-[0_0_20px_-5px_rgba(244,192,37,0.5)] disabled:opacity-50"
+                        >
+                            {loading ? 'Saving...' : mode === 'open' ? 'Open Position' : 'Save Trade'}
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     );
