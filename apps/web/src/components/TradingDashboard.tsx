@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { AreaChart, Area, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-import { Wallet, Plus, Lock, Crown, Clock } from 'lucide-react';
+import { Wallet, Plus, Lock, Crown, Clock, Target } from 'lucide-react';
 import { authService } from '../services/authService';
 import { upgradeService } from '../services/upgradeService';
 import { useAppearance } from '../contexts/AppearanceContext';
@@ -8,6 +8,7 @@ import { useLanguage } from '../contexts/LanguageContext';
 import LogTradeModal from './LogTradeModal';
 import WithdrawTradeModal from './WithdrawTradeModal';
 import DepositTradeModal from './DepositTradeModal';
+import ClosePositionModal from './ClosePositionModal';
 import Skeleton from './Skeleton';
 import CryptoMarket from './CryptoMarket';
 import CryptoWatchlist from './CryptoWatchlist';
@@ -21,8 +22,12 @@ const TradingDashboard = () => {
     const [trades, setTrades] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [isLogModalOpen, setIsLogModalOpen] = useState(false);
+    const [isOpenPositionModalOpen, setIsOpenPositionModalOpen] = useState(false);
     const [isWithdrawModalOpen, setIsWithdrawModalOpen] = useState(false);
     const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
+    const [isCloseModalOpen, setIsCloseModalOpen] = useState(false);
+    const [selectedPosition, setSelectedPosition] = useState<any>(null);
+    const [openPositions, setOpenPositions] = useState<any[]>([]);
 
     // Upgrade request state
     const [hasPendingRequest, setHasPendingRequest] = useState(false);
@@ -42,12 +47,14 @@ const TradingDashboard = () => {
             return;
         }
         try {
-            const [statsRes, tradesRes] = await Promise.all([
+            const [statsRes, tradesRes, openRes] = await Promise.all([
                 authService.fetchWithAuth('/api/trading/stats'),
-                authService.fetchWithAuth('/api/trading')
+                authService.fetchWithAuth('/api/trading'),
+                authService.fetchWithAuth('/api/trading/open')
             ]);
             setStats(await statsRes.json());
             setTrades(await tradesRes.json());
+            setOpenPositions(await openRes.json());
         } catch (error) {
             console.error("Failed to fetch trading data", error);
         } finally {
@@ -391,6 +398,60 @@ const TradingDashboard = () => {
                         </div>
                     </div>
 
+                    {/* Open Positions Section */}
+                    {openPositions.length > 0 && (
+                        <div className="bg-white dark:bg-[#2b2616] rounded-2xl border border-slate-200 dark:border-[#f4c025]/10 p-4 md:p-6 shadow-sm">
+                            <div className="flex items-center justify-between mb-4">
+                                <div className="flex items-center gap-2">
+                                    <Target size={18} className="text-amber-500 dark:text-[#f4c025]" />
+                                    <h3 className="text-slate-800 dark:text-white font-bold text-lg">Open Positions</h3>
+                                    <span className="bg-amber-100 dark:bg-[#f4c025]/20 text-amber-700 dark:text-[#f4c025] text-xs font-bold px-2 py-0.5 rounded-full">{openPositions.length}</span>
+                                </div>
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
+                                {openPositions.map((pos) => (
+                                    <div key={pos.id} className="bg-slate-50 dark:bg-[#1e1b10] rounded-xl p-4 border border-slate-200 dark:border-[#f4c025]/10 hover:border-amber-300 dark:hover:border-[#f4c025]/30 transition-all group">
+                                        <div className="flex items-center justify-between mb-3">
+                                            <span className="font-bold text-slate-800 dark:text-white text-base">{pos.pair}</span>
+                                            <span className={`px-2 py-0.5 rounded text-[10px] uppercase font-bold border ${pos.type === 'LONG'
+                                                ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20'
+                                                : 'bg-rose-500/10 text-rose-500 border-rose-500/20'
+                                                }`}>
+                                                {pos.type}
+                                            </span>
+                                        </div>
+                                        <div className="grid grid-cols-3 gap-2 mb-3">
+                                            <div>
+                                                <p className="text-[10px] text-slate-400 dark:text-[#cbbc90] uppercase">Entry</p>
+                                                <p className="text-sm font-bold text-slate-700 dark:text-white">${pos.entryPrice.toLocaleString()}</p>
+                                            </div>
+                                            <div>
+                                                <p className="text-[10px] text-slate-400 dark:text-[#cbbc90] uppercase">Margin</p>
+                                                <p className="text-sm font-bold text-slate-700 dark:text-white">${pos.amount.toLocaleString()}</p>
+                                            </div>
+                                            <div>
+                                                <p className="text-[10px] text-slate-400 dark:text-[#cbbc90] uppercase">Leverage</p>
+                                                <p className="text-sm font-bold text-slate-700 dark:text-white">{pos.leverage}x</p>
+                                            </div>
+                                        </div>
+                                        <div className="flex items-center justify-between">
+                                            <div className="flex items-center gap-1.5">
+                                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                                                <span className="text-[10px] text-slate-400 dark:text-[#cbbc90] uppercase">Active</span>
+                                            </div>
+                                            <button
+                                                onClick={() => { setSelectedPosition(pos); setIsCloseModalOpen(true); }}
+                                                className="text-xs font-bold px-3 py-1.5 rounded-lg bg-amber-500/10 text-amber-600 dark:text-[#f4c025] border border-amber-500/20 hover:bg-amber-500/20 transition-all"
+                                            >
+                                                Close Position
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
                     {/* Trade Log */}
                     <div className="bg-white dark:bg-[#2b2616] rounded-2xl border border-slate-200 dark:border-[#f4c025]/10 p-4 md:p-6 shadow-sm">
                         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
@@ -399,6 +460,12 @@ const TradingDashboard = () => {
                                 <div className="relative flex-1 sm:flex-none">
                                     <input type="text" placeholder={t('common.search') + "..."} className="w-full sm:w-auto bg-slate-50 dark:bg-[#1e1b10] border border-slate-200 dark:border-[#f4c025]/10 rounded-lg py-2 px-4 text-sm text-slate-800 dark:text-white focus:outline-none focus:border-amber-400 dark:focus:border-[#f4c025]/50" />
                                 </div>
+                                <button
+                                    onClick={() => setIsOpenPositionModalOpen(true)}
+                                    className="bg-white dark:bg-[#1e1b10] text-amber-600 dark:text-[#f4c025] border border-slate-200 dark:border-[#f4c025]/50 px-4 py-2 rounded-lg font-bold text-sm hover:bg-amber-50 dark:hover:bg-[#f4c025]/10 transition-all active:scale-95 flex items-center justify-center gap-2 whitespace-nowrap"
+                                >
+                                    <Target size={16} /> Open Position
+                                </button>
                                 <button
                                     onClick={() => setIsLogModalOpen(true)}
                                     className="bg-amber-500 dark:bg-[#f4c025] text-white dark:text-[#2b2616] px-4 py-2 rounded-lg font-bold text-sm hover:bg-amber-600 dark:hover:bg-[#dca60e] transition-colors flex items-center justify-center gap-2 whitespace-nowrap"
@@ -493,6 +560,12 @@ const TradingDashboard = () => {
                 onClose={() => setIsLogModalOpen(false)}
                 onSave={fetchData}
             />
+            <LogTradeModal
+                isOpen={isOpenPositionModalOpen}
+                onClose={() => setIsOpenPositionModalOpen(false)}
+                onSave={fetchData}
+                mode="open"
+            />
             <WithdrawTradeModal
                 isOpen={isWithdrawModalOpen}
                 onClose={() => setIsWithdrawModalOpen(false)}
@@ -504,6 +577,13 @@ const TradingDashboard = () => {
                 isOpen={isDepositModalOpen}
                 onClose={() => setIsDepositModalOpen(false)}
                 onSuccess={fetchData}
+            />
+
+            <ClosePositionModal
+                isOpen={isCloseModalOpen}
+                onClose={() => { setIsCloseModalOpen(false); setSelectedPosition(null); }}
+                onSave={fetchData}
+                trade={selectedPosition}
             />
         </div>
     );

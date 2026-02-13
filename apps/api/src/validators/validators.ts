@@ -64,6 +64,27 @@ export const depositWithdrawSchema = z.object({
         .optional(),
 });
 
+export const openPositionSchema = z.object({
+    pair: z.string().min(1, 'Trading pair is required').max(50),
+    type: z.enum(['LONG', 'SHORT'], { message: "Type must be 'LONG' or 'SHORT'" }),
+    entryPrice: z.union([z.number(), z.string()])
+        .transform((v) => Number(v))
+        .pipe(z.number().positive('Entry price must be positive')),
+    amount: z.union([z.number(), z.string()])
+        .transform((v) => Number(v))
+        .pipe(z.number().positive('Amount must be positive')),
+    leverage: z.union([z.number(), z.string()])
+        .transform((v) => Number(v))
+        .pipe(z.number().min(1, 'Leverage must be at least 1')),
+    notes: z.string().max(500).optional(),
+});
+
+export const closePositionSchema = z.object({
+    closePrice: z.union([z.number(), z.string()])
+        .transform((v) => Number(v))
+        .pipe(z.number().positive('Close price must be positive')),
+});
+
 // ─── Savings Goal Schemas ───────────────────────────────────────────────────
 
 export const createSavingsGoalSchema = z.object({

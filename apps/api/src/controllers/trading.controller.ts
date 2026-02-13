@@ -13,6 +13,43 @@ export const tradingController = {
         }
     },
 
+    openPosition: async (req: Request, res: Response) => {
+        try {
+            const userId = (req as any).user.id;
+            const result = await tradingService.openPosition(userId, req.body);
+            res.json(result);
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ error: 'Failed to open position' });
+        }
+    },
+
+    closePosition: async (req: Request, res: Response) => {
+        try {
+            const userId = (req as any).user.id;
+            const { id } = req.params as { id: string };
+            const result = await tradingService.closePosition(userId, id, req.body);
+            res.json(result);
+        } catch (error: any) {
+            console.error(error);
+            if (error.message === 'Position not found or already closed') {
+                return res.status(404).json({ error: error.message });
+            }
+            res.status(500).json({ error: 'Failed to close position' });
+        }
+    },
+
+    getOpenPositions: async (req: Request, res: Response) => {
+        try {
+            const userId = (req as any).user.id;
+            const positions = await tradingService.getOpenPositions(userId);
+            res.json(positions);
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ error: 'Failed to fetch open positions' });
+        }
+    },
+
     getTrades: async (req: Request, res: Response) => {
         try {
             const userId = (req as any).user.id;

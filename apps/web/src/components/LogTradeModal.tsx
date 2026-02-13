@@ -6,9 +6,10 @@ interface LogTradeModalProps {
     isOpen: boolean;
     onClose: () => void;
     onSave?: () => void;
+    mode?: 'open' | 'closed';
 }
 
-const LogTradeModal: React.FC<LogTradeModalProps> = ({ isOpen, onClose, onSave }) => {
+const LogTradeModal: React.FC<LogTradeModalProps> = ({ isOpen, onClose, onSave, mode = 'closed' }) => {
     const [pair, setPair] = useState('BTC/USDT');
     const [type, setType] = useState<'LONG' | 'SHORT'>('LONG');
     const [leverage, setLeverage] = useState(20);
@@ -47,18 +48,23 @@ const LogTradeModal: React.FC<LogTradeModalProps> = ({ isOpen, onClose, onSave }
         setLoading(true);
 
         try {
-            const payload = {
+            const payload: any = {
                 pair,
                 type,
                 leverage,
                 amount: parseFloat(amount),
                 entryPrice: parseFloat(entryPrice),
-                closePrice: parseFloat(closePrice),
-                pnl: parseFloat(pnl),
                 notes
             };
 
-            await authService.fetchWithAuth('/api/trading', {
+            if (mode === 'closed') {
+                payload.closePrice = parseFloat(closePrice);
+                payload.pnl = parseFloat(pnl);
+            }
+
+            const endpoint = mode === 'open' ? '/api/trading/open' : '/api/trading';
+
+            await authService.fetchWithAuth(endpoint, {
                 method: 'POST',
                 body: JSON.stringify(payload)
             });
@@ -80,8 +86,12 @@ const LogTradeModal: React.FC<LogTradeModalProps> = ({ isOpen, onClose, onSave }
             <div className="w-full max-w-lg bg-white dark:bg-[#2b2616] border border-slate-200 dark:border-[#f4c025]/20 rounded-2xl shadow-[0_0_40px_-10px_rgba(0,0,0,0.1)] dark:shadow-[0_0_40px_-10px_rgba(244,192,37,0.1)] overflow-hidden">
                 <div className="flex items-center justify-between p-6 border-b border-slate-200 dark:border-[#f4c025]/10">
                     <div>
-                        <h2 className="text-xl font-bold text-slate-800 dark:text-white">Log New Trade</h2>
-                        <p className="text-xs text-slate-500 dark:text-[#cbbc90] mt-1">Enter your trade details to track performance.</p>
+                        <h2 className="text-xl font-bold text-slate-800 dark:text-white">
+                            {mode === 'open' ? 'Open New Position' : 'Log New Trade'}
+                        </h2>
+                        <p className="text-xs text-slate-500 dark:text-[#cbbc90] mt-1">
+                            {mode === 'open' ? 'Enter position details to start tracking.' : 'Enter your trade details to track performance.'}
+                        </p>
                     </div>
                     <button onClick={onClose} className="text-slate-400 hover:text-slate-600 dark:text-[#cbbc90] dark:hover:text-white transition-colors">
                         <X size={20} />
@@ -174,28 +184,30 @@ const LogTradeModal: React.FC<LogTradeModalProps> = ({ isOpen, onClose, onSave }
                             </div>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                                <label className="text-xs font-semibold text-slate-500 dark:text-[#cbbc90] uppercase tracking-wider">Close Price ($)</label>
-                                <input
-                                    type="number"
-                                    value={closePrice}
-                                    onChange={(e) => setClosePrice(e.target.value)}
-                                    className="w-full bg-slate-50 dark:bg-[#1e1b10] border border-slate-200 dark:border-[#f4c025]/20 rounded-lg px-4 py-3 text-slate-800 dark:text-white focus:outline-none focus:border-amber-400 dark:focus:border-[#f4c025] transition-colors"
-                                />
+                        {mode === 'closed' && (
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                    <label className="text-xs font-semibold text-slate-500 dark:text-[#cbbc90] uppercase tracking-wider">Close Price ($)</label>
+                                    <input
+                                        type="number"
+                                        value={closePrice}
+                                        onChange={(e) => setClosePrice(e.target.value)}
+                                        className="w-full bg-slate-50 dark:bg-[#1e1b10] border border-slate-200 dark:border-[#f4c025]/20 rounded-lg px-4 py-3 text-slate-800 dark:text-white focus:outline-none focus:border-amber-400 dark:focus:border-[#f4c025] transition-colors"
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-xs font-semibold text-slate-500 dark:text-[#cbbc90] uppercase tracking-wider">Realized PnL ($)</label>
+                                    <input
+                                        type="number"
+                                        value={pnl}
+                                        onChange={(e) => setPnl(e.target.value)}
+                                        className={`w-full bg-slate-50 dark:bg-[#1e1b10] border border-slate-200 dark:border-[#f4c025]/20 rounded-lg px-4 py-3 focus:outline-none focus:border-amber-400 dark:focus:border-[#f4c025] transition-colors font-bold ${parseFloat(pnl) > 0 ? 'text-emerald-500 dark:text-emerald-400' : parseFloat(pnl) < 0 ? 'text-rose-500 dark:text-rose-400' : 'text-slate-800 dark:text-white'
+                                            }`}
+                                        placeholder="+ 0.00"
+                                    />
+                                </div>
                             </div>
-                            <div className="space-y-2">
-                                <label className="text-xs font-semibold text-slate-500 dark:text-[#cbbc90] uppercase tracking-wider">Realized PnL ($)</label>
-                                <input
-                                    type="number"
-                                    value={pnl}
-                                    onChange={(e) => setPnl(e.target.value)}
-                                    className={`w-full bg-slate-50 dark:bg-[#1e1b10] border border-slate-200 dark:border-[#f4c025]/20 rounded-lg px-4 py-3 focus:outline-none focus:border-amber-400 dark:focus:border-[#f4c025] transition-colors font-bold ${parseFloat(pnl) > 0 ? 'text-emerald-500 dark:text-emerald-400' : parseFloat(pnl) < 0 ? 'text-rose-500 dark:text-rose-400' : 'text-slate-800 dark:text-white'
-                                        }`}
-                                    placeholder="+ 0.00"
-                                />
-                            </div>
-                        </div>
+                        )}
 
                         <div className="bg-slate-50 dark:bg-[#1e1b10] border border-slate-200 dark:border-[#f4c025]/10 border-dashed rounded-lg p-3">
                             <textarea
@@ -219,7 +231,7 @@ const LogTradeModal: React.FC<LogTradeModalProps> = ({ isOpen, onClose, onSave }
                                 disabled={loading}
                                 className="px-6 py-3 rounded-lg bg-amber-500 dark:bg-[#f4c025] text-white dark:text-[#2b2616] font-bold hover:bg-amber-600 dark:hover:bg-[#dca60e] transition-all transform hover:scale-[1.02] shadow-[0_4px_10px_rgba(0,0,0,0.1)] dark:shadow-[0_0_20px_-5px_rgba(244,192,37,0.5)] disabled:opacity-50"
                             >
-                                {loading ? 'Saving...' : 'Save Trade'}
+                                {loading ? 'Saving...' : mode === 'open' ? 'Open Position' : 'Save Trade'}
                             </button>
                         </div>
                     </form>
