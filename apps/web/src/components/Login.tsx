@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { authService } from '../services/authService';
-import { authClient } from '../lib/auth-client';
 import { useAppearance } from '../contexts/AppearanceContext';
 import LogoText from './LogoText';
 
@@ -47,21 +46,12 @@ const Login: React.FC<LoginProps> = ({ onLogin, onBack, defaultSignUp = false })
         }
     };
 
-    const handleGoogleSignIn = async () => {
+    const handleGoogleSignIn = () => {
         setIsLoading(true);
         setError(null);
-        try {
-            await authClient.signIn.social({
-                provider: "google",
-                callbackURL: window.location.origin + "/dashboard" // Handle via proper absolute URL
-            });
-            // Note: Better Auth social sign in usually redirects. 
-            // If it redirects, this code might not run until return.
-        } catch (err: any) {
-            console.error("Google auth failed", err);
-            setError("Google authentication failed");
-            setIsLoading(false);
-        }
+        // Redirect to our manual Google OAuth endpoint (bypasses Better Auth cookies)
+        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+        window.location.href = `${apiUrl}/api/auth/google/redirect`;
     };
 
     const toggleMode = () => {

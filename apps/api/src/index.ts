@@ -21,8 +21,11 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
-// IMPORTANT: Auth routes MUST be registered BEFORE express.json() body parser
-// The body parser can consume the request stream and interfere with Better Auth's processing
+// Manual Google OAuth routes (bypasses Better Auth's cookie-based state)
+import googleAuthRoutes from './routes/google-auth.routes.js';
+app.use('/api/auth/google', googleAuthRoutes);
+
+// Better Auth handler for email/password, sessions, etc.
 app.all("/api/auth/*splat", toNodeHandler(auth));
 
 // Body parser for all other routes
