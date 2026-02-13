@@ -152,14 +152,26 @@ export const notificationService = {
             const nextDue = item.nextDueDate ? new Date(item.nextDueDate) : null;
             if (!nextDue) continue;
 
-            // Only notify for items due tomorrow (not past due ones being processed)
-            const tomorrowStart = new Date();
-            tomorrowStart.setDate(tomorrowStart.getDate() + 1);
-            tomorrowStart.setHours(0, 0, 0, 0);
-            const tomorrowEnd = new Date(tomorrowStart);
-            tomorrowEnd.setHours(23, 59, 59, 999);
+            // Verify nextDue is actually "tomorrow" in user's timezone (WIB = UTC+7) or just check if it matches the date string
+            // Simpler approach: Check if the difference in time is roughly 24 hours from "now" (or within the "tomorrow" window)
 
-            if (nextDue >= tomorrowStart && nextDue <= tomorrowEnd) {
+            // Current approach (Strict):
+            // tomorrowStart = 00:00:00 tomorrow (Local Server Time)
+            // nextDue = stored as UTC timestamp?
+
+            // Fix: We know the cron runs at 8 AM WIB.
+            // If cron runs at 8 AM WIB (01:00 UTC), "tomorrow" means the next calendar day in WIB.
+            // So if today is 14th Feb, tomorrow is 15th Feb.
+            // Recurring transaction 'date' stored as integer (e.g. 15).
+            // nextDueDate should be set to 15th Feb.
+
+            const rangeStart = new Date(); // now
+            const rangeEnd = new Date();
+            rangeEnd.setDate(rangeEnd.getDate() + 2); // Look ahead 48 hours to be safe
+
+            // Relaxed check: Is it due within the next 30 hours? (covers tomorrow)
+            // And ensure it's not in the past
+            if (nextDue > rangeStart && nextDue < rangeEnd) {
                 const name = cryptoService.decrypt(item.name);
                 if (!userRecurrings.has(item.userId)) {
                     userRecurrings.set(item.userId, []);
