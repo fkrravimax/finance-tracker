@@ -69,8 +69,8 @@ const ClosePositionModal: React.FC<ClosePositionModalProps> = ({ isOpen, onClose
     if (!isOpen || !trade) return null;
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-            <div className="w-full max-w-md bg-white dark:bg-[#2b2616] border border-slate-200 dark:border-[#f4c025]/20 rounded-2xl shadow-[0_0_40px_-10px_rgba(0,0,0,0.1)] dark:shadow-[0_0_40px_-10px_rgba(244,192,37,0.1)] overflow-hidden flex flex-col max-h-[85vh]">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 pb-20 md:pb-4">
+            <div className="w-full max-w-md bg-white dark:bg-[#2b2616] border border-slate-200 dark:border-[#f4c025]/20 rounded-2xl shadow-[0_0_40px_-10px_rgba(0,0,0,0.1)] dark:shadow-[0_0_40px_-10px_rgba(244,192,37,0.1)] overflow-hidden flex flex-col max-h-[80vh] md:max-h-[85vh]">
                 <div className="flex items-center justify-between p-4 md:p-6 border-b border-slate-200 dark:border-[#f4c025]/10">
                     <div>
                         <h2 className="text-xl font-bold text-slate-800 dark:text-white">Close Position</h2>
@@ -81,35 +81,35 @@ const ClosePositionModal: React.FC<ClosePositionModalProps> = ({ isOpen, onClose
                     </button>
                 </div>
 
-                <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-4">
-                    {/* Position Summary */}
-                    <div className="bg-slate-50 dark:bg-[#1e1b10] rounded-xl p-4 border border-slate-200 dark:border-[#f4c025]/10 space-y-3">
-                        <div className="flex items-center justify-between">
-                            <span className="text-lg font-bold text-slate-800 dark:text-white">{trade.pair}</span>
-                            <span className={`px-2.5 py-1 rounded text-[10px] uppercase font-bold border ${trade.type === 'LONG'
-                                ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20'
-                                : 'bg-rose-500/10 text-rose-500 border-rose-500/20'
-                                }`}>
-                                {trade.type}
-                            </span>
+                <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0">
+                    <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-4">
+                        {/* Position Summary */}
+                        <div className="bg-slate-50 dark:bg-[#1e1b10] rounded-xl p-4 border border-slate-200 dark:border-[#f4c025]/10 space-y-3">
+                            <div className="flex items-center justify-between">
+                                <span className="text-lg font-bold text-slate-800 dark:text-white">{trade.pair}</span>
+                                <span className={`px-2.5 py-1 rounded text-[10px] uppercase font-bold border ${trade.type === 'LONG'
+                                    ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20'
+                                    : 'bg-rose-500/10 text-rose-500 border-rose-500/20'
+                                    }`}>
+                                    {trade.type}
+                                </span>
+                            </div>
+                            <div className="grid grid-cols-3 gap-3">
+                                <div>
+                                    <p className="text-[10px] text-slate-400 dark:text-[#cbbc90] uppercase">Entry</p>
+                                    <p className="text-sm font-bold text-slate-700 dark:text-white">${trade.entryPrice.toLocaleString()}</p>
+                                </div>
+                                <div>
+                                    <p className="text-[10px] text-slate-400 dark:text-[#cbbc90] uppercase">Margin</p>
+                                    <p className="text-sm font-bold text-slate-700 dark:text-white">${trade.amount.toLocaleString()}</p>
+                                </div>
+                                <div>
+                                    <p className="text-[10px] text-slate-400 dark:text-[#cbbc90] uppercase">Leverage</p>
+                                    <p className="text-sm font-bold text-slate-700 dark:text-white">{trade.leverage}x</p>
+                                </div>
+                            </div>
                         </div>
-                        <div className="grid grid-cols-3 gap-3">
-                            <div>
-                                <p className="text-[10px] text-slate-400 dark:text-[#cbbc90] uppercase">Entry</p>
-                                <p className="text-sm font-bold text-slate-700 dark:text-white">${trade.entryPrice.toLocaleString()}</p>
-                            </div>
-                            <div>
-                                <p className="text-[10px] text-slate-400 dark:text-[#cbbc90] uppercase">Margin</p>
-                                <p className="text-sm font-bold text-slate-700 dark:text-white">${trade.amount.toLocaleString()}</p>
-                            </div>
-                            <div>
-                                <p className="text-[10px] text-slate-400 dark:text-[#cbbc90] uppercase">Leverage</p>
-                                <p className="text-sm font-bold text-slate-700 dark:text-white">{trade.leverage}x</p>
-                            </div>
-                        </div>
-                    </div>
 
-                    <form onSubmit={handleSubmit} className="space-y-5">
                         {/* Close Price Input */}
                         <div className="space-y-2">
                             <label className="text-xs font-semibold text-slate-500 dark:text-[#cbbc90] uppercase tracking-wider">Close Price ($)</label>
@@ -118,7 +118,7 @@ const ClosePositionModal: React.FC<ClosePositionModalProps> = ({ isOpen, onClose
                                 step="any"
                                 value={closePrice}
                                 onChange={(e) => setClosePrice(e.target.value)}
-                                className="w-full bg-slate-50 dark:bg-[#1e1b10] border border-slate-200 dark:border-[#f4c025]/20 rounded-lg px-4 py-3 text-slate-800 dark:text-white focus:outline-none focus:border-amber-400 dark:focus:border-[#f4c025] transition-colors text-lg font-mono"
+                                className="w-full bg-slate-50 dark:bg-[#1e1b10] border border-slate-200 dark:border-[#f4c025]/20 rounded-lg px-4 py-2.5 text-slate-800 dark:text-white focus:outline-none focus:border-amber-400 dark:focus:border-[#f4c025] transition-colors text-lg font-mono"
                                 placeholder="0.00"
                                 required
                                 autoFocus
@@ -140,26 +140,26 @@ const ClosePositionModal: React.FC<ClosePositionModalProps> = ({ isOpen, onClose
                                 </p>
                             </div>
                         )}
+                    </div>
 
-                        {/* Actions */}
-                        <div className="flex justify-end space-x-3 pt-2">
-                            <button
-                                type="button"
-                                onClick={onClose}
-                                className="px-6 py-3 rounded-lg border border-slate-200 dark:border-[#f4c025]/30 text-slate-500 hover:text-slate-800 dark:text-[#f4c025] dark:hover:bg-[#f4c025]/10 transition-colors"
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                type="submit"
-                                disabled={loading || !closePrice}
-                                className="px-6 py-3 rounded-lg bg-amber-500 dark:bg-[#f4c025] text-white dark:text-[#2b2616] font-bold hover:bg-amber-600 dark:hover:bg-[#dca60e] transition-all transform hover:scale-[1.02] shadow-[0_4px_10px_rgba(0,0,0,0.1)] dark:shadow-[0_0_20px_-5px_rgba(244,192,37,0.5)] disabled:opacity-50"
-                            >
-                                {loading ? 'Closing...' : 'Close Position'}
-                            </button>
-                        </div>
-                    </form>
-                </div>
+                    {/* Actions */}
+                    <div className="flex justify-end space-x-3 p-4 md:p-6 border-t border-slate-200 dark:border-[#f4c025]/10 bg-white dark:bg-[#2b2616]">
+                        <button
+                            type="button"
+                            onClick={onClose}
+                            className="px-5 py-2.5 rounded-lg border border-slate-200 dark:border-[#f4c025]/30 text-slate-500 hover:text-slate-800 dark:text-[#f4c025] dark:hover:bg-[#f4c025]/10 transition-colors"
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            type="submit"
+                            disabled={loading || !closePrice}
+                            className="px-5 py-2.5 rounded-lg bg-amber-500 dark:bg-[#f4c025] text-white dark:text-[#2b2616] font-bold hover:bg-amber-600 dark:hover:bg-[#dca60e] transition-all shadow-[0_4px_10px_rgba(0,0,0,0.1)] dark:shadow-[0_0_20px_-5px_rgba(244,192,37,0.5)] disabled:opacity-50"
+                        >
+                            {loading ? 'Closing...' : 'Close Position'}
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     );
