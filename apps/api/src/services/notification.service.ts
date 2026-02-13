@@ -152,40 +152,31 @@ export const notificationService = {
             const nextDue = item.nextDueDate ? new Date(item.nextDueDate) : null;
             if (!nextDue) continue;
 
-            // Verify nextDue is actually "tomorrow" in user's timezone (WIB = UTC+7) or just check if it matches the date string
-            // Simpler approach: Check if the difference in time is roughly 24 hours from "now" (or within the "tomorrow" window)
+            // Fix: User requested notification 2 DAYS before due date.
 
-            // Current approach (Strict):
-            // tomorrowStart = 00:00:00 tomorrow (Local Server Time)
-            // nextDue = stored as UTC timestamp?
+            // Check window: 40 hours to 56 hours from now (approx 2 days)
+            const rangeStart = new Date(Date.now() + (40 * 60 * 60 * 1000));
+            const rangeEnd = new Date(Date.now() + (56 * 60 * 60 * 1000));
 
-            // Fix: We know the cron runs at 8 AM WIB.
-            // If cron runs at 8 AM WIB (01:00 UTC), "tomorrow" means the next calendar day in WIB.
-            // So if today is 14th Feb, tomorrow is 15th Feb.
-            // Recurring transaction 'date' stored as integer (e.g. 15).
-            // nextDueDate should be set to 15th Feb.
-
-            const rangeStart = new Date(); // now
-            const rangeEnd = new Date();
-            rangeEnd.setDate(rangeEnd.getDate() + 2); // Look ahead 48 hours to be safe
-
-            // Relaxed check: Is it due within the next 30 hours? (covers tomorrow)
-            // And ensure it's not in the past
-            if (nextDue > rangeStart && nextDue < rangeEnd) {
+            if (nextDue >= rangeStart && nextDue <= rangeEnd) {
                 const name = cryptoService.decrypt(item.name);
                 if (!userRecurrings.has(item.userId)) {
                     userRecurrings.set(item.userId, []);
                 }
                 userRecurrings.get(item.userId)!.push(name);
             }
+            // Also notify if it's due TOMORROW (1 day before) just in case they missed the 2-day one?
+            // User specifically asked "ensure it appears 2 days before", implies that's the key requirement.
+            // I'll stick to the 2-day window for this specific request to be precise.
+
         }
 
         for (const [userId, names] of userRecurrings) {
             try {
                 const namelist = names.join(', ');
                 const payload: PushPayload = {
-                    title: 'Tagihan Jatuh Tempo Besok! 📅',
-                    body: `${namelist} akan jatuh tempo besok. Pastikan saldo mencukupi!`,
+                    title: 'Tagihan Jatuh Tempo 2 Hari Lagi! 📅',
+                    body: `${namelist} akan jatuh tempo dalam 2 hari. Siapkan dana ya!`,
                     icon: '/icon-192.png',
                     badge: '/icon-192.png',
                     tag: 'recurring-reminder',

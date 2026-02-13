@@ -38,26 +38,23 @@ const seedRecurring = async () => {
         });
         console.log(`Created: Test Recurring Due Today (${todayDue.toISOString()})`);
 
-        // 3. Create a recurring transaction due TOMORROW (for recurring-reminder)
-        const tomorrowDue = new Date(now);
-        tomorrowDue.setDate(tomorrowDue.getDate() + 1);
-        // Ensure it has same time as "now" roughly
+        // 3. Create a recurring transaction due IN 2 DAYS (for recurring-reminder)
+        const twoDaysDue = new Date(now);
+        twoDaysDue.setDate(twoDaysDue.getDate() + 2);
 
         await db.insert(recurringTransactions).values({
             id: randomUUID(),
             userId: user.id,
-            name: cryptoService.encrypt('Test Recurring Due Tomorrow'),
+            name: cryptoService.encrypt('Test Recurring Due In 2 Days'),
             amount: cryptoService.encrypt(100000),
             frequency: 'Monthly',
-            date: tomorrowDue.getDate(),
+            date: twoDaysDue.getDate(),
             icon: '📅',
-            nextDueDate: tomorrowDue,
+            nextDueDate: twoDaysDue,
             createdAt: new Date(),
             updatedAt: new Date()
         });
-        console.log(`Created: Test Recurring Due Tomorrow (${tomorrowDue.toISOString()})`);
-
-        console.log(`Created: Test Recurring Due Tomorrow (${tomorrowDue.toISOString()})`);
+        console.log(`Created: Test Recurring Due In 2 Days (${twoDaysDue.toISOString()})`);
 
         console.log('Seed complete! Exiting in 2 seconds...');
         setTimeout(() => process.exit(0), 2000);
