@@ -83,8 +83,8 @@ const LogTradeModal: React.FC<LogTradeModalProps> = ({ isOpen, onClose, onSave, 
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-            <div className="w-full max-w-lg bg-white dark:bg-[#2b2616] border border-slate-200 dark:border-[#f4c025]/20 rounded-2xl shadow-[0_0_40px_-10px_rgba(0,0,0,0.1)] dark:shadow-[0_0_40px_-10px_rgba(244,192,37,0.1)] overflow-hidden">
-                <div className="flex items-center justify-between p-6 border-b border-slate-200 dark:border-[#f4c025]/10">
+            <div className="w-full max-w-lg bg-white dark:bg-[#2b2616] border border-slate-200 dark:border-[#f4c025]/20 rounded-2xl shadow-[0_0_40px_-10px_rgba(0,0,0,0.1)] dark:shadow-[0_0_40px_-10px_rgba(244,192,37,0.1)] overflow-hidden flex flex-col max-h-[85vh]">
+                <div className="flex items-center justify-between p-4 md:p-6 border-b border-slate-200 dark:border-[#f4c025]/10">
                     <div>
                         <h2 className="text-xl font-bold text-slate-800 dark:text-white">
                             {mode === 'open' ? 'Open New Position' : 'Log New Trade'}
@@ -98,8 +98,8 @@ const LogTradeModal: React.FC<LogTradeModalProps> = ({ isOpen, onClose, onSave, 
                     </button>
                 </div>
 
-                <div className="overflow-y-auto max-h-[80vh]">
-                    <form onSubmit={handleSubmit} className="p-6 space-y-6">
+                <div className="flex-1 overflow-y-auto">
+                    <form onSubmit={handleSubmit} className="p-4 md:p-6 space-y-4 md:space-y-6">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="space-y-2">
                                 <label className="text-xs font-semibold text-slate-500 dark:text-[#cbbc90] uppercase tracking-wider">Trading Pair</label>
@@ -170,7 +170,7 @@ const LogTradeModal: React.FC<LogTradeModalProps> = ({ isOpen, onClose, onSave, 
                                     type="number"
                                     value={amount}
                                     onChange={(e) => setAmount(e.target.value)}
-                                    className="w-full bg-slate-50 dark:bg-[#1e1b10] border border-slate-200 dark:border-[#f4c025]/20 rounded-lg px-4 py-3 text-slate-800 dark:text-white focus:outline-none focus:border-amber-400 dark:focus:border-[#f4c025] transition-colors"
+                                    className="w-full bg-slate-50 dark:bg-[#1e1b10] border border-slate-200 dark:border-[#f4c025]/20 rounded-lg px-4 py-2.5 text-slate-800 dark:text-white focus:outline-none focus:border-amber-400 dark:focus:border-[#f4c025] transition-colors"
                                 />
                             </div>
                             <div className="space-y-2">
@@ -179,7 +179,7 @@ const LogTradeModal: React.FC<LogTradeModalProps> = ({ isOpen, onClose, onSave, 
                                     type="number"
                                     value={entryPrice}
                                     onChange={(e) => setEntryPrice(e.target.value)}
-                                    className="w-full bg-slate-50 dark:bg-[#1e1b10] border border-slate-200 dark:border-[#f4c025]/20 rounded-lg px-4 py-3 text-slate-800 dark:text-white focus:outline-none focus:border-amber-400 dark:focus:border-[#f4c025] transition-colors"
+                                    className="w-full bg-slate-50 dark:bg-[#1e1b10] border border-slate-200 dark:border-[#f4c025]/20 rounded-lg px-4 py-2.5 text-slate-800 dark:text-white focus:outline-none focus:border-amber-400 dark:focus:border-[#f4c025] transition-colors"
                                 />
                             </div>
                         </div>
@@ -192,7 +192,7 @@ const LogTradeModal: React.FC<LogTradeModalProps> = ({ isOpen, onClose, onSave, 
                                         type="number"
                                         value={closePrice}
                                         onChange={(e) => setClosePrice(e.target.value)}
-                                        className="w-full bg-slate-50 dark:bg-[#1e1b10] border border-slate-200 dark:border-[#f4c025]/20 rounded-lg px-4 py-3 text-slate-800 dark:text-white focus:outline-none focus:border-amber-400 dark:focus:border-[#f4c025] transition-colors"
+                                        className="w-full bg-slate-50 dark:bg-[#1e1b10] border border-slate-200 dark:border-[#f4c025]/20 rounded-lg px-4 py-2.5 text-slate-800 dark:text-white focus:outline-none focus:border-amber-400 dark:focus:border-[#f4c025] transition-colors"
                                     />
                                 </div>
                                 <div className="space-y-2">
@@ -201,7 +201,7 @@ const LogTradeModal: React.FC<LogTradeModalProps> = ({ isOpen, onClose, onSave, 
                                         type="number"
                                         value={pnl}
                                         onChange={(e) => setPnl(e.target.value)}
-                                        className={`w-full bg-slate-50 dark:bg-[#1e1b10] border border-slate-200 dark:border-[#f4c025]/20 rounded-lg px-4 py-3 focus:outline-none focus:border-amber-400 dark:focus:border-[#f4c025] transition-colors font-bold ${parseFloat(pnl) > 0 ? 'text-emerald-500 dark:text-emerald-400' : parseFloat(pnl) < 0 ? 'text-rose-500 dark:text-rose-400' : 'text-slate-800 dark:text-white'
+                                        className={`w-full bg-slate-50 dark:bg-[#1e1b10] border border-slate-200 dark:border-[#f4c025]/20 rounded-lg px-4 py-2.5 focus:outline-none focus:border-amber-400 dark:focus:border-[#f4c025] transition-colors font-bold ${parseFloat(pnl) > 0 ? 'text-emerald-500 dark:text-emerald-400' : parseFloat(pnl) < 0 ? 'text-rose-500 dark:text-rose-400' : 'text-slate-800 dark:text-white'
                                             }`}
                                         placeholder="+ 0.00"
                                     />
@@ -214,7 +214,7 @@ const LogTradeModal: React.FC<LogTradeModalProps> = ({ isOpen, onClose, onSave, 
                                 value={notes}
                                 onChange={(e) => setNotes(e.target.value)}
                                 placeholder="Add Trade Notes..."
-                                className="w-full bg-transparent text-sm text-slate-800 dark:text-white placeholder-slate-400 dark:placeholder-[#cbbc90] resize-none focus:outline-none h-16"
+                                className="w-full bg-transparent text-sm text-slate-800 dark:text-white placeholder-slate-400 dark:placeholder-[#cbbc90] resize-none focus:outline-none h-12 md:h-16"
                             />
                         </div>
 
