@@ -280,7 +280,15 @@
         "monthly": "Bulanan",
         "weekly": "Mingguan",
         "yearly": "Tahunan",
-        "addTransaction": "Tambah Transaksi"
+        "addTransaction": "Tambah Transaksi",
+        "notifications": "Notifikasi",
+        "notificationsDesc": "Kelola preferensi notifikasi push Anda",
+        "enablePush": "Aktifkan Notifikasi Push",
+        "enablePushDesc": "Dapatkan info terbaru tentang keuangan Anda",
+        "notifyRecurring": "Tagihan Berulang",
+        "notifyBudget": "Peringatan Anggaran",
+        "notifyDaily": "Ringkasan Harian",
+        "notifyLunch": "Pengingat Makan Siang"
     },
     "landing": {
         "hero": {

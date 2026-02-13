@@ -280,7 +280,15 @@
         "monthly": "Monthly",
         "weekly": "Weekly",
         "yearly": "Yearly",
-        "addTransaction": "Add Transaction"
+        "addTransaction": "Add Transaction",
+        "notifications": "Notifications",
+        "notificationsDesc": "Manage your push notification preferences",
+        "enablePush": "Enable Push Notifications",
+        "enablePushDesc": "Receive updates about your finances",
+        "notifyRecurring": "Recurring Bills",
+        "notifyBudget": "Budget Alerts",
+        "notifyDaily": "Daily Summary",
+        "notifyLunch": "Lunch Reminder"
     },
     "landing": {
         "hero": {
