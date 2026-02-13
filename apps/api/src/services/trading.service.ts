@@ -1,7 +1,7 @@
 
 import { db } from '../db/index.js';
 import { trades, users, transactions } from '../db/schema.js';
-import { eq, desc } from "drizzle-orm";
+import { eq, desc, and } from "drizzle-orm";
 import { randomUUID } from "crypto";
 import { cryptoService } from './encryption.service.js';
 
@@ -48,7 +48,7 @@ export const tradingService = {
 
     async getTrades(userId: string) {
         const raw = await db.select().from(trades)
-            .where(eq(trades.userId, userId))
+            .where(and(eq(trades.userId, userId), eq(trades.status, 'CLOSED')))
             .orderBy(desc(trades.createdAt));
 
         return raw.map(t => ({
@@ -58,6 +58,96 @@ export const tradingService = {
             closePrice: t.closePrice ? cryptoService.decryptToNumber(t.closePrice) : null,
             pnl: t.pnl ? cryptoService.decryptToNumber(t.pnl) : null,
             notes: t.notes ? cryptoService.decrypt(t.notes) : null
+        }));
+    },
+
+    async openPosition(userId: string, data: any) {
+        const tradeId = randomUUID();
+
+        const [newTrade] = await db.insert(trades).values({
+            id: tradeId,
+            userId,
+            pair: data.pair,
+            type: data.type,
+            amount: cryptoService.encrypt(data.amount),
+            entryPrice: cryptoService.encrypt(data.entryPrice),
+            leverage: parseInt(data.leverage),
+            status: 'OPEN',
+            notes: data.notes ? cryptoService.encrypt(data.notes) : null,
+            openedAt: new Date(),
+        }).returning();
+
+        return {
+            ...newTrade,
+            amount: cryptoService.decryptToNumber(newTrade.amount),
+            entryPrice: cryptoService.decryptToNumber(newTrade.entryPrice),
+            notes: newTrade.notes ? cryptoService.decrypt(newTrade.notes) : null,
+        };
+    },
+
+    async closePosition(userId: string, tradeId: string, data: { closePrice: number }) {
+        return await db.transaction(async (tx) => {
+            // 1. Find the open trade
+            const [trade] = await tx.select().from(trades)
+                .where(and(eq(trades.id, tradeId), eq(trades.userId, userId), eq(trades.status, 'OPEN')));
+
+            if (!trade) {
+                throw new Error('Position not found or already closed');
+            }
+
+            // 2. Calculate PnL
+            const entryPrice = cryptoService.decryptToNumber(trade.entryPrice);
+            const amount = cryptoService.decryptToNumber(trade.amount);
+            const closePrice = data.closePrice;
+            const leverage = trade.leverage;
+
+            let percentage = 0;
+            if (trade.type === 'LONG') {
+                percentage = (closePrice - entryPrice) / entryPrice;
+            } else {
+                percentage = (entryPrice - closePrice) / entryPrice;
+            }
+            const pnl = amount * leverage * percentage;
+
+            // 3. Update trade to CLOSED
+            const [updatedTrade] = await tx.update(trades).set({
+                closePrice: cryptoService.encrypt(closePrice),
+                pnl: cryptoService.encrypt(pnl),
+                outcome: pnl > 0 ? 'WIN' : pnl < 0 ? 'LOSS' : 'BE',
+                status: 'CLOSED',
+                closedAt: new Date(),
+                updatedAt: new Date(),
+            }).where(eq(trades.id, tradeId)).returning();
+
+            // 4. Update user trading balance
+            const [user] = await tx.select().from(users).where(eq(users.id, userId));
+            const currentBalance = cryptoService.decryptToNumber(user.tradingBalance || '0');
+            const newBalance = currentBalance + pnl;
+
+            await tx.update(users)
+                .set({ tradingBalance: cryptoService.encrypt(newBalance) })
+                .where(eq(users.id, userId));
+
+            return {
+                ...updatedTrade,
+                amount: cryptoService.decryptToNumber(updatedTrade.amount),
+                entryPrice: cryptoService.decryptToNumber(updatedTrade.entryPrice),
+                closePrice: data.closePrice,
+                pnl,
+            };
+        });
+    },
+
+    async getOpenPositions(userId: string) {
+        const raw = await db.select().from(trades)
+            .where(and(eq(trades.userId, userId), eq(trades.status, 'OPEN')))
+            .orderBy(desc(trades.openedAt));
+
+        return raw.map(t => ({
+            ...t,
+            amount: cryptoService.decryptToNumber(t.amount),
+            entryPrice: cryptoService.decryptToNumber(t.entryPrice),
+            notes: t.notes ? cryptoService.decrypt(t.notes) : null,
         }));
     },
 
