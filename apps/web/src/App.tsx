@@ -11,6 +11,7 @@ import LandingPage from './components/LandingPage'
 import TradingDashboard from './components/TradingDashboard'
 import AdminDashboard from './components/AdminDashboard'
 import ErrorBoundary from './components/ErrorBoundary'
+import OAuthCallback from './components/OAuthCallback'
 import { authService } from './services/authService'
 import { authClient } from './lib/auth-client';
 import PrivacyPolicy from './components/PrivacyPolicy';
@@ -65,6 +66,11 @@ function App() {
     // Allow public access to Privacy Policy
     if (location.pathname === '/privacy') {
         return <PrivacyPolicy />;
+    }
+
+    // Handle OAuth callback (public route)
+    if (location.pathname === '/auth/callback') {
+        return <OAuthCallback onLogin={handleLogin} />;
     }
 
     if (isAuthChecking) {
