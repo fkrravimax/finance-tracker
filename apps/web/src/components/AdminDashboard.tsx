@@ -33,6 +33,20 @@ const AdminDashboard = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [processingId, setProcessingId] = useState<string | null>(null);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [currentPage, setCurrentPage] = useState(1);
+    const USERS_PER_PAGE = 10;
+
+    // Filter and paginate users
+    const filteredUsers = users.filter(user =>
+        user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        user.email.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+    const totalPages = Math.max(1, Math.ceil(filteredUsers.length / USERS_PER_PAGE));
+    const paginatedUsers = filteredUsers.slice(
+        (currentPage - 1) * USERS_PER_PAGE,
+        currentPage * USERS_PER_PAGE
+    );
 
     const fetchUsers = async () => {
         try {
@@ -170,7 +184,7 @@ const AdminDashboard = () => {
             )}
 
             {/* User Management Header */}
-            <div className="flex justify-between items-center">
+            <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
                 <div>
                     <h1 className="text-2xl font-bold text-gray-800 dark:text-white">{t('admin.title')}</h1>
                     <p className="text-gray-500 dark:text-gray-400 mt-1">{t('admin.subtitle')}</p>
@@ -188,6 +202,33 @@ const AdminDashboard = () => {
                 </div>
             </div>
 
+            {/* Search Bar */}
+            <div className="relative">
+                <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xl">search</span>
+                <input
+                    type="text"
+                    placeholder="Search by name or email..."
+                    value={searchQuery}
+                    onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }}
+                    className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 transition-all placeholder:text-gray-400"
+                />
+                {searchQuery && (
+                    <button
+                        onClick={() => { setSearchQuery(''); setCurrentPage(1); }}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                    >
+                        <span className="material-symbols-outlined text-lg">close</span>
+                    </button>
+                )}
+            </div>
+
+            {/* Results info */}
+            {searchQuery && (
+                <p className="text-sm text-gray-500 dark:text-gray-400 -mt-2">
+                    Showing {filteredUsers.length} of {users.length} users
+                </p>
+            )}
+
             <div className="overflow-hidden bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
                 <div className="overflow-x-auto hidden md:block">
                     <table className="w-full text-left text-sm text-gray-600 dark:text-gray-300">
@@ -200,7 +241,13 @@ const AdminDashboard = () => {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
-                            {users.map(user => (
+                            {paginatedUsers.length === 0 ? (
+                                <tr>
+                                    <td colSpan={4} className="px-6 py-12 text-center text-gray-400">
+                                        {searchQuery ? 'No users found matching your search.' : 'No users found.'}
+                                    </td>
+                                </tr>
+                            ) : paginatedUsers.map(user => (
                                 <tr key={user.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors">
                                     <td className="px-6 py-4">
                                         <div className="flex flex-col">
@@ -256,7 +303,11 @@ const AdminDashboard = () => {
 
                 {/* Mobile Card View */}
                 <div className="md:hidden flex flex-col divide-y divide-gray-100 dark:divide-gray-700">
-                    {users.map(user => (
+                    {paginatedUsers.length === 0 ? (
+                        <div className="p-8 text-center text-gray-400">
+                            {searchQuery ? 'No users found matching your search.' : 'No users found.'}
+                        </div>
+                    ) : paginatedUsers.map(user => (
                         <div key={user.id} className="p-4 space-y-3">
                             <div className="flex items-start justify-between">
                                 <div className="flex flex-col">
@@ -306,6 +357,74 @@ const AdminDashboard = () => {
                         </div>
                     ))}
                 </div>
+
+                {/* Pagination Controls */}
+                {totalPages > 1 && (
+                    <div className="flex items-center justify-between px-6 py-4 border-t border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/50">
+                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                            Page {currentPage} of {totalPages} · {filteredUsers.length} users
+                        </p>
+                        <div className="flex items-center gap-1">
+                            <button
+                                onClick={() => setCurrentPage(1)}
+                                disabled={currentPage === 1}
+                                className="p-1.5 rounded-lg text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                                title="First page"
+                            >
+                                <span className="material-symbols-outlined text-lg">first_page</span>
+                            </button>
+                            <button
+                                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                                disabled={currentPage === 1}
+                                className="p-1.5 rounded-lg text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                                title="Previous page"
+                            >
+                                <span className="material-symbols-outlined text-lg">chevron_left</span>
+                            </button>
+                            {/* Page number buttons */}
+                            {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                                let pageNum: number;
+                                if (totalPages <= 5) {
+                                    pageNum = i + 1;
+                                } else if (currentPage <= 3) {
+                                    pageNum = i + 1;
+                                } else if (currentPage >= totalPages - 2) {
+                                    pageNum = totalPages - 4 + i;
+                                } else {
+                                    pageNum = currentPage - 2 + i;
+                                }
+                                return (
+                                    <button
+                                        key={pageNum}
+                                        onClick={() => setCurrentPage(pageNum)}
+                                        className={`w-8 h-8 rounded-lg text-xs font-medium transition-colors ${currentPage === pageNum
+                                                ? 'bg-primary text-white'
+                                                : 'text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
+                                            }`}
+                                    >
+                                        {pageNum}
+                                    </button>
+                                );
+                            })}
+                            <button
+                                onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                                disabled={currentPage === totalPages}
+                                className="p-1.5 rounded-lg text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                                title="Next page"
+                            >
+                                <span className="material-symbols-outlined text-lg">chevron_right</span>
+                            </button>
+                            <button
+                                onClick={() => setCurrentPage(totalPages)}
+                                disabled={currentPage === totalPages}
+                                className="p-1.5 rounded-lg text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                                title="Last page"
+                            >
+                                <span className="material-symbols-outlined text-lg">last_page</span>
+                            </button>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );
