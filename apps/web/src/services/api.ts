@@ -12,6 +12,15 @@ const api = axios.create({
     withCredentials: true,
 });
 
+// Request Interceptor: Attach session token from localStorage as Bearer token
+api.interceptors.request.use((config) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+});
+
 // Response Interceptor: Handle auth errors (e.g., expired session)
 api.interceptors.response.use(
     (response) => response,
