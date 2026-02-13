@@ -26,17 +26,22 @@ function App() {
     // Check for saved auth session
     useEffect(() => {
         const checkAuth = async () => {
-            // Check localStorage first for speed
+            // Check localStorage first — covers both email/password and Google OAuth sessions
             if (authService.isAuthenticated()) {
                 setIsAuthenticated(true);
                 setIsAuthChecking(false);
                 return;
             }
 
-            // If strictly relying on Better Auth cookies (OAuth), check session
+            // Fallback: check Better Auth cookie session (email/password login via cookies)
             try {
                 const session = await authClient.getSession();
                 if (session.data) {
+                    // Store user data in localStorage for consistency
+                    const user = session.data.user;
+                    if (user) {
+                        localStorage.setItem('user', JSON.stringify(user));
+                    }
                     setIsAuthenticated(true);
                 }
             } catch (error) {
