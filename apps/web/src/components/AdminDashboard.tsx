@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import { authService } from '../services/authService';
 import { upgradeService } from '../services/upgradeService';
-import { Crown, Check, X } from 'lucide-react';
+import { Crown, Check, X, Trash2 } from 'lucide-react';
 
 interface User {
     id: string;
@@ -36,6 +36,12 @@ const AdminDashboard = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const USERS_PER_PAGE = 10;
+
+    // Delete user state (double confirmation)
+    const [deleteTarget, setDeleteTarget] = useState<User | null>(null);
+    const [deleteStep, setDeleteStep] = useState<0 | 1 | 2>(0); // 0=none, 1=first confirm, 2=type email
+    const [deleteConfirmEmail, setDeleteConfirmEmail] = useState('');
+    const [isDeleting, setIsDeleting] = useState(false);
 
     // Filter and paginate users
     const filteredUsers = users.filter(user =>
@@ -111,6 +117,41 @@ const AdminDashboard = () => {
             alert(result.error || 'Failed to process request');
         }
         setProcessingId(null);
+    };
+
+    // Delete user handlers
+    const openDeleteConfirm = (user: User) => {
+        setDeleteTarget(user);
+        setDeleteStep(1);
+        setDeleteConfirmEmail('');
+    };
+
+    const closeDeleteConfirm = () => {
+        setDeleteTarget(null);
+        setDeleteStep(0);
+        setDeleteConfirmEmail('');
+        setIsDeleting(false);
+    };
+
+    const handleDeleteUser = async () => {
+        if (!deleteTarget || deleteConfirmEmail !== deleteTarget.email) return;
+        setIsDeleting(true);
+        try {
+            const response = await authService.fetchWithAuth(`/api/admin/users/${deleteTarget.id}`, {
+                method: 'DELETE',
+            });
+            const data = await response.json();
+            if (data.success) {
+                setUsers(prev => prev.filter(u => u.id !== deleteTarget.id));
+                closeDeleteConfirm();
+            } else {
+                alert(data.error || 'Failed to delete user');
+                setIsDeleting(false);
+            }
+        } catch (err) {
+            console.error('Delete user failed:', err);
+            setIsDeleting(false);
+        }
     };
 
     if (loading) {
@@ -234,16 +275,17 @@ const AdminDashboard = () => {
                     <table className="w-full text-left text-sm text-gray-600 dark:text-gray-300" style={{ tableLayout: 'fixed' }}>
                         <thead className="bg-gray-50 dark:bg-gray-700/50 text-gray-900 dark:text-white border-b border-gray-100 dark:border-gray-700">
                             <tr>
-                                <th className="px-6 py-4 font-semibold whitespace-nowrap w-[40%]">{t('admin.users')}</th>
-                                <th className="px-6 py-4 font-semibold whitespace-nowrap w-[20%]">{t('admin.role')}</th>
-                                <th className="px-6 py-4 font-semibold whitespace-nowrap w-[20%]">{t('admin.plan')}</th>
-                                <th className="px-6 py-4 font-semibold whitespace-nowrap w-[20%]">{t('admin.joinedDate')}</th>
+                                <th className="px-6 py-4 font-semibold whitespace-nowrap w-[35%]">{t('admin.users')}</th>
+                                <th className="px-6 py-4 font-semibold whitespace-nowrap w-[18%]">{t('admin.role')}</th>
+                                <th className="px-6 py-4 font-semibold whitespace-nowrap w-[18%]">{t('admin.plan')}</th>
+                                <th className="px-6 py-4 font-semibold whitespace-nowrap w-[18%]">{t('admin.joinedDate')}</th>
+                                <th className="px-6 py-4 font-semibold whitespace-nowrap w-[11%] text-center">Actions</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
                             {paginatedUsers.length === 0 ? (
                                 <tr>
-                                    <td colSpan={4} className="px-6 py-12 text-center text-gray-400">
+                                    <td colSpan={5} className="px-6 py-12 text-center text-gray-400">
                                         {searchQuery ? 'No users found matching your search.' : 'No users found.'}
                                     </td>
                                 </tr>
@@ -294,6 +336,15 @@ const AdminDashboard = () => {
                                             month: 'short',
                                             day: 'numeric'
                                         })}
+                                    </td>
+                                    <td className="px-6 py-4 text-center">
+                                        <button
+                                            onClick={() => openDeleteConfirm(user)}
+                                            className="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                                            title={`Delete ${user.name}`}
+                                        >
+                                            <Trash2 className="w-4 h-4" />
+                                        </button>
                                     </td>
                                 </tr>
                             ))}
@@ -353,6 +404,14 @@ const AdminDashboard = () => {
                                     <option value="PREMIUM">Premium</option>
                                     <option value="PLATINUM">Platinum</option>
                                 </select>
+
+                                <button
+                                    onClick={() => openDeleteConfirm(user)}
+                                    className="p-2 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                                    title={`Delete ${user.name}`}
+                                >
+                                    <Trash2 className="w-4 h-4" />
+                                </button>
                             </div>
                         </div>
                     ))}
@@ -426,6 +485,103 @@ const AdminDashboard = () => {
                     </div>
                 )}
             </div>
+
+            {/* Double Confirmation Delete Modal */}
+            {deleteTarget && deleteStep > 0 && (
+                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={closeDeleteConfirm}>
+                    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full p-6 space-y-4" onClick={e => e.stopPropagation()}>
+                        {/* Step 1: First Confirmation */}
+                        {deleteStep === 1 && (
+                            <>
+                                <div className="flex items-center gap-3">
+                                    <div className="w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center flex-shrink-0">
+                                        <Trash2 className="w-6 h-6 text-red-500" />
+                                    </div>
+                                    <div>
+                                        <h3 className="text-lg font-bold text-gray-900 dark:text-white">Delete User?</h3>
+                                        <p className="text-sm text-gray-500 dark:text-gray-400">This action cannot be undone</p>
+                                    </div>
+                                </div>
+
+                                <div className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4 space-y-1">
+                                    <p className="font-medium text-gray-900 dark:text-white">{deleteTarget.name}</p>
+                                    <p className="text-sm text-gray-500 dark:text-gray-400">{deleteTarget.email}</p>
+                                    <div className="flex gap-2 mt-2">
+                                        <span className="text-xs px-2 py-0.5 rounded bg-gray-200 dark:bg-gray-600 text-gray-600 dark:text-gray-300">{deleteTarget.role}</span>
+                                        <span className="text-xs px-2 py-0.5 rounded bg-gray-200 dark:bg-gray-600 text-gray-600 dark:text-gray-300">{deleteTarget.plan}</span>
+                                    </div>
+                                </div>
+
+                                <div className="bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-800/30 rounded-xl p-3">
+                                    <p className="text-sm text-red-600 dark:text-red-400">
+                                        ⚠️ This will permanently delete <strong>all user data</strong> including wallets, transactions, budgets, savings goals, trades, and sessions.
+                                    </p>
+                                </div>
+
+                                <div className="flex gap-3 pt-2">
+                                    <button
+                                        onClick={closeDeleteConfirm}
+                                        className="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors font-medium text-sm"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        onClick={() => setDeleteStep(2)}
+                                        className="flex-1 px-4 py-2.5 rounded-xl bg-red-500 hover:bg-red-600 text-white transition-colors font-medium text-sm"
+                                    >
+                                        Yes, Continue
+                                    </button>
+                                </div>
+                            </>
+                        )}
+
+                        {/* Step 2: Type email to confirm */}
+                        {deleteStep === 2 && (
+                            <>
+                                <div className="flex items-center gap-3">
+                                    <div className="w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center flex-shrink-0">
+                                        <Trash2 className="w-6 h-6 text-red-500" />
+                                    </div>
+                                    <div>
+                                        <h3 className="text-lg font-bold text-gray-900 dark:text-white">Final Confirmation</h3>
+                                        <p className="text-sm text-gray-500 dark:text-gray-400">Type the user's email to confirm</p>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                                        Type <strong className="text-gray-900 dark:text-white select-all">{deleteTarget.email}</strong> to confirm deletion:
+                                    </p>
+                                    <input
+                                        type="text"
+                                        value={deleteConfirmEmail}
+                                        onChange={(e) => setDeleteConfirmEmail(e.target.value)}
+                                        placeholder={deleteTarget.email}
+                                        className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-800 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-red-400/40 transition-all placeholder:text-gray-300 dark:placeholder:text-gray-600"
+                                        autoFocus
+                                    />
+                                </div>
+
+                                <div className="flex gap-3 pt-2">
+                                    <button
+                                        onClick={() => { setDeleteStep(1); setDeleteConfirmEmail(''); }}
+                                        className="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors font-medium text-sm"
+                                    >
+                                        Back
+                                    </button>
+                                    <button
+                                        onClick={handleDeleteUser}
+                                        disabled={deleteConfirmEmail !== deleteTarget.email || isDeleting}
+                                        className="flex-1 px-4 py-2.5 rounded-xl bg-red-500 hover:bg-red-600 text-white transition-colors font-medium text-sm disabled:opacity-40 disabled:cursor-not-allowed"
+                                    >
+                                        {isDeleting ? 'Deleting...' : 'Delete Permanently'}
+                                    </button>
+                                </div>
+                            </>
+                        )}
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

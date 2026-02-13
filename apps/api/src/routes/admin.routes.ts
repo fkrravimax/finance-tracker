@@ -1,7 +1,7 @@
 
 import { Router, Request, Response } from 'express';
 import { db } from '../db/index.js';
-import { users, upgradeRequests } from '../db/schema.js';
+import { users, upgradeRequests, sessions, accounts, wallets, transactions, savingsGoals, budgets, recurringTransactions, trades } from '../db/schema.js';
 import { eq, desc } from 'drizzle-orm';
 import { adminMiddleware } from '../middleware/admin.middleware.js';
 
@@ -144,6 +144,53 @@ router.patch('/upgrade-requests/:id', async (req: Request, res: Response) => {
     } catch (error) {
         console.error("Error processing upgrade request:", error);
         res.status(500).json({ error: "Failed to process upgrade request" });
+    }
+});
+
+// DELETE /api/admin/users/:id - Delete a user and all their data
+router.delete('/users/:id', async (req: Request, res: Response) => {
+    try {
+        const { id } = req.params;
+        const adminUser = (req as any).user;
+
+        // Prevent admin from deleting themselves
+        if (adminUser.id === id) {
+            return res.status(400).json({ error: "You cannot delete your own account" });
+        }
+
+        // Check if user exists
+        const [targetUser] = await db.select({ id: users.id, name: users.name, email: users.email })
+            .from(users)
+            .where(eq(users.id, id as string))
+            .limit(1);
+
+        if (!targetUser) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        // Delete all user data in order (child tables first)
+        await db.delete(trades).where(eq(trades.userId, id as string));
+        await db.delete(recurringTransactions).where(eq(recurringTransactions.userId, id as string));
+        await db.delete(budgets).where(eq(budgets.userId, id as string));
+        await db.delete(savingsGoals).where(eq(savingsGoals.userId, id as string));
+        await db.delete(transactions).where(eq(transactions.userId, id as string));
+        await db.delete(wallets).where(eq(wallets.userId, id as string));
+        await db.delete(upgradeRequests).where(eq(upgradeRequests.userId, id as string));
+        await db.delete(sessions).where(eq(sessions.userId, id as string));
+        await db.delete(accounts).where(eq(accounts.userId, id as string));
+
+        // Finally, delete the user
+        await db.delete(users).where(eq(users.id, id as string));
+
+        console.log(`Admin ${adminUser.email} deleted user ${targetUser.email} (${id})`);
+
+        res.json({
+            success: true,
+            message: `User ${targetUser.name} (${targetUser.email}) has been deleted`
+        });
+    } catch (error) {
+        console.error("Error deleting user:", error);
+        res.status(500).json({ error: "Failed to delete user" });
     }
 });
 
