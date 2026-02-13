@@ -626,10 +626,10 @@ const Settings: React.FC = () => {
                             {isSubscribed && (
                                 <div className="pl-4 border-l-2 border-slate-100 dark:border-[#493f22] flex flex-col gap-4">
                                     {[
-                                        { key: 'notifyRecurring', label: t('settings.notifyRecurring'), desc: 'Get daily reminders for upcoming bill payments' },
-                                        { key: 'notifyBudget80', label: t('settings.notifyBudget'), desc: 'Alert when you reach 50% and 80% of your budget' },
-                                        { key: 'notifyDaily', label: t('settings.notifyDaily'), desc: 'Receive a daily summary of your income and expenses' },
-                                        { key: 'notifyLunch', label: t('settings.notifyLunch'), desc: 'Get a friendly lunch reminder at 12:00 PM' },
+                                        { key: 'notifyRecurring', label: t('settings.notifyRecurring'), desc: t('settings.notifyRecurringDesc') },
+                                        { key: 'notifyBudget80', label: t('settings.notifyBudget'), desc: t('settings.notifyBudgetDesc') },
+                                        { key: 'notifyDaily', label: t('settings.notifyDaily'), desc: t('settings.notifyDailyDesc') },
+                                        { key: 'notifyLunch', label: t('settings.notifyLunch'), desc: t('settings.notifyLunchDesc') },
                                     ].map((pref) => (
                                         <div key={pref.key} className="flex items-center justify-between">
                                             <div>
