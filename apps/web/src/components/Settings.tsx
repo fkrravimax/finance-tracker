@@ -9,6 +9,7 @@ import ConfirmationModal from './ConfirmationModal';
 import ProfilePictureModal from './modals/ProfilePictureModal';
 
 import { useNotification } from '../contexts/NotificationContext';
+import { usePushNotifications } from '../hooks/usePushNotifications';
 import { authService } from '../services/authService';
 
 const Settings: React.FC = () => {
@@ -227,6 +228,24 @@ const Settings: React.FC = () => {
     };
 
     // Handlers
+
+    const { isSubscribed, subscribe, unsubscribe, loading: pushLoading, isSupported } = usePushNotifications();
+
+    const handleUpdatePref = async (key: string, value: boolean) => {
+        try {
+            // Optimistic update
+            setCurrentUser((prev: any) => ({ ...prev, [key]: value }));
+
+            await authClient.updateUser({
+                [key]: value
+            } as any); // Cast to any because TS might not know about custom fields yet
+        } catch (error) {
+            console.error(`Failed to update ${key}`, error);
+            showNotification("Failed to update preference", 'error');
+            // Revert on failure
+            setCurrentUser((prev: any) => ({ ...prev, [key]: !value }));
+        }
+    };
 
 
     const handleAddRecurring = async (e: React.FormEvent) => {
@@ -561,6 +580,82 @@ const Settings: React.FC = () => {
                                     </button>
                                 </div>
                             </div>
+                        </div>
+                    )}
+                </div>
+
+                {/* Notifications Category */}
+                <div className="bg-white dark:bg-[#342d18] rounded-2xl border border-slate-100 dark:border-[#493f22] overflow-hidden shadow-sm">
+                    <button
+                        onClick={() => toggleSection('notifications')}
+                        className="w-full flex items-center justify-between p-6 bg-surface-light dark:bg-[#2b2616] hover:bg-slate-50 dark:hover:bg-[#36301d] transition-colors text-left"
+                    >
+                        <div className="flex items-center gap-3">
+                            <span className="material-symbols-outlined text-primary text-2xl">notifications</span>
+                            <div>
+                                <h2 className="text-lg font-bold text-slate-900 dark:text-white">{t('settings.notifications')}</h2>
+                                <p className="text-sm text-slate-500 dark:text-[#cbbc90]">{t('settings.notificationsDesc')}</p>
+                            </div>
+                        </div>
+                        <span className={`material-symbols-outlined text-slate-400 transition-transform ${openSection === 'notifications' ? 'rotate-180' : ''}`}>expand_more</span>
+                    </button>
+
+                    {openSection === 'notifications' && (
+                        <div className="p-6 border-t border-slate-100 dark:border-[#493f22] flex flex-col gap-6 animate-fade-in">
+
+                            {/* Master Toggle */}
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <h3 className="font-bold text-slate-900 dark:text-white">{t('settings.enablePush')}</h3>
+                                    <p className="text-sm text-slate-500 dark:text-[#cbbc90]">{t('settings.enablePushDesc')}</p>
+                                </div>
+                                <button
+                                    onClick={isSubscribed ? unsubscribe : subscribe}
+                                    disabled={pushLoading}
+                                    className={`relative w-12 h-6 rounded-full transition-colors ${isSubscribed ? 'bg-primary' : 'bg-slate-200 dark:bg-slate-700'
+                                        }`}
+                                >
+                                    <span
+                                        className={`absolute top-1 left-1 w-4 h-4 rounded-full bg-white transition-transform ${isSubscribed ? 'translate-x-6' : 'translate-x-0'
+                                            }`}
+                                    />
+                                </button>
+                            </div>
+
+                            {/* Preference Toggles (Only visible if subscribed) */}
+                            {isSubscribed && (
+                                <div className="pl-4 border-l-2 border-slate-100 dark:border-[#493f22] flex flex-col gap-4">
+                                    {[
+                                        { key: 'notifyRecurring', label: t('settings.notifyRecurring'), desc: 'Get daily reminders for upcoming bill payments' },
+                                        { key: 'notifyBudget80', label: t('settings.notifyBudget'), desc: 'Alert when you reach 50% and 80% of your budget' },
+                                        { key: 'notifyDaily', label: t('settings.notifyDaily'), desc: 'Receive a daily summary of your income and expenses' },
+                                        { key: 'notifyLunch', label: t('settings.notifyLunch'), desc: 'Get a friendly lunch reminder at 12:00 PM' },
+                                    ].map((pref) => (
+                                        <div key={pref.key} className="flex items-center justify-between">
+                                            <div>
+                                                <h4 className="font-bold text-slate-800 dark:text-white text-sm">{pref.label}</h4>
+                                                <p className="text-xs text-slate-500 dark:text-[#cbbc90]">{pref.desc}</p>
+                                            </div>
+                                            <button
+                                                onClick={() => handleUpdatePref(pref.key, !currentUser?.[pref.key])}
+                                                className={`relative w-10 h-5 rounded-full transition-colors ${currentUser?.[pref.key] !== false ? 'bg-primary/80' : 'bg-slate-200 dark:bg-slate-700'
+                                                    }`}
+                                            >
+                                                <span
+                                                    className={`absolute top-1 left-1 w-3 h-3 rounded-full bg-white transition-transform ${currentUser?.[pref.key] !== false ? 'translate-x-5' : 'translate-x-0'
+                                                        }`}
+                                                />
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+
+                            {!isSupported && (
+                                <div className="p-4 bg-red-50 dark:bg-red-900/10 text-red-600 dark:text-red-400 rounded-xl text-sm border border-red-100 dark:border-red-900/30">
+                                    Push notifications are not supported in this browser.
+                                </div>
+                            )}
                         </div>
                     )}
                 </div>

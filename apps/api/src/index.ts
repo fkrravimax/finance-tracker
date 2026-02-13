@@ -80,6 +80,9 @@ app.use('/api/ai', authMiddleware, aiRoutes);
 import walletRoutes from './routes/wallet.routes.js';
 app.use('/api/wallets', authMiddleware, walletRoutes);
 
+import notificationRoutes from './routes/notification.routes.js';
+app.use('/api/notifications', authMiddleware, notificationRoutes);
+
 // Health Check
 app.get('/api/health', (req, res) => {
     res.json({ status: 'ok', timestamp: new Date() });
