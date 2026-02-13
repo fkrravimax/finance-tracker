@@ -231,13 +231,13 @@ const AdminDashboard = () => {
 
             <div className="overflow-hidden bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
                 <div className="overflow-x-auto hidden md:block">
-                    <table className="w-full text-left text-sm text-gray-600 dark:text-gray-300">
+                    <table className="w-full text-left text-sm text-gray-600 dark:text-gray-300" style={{ tableLayout: 'fixed' }}>
                         <thead className="bg-gray-50 dark:bg-gray-700/50 text-gray-900 dark:text-white border-b border-gray-100 dark:border-gray-700">
                             <tr>
-                                <th className="px-6 py-4 font-semibold whitespace-nowrap">{t('admin.users')}</th>
-                                <th className="px-6 py-4 font-semibold whitespace-nowrap">{t('admin.role')}</th>
-                                <th className="px-6 py-4 font-semibold whitespace-nowrap">{t('admin.plan')}</th>
-                                <th className="px-6 py-4 font-semibold whitespace-nowrap">{t('admin.joinedDate')}</th>
+                                <th className="px-6 py-4 font-semibold whitespace-nowrap w-[40%]">{t('admin.users')}</th>
+                                <th className="px-6 py-4 font-semibold whitespace-nowrap w-[20%]">{t('admin.role')}</th>
+                                <th className="px-6 py-4 font-semibold whitespace-nowrap w-[20%]">{t('admin.plan')}</th>
+                                <th className="px-6 py-4 font-semibold whitespace-nowrap w-[20%]">{t('admin.joinedDate')}</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
@@ -398,8 +398,8 @@ const AdminDashboard = () => {
                                         key={pageNum}
                                         onClick={() => setCurrentPage(pageNum)}
                                         className={`w-8 h-8 rounded-lg text-xs font-medium transition-colors ${currentPage === pageNum
-                                                ? 'bg-primary text-white'
-                                                : 'text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
+                                            ? 'bg-primary text-white'
+                                            : 'text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
                                             }`}
                                     >
                                         {pageNum}
