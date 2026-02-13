@@ -26,8 +26,8 @@ api.interceptors.response.use(
     (response) => response,
     (error) => {
         if (error.response?.status === 401) {
-            // Session expired or invalid — clean up local state
-            localStorage.removeItem('user');
+            // Session expired or invalid — clear token but keep user for graceful re-login
+            localStorage.removeItem('token');
         }
         return Promise.reject(error);
     }
