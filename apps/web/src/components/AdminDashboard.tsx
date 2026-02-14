@@ -431,46 +431,67 @@ const AdminDashboard = () => {
                 )}
             </div>
 
-            {/* Results info */}
-            {searchQuery && (
-                <p className="text-sm text-gray-500 dark:text-gray-400 -mt-2">
-                    Showing {filteredUsers.length} of {users.length} users
+            {/* Results info & Rows per page */}
+            <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-2">
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                    Showing <span className="font-medium text-gray-900 dark:text-white">{filteredUsers.length > 0 ? (currentPage - 1) * USERS_PER_PAGE + 1 : 0}</span> to <span className="font-medium text-gray-900 dark:text-white">{Math.min(currentPage * USERS_PER_PAGE, filteredUsers.length)}</span> of <span className="font-medium text-gray-900 dark:text-white">{filteredUsers.length}</span> users
                 </p>
-            )}
 
-            <div className="overflow-hidden bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
-                <div className="overflow-x-auto hidden md:block">
+                <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+                    <span>Rows per page:</span>
+                    <select
+                        value={usersPerPage}
+                        onChange={(e) => {
+                            setUsersPerPage(Number(e.target.value));
+                            setCurrentPage(1);
+                        }}
+                        className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-primary/40"
+                    >
+                        <option value={10}>10</option>
+                        <option value={25}>25</option>
+                        <option value={50}>50</option>
+                        <option value={100}>100</option>
+                    </select>
+                </div>
+            </div>
+
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col h-[600px] max-h-[calc(100vh-280px)]">
+                {/* Desktop Table View - Scrollable Container */}
+                <div className="overflow-auto flex-1 hidden md:block relative custom-scrollbar">
                     <table className="w-full text-left text-sm text-gray-600 dark:text-gray-300" style={{ tableLayout: 'fixed' }}>
-                        <thead className="bg-gray-50 dark:bg-gray-700/50 text-gray-900 dark:text-white border-b border-gray-100 dark:border-gray-700">
+                        <thead className="bg-gray-50 dark:bg-gray-700/50 text-gray-900 dark:text-white border-b border-gray-100 dark:border-gray-700 sticky top-0 z-10 backdrop-blur-sm bg-gray-50/90 dark:bg-gray-800/90">
                             <tr>
-                                <th className="px-6 py-4 font-semibold whitespace-nowrap w-[35%]">{t('admin.users')}</th>
-                                <th className="px-6 py-4 font-semibold whitespace-nowrap w-[18%]">{t('admin.role')}</th>
-                                <th className="px-6 py-4 font-semibold whitespace-nowrap w-[18%]">{t('admin.plan')}</th>
-                                <th className="px-6 py-4 font-semibold whitespace-nowrap w-[18%]">{t('admin.joinedDate')}</th>
-                                <th className="px-6 py-4 font-semibold whitespace-nowrap w-[11%] text-center">Actions</th>
+                                <th className="px-6 py-4 font-semibold whitespace-nowrap w-[35%] tracking-wide text-xs uppercase text-gray-500 dark:text-gray-400">{t('admin.users')}</th>
+                                <th className="px-6 py-4 font-semibold whitespace-nowrap w-[18%] tracking-wide text-xs uppercase text-gray-500 dark:text-gray-400">{t('admin.role')}</th>
+                                <th className="px-6 py-4 font-semibold whitespace-nowrap w-[18%] tracking-wide text-xs uppercase text-gray-500 dark:text-gray-400">{t('admin.plan')}</th>
+                                <th className="px-6 py-4 font-semibold whitespace-nowrap w-[18%] tracking-wide text-xs uppercase text-gray-500 dark:text-gray-400">{t('admin.joinedDate')}</th>
+                                <th className="px-6 py-4 font-semibold whitespace-nowrap w-[11%] text-center tracking-wide text-xs uppercase text-gray-500 dark:text-gray-400">Actions</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
                             {paginatedUsers.length === 0 ? (
                                 <tr>
-                                    <td colSpan={5} className="px-6 py-12 text-center text-gray-400">
-                                        {searchQuery ? 'No users found matching your search.' : 'No users found.'}
+                                    <td colSpan={5} className="px-6 py-24 text-center text-gray-400">
+                                        <div className="flex flex-col items-center justify-center gap-2">
+                                            <span className="text-4xl">🔍</span>
+                                            <p>{searchQuery ? 'No users found matching your search.' : 'No users found.'}</p>
+                                        </div>
                                     </td>
                                 </tr>
-                            ) : paginatedUsers.map(user => (
-                                <tr key={user.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors">
+                            ) : paginatedUsers.map((user, index) => (
+                                <tr key={user.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors group">
                                     <td className="px-6 py-4">
                                         <div className="flex flex-col">
-                                            <span className="font-medium text-gray-900 dark:text-white">{user.name}</span>
+                                            <span className="font-medium text-gray-900 dark:text-white group-hover:text-primary transition-colors">{user.name}</span>
                                             <span className="text-xs text-gray-500">{user.email}</span>
                                         </div>
                                     </td>
                                     <td className="px-6 py-4">
                                         <span className={`
-                                            px-2.5 py-1 rounded-full text-xs font-medium inline-flex items-center gap-1.5
+                                            px-2.5 py-1 rounded-full text-xs font-medium inline-flex items-center gap-1.5 border
                                             ${user.role === 'ADMIN'
-                                                ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300'
-                                                : 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300'}
+                                                ? 'bg-purple-50 text-purple-700 border-purple-100 dark:bg-purple-900/20 dark:text-purple-300 dark:border-purple-800/50'
+                                                : 'bg-gray-50 text-gray-700 border-gray-100 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700'}
                                         `}>
                                             <Shield className="w-3.5 h-3.5" />
                                             {user.role}
@@ -478,19 +499,19 @@ const AdminDashboard = () => {
                                     </td>
                                     <td className="px-6 py-4">
                                         <span className={`
-                                            px-2.5 py-1 rounded-full text-xs font-medium inline-flex items-center gap-1.5
+                                            px-2.5 py-1 rounded-full text-xs font-medium inline-flex items-center gap-1.5 border
                                             ${user.plan === 'PLATINUM'
-                                                ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300'
+                                                ? 'bg-amber-50 text-amber-700 border-amber-100 dark:bg-amber-900/20 dark:text-amber-300 dark:border-amber-800/50'
                                                 : user.plan === 'PREMIUM'
-                                                    ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300'
-                                                    : 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300'}
+                                                    ? 'bg-blue-50 text-blue-700 border-blue-100 dark:bg-blue-900/20 dark:text-blue-300 dark:border-blue-800/50'
+                                                    : 'bg-gray-50 text-gray-700 border-gray-100 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700'}
                                         `}>
                                             {user.plan === 'PLATINUM' && <Crown className="w-3.5 h-3.5" />}
                                             {user.plan === 'PREMIUM' && <CreditCard className="w-3.5 h-3.5" />}
                                             {user.plan}
                                         </span>
                                     </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-gray-500 text-xs">
+                                    <td className="px-6 py-4 whitespace-nowrap text-gray-500 text-xs font-mono">
                                         {new Date(user.createdAt).toLocaleDateString(undefined, {
                                             year: 'numeric',
                                             month: 'short',
@@ -503,15 +524,20 @@ const AdminDashboard = () => {
                                                 e.stopPropagation();
                                                 setActiveActionMenu(activeActionMenu === user.id ? null : user.id);
                                             }}
-                                            className={`p-2 rounded-lg transition-colors ${activeActionMenu === user.id ? 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white' : 'text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-600 dark:hover:text-gray-300'}`}
+                                            className={`p-2 rounded-lg transition-all transform active:scale-95 ${activeActionMenu === user.id ? 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm' : 'text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-600 dark:hover:text-gray-300'}`}
                                         >
                                             <MoreVertical className="w-4 h-4" />
                                         </button>
 
                                         {activeActionMenu === user.id && (
-                                            <div className="absolute right-8 top-8 w-48 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-100 dark:border-gray-700 z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-100 text-left">
+                                            <div className={`fixed z-50 w-48 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-100 dark:border-gray-700 overflow-hidden animate-in fade-in zoom-in-95 duration-100 text-left`}
+                                                 style={{
+                                                     right: 'max(16px, calc(100vw - ' + (e.currentTarget.getBoundingClientRect().right) + 'px))',
+                                                     top: Math.min(window.innerHeight - 200, e.currentTarget.getBoundingClientRect().bottom + 8) + 'px'
+                                                 }}
+                                            >
                                                 <div className="p-2 border-b border-gray-100 dark:border-gray-700">
-                                                    <p className="px-2 py-1 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Role</p>
+                                                    <p className="px-2 py-1 text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Role Management</p>
                                                     <button
                                                         onClick={() => handleUpdate(user.id, 'role', user.role === 'ADMIN' ? 'USER' : 'ADMIN')}
                                                         className="w-full text-left px-2 py-1.5 text-sm rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200"
@@ -519,9 +545,9 @@ const AdminDashboard = () => {
                                                         {user.role === 'ADMIN' ? 'Demote to User' : 'Promote to Admin'}
                                                     </button>
                                                 </div>
-
+                                                
                                                 <div className="p-2 border-b border-gray-100 dark:border-gray-700">
-                                                    <p className="px-2 py-1 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Plan</p>
+                                                    <p className="px-2 py-1 text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Plan Management</p>
                                                     {['FREE', 'PREMIUM', 'PLATINUM'].map((plan) => (
                                                         <button
                                                             key={plan}
@@ -555,8 +581,8 @@ const AdminDashboard = () => {
                     </table>
                 </div>
 
-                {/* Mobile Card View */}
-                <div className="md:hidden flex flex-col divide-y divide-gray-100 dark:divide-gray-700">
+                {/* Mobile Card View (Scrollable) */}
+                <div className="md:hidden flex flex-col divide-y divide-gray-100 dark:divide-gray-700 overflow-auto flex-1">
                     {paginatedUsers.length === 0 ? (
                         <div className="p-8 text-center text-gray-400">
                             {searchQuery ? 'No users found matching your search.' : 'No users found.'}
@@ -569,7 +595,7 @@ const AdminDashboard = () => {
                                     <span className="text-xs text-gray-500">{user.email}</span>
                                 </div>
                                 <div className="flex items-center gap-2">
-                                    <span className="text-xs text-gray-400">
+                                    <span className="text-xs text-gray-400 font-mono">
                                         {new Date(user.createdAt).toLocaleDateString(undefined, {
                                             month: 'short',
                                             day: 'numeric'
@@ -589,21 +615,21 @@ const AdminDashboard = () => {
 
                             <div className="flex items-center gap-2">
                                 <span className={`
-                                    px-2.5 py-1 rounded-full text-xs font-medium inline-flex items-center gap-1.5
+                                    px-2.5 py-1 rounded-full text-xs font-medium inline-flex items-center gap-1.5 border
                                     ${user.role === 'ADMIN'
-                                        ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300'
-                                        : 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300'}
+                                        ? 'bg-purple-50 text-purple-700 border-purple-100 dark:bg-purple-900/20 dark:text-purple-300 dark:border-purple-800'
+                                        : 'bg-gray-50 text-gray-700 border-gray-100 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600'}
                                 `}>
                                     <Shield className="w-3.5 h-3.5" />
                                     {user.role}
                                 </span>
                                 <span className={`
-                                    px-2.5 py-1 rounded-full text-xs font-medium inline-flex items-center gap-1.5
+                                    px-2.5 py-1 rounded-full text-xs font-medium inline-flex items-center gap-1.5 border
                                     ${user.plan === 'PLATINUM'
-                                        ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300'
+                                        ? 'bg-amber-50 text-amber-700 border-amber-100 dark:bg-amber-900/20 dark:text-amber-300 dark:border-amber-800'
                                         : user.plan === 'PREMIUM'
-                                            ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300'
-                                            : 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300'}
+                                            ? 'bg-blue-50 text-blue-700 border-blue-100 dark:bg-blue-900/20 dark:text-blue-300 dark:border-blue-800'
+                                            : 'bg-gray-50 text-gray-700 border-gray-100 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600'}
                                 `}>
                                     {user.plan === 'PLATINUM' && <Crown className="w-3.5 h-3.5" />}
                                     {user.plan === 'PREMIUM' && <CreditCard className="w-3.5 h-3.5" />}
@@ -612,9 +638,16 @@ const AdminDashboard = () => {
                             </div>
 
                             {activeActionMenu === user.id && (
-                                <div className={`absolute right-4 ${index > paginatedUsers.length - 3 ? 'bottom-12' : 'top-10'} w-48 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-100 dark:border-gray-700 z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-100 text-left`}>
+                                <div className={`absolute right-4 z-50 w-48 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-100 dark:border-gray-700 overflow-hidden animate-in fade-in zoom-in-95 duration-100 text-left`}
+                                     style={{
+                                        top: 'auto',
+                                        bottom: index > paginatedUsers.length - 3 ? '100%' : 'auto',
+                                        marginTop: '4px',
+                                        marginBottom: '4px'
+                                     }}
+                                >
                                     <div className="p-2 border-b border-gray-100 dark:border-gray-700">
-                                        <p className="px-2 py-1 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Role</p>
+                                        <p className="px-2 py-1 text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Role</p>
                                         <button
                                             onClick={() => handleUpdate(user.id, 'role', user.role === 'ADMIN' ? 'USER' : 'ADMIN')}
                                             className="w-full text-left px-2 py-1.5 text-sm rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200"
@@ -622,9 +655,9 @@ const AdminDashboard = () => {
                                             {user.role === 'ADMIN' ? 'Demote to User' : 'Promote to Admin'}
                                         </button>
                                     </div>
-
+                                    
                                     <div className="p-2 border-b border-gray-100 dark:border-gray-700">
-                                        <p className="px-2 py-1 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Plan</p>
+                                        <p className="px-2 py-1 text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Plan</p>
                                         {['FREE', 'PREMIUM', 'PLATINUM'].map((plan) => (
                                             <button
                                                 key={plan}
@@ -655,9 +688,9 @@ const AdminDashboard = () => {
                     ))}
                 </div>
 
-                {/* Pagination Controls */}
+                {/* Pagination Controls - Fixed at bottom */}
                 {totalPages > 1 && (
-                    <div className="flex items-center justify-between px-6 py-4 border-t border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/50">
+                    <div className="flex flex-col sm:flex-row items-center justify-between px-6 py-4 border-t border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 rounded-b-xl z-10 shrink-0">
                         <p className="text-xs text-gray-500 dark:text-gray-400">
                             Page {currentPage} of {totalPages} · {filteredUsers.length} users
                         </p>
