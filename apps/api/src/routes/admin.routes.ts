@@ -184,18 +184,19 @@ router.post('/notifications/broadcast', async (req: Request, res: Response) => {
         };
 
         // Send in background to avoid blocking response for too long
-        pushService.sendToMultipleUsers(userIds, payload)
-            .then(results => {
-                console.log('[DEBUG] Broadcast results:', JSON.stringify(results));
-            })
-            .catch(err =>
-                console.error("[ADMIN] Broadcast failed:", err)
-            );
+        // UPDATE: Must await in serverless environment!
+        const results = await pushService.sendToMultipleUsers(userIds, payload);
+
+        console.log('[DEBUG] Broadcast results:', JSON.stringify(results));
+
+        const successCount = results.filter(r => r.status === 'fulfilled').length;
+        const failCount = results.filter(r => r.status === 'rejected').length;
 
         res.json({
             success: true,
-            message: `Broadcast queued for ${userIds.length} users`,
-            count: userIds.length
+            message: `Broadcast completed. Success: ${successCount}, Failed: ${failCount}`,
+            count: userIds.length,
+            details: { success: successCount, failed: failCount }
         });
     } catch (error) {
         console.error("Error sending broadcast:", error);
