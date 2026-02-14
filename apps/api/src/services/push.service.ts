@@ -91,13 +91,14 @@ export const pushService = {
     },
 
     async sendToMultipleUsers(userIds: string[], payload: PushPayload) {
-        for (const userId of userIds) {
-            try {
-                await this.sendToUser(userId, payload);
-            } catch (error) {
+        const promises = userIds.map(userId =>
+            this.sendToUser(userId, payload).catch(error => {
                 console.error(`[PUSH] Failed to send to user ${userId}:`, error);
-            }
-        }
+                throw error; // Re-throw to be caught by allSettled as rejected
+            })
+        );
+
+        return Promise.allSettled(promises);
     },
 
     getVapidPublicKey() {
