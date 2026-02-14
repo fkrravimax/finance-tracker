@@ -478,7 +478,7 @@ const AdminDashboard = () => {
                                         </div>
                                     </td>
                                 </tr>
-                            ) : paginatedUsers.map((user, index) => (
+                            ) : paginatedUsers.map((user) => (
                                 <tr key={user.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors group">
                                     <td className="px-6 py-4">
                                         <div className="flex flex-col">
@@ -530,12 +530,7 @@ const AdminDashboard = () => {
                                         </button>
 
                                         {activeActionMenu === user.id && (
-                                            <div className={`fixed z-50 w-48 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-100 dark:border-gray-700 overflow-hidden animate-in fade-in zoom-in-95 duration-100 text-left`}
-                                                 style={{
-                                                     right: 'max(16px, calc(100vw - ' + (e.currentTarget.getBoundingClientRect().right) + 'px))',
-                                                     top: Math.min(window.innerHeight - 200, e.currentTarget.getBoundingClientRect().bottom + 8) + 'px'
-                                                 }}
-                                            >
+                                            <div className="absolute right-8 top-8 w-48 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-100 dark:border-gray-700 z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-100 text-left">
                                                 <div className="p-2 border-b border-gray-100 dark:border-gray-700">
                                                     <p className="px-2 py-1 text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Role Management</p>
                                                     <button
@@ -545,7 +540,7 @@ const AdminDashboard = () => {
                                                         {user.role === 'ADMIN' ? 'Demote to User' : 'Promote to Admin'}
                                                     </button>
                                                 </div>
-                                                
+
                                                 <div className="p-2 border-b border-gray-100 dark:border-gray-700">
                                                     <p className="px-2 py-1 text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Plan Management</p>
                                                     {['FREE', 'PREMIUM', 'PLATINUM'].map((plan) => (
@@ -639,12 +634,12 @@ const AdminDashboard = () => {
 
                             {activeActionMenu === user.id && (
                                 <div className={`absolute right-4 z-50 w-48 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-100 dark:border-gray-700 overflow-hidden animate-in fade-in zoom-in-95 duration-100 text-left`}
-                                     style={{
+                                    style={{
                                         top: 'auto',
                                         bottom: index > paginatedUsers.length - 3 ? '100%' : 'auto',
                                         marginTop: '4px',
                                         marginBottom: '4px'
-                                     }}
+                                    }}
                                 >
                                     <div className="p-2 border-b border-gray-100 dark:border-gray-700">
                                         <p className="px-2 py-1 text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Role</p>
@@ -655,7 +650,7 @@ const AdminDashboard = () => {
                                             {user.role === 'ADMIN' ? 'Demote to User' : 'Promote to Admin'}
                                         </button>
                                     </div>
-                                    
+
                                     <div className="p-2 border-b border-gray-100 dark:border-gray-700">
                                         <p className="px-2 py-1 text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Plan</p>
                                         {['FREE', 'PREMIUM', 'PLATINUM'].map((plan) => (
