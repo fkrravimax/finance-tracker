@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import { authService } from '../services/authService';
 import { upgradeService } from '../services/upgradeService';
-import { Crown, Check, X, Trash2 } from 'lucide-react';
+import { Crown, Check, X, Trash2, Bell, Send } from 'lucide-react';
 
 interface User {
     id: string;
@@ -154,6 +154,48 @@ const AdminDashboard = () => {
         }
     };
 
+    // Broadcast Notification State
+    const [broadcastTitle, setBroadcastTitle] = useState('');
+    const [broadcastBody, setBroadcastBody] = useState('');
+    const [isSendingBroadcast, setIsSendingBroadcast] = useState(false);
+
+    const handleSendBroadcast = async () => {
+        if (!broadcastBody.trim()) {
+            alert("Please enter a message body");
+            return;
+        }
+
+        if (!confirm("Are you sure you want to send this notification to ALL users?")) {
+            return;
+        }
+
+        setIsSendingBroadcast(true);
+        try {
+            const response = await authService.fetchWithAuth('/api/admin/notifications/broadcast', {
+                method: 'POST',
+                body: JSON.stringify({
+                    title: broadcastTitle,
+                    body: broadcastBody
+                }),
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                alert(`Broadcast sent successfully to ${data.count} users!`);
+                setBroadcastTitle('');
+                setBroadcastBody('');
+            } else {
+                alert(data.error || "Failed to send broadcast");
+            }
+        } catch (err) {
+            console.error("Failed to send broadcast:", err);
+            alert("An error occurred while sending broadcast");
+        } finally {
+            setIsSendingBroadcast(false);
+        }
+    };
+
     if (loading) {
         return (
             <div className="flex justify-center items-center h-full">
@@ -223,6 +265,84 @@ const AdminDashboard = () => {
                     </div>
                 </div>
             )}
+
+            {/* Broadcast Notification Section */}
+            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-xl border border-blue-200 dark:border-blue-800/50 p-6">
+                <div className="flex items-center gap-3 mb-4">
+                    <div className="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center">
+                        <Bell className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                        <h2 className="text-lg font-bold text-blue-900 dark:text-blue-300">Broadcast Notification</h2>
+                        <p className="text-sm text-blue-700 dark:text-blue-400">Send push notifications to all users</p>
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-4">
+                        <div>
+                            <label className="block text-sm font-medium text-blue-900 dark:text-blue-300 mb-1">
+                                Title (Optional)
+                            </label>
+                            <input
+                                type="text"
+                                placeholder="Info Admin 📢"
+                                value={broadcastTitle}
+                                onChange={(e) => setBroadcastTitle(e.target.value)}
+                                className="w-full px-4 py-2 rounded-lg border border-blue-200 dark:border-blue-800 bg-white dark:bg-gray-800 text-gray-800 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/40"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-blue-900 dark:text-blue-300 mb-1">
+                                Message <span className="text-red-500">*</span>
+                            </label>
+                            <textarea
+                                placeholder="Write your update or announcement here..."
+                                value={broadcastBody}
+                                onChange={(e) => setBroadcastBody(e.target.value)}
+                                rows={3}
+                                className="w-full px-4 py-2 rounded-lg border border-blue-200 dark:border-blue-800 bg-white dark:bg-gray-800 text-gray-800 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/40 resize-none"
+                            />
+                        </div>
+                        <div className="flex justify-end">
+                            <button
+                                onClick={handleSendBroadcast}
+                                disabled={isSendingBroadcast || !broadcastBody.trim()}
+                                className="flex items-center gap-2 px-6 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed shadow-md shadow-blue-500/20"
+                            >
+                                {isSendingBroadcast ? (
+                                    <>Processing...</>
+                                ) : (
+                                    <>
+                                        <Send className="w-4 h-4" />
+                                        Send Broadcast
+                                    </>
+                                )}
+                            </button>
+                        </div>
+                    </div>
+
+                    <div className="hidden md:flex items-center justify-center bg-white/50 dark:bg-black/20 rounded-xl p-6 border border-blue-100 dark:border-blue-900/30">
+                        <div className="text-center space-y-2 max-w-xs">
+                            <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/50 rounded-full flex items-center justify-center mx-auto text-4xl">
+                                📢
+                            </div>
+                            <h3 className="font-medium text-gray-900 dark:text-white">Example Preview</h3>
+                            <div className="bg-white dark:bg-gray-800 rounded-lg p-3 shadow-sm text-left border border-gray-100 dark:border-gray-700">
+                                <p className="font-semibold text-sm text-gray-900 dark:text-white mb-1">
+                                    {broadcastTitle || 'Info Admin 📢'}
+                                </p>
+                                <p className="text-xs text-gray-600 dark:text-gray-400 line-clamp-2">
+                                    {broadcastBody || 'Your message will appear here...'}
+                                </p>
+                            </div>
+                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                                This will be sent to all users who have enabled "Info/Update" notifications.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             {/* User Management Header */}
             <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
