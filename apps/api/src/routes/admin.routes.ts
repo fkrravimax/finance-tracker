@@ -162,9 +162,12 @@ router.post('/notifications/broadcast', async (req: Request, res: Response) => {
             .from(users)
             .where(eq(users.notifyInfo, true));
 
+        console.log(`[DEBUG] Eligible users count: ${eligibleUsers.length}`);
+
         const userIds = eligibleUsers.map(u => u.id);
 
         if (userIds.length === 0) {
+            console.log('[DEBUG] No eligible users found for broadcast');
             return res.json({ success: true, message: "No users subscribed to info notifications", count: 0 });
         }
 
@@ -181,9 +184,13 @@ router.post('/notifications/broadcast', async (req: Request, res: Response) => {
         };
 
         // Send in background to avoid blocking response for too long
-        pushService.sendToMultipleUsers(userIds, payload).catch(err =>
-            console.error("[ADMIN] Broadcast failed:", err)
-        );
+        pushService.sendToMultipleUsers(userIds, payload)
+            .then(results => {
+                console.log('[DEBUG] Broadcast results:', JSON.stringify(results));
+            })
+            .catch(err =>
+                console.error("[ADMIN] Broadcast failed:", err)
+            );
 
         res.json({
             success: true,
