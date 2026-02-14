@@ -15,6 +15,7 @@ export const users = pgTable("user", {
     notifyDaily: boolean("notify_daily").default(false),
     notifyLunch: boolean("notify_lunch").default(true),
     notifyRecurring: boolean("notify_recurring").default(true),
+    notifyInfo: boolean("notify_info").default(true),
     tradingBalance: text("trading_balance").default("0").notNull(),
     createdAt: timestamp("created_at").notNull(),
     updatedAt: timestamp("updated_at").notNull(),

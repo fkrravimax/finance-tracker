@@ -4,6 +4,7 @@ import { db } from '../db/index.js';
 import { users, upgradeRequests, sessions, accounts, wallets, transactions, savingsGoals, budgets, recurringTransactions, trades } from '../db/schema.js';
 import { eq, desc } from 'drizzle-orm';
 import { adminMiddleware } from '../middleware/admin.middleware.js';
+import { pushService, type PushPayload } from '../services/push.service.js';
 
 const router = Router();
 
@@ -144,6 +145,54 @@ router.patch('/upgrade-requests/:id', async (req: Request, res: Response) => {
     } catch (error) {
         console.error("Error processing upgrade request:", error);
         res.status(500).json({ error: "Failed to process upgrade request" });
+    }
+});
+
+// POST /api/admin/notifications/broadcast - Send push notification to all users
+router.post('/notifications/broadcast', async (req: Request, res: Response) => {
+    try {
+        const { title, body, url } = req.body;
+
+        if (!body) {
+            return res.status(400).json({ error: "Message body is required" });
+        }
+
+        // Get all users who have enabled info notifications
+        const eligibleUsers = await db.select({ id: users.id })
+            .from(users)
+            .where(eq(users.notifyInfo, true));
+
+        const userIds = eligibleUsers.map(u => u.id);
+
+        if (userIds.length === 0) {
+            return res.json({ success: true, message: "No users subscribed to info notifications", count: 0 });
+        }
+
+        const payload: PushPayload = {
+            title: title || 'Info Admin 📢',
+            body,
+            icon: '/icon-192.png',
+            badge: '/icon-192.png',
+            tag: 'admin-broadcast-' + Date.now(),
+            data: {
+                url: url || '/',
+                action: 'open-app',
+            },
+        };
+
+        // Send in background to avoid blocking response for too long
+        pushService.sendToMultipleUsers(userIds, payload).catch(err =>
+            console.error("[ADMIN] Broadcast failed:", err)
+        );
+
+        res.json({
+            success: true,
+            message: `Broadcast queued for ${userIds.length} users`,
+            count: userIds.length
+        });
+    } catch (error) {
+        console.error("Error sending broadcast:", error);
+        res.status(500).json({ error: "Failed to send broadcast" });
     }
 });
 
