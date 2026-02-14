@@ -53,6 +53,7 @@ export const auth = betterAuth({
         "http://localhost:5174"
     ],
     baseURL: process.env.BETTER_AUTH_URL,
+    appName: "Rupiku",
     advanced: {
         crossSubDomainCookies: {
             enabled: false,
