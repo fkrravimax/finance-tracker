@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import { authService } from '../services/authService';
 import { upgradeService } from '../services/upgradeService';
-import { Crown, Check, X, Trash2, Bell, Send } from 'lucide-react';
+import { Crown, Check, X, Trash2, Bell, Send, MoreVertical, Shield, CreditCard } from 'lucide-react';
 
 interface User {
     id: string;
@@ -37,11 +37,25 @@ const AdminDashboard = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const USERS_PER_PAGE = 10;
 
+    // Action Menu State
+    const [activeActionMenu, setActiveActionMenu] = useState<string | null>(null);
+
     // Delete user state (double confirmation)
     const [deleteTarget, setDeleteTarget] = useState<User | null>(null);
     const [deleteStep, setDeleteStep] = useState<0 | 1 | 2>(0); // 0=none, 1=first confirm, 2=type email
     const [deleteConfirmEmail, setDeleteConfirmEmail] = useState('');
     const [isDeleting, setIsDeleting] = useState(false);
+
+    // Close menu when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (activeActionMenu && !(event.target as Element).closest('.action-menu-container')) {
+                setActiveActionMenu(null);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, [activeActionMenu]);
 
     // Filter and paginate users
     const filteredUsers = users.filter(user =>
@@ -418,37 +432,29 @@ const AdminDashboard = () => {
                                         </div>
                                     </td>
                                     <td className="px-6 py-4">
-                                        <select
-                                            value={user.role}
-                                            onChange={(e) => handleUpdate(user.id, 'role', e.target.value)}
-                                            className={`
-                                                px-3 py-1.5 rounded-lg text-xs font-medium border outline-none cursor-pointer transition-colors
-                                                ${user.role === 'ADMIN'
-                                                    ? 'bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-900/20 dark:text-purple-300 dark:border-purple-800'
-                                                    : 'bg-gray-50 text-gray-700 border-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600'}
-                                            `}
-                                        >
-                                            <option value="USER">User</option>
-                                            <option value="ADMIN">Admin</option>
-                                        </select>
+                                        <span className={`
+                                            px-2.5 py-1 rounded-full text-xs font-medium inline-flex items-center gap-1.5
+                                            ${user.role === 'ADMIN'
+                                                ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300'
+                                                : 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300'}
+                                        `}>
+                                            <Shield className="w-3.5 h-3.5" />
+                                            {user.role}
+                                        </span>
                                     </td>
                                     <td className="px-6 py-4">
-                                        <select
-                                            value={user.plan}
-                                            onChange={(e) => handleUpdate(user.id, 'plan', e.target.value)}
-                                            className={`
-                                                px-3 py-1.5 rounded-lg text-xs font-medium border outline-none cursor-pointer transition-colors
-                                                ${user.plan === 'PLATINUM'
-                                                    ? 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/20 dark:text-amber-300 dark:border-amber-800'
-                                                    : user.plan === 'PREMIUM'
-                                                        ? 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/20 dark:text-blue-300 dark:border-blue-800'
-                                                        : 'bg-gray-50 text-gray-700 border-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600'}
-                                            `}
-                                        >
-                                            <option value="FREE">Free</option>
-                                            <option value="PREMIUM">Premium</option>
-                                            <option value="PLATINUM">Platinum</option>
-                                        </select>
+                                        <span className={`
+                                            px-2.5 py-1 rounded-full text-xs font-medium inline-flex items-center gap-1.5
+                                            ${user.plan === 'PLATINUM'
+                                                ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300'
+                                                : user.plan === 'PREMIUM'
+                                                    ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300'
+                                                    : 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300'}
+                                        `}>
+                                            {user.plan === 'PLATINUM' && <Crown className="w-3.5 h-3.5" />}
+                                            {user.plan === 'PREMIUM' && <CreditCard className="w-3.5 h-3.5" />}
+                                            {user.plan}
+                                        </span>
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-gray-500 text-xs">
                                         {new Date(user.createdAt).toLocaleDateString(undefined, {
@@ -457,14 +463,57 @@ const AdminDashboard = () => {
                                             day: 'numeric'
                                         })}
                                     </td>
-                                    <td className="px-6 py-4 text-center">
+                                    <td className="px-6 py-4 text-center relative action-menu-container">
                                         <button
-                                            onClick={() => openDeleteConfirm(user)}
-                                            className="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
-                                            title={`Delete ${user.name}`}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                setActiveActionMenu(activeActionMenu === user.id ? null : user.id);
+                                            }}
+                                            className={`p-2 rounded-lg transition-colors ${activeActionMenu === user.id ? 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white' : 'text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-600 dark:hover:text-gray-300'}`}
                                         >
-                                            <Trash2 className="w-4 h-4" />
+                                            <MoreVertical className="w-4 h-4" />
                                         </button>
+
+                                        {activeActionMenu === user.id && (
+                                            <div className="absolute right-8 top-8 w-48 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-100 dark:border-gray-700 z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-100 text-left">
+                                                <div className="p-2 border-b border-gray-100 dark:border-gray-700">
+                                                    <p className="px-2 py-1 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Role</p>
+                                                    <button
+                                                        onClick={() => handleUpdate(user.id, 'role', user.role === 'ADMIN' ? 'USER' : 'ADMIN')}
+                                                        className="w-full text-left px-2 py-1.5 text-sm rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200"
+                                                    >
+                                                        {user.role === 'ADMIN' ? 'Demote to User' : 'Promote to Admin'}
+                                                    </button>
+                                                </div>
+
+                                                <div className="p-2 border-b border-gray-100 dark:border-gray-700">
+                                                    <p className="px-2 py-1 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Plan</p>
+                                                    {['FREE', 'PREMIUM', 'PLATINUM'].map((plan) => (
+                                                        <button
+                                                            key={plan}
+                                                            onClick={() => handleUpdate(user.id, 'plan', plan)}
+                                                            className={`w-full text-left px-2 py-1.5 text-sm rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center justify-between ${user.plan === plan ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400' : 'text-gray-700 dark:text-gray-200'}`}
+                                                        >
+                                                            <span>{plan}</span>
+                                                            {user.plan === plan && <Check className="w-3.5 h-3.5" />}
+                                                        </button>
+                                                    ))}
+                                                </div>
+
+                                                <div className="p-1">
+                                                    <button
+                                                        onClick={() => {
+                                                            openDeleteConfirm(user);
+                                                            setActiveActionMenu(null);
+                                                        }}
+                                                        className="w-full text-left px-3 py-2 text-sm rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400 flex items-center gap-2"
+                                                    >
+                                                        <Trash2 className="w-3.5 h-3.5" />
+                                                        Delete User
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        )}
                                     </td>
                                 </tr>
                             ))}
@@ -478,61 +527,96 @@ const AdminDashboard = () => {
                         <div className="p-8 text-center text-gray-400">
                             {searchQuery ? 'No users found matching your search.' : 'No users found.'}
                         </div>
-                    ) : paginatedUsers.map(user => (
-                        <div key={user.id} className="p-4 space-y-3">
+                    ) : paginatedUsers.map((user, index) => (
+                        <div key={user.id} className="p-4 space-y-3 relative action-menu-container">
                             <div className="flex items-start justify-between">
                                 <div className="flex flex-col">
                                     <span className="font-medium text-gray-900 dark:text-white text-base">{user.name}</span>
                                     <span className="text-xs text-gray-500">{user.email}</span>
                                 </div>
-                                <span className="text-xs text-gray-400">
-                                    {new Date(user.createdAt).toLocaleDateString(undefined, {
-                                        month: 'short',
-                                        day: 'numeric'
-                                    })}
+                                <div className="flex items-center gap-2">
+                                    <span className="text-xs text-gray-400">
+                                        {new Date(user.createdAt).toLocaleDateString(undefined, {
+                                            month: 'short',
+                                            day: 'numeric'
+                                        })}
+                                    </span>
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            setActiveActionMenu(activeActionMenu === user.id ? null : user.id);
+                                        }}
+                                        className={`p-1.5 rounded-lg transition-colors ${activeActionMenu === user.id ? 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white' : 'text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'}`}
+                                    >
+                                        <MoreVertical className="w-4 h-4" />
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div className="flex items-center gap-2">
+                                <span className={`
+                                    px-2.5 py-1 rounded-full text-xs font-medium inline-flex items-center gap-1.5
+                                    ${user.role === 'ADMIN'
+                                        ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300'
+                                        : 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300'}
+                                `}>
+                                    <Shield className="w-3.5 h-3.5" />
+                                    {user.role}
+                                </span>
+                                <span className={`
+                                    px-2.5 py-1 rounded-full text-xs font-medium inline-flex items-center gap-1.5
+                                    ${user.plan === 'PLATINUM'
+                                        ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300'
+                                        : user.plan === 'PREMIUM'
+                                            ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300'
+                                            : 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300'}
+                                `}>
+                                    {user.plan === 'PLATINUM' && <Crown className="w-3.5 h-3.5" />}
+                                    {user.plan === 'PREMIUM' && <CreditCard className="w-3.5 h-3.5" />}
+                                    {user.plan}
                                 </span>
                             </div>
 
-                            <div className="flex items-center gap-2 pt-1">
-                                <select
-                                    value={user.role}
-                                    onChange={(e) => handleUpdate(user.id, 'role', e.target.value)}
-                                    className={`
-                                        flex-1 px-3 py-2 rounded-lg text-xs font-medium border outline-none transition-colors
-                                        ${user.role === 'ADMIN'
-                                            ? 'bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-900/20 dark:text-purple-300 dark:border-purple-800'
-                                            : 'bg-gray-50 text-gray-700 border-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600'}
-                                    `}
-                                >
-                                    <option value="USER">User</option>
-                                    <option value="ADMIN">Admin</option>
-                                </select>
+                            {activeActionMenu === user.id && (
+                                <div className={`absolute right-4 ${index > paginatedUsers.length - 3 ? 'bottom-12' : 'top-10'} w-48 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-100 dark:border-gray-700 z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-100 text-left`}>
+                                    <div className="p-2 border-b border-gray-100 dark:border-gray-700">
+                                        <p className="px-2 py-1 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Role</p>
+                                        <button
+                                            onClick={() => handleUpdate(user.id, 'role', user.role === 'ADMIN' ? 'USER' : 'ADMIN')}
+                                            className="w-full text-left px-2 py-1.5 text-sm rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200"
+                                        >
+                                            {user.role === 'ADMIN' ? 'Demote to User' : 'Promote to Admin'}
+                                        </button>
+                                    </div>
 
-                                <select
-                                    value={user.plan}
-                                    onChange={(e) => handleUpdate(user.id, 'plan', e.target.value)}
-                                    className={`
-                                        flex-1 px-3 py-2 rounded-lg text-xs font-medium border outline-none transition-colors
-                                        ${user.plan === 'PLATINUM'
-                                            ? 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/20 dark:text-amber-300 dark:border-amber-800'
-                                            : user.plan === 'PREMIUM'
-                                                ? 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/20 dark:text-blue-300 dark:border-blue-800'
-                                                : 'bg-gray-50 text-gray-700 border-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600'}
-                                    `}
-                                >
-                                    <option value="FREE">Free</option>
-                                    <option value="PREMIUM">Premium</option>
-                                    <option value="PLATINUM">Platinum</option>
-                                </select>
+                                    <div className="p-2 border-b border-gray-100 dark:border-gray-700">
+                                        <p className="px-2 py-1 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Plan</p>
+                                        {['FREE', 'PREMIUM', 'PLATINUM'].map((plan) => (
+                                            <button
+                                                key={plan}
+                                                onClick={() => handleUpdate(user.id, 'plan', plan)}
+                                                className={`w-full text-left px-2 py-1.5 text-sm rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center justify-between ${user.plan === plan ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400' : 'text-gray-700 dark:text-gray-200'}`}
+                                            >
+                                                <span>{plan}</span>
+                                                {user.plan === plan && <Check className="w-3.5 h-3.5" />}
+                                            </button>
+                                        ))}
+                                    </div>
 
-                                <button
-                                    onClick={() => openDeleteConfirm(user)}
-                                    className="p-2 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
-                                    title={`Delete ${user.name}`}
-                                >
-                                    <Trash2 className="w-4 h-4" />
-                                </button>
-                            </div>
+                                    <div className="p-1">
+                                        <button
+                                            onClick={() => {
+                                                openDeleteConfirm(user);
+                                                setActiveActionMenu(null);
+                                            }}
+                                            className="w-full text-left px-3 py-2 text-sm rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400 flex items-center gap-2"
+                                        >
+                                            <Trash2 className="w-3.5 h-3.5" />
+                                            Delete User
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     ))}
                 </div>
