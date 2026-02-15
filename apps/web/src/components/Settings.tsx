@@ -11,6 +11,7 @@ import ProfilePictureModal from './modals/ProfilePictureModal';
 import { useNotification } from '../contexts/NotificationContext';
 import { usePushNotifications } from '../hooks/usePushNotifications';
 import { authService } from '../services/authService';
+import SessionList from './Settings/SessionList';
 
 const Settings: React.FC = () => {
     const { theme, setTheme, privacyMode, setPrivacyMode } = useAppearance();
@@ -915,6 +916,29 @@ const Settings: React.FC = () => {
                                     </div>
                                 </div>
                             </div>
+                        </div>
+                    )}
+                </div>
+
+                {/* Security Category */}
+                <div className="bg-white dark:bg-[#342d18] rounded-2xl border border-slate-100 dark:border-[#493f22] overflow-hidden shadow-sm">
+                    <button
+                        onClick={() => toggleSection('security')}
+                        className="w-full flex items-center justify-between p-6 bg-surface-light dark:bg-[#2b2616] hover:bg-slate-50 dark:hover:bg-[#36301d] transition-colors text-left"
+                    >
+                        <div className="flex items-center gap-3">
+                            <span className="material-symbols-outlined text-primary text-2xl">security</span>
+                            <div>
+                                <h2 className="text-lg font-bold text-slate-900 dark:text-white">Security</h2>
+                                <p className="text-sm text-slate-500 dark:text-[#cbbc90]">Login History & Active Sessions</p>
+                            </div>
+                        </div>
+                        <span className={`material-symbols-outlined text-slate-400 transition-transform ${openSection === 'security' ? 'rotate-180' : ''}`}>expand_more</span>
+                    </button>
+
+                    {openSection === 'security' && (
+                        <div className="p-6 border-t border-slate-100 dark:border-[#493f22] flex flex-col gap-6 animate-fade-in">
+                            <SessionList />
                         </div>
                     )}
                 </div>

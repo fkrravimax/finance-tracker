@@ -59,6 +59,9 @@ app.use('/api/trading', authMiddleware, tradingRoutes);
 import cryptoRoutes from './routes/crypto.routes.js';
 app.use('/api/crypto', authMiddleware, cryptoRoutes);
 
+import sessionRoutes from './routes/session.routes.js';
+app.use('/api/sessions', authMiddleware, sessionRoutes);
+
 import adminRoutes from './routes/admin.routes.js';
 app.use('/api/admin', authMiddleware, adminRoutes);
 
