@@ -50,10 +50,23 @@ const INITIAL_NOTIFICATIONS = [
 const DashboardContent: React.FC<DashboardLayoutProps> = ({ children, onLogout }) => {
     const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);
     const [isNotificationsOpen, setIsNotificationsOpen] = React.useState(false);
+    const [notifications, setNotifications] = React.useState(INITIAL_NOTIFICATIONS);
     const { isQuickAddOpen, closeQuickAdd, editingTransaction } = useUI();
 
     const navigate = useNavigate();
     const location = useLocation();
+
+    const unreadCount = notifications.filter(n => !n.read).length;
+
+    const handleToggleNotifications = () => {
+        if (!isNotificationsOpen) {
+            // Open dropdown and mark all as read
+            setIsNotificationsOpen(true);
+            setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+        } else {
+            setIsNotificationsOpen(false);
+        }
+    };
 
     const handleSwipeRight = (eventData: SwipeEventData) => {
         if ((eventData.event.target as HTMLElement).closest('[data-no-swipe="true"]')) return;
@@ -129,12 +142,14 @@ const DashboardContent: React.FC<DashboardLayoutProps> = ({ children, onLogout }
                     {/* Notification Button */}
                     <div className="relative">
                         <button
-                            onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
+                            onClick={handleToggleNotifications}
                             className="p-2 text-slate-600 dark:text-white hover:bg-slate-100 dark:hover:bg-[#2b2616] rounded-full transition-colors relative"
                         >
                             <span className={`material-symbols-outlined ${isNotificationsOpen ? 'font-variation-FILL-1' : ''}`}>notifications</span>
                             {/* Unread Badge */}
-                            <span className="absolute top-2 right-2 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white dark:border-[#1a160b]"></span>
+                            {unreadCount > 0 && (
+                                <span className="absolute top-2 right-2 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white dark:border-[#1a160b]"></span>
+                            )}
                         </button>
 
                         {/* Notification Dropdown */}
@@ -150,7 +165,7 @@ const DashboardContent: React.FC<DashboardLayoutProps> = ({ children, onLogout }
                                         <button className="text-xs font-bold text-primary hover:text-primary-dark">Mark all read</button>
                                     </div>
                                     <div className="max-h-[60vh] overflow-y-auto">
-                                        {MOCK_NOTIFICATIONS.map((notif) => (
+                                        {notifications.map((notif) => (
                                             <div key={notif.id} className={`p-4 border-b border-slate-50 dark:border-white/5 hover:bg-slate-50 dark:hover:bg-white/5 transition-colors ${!notif.read ? 'bg-blue-50/30 dark:bg-blue-500/5' : ''}`}>
                                                 <div className="flex gap-3">
                                                     <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${notif.type === 'bill' ? 'bg-rose-100 text-rose-600 dark:bg-rose-500/20 dark:text-rose-400' :
@@ -177,7 +192,13 @@ const DashboardContent: React.FC<DashboardLayoutProps> = ({ children, onLogout }
                                         ))}
                                     </div>
                                     <div className="p-3 bg-slate-50 dark:bg-white/5 text-center">
-                                        <button className="text-xs font-bold text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-primary transition-colors">
+                                        <button
+                                            onClick={() => {
+                                                setIsNotificationsOpen(false);
+                                                navigate('/notifications');
+                                            }}
+                                            className="text-xs font-bold text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-primary transition-colors"
+                                        >
                                             View All Notifications
                                         </button>
                                     </div>
