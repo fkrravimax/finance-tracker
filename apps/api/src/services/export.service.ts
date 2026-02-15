@@ -1,8 +1,9 @@
 
 import { db } from '../db/index.js';
 import { transactions, budgets, savingsGoals } from '../db/schema.js';
-import { eq, and, like, desc, sql, gte, lte } from "drizzle-orm";
+import { eq, and, desc, gte, lte } from "drizzle-orm";
 import ExcelJS from 'exceljs';
+import { cryptoService } from "./encryption.service.js";
 
 export const exportService = {
     async generateReport(userId: string, filters: { wallet?: string; startDate?: Date; endDate?: Date }) {
@@ -10,25 +11,70 @@ export const exportService = {
         workbook.creator = 'FinTrack App';
         workbook.created = new Date();
 
+        // --- 1. Fetch & Decrypt Data Once ---
+
+        // A. Transactions
+        const txConditions = [eq(transactions.userId, userId)];
+        if (filters.startDate) {
+            txConditions.push(gte(transactions.date, filters.startDate));
+        }
+        if (filters.endDate) {
+            const end = new Date(filters.endDate);
+            end.setHours(23, 59, 59, 999);
+            txConditions.push(lte(transactions.date, end));
+        }
+
+        const rawTransactions = await db.select().from(transactions)
+            .where(and(...txConditions))
+            .orderBy(desc(transactions.date));
+
+        const decryptedTransactions = rawTransactions.map(t => ({
+            ...t,
+            amount: cryptoService.decryptToNumber(t.amount),
+            merchant: cryptoService.decrypt(t.merchant),
+            description: cryptoService.decrypt(t.description || ''),
+        }));
+
+        // Apply Wallet Filter (Description Regex)
+        let filteredTransactions = decryptedTransactions;
+        if (filters.wallet) {
+            const walletRegex = new RegExp(`\\(via ${filters.wallet}\\)`, 'i');
+            filteredTransactions = decryptedTransactions.filter(t =>
+                walletRegex.test(t.description)
+            );
+        }
+
+        // B. Savings Goals
+        const rawGoals = await db.select().from(savingsGoals).where(eq(savingsGoals.userId, userId));
+        const decryptedGoals = rawGoals.map(g => ({
+            ...g,
+            name: cryptoService.decrypt(g.name),
+            targetAmount: cryptoService.decryptToNumber(g.targetAmount),
+            currentAmount: cryptoService.decryptToNumber(g.currentAmount),
+        }));
+
+
+        // --- 2. Generate Sheets using Processed Data ---
+
         // 1. Audit Trail (Log)
-        await this.addAuditTrail(workbook, userId, filters);
+        this.addAuditTrail(workbook, filteredTransactions);
 
         // 2. Micro-Spending Analysis (< 15k expense)
-        await this.addMicroSpending(workbook, userId, filters);
+        this.addMicroSpending(workbook, filteredTransactions);
 
         // 3. Savings Milestone
-        await this.addSavingsMilestone(workbook, userId);
+        this.addSavingsMilestone(workbook, decryptedGoals);
 
         // 4. Budget Performance
-        await this.addBudgetPerformance(workbook, userId, filters);
+        this.addBudgetPerformance(workbook, filteredTransactions);
 
         // 5. Daily Average Analysis
-        await this.addDailyAverage(workbook, userId, filters);
+        this.addDailyAverage(workbook, filteredTransactions);
 
         return workbook;
     },
 
-    async addAuditTrail(workbook: ExcelJS.Workbook, userId: string, filters: any) {
+    addAuditTrail(workbook: ExcelJS.Workbook, data: any[]) {
         const sheet = workbook.addWorksheet('Audit Trail');
         sheet.columns = [
             { header: 'Date', key: 'date', width: 15 },
@@ -40,14 +86,6 @@ export const exportService = {
             { header: 'Wallet Source', key: 'wallet', width: 15 },
         ];
 
-        const conditions = [eq(transactions.userId, userId)];
-        if (filters.wallet) {
-            conditions.push(like(transactions.description, `%via ${filters.wallet}%`));
-        }
-        const whereClause = and(...conditions);
-
-        const data = await db.select().from(transactions).where(whereClause).orderBy(desc(transactions.date));
-
         data.forEach(t => {
             // Extract wallet from description pattern "Notes (via Wallet)"
             const walletMatch = t.description?.match(/\(via (Bank|Cash|E-wallet)\)/);
@@ -56,7 +94,7 @@ export const exportService = {
             sheet.addRow({
                 date: t.date,
                 type: t.type,
-                amount: Number(t.amount),
+                amount: t.amount,
                 category: t.category,
                 merchant: t.merchant,
                 description: t.description,
@@ -68,7 +106,7 @@ export const exportService = {
         sheet.getRow(1).font = { bold: true };
     },
 
-    async addMicroSpending(workbook: ExcelJS.Workbook, userId: string, filters: any) {
+    addMicroSpending(workbook: ExcelJS.Workbook, data: any[]) {
         const sheet = workbook.addWorksheet('Micro-Spending Analysis');
         sheet.columns = [
             { header: 'Date', key: 'date', width: 15 },
@@ -77,35 +115,24 @@ export const exportService = {
             { header: 'Amount (< 15k)', key: 'amount', width: 15 },
         ];
 
-        const conditions = [
-            eq(transactions.userId, userId),
-            eq(transactions.type, 'expense'),
-            sql`CAST(${transactions.amount} AS DECIMAL) < 15000`
-        ];
+        // Filter for expenses < 15000
+        const microExpenses = data.filter(t => t.type === 'expense' && t.amount < 15000);
 
-        if (filters.wallet) {
-            conditions.push(like(transactions.description, `%via ${filters.wallet}%`));
-        }
-
-        const whereClause = and(...conditions);
-
-        const data = await db.select().from(transactions).where(whereClause).orderBy(desc(transactions.date));
-
-        data.forEach(t => {
+        microExpenses.forEach(t => {
             sheet.addRow({
                 date: t.date,
                 category: t.category,
                 merchant: t.merchant,
-                amount: Number(t.amount)
+                amount: t.amount
             });
         });
 
-        const totalRow = sheet.addRow({ merchant: 'TOTAL LEAKAGE', amount: data.reduce((sum, t) => sum + Number(t.amount), 0) });
+        const totalRow = sheet.addRow({ merchant: 'TOTAL LEAKAGE', amount: microExpenses.reduce((sum, t) => sum + t.amount, 0) });
         totalRow.font = { bold: true, color: { argb: 'FFFF0000' } };
         sheet.getRow(1).font = { bold: true };
     },
 
-    async addSavingsMilestone(workbook: ExcelJS.Workbook, userId: string) {
+    addSavingsMilestone(workbook: ExcelJS.Workbook, goals: any[]) {
         const sheet = workbook.addWorksheet('Savings Milestone');
         sheet.columns = [
             { header: 'Goal Name', key: 'name', width: 20 },
@@ -115,11 +142,9 @@ export const exportService = {
             { header: 'Target Date', key: 'date', width: 15 },
         ];
 
-        const goals = await db.select().from(savingsGoals).where(eq(savingsGoals.userId, userId));
-
         goals.forEach(g => {
-            const target = Number(g.targetAmount);
-            const current = Number(g.currentAmount);
+            const target = g.targetAmount;
+            const current = g.currentAmount;
             const progress = target > 0 ? (current / target) * 100 : 0;
 
             sheet.addRow({
@@ -134,7 +159,7 @@ export const exportService = {
         sheet.getRow(1).font = { bold: true };
     },
 
-    async addBudgetPerformance(workbook: ExcelJS.Workbook, userId: string, filters: any) {
+    addBudgetPerformance(workbook: ExcelJS.Workbook, data: any[]) {
         const sheet = workbook.addWorksheet('Budget Performance');
         sheet.columns = [
             { header: 'Category', key: 'category', width: 20 },
@@ -143,34 +168,13 @@ export const exportService = {
         ];
 
         // Group expenses by category
-        // TODO: This is a simplified view since we only have one Global Budget Limit in schema currently,
-        // not per-category budgets. So we list spending per category.
-
-        // Logic: specific category budget vs actual is requested, but schema only supports global budget now.
-        // We will show "Spending by Category" which is the closest calculation.
-
-        const conditions = [
-            eq(transactions.userId, userId),
-            eq(transactions.type, 'expense')
-        ];
-
-        if (filters.wallet) {
-            conditions.push(like(transactions.description, `%via ${filters.wallet}%`));
-        }
-
-        const whereClause = and(...conditions);
-
-        const expenses = await db.select({
-            category: transactions.category,
-            amount: transactions.amount,
-        }).from(transactions).where(whereClause);
-
+        const expenses = data.filter(t => t.type === 'expense');
         const categorySummary: Record<string, { total: number, count: number }> = {};
 
         expenses.forEach(e => {
             const cat = e.category;
             if (!categorySummary[cat]) categorySummary[cat] = { total: 0, count: 0 };
-            categorySummary[cat].total += Number(e.amount);
+            categorySummary[cat].total += e.amount;
             categorySummary[cat].count += 1;
         });
 
@@ -185,7 +189,7 @@ export const exportService = {
         sheet.getRow(1).font = { bold: true };
     },
 
-    async addDailyAverage(workbook: ExcelJS.Workbook, userId: string, filters: any) {
+    addDailyAverage(workbook: ExcelJS.Workbook, data: any[]) {
         const sheet = workbook.addWorksheet('Daily Average');
         sheet.columns = [
             { header: 'Date', key: 'date', width: 15 },
@@ -193,39 +197,29 @@ export const exportService = {
             { header: 'Status', key: 'status', width: 15 },
         ];
 
-        const conditions = [
-            eq(transactions.userId, userId),
-            eq(transactions.type, 'expense')
-        ];
-
-        if (filters.wallet) {
-            conditions.push(like(transactions.description, `%via ${filters.wallet}%`));
-        }
-
-        const whereClause = and(...conditions);
-
         // Fetch all expenses to calculate daily totals
-        const expenses = await db.select({
-            date: transactions.date,
-            amount: transactions.amount,
-        }).from(transactions).where(whereClause).orderBy(transactions.date);
+        const expenses = data
+            .filter(t => t.type === 'expense')
+            // Sort by date ascending for the report (already desc in fetch, so reverse)
+            .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
         if (expenses.length === 0) return;
 
         // Group by Date
         const dailyTotals: Record<string, number> = {};
         expenses.forEach(e => {
-            const dateStr = e.date.toISOString().split('T')[0];
-            if (!dailyTotals[dateStr]) dailyTotals[dateStr] = 0;
-            dailyTotals[dateStr] += Number(e.amount);
+            try {
+                const dateStr = new Date(e.date).toISOString().split('T')[0];
+                if (!dailyTotals[dateStr]) dailyTotals[dateStr] = 0;
+                dailyTotals[dateStr] += e.amount;
+            } catch (e) {
+                // Ignore invalid dates
+            }
         });
 
         // Calculate Range Stats
         const dates = Object.keys(dailyTotals).sort();
-        const totalOverall = expenses.reduce((sum, e) => sum + Number(e.amount), 0);
-        // We calculate average based on the number of days with spending for now, 
-        // to avoid skewing if the user didn't use the app for a month. A more strict average 
-        // would use (EndDate - StartDate) days.
+        const totalOverall = expenses.reduce((sum, e) => sum + e.amount, 0);
         const daysWithSpending = dates.length;
         const average = daysWithSpending > 0 ? totalOverall / daysWithSpending : 0;
 
