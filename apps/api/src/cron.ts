@@ -45,16 +45,6 @@ export const startCronJobs = () => {
         }
     }, { timezone: 'Asia/Jakarta' });
 
-    // 📊 Budget Alert — Every day at 9:00 AM WIB
-    cron.schedule('0 9 * * *', async () => {
-        console.log('[CRON] Running budget alert check...');
-        try {
-            await notificationService.checkBudgetAlerts();
-        } catch (error) {
-            console.error('[CRON] Error checking budget alerts:', error);
-        }
-    }, { timezone: 'Asia/Jakarta' });
-
     // 📈 Market Update — Every 12 hours (00:00 & 12:00)
     cron.schedule('0 0,12 * * *', async () => {
         console.log('[CRON] Running market update check...');

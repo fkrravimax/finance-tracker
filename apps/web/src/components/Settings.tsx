@@ -627,7 +627,10 @@ const Settings: React.FC = () => {
                                 <div className="pl-4 border-l-2 border-slate-100 dark:border-[#493f22] flex flex-col gap-4">
                                     {[
                                         { key: 'notifyRecurring', label: t('settings.notifyRecurring'), desc: t('settings.notifyRecurringDesc') },
-                                        { key: 'notifyBudget80', label: t('settings.notifyBudget'), desc: t('settings.notifyBudgetDesc') },
+                                        { key: 'notifyBudget50', label: 'Budget Alert (50%)', desc: 'Notify when 50% of budget is used' },
+                                        { key: 'notifyBudget80', label: 'Budget Alert (80%)', desc: 'Notify when 80% of budget is used' },
+                                        { key: 'notifyBudget95', label: 'Budget Alert (95%)', desc: 'Notify when 95% of budget is used' },
+                                        { key: 'notifyBudget100', label: 'Budget Alert (100%)', desc: 'Notify when budget is fully used' },
                                         { key: 'notifyDaily', label: t('settings.notifyDaily'), desc: t('settings.notifyDailyDesc') },
                                         { key: 'notifyLunch', label: t('settings.notifyLunch'), desc: t('settings.notifyLunchDesc') },
                                     ].map((pref) => (

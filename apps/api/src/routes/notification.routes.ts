@@ -12,7 +12,7 @@ const router = Router();
 
 router.get('/', async (req, res) => {
     try {
-        const userId = req.body.user.id; // From authMiddleware
+        const userId = res.locals.user.id; // From authMiddleware
         const limit = parseInt(req.query.limit as string) || 50;
         const offset = parseInt(req.query.offset as string) || 0;
 
@@ -33,7 +33,7 @@ router.get('/', async (req, res) => {
 
 router.put('/read-all', async (req, res) => {
     try {
-        const userId = req.body.user.id;
+        const userId = res.locals.user.id;
         await notificationService.markAllAsRead(userId);
         res.json({ success: true });
     } catch (error) {
@@ -43,7 +43,7 @@ router.put('/read-all', async (req, res) => {
 
 router.put('/:id/read', async (req, res) => {
     try {
-        const userId = req.body.user.id;
+        const userId = res.locals.user.id;
         const { id } = req.params;
         await notificationService.markAsRead(userId, id);
         res.json({ success: true });
@@ -57,7 +57,7 @@ router.put('/:id/read', async (req, res) => {
 
 router.get('/watchlist', async (req, res) => {
     try {
-        const userId = req.body.user.id;
+        const userId = res.locals.user.id;
         const list = await db.select().from(watchlists).where(eq(watchlists.userId, userId));
         res.json(list);
     } catch (error) {
@@ -67,7 +67,7 @@ router.get('/watchlist', async (req, res) => {
 
 router.post('/watchlist', async (req, res) => {
     try {
-        const userId = req.body.user.id;
+        const userId = res.locals.user.id;
         const { symbol } = req.body;
 
         if (!symbol) return res.status(400).json({ error: 'Symbol is required' });
@@ -91,12 +91,44 @@ router.post('/watchlist', async (req, res) => {
 
 router.delete('/watchlist/:id', async (req, res) => {
     try {
-        const userId = req.body.user.id;
+        const userId = res.locals.user.id;
         const { id } = req.params;
         await db.delete(watchlists).where(and(eq(watchlists.id, id), eq(watchlists.userId, userId)));
         res.json({ success: true });
     } catch (error) {
         res.status(500).json({ error: 'Failed to delete from watchlist' });
+    }
+});
+
+// --- Debug / Test ---
+router.post('/test-notification', async (req, res) => {
+    try {
+        const userId = res.locals.user.id;
+        await notificationService.createAndSend(
+            userId,
+            'info',
+            'Test Notification 🔔',
+            'This is a test notification to verify the system is working.',
+            {
+                title: 'Test',
+                body: 'System check',
+                icon: '/icon-192.png'
+            }
+        );
+        res.json({ success: true, message: 'Notification created' });
+    } catch (error) {
+        console.error('Test notification error:', error);
+        res.status(500).json({ error: 'Failed to create test notification' });
+    }
+});
+
+router.post('/test-budget-alert', async (req, res) => {
+    try {
+        await notificationService.checkBudgetAlerts();
+        res.json({ success: true, message: 'Budget alerts triggered manually' });
+    } catch (error) {
+        console.error('Test budget alert error:', error);
+        res.status(500).json({ error: 'Failed to trigger budget alerts' });
     }
 });
 
