@@ -12,7 +12,7 @@ interface DashboardLayoutProps {
     onLogout: () => void;
 }
 
-const MOCK_NOTIFICATIONS = [
+const INITIAL_NOTIFICATIONS = [
     {
         id: 1,
         title: 'Bill Reminder',
