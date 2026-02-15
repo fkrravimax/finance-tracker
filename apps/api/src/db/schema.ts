@@ -163,3 +163,27 @@ export const pushSubscriptions = pgTable("push_subscription", {
     auth: text("auth").notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
 });
+
+// --- Notifications Table ---
+
+export const notifications = pgTable("notification", {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: text("user_id").notNull().references(() => users.id),
+    title: text("title").notNull(),
+    message: text("message").notNull(),
+    type: text("type").notNull(), // 'bill', 'budget', 'market', 'security', 'info', 'success', 'warning'
+    isRead: boolean("is_read").default(false).notNull(),
+    metadata: text("metadata"), // JSON stringified extra data
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// --- Watchlists Table ---
+
+export const watchlists = pgTable("watchlist", {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: text("user_id").notNull().references(() => users.id),
+    symbol: text("symbol").notNull(), // e.g., 'BTC', 'ETH'
+    lastPrice: text("last_price"), // Encrypted snapshot for comparison
+    lastCheckedAt: timestamp("last_checked_at"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+});
