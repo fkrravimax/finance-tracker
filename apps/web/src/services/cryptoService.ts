@@ -118,4 +118,9 @@ export const cryptoService = {
         const { data } = await api.get(`/crypto/convert?amount=${amount}&symbol=${symbol}&convert=${convert}`);
         return data;
     },
+
+    search: async (query: string): Promise<{ id: number; name: string; symbol: string; slug: string; rank: number; is_active: number }[]> => {
+        const { data } = await api.get(`/crypto/search?q=${query}`);
+        return data;
+    },
 };

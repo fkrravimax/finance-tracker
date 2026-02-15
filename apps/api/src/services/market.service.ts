@@ -259,6 +259,22 @@ export const cryptoService = {
         return data;
     },
 
+    /**
+     * Search for coins by name or symbol (uses cached map)
+     */
+    async search(query: string) {
+        if (!query) return [];
+        const q = query.toLowerCase();
+
+        // Ensure we have a map cached (fetch sufficient limit for search)
+        const map = await this.getMap(1000); // Fetch top 1000 for search
+
+        return map.filter((coin: any) =>
+            coin.name.toLowerCase().includes(q) ||
+            coin.symbol.toLowerCase().includes(q)
+        ).slice(0, 10); // Limit results to top 10 matches
+    },
+
 
     /**
      * Get Bitcoin Fear and Greed Index from Alternative.me
