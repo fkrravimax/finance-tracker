@@ -312,6 +312,22 @@ const Settings: React.FC = () => {
         }
     };
 
+    // Plan Badge Helpers
+    const getPlanBadgeStyles = (plan: string) => {
+        switch (plan) {
+            case 'PLATINUM':
+                return 'bg-slate-900 text-white border-slate-700 bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,0.3)_50%,transparent_75%,transparent_100%)] bg-[length:250%_250%,100%_100%] bg-no-repeat animate-shine';
+            case 'PREMIUM':
+            case 'GOLD':
+                return 'bg-amber-100 text-amber-700 border-amber-200 dark:bg-amber-900/30 dark:text-amber-400 dark:border-amber-700/50';
+            case 'SILVER':
+                return 'bg-slate-100 text-slate-600 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700';
+            case 'FREE':
+            default:
+                return 'bg-slate-100 text-slate-500 border-slate-200 dark:bg-zinc-800 dark:text-zinc-500 dark:border-zinc-700';
+        }
+    };
+
     // Removed handleResetApp in favor of handleResetAppClick & handleConfirmAction
 
     return (
@@ -425,7 +441,7 @@ const Settings: React.FC = () => {
                     <h2 className="text-2xl font-black text-slate-800 dark:text-white">{currentUser?.name || 'User'}</h2>
                     <p className="text-slate-500 dark:text-[#cbbc90] font-medium">{currentUser?.email || 'user@example.com'}</p>
                     {currentUser?.plan && (
-                        <span className="inline-block mt-2 px-3 py-1 rounded-full bg-mint/20 text-mint-dark text-xs font-bold uppercase tracking-wider">
+                        <span className={`inline-block mt-2 px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider shadow-sm border ${getPlanBadgeStyles(currentUser.plan)}`}>
                             {currentUser.plan} Plan
                         </span>
                     )}

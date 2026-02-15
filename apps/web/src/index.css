@@ -175,6 +175,17 @@
     font-weight: 900;
 }
 
+/* Light Mode Override for Platinum Text to be more visible */
+:root:not(.dark) .text-platinum {
+    background: linear-gradient(to right, #7e8491 0%, #b8b8b8 20%, #585d68 40%, #b8b8b8 60%, #7e8491 80%, #585d68 100%);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    text-shadow: none;
+    /* Remove glow in light mode for sharpness */
+}
+
 @keyframes shine {
     to {
         background-position: 200% center;
