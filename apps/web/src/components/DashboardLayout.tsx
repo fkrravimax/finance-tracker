@@ -6,6 +6,7 @@ import LogoText from './LogoText';
 import QuickAddTransactionModal from './QuickAddTransactionModal';
 import { UIProvider, useUI } from '../contexts/UIContext';
 import { useSwipeable, type SwipeEventData } from 'react-swipeable';
+import NotificationBell from './NotificationBell';
 
 interface DashboardLayoutProps {
     children: React.ReactNode;
@@ -95,6 +96,20 @@ const DashboardContent: React.FC<DashboardLayoutProps> = ({ children, onLogout }
             />
 
             <main className="flex-1 h-full overflow-y-auto overflow-x-hidden relative flex flex-col w-full max-w-full pb-[calc(80px+env(safe-area-inset-bottom))] md:pb-0">
+
+                {/* Desktop Header */}
+                <div className="hidden md:flex justify-end items-center px-6 py-4 sticky top-0 z-30 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md">
+                    <div className="flex items-center gap-4">
+                        <NotificationBell
+                            notifications={notifications}
+                            unreadCount={unreadCount}
+                            isOpen={isNotificationsOpen}
+                            onToggle={handleToggleNotifications}
+                            onClose={() => setIsNotificationsOpen(false)}
+                        />
+                    </div>
+                </div>
+
                 {/* Mobile Header (Visible only on small screens) */}
                 <div className="md:hidden flex items-center justify-between px-4 pb-4 pt-[calc(env(safe-area-inset-top)+1rem)] border-b border-slate-200 dark:border-white/5 bg-surface-light dark:bg-background-dark sticky top-0 z-50 shadow-sm">
                     <div className="flex items-center gap-2">
@@ -105,73 +120,13 @@ const DashboardContent: React.FC<DashboardLayoutProps> = ({ children, onLogout }
                     </div>
 
                     {/* Notification Button */}
-                    <div className="relative">
-                        <button
-                            onClick={handleToggleNotifications}
-                            className="p-2 text-slate-600 dark:text-white hover:bg-slate-100 dark:hover:bg-[#2b2616] rounded-full transition-colors relative"
-                        >
-                            <span className={`material-symbols-outlined ${isNotificationsOpen ? 'font-variation-FILL-1' : ''}`}>notifications</span>
-                            {/* Unread Badge */}
-                            {unreadCount > 0 && (
-                                <span className="absolute top-2 right-2 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white dark:border-[#1a160b]"></span>
-                            )}
-                        </button>
-
-                        {/* Notification Dropdown */}
-                        {isNotificationsOpen && (
-                            <>
-                                <div
-                                    className="fixed inset-0 z-40"
-                                    onClick={() => setIsNotificationsOpen(false)}
-                                ></div>
-                                <div className="absolute right-0 top-12 w-[85vw] max-w-[320px] bg-white dark:bg-[#1a160b] rounded-2xl shadow-xl border border-slate-100 dark:border-white/10 z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-200 origin-top-right">
-                                    <div className="p-4 border-b border-slate-100 dark:border-white/5 flex items-center justify-between bg-slate-50/50 dark:bg-white/5">
-                                        <h3 className="font-bold text-slate-800 dark:text-white">Notifications</h3>
-                                        <button className="text-xs font-bold text-primary hover:text-primary-dark">Mark all read</button>
-                                    </div>
-                                    <div className="max-h-[60vh] overflow-y-auto">
-                                        {notifications.map((notif) => (
-                                            <div key={notif.id} className={`p-4 border-b border-slate-50 dark:border-white/5 hover:bg-slate-50 dark:hover:bg-white/5 transition-colors ${!notif.read ? 'bg-blue-50/30 dark:bg-blue-500/5' : ''}`}>
-                                                <div className="flex gap-3">
-                                                    <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${notif.type === 'bill' ? 'bg-rose-100 text-rose-600 dark:bg-rose-500/20 dark:text-rose-400' :
-                                                        notif.type === 'warning' || notif.type === 'budget' ? 'bg-amber-100 text-amber-600 dark:bg-amber-500/20 dark:text-amber-400' :
-                                                            notif.type === 'trend' || notif.type === 'market' ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400' :
-                                                                'bg-blue-100 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400'
-                                                        }`}>
-                                                        <span className="material-symbols-outlined text-sm">
-                                                            {notif.type === 'bill' ? 'receipt_long' :
-                                                                notif.type === 'warning' || notif.type === 'budget' ? 'warning' :
-                                                                    notif.type === 'trend' || notif.type === 'market' ? 'trending_up' :
-                                                                        notif.type === 'security' ? 'security' : 'notifications'}
-                                                        </span>
-                                                    </div>
-                                                    <div className="flex-1 min-w-0">
-                                                        <p className="text-sm font-bold text-slate-800 dark:text-white leading-tight mb-1">{notif.title}</p>
-                                                        <p className="text-xs text-slate-500 dark:text-slate-400 leading-snug">{notif.message}</p>
-                                                        <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-2 font-medium">{notif.time}</p>
-                                                    </div>
-                                                    {!notif.read && (
-                                                        <div className="w-2 h-2 rounded-full bg-blue-500 mt-1.5 shrink-0"></div>
-                                                    )}
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                    <div className="p-3 bg-slate-50 dark:bg-white/5 text-center">
-                                        <button
-                                            onClick={() => {
-                                                setIsNotificationsOpen(false);
-                                                navigate('/notifications');
-                                            }}
-                                            className="text-xs font-bold text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-primary transition-colors"
-                                        >
-                                            View All Notifications
-                                        </button>
-                                    </div>
-                                </div>
-                            </>
-                        )}
-                    </div>
+                    <NotificationBell
+                        notifications={notifications}
+                        unreadCount={unreadCount}
+                        isOpen={isNotificationsOpen}
+                        onToggle={handleToggleNotifications}
+                        onClose={() => setIsNotificationsOpen(false)}
+                    />
                 </div>
                 {children}
             </main>
