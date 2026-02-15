@@ -7,6 +7,7 @@ import QuickAddTransactionModal from './QuickAddTransactionModal';
 import { UIProvider, useUI } from '../contexts/UIContext';
 import { useSwipeable, type SwipeEventData } from 'react-swipeable';
 import NotificationBell from './NotificationBell';
+import api from '../services/api';
 
 interface DashboardLayoutProps {
     children: React.ReactNode;
@@ -22,13 +23,44 @@ const DashboardContent: React.FC<DashboardLayoutProps> = ({ children, onLogout }
     const navigate = useNavigate();
     const location = useLocation();
 
-    const unreadCount = notifications.filter(n => !n.read).length;
+    // Fetch notifications
+    const fetchNotifications = React.useCallback(async () => {
+        try {
+            const res = await api.get('/notifications?limit=10'); // Fetch top 10 to have buffer
+            if (res.data && Array.isArray(res.data.data)) {
+                setNotifications(res.data.data);
+            }
+        } catch (error) {
+            console.error('Failed to fetch notifications:', error);
+        }
+    }, []);
 
-    const handleToggleNotifications = () => {
+    React.useEffect(() => {
+        fetchNotifications();
+        // Poll every 1 minute
+        const interval = setInterval(fetchNotifications, 60000);
+        return () => clearInterval(interval);
+    }, [fetchNotifications]);
+
+    // Re-fetch when location changes (e.g. returning from notifications page)
+    React.useEffect(() => {
+        fetchNotifications();
+    }, [location.pathname, fetchNotifications]);
+
+    const unreadCount = notifications.filter(n => !n.isRead).length;
+
+    const handleToggleNotifications = async () => {
         if (!isNotificationsOpen) {
-            // Open dropdown and mark all as read
             setIsNotificationsOpen(true);
-            setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+            // Mark all as read in backend
+            try {
+                if (unreadCount > 0) {
+                    await api.put('/notifications/read-all');
+                    setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
+                }
+            } catch (error) {
+                console.error('Failed to mark notifications as read:', error);
+            }
         } else {
             setIsNotificationsOpen(false);
         }

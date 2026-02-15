@@ -6,8 +6,10 @@ export interface Notification {
     type: string;
     title: string;
     message: string;
-    time: string;
-    read: boolean;
+    time?: string;
+    read?: boolean;
+    isRead?: boolean;
+    createdAt?: string;
 }
 
 interface NotificationBellProps {
@@ -26,6 +28,9 @@ const NotificationBell: React.FC<NotificationBellProps> = ({
     onClose,
 }) => {
     const navigate = useNavigate();
+
+    // Limit to 5 notifications for the popup
+    const recentNotifications = notifications.slice(0, 5);
 
     return (
         <div className="relative">
@@ -49,18 +54,31 @@ const NotificationBell: React.FC<NotificationBellProps> = ({
                     ></div>
                     <div className="absolute right-0 top-12 w-[85vw] max-w-[320px] bg-white dark:bg-[#1a160b] rounded-2xl shadow-xl border border-slate-100 dark:border-white/10 z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-200 origin-top-right">
                         <div className="p-4 border-b border-slate-100 dark:border-white/5 flex items-center justify-between bg-slate-50/50 dark:bg-white/5">
-                            <h3 className="font-bold text-slate-800 dark:text-white">Notifications</h3>
-                            <button className="text-xs font-bold text-primary hover:text-primary-dark">Mark all read</button>
+                            <h3 className="font-bold text-slate-800 dark:text-white">Recent Notifications</h3>
+                            <button
+                                onClick={() => navigate('/notifications')}
+                                className="text-xs font-bold text-primary hover:text-primary-dark"
+                            >
+                                View all
+                            </button>
                         </div>
                         <div className="max-h-[60vh] overflow-y-auto">
-                            {notifications.length === 0 ? (
+                            {recentNotifications.length === 0 ? (
                                 <div className="p-8 text-center text-slate-400 dark:text-slate-500">
                                     <span className="material-symbols-outlined text-4xl mb-2">notifications_off</span>
                                     <p className="text-sm">No notifications</p>
                                 </div>
                             ) : (
-                                notifications.map((notif) => (
-                                    <div key={notif.id} className={`p-4 border-b border-slate-50 dark:border-white/5 hover:bg-slate-50 dark:hover:bg-white/5 transition-colors ${!notif.read ? 'bg-blue-50/30 dark:bg-blue-500/5' : ''}`}>
+                                recentNotifications.map((notif) => (
+                                    <div
+                                        key={notif.id}
+                                        className={`p-4 border-b border-slate-50 dark:border-white/5 transition-colors cursor-pointer
+                                            ${!notif.read && !notif.isRead // Handle both potential property names
+                                                ? 'bg-amber-50/80 dark:bg-amber-500/10 hover:bg-amber-100 dark:hover:bg-amber-500/20'
+                                                : 'hover:bg-slate-50 dark:hover:bg-white/5'
+                                            }`}
+                                        onClick={() => navigate('/notifications')}
+                                    >
                                         <div className="flex gap-3">
                                             <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${notif.type === 'bill' ? 'bg-rose-100 text-rose-600 dark:bg-rose-500/20 dark:text-rose-400' :
                                                 notif.type === 'warning' || notif.type === 'budget' ? 'bg-amber-100 text-amber-600 dark:bg-amber-500/20 dark:text-amber-400' :
@@ -76,11 +94,13 @@ const NotificationBell: React.FC<NotificationBellProps> = ({
                                             </div>
                                             <div className="flex-1 min-w-0">
                                                 <p className="text-sm font-bold text-slate-800 dark:text-white leading-tight mb-1">{notif.title}</p>
-                                                <p className="text-xs text-slate-500 dark:text-slate-400 leading-snug">{notif.message}</p>
-                                                <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-2 font-medium">{notif.time}</p>
+                                                <p className="text-xs text-slate-500 dark:text-slate-400 leading-snug line-clamp-2">{notif.message}</p>
+                                                <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-2 font-medium">
+                                                    {new Date(notif.time || (notif as any).createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                </p>
                                             </div>
-                                            {!notif.read && (
-                                                <div className="w-2 h-2 rounded-full bg-blue-500 mt-1.5 shrink-0"></div>
+                                            {(!notif.read && !notif.isRead) && (
+                                                <div className="w-2 h-2 rounded-full bg-amber-500 mt-1.5 shrink-0"></div>
                                             )}
                                         </div>
                                     </div>
