@@ -82,6 +82,19 @@ export const cryptoController = {
             res.status(500).json({ error: 'Failed to fetch crypto map' });
         }
     },
+
+    search: async (req: Request, res: Response) => {
+        try {
+            const query = req.query.q as string;
+            if (!query) return res.json([]);
+
+            const data = await cryptoService.search(query);
+            res.json(data);
+        } catch (error: any) {
+            console.error('Failed to search crypto:', error.message);
+            res.status(500).json({ error: 'Failed to search crypto' });
+        }
+    },
     async getFearGreedIndex(req: Request, res: Response) {
         try {
             const data = await cryptoService.getFearGreedIndex();

@@ -24,4 +24,7 @@ router.get('/convert', cryptoController.convertPrice);
 // GET /api/crypto/map?limit=200
 router.get('/map', cryptoController.getMap);
 
+// GET /api/crypto/search?q=btc
+router.get('/search', cryptoController.search);
+
 export default router;

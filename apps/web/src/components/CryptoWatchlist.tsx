@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { cryptoService, type CryptoQuote, type CryptoInfo } from '../services/cryptoService';
 import api from '../services/api';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -12,12 +12,25 @@ const CryptoWatchlist = () => {
         symbol: string;
     }
 
+    interface SearchResult {
+        id: number;
+        name: string;
+        symbol: string;
+        rank: number;
+    }
+
     const [watchlistItems, setWatchlistItems] = useState<WatchlistItem[]>([]);
     const [quotes, setQuotes] = useState<Record<string, CryptoQuote>>({});
     const [infos, setInfos] = useState<Record<string, CryptoInfo>>({});
     const [loading, setLoading] = useState(true);
-    const [addInput, setAddInput] = useState('');
+
+    // Search & Add States
     const [showAddForm, setShowAddForm] = useState(false);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
+    const [isSearching, setIsSearching] = useState(false);
+    const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
     const [holdings, setHoldings] = useState<Record<string, number>>(() => {
         const saved = localStorage.getItem('crypto_holdings');
         return saved ? JSON.parse(saved) : {};
@@ -38,7 +51,6 @@ const CryptoWatchlist = () => {
 
     const fetchData = useCallback(async () => {
         try {
-            // 1. Get watchlist from DB (or use local state if not first load)
             let items = watchlistItems;
             if (loading) {
                 items = await fetchWatchlist();
@@ -65,7 +77,7 @@ const CryptoWatchlist = () => {
 
     useEffect(() => {
         fetchData();
-        const interval = setInterval(fetchData, 3 * 60 * 1000); // Refresh prices every 3m
+        const interval = setInterval(fetchData, 3 * 60 * 1000); // 3 mins
         return () => clearInterval(interval);
     }, [fetchData]);
 
@@ -73,15 +85,41 @@ const CryptoWatchlist = () => {
         localStorage.setItem('crypto_holdings', JSON.stringify(holdings));
     }, [holdings]);
 
-    const addToWatchlist = async () => {
-        const symbol = addInput.trim().toUpperCase();
+    // Search Logic
+    useEffect(() => {
+        if (!searchQuery.trim()) {
+            setSearchResults([]);
+            return;
+        }
+
+        if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
+
+        searchTimeoutRef.current = setTimeout(async () => {
+            setIsSearching(true);
+            try {
+                const results = await cryptoService.search(searchQuery);
+                setSearchResults(results);
+            } catch (error) {
+                console.error('Search failed:', error);
+            } finally {
+                setIsSearching(false);
+            }
+        }, 500); // Debounce 500ms
+
+        return () => {
+            if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
+        };
+    }, [searchQuery]);
+
+    const addToWatchlist = async (symbol: string) => {
         if (symbol && !watchlistItems.some(i => i.symbol === symbol)) {
             try {
                 setLoading(true);
                 await api.post('/notifications/watchlist', { symbol });
-                setAddInput('');
+                setSearchQuery('');
+                setSearchResults([]);
                 setShowAddForm(false);
-                await fetchWatchlist(); // Refresh list to get ID
+                await fetchWatchlist();
             } catch (error) {
                 console.error('Failed to add to watchlist:', error);
                 setLoading(false);
@@ -91,7 +129,6 @@ const CryptoWatchlist = () => {
 
     const removeFromWatchlist = async (id: string, symbol: string) => {
         try {
-            // Optimistic update
             setWatchlistItems(prev => prev.filter(i => i.id !== id));
             await api.delete(`/notifications/watchlist/${id}`);
 
@@ -100,7 +137,7 @@ const CryptoWatchlist = () => {
             setHoldings(newHoldings);
         } catch (error) {
             console.error('Failed to remove from watchlist:', error);
-            fetchWatchlist(); // Revert on error
+            fetchWatchlist();
         }
     };
 
@@ -126,7 +163,6 @@ const CryptoWatchlist = () => {
         return `$${value.toFixed(2)}`;
     };
 
-    // Calculate total portfolio
     const totalPortfolioValue = watchlistItems.reduce((total, item) => {
         const quote = quotes[item.symbol];
         const amount = holdings[item.symbol] || 0;
@@ -146,37 +182,61 @@ const CryptoWatchlist = () => {
                 </div>
             )}
 
-            {/* Watchlist */}
-            <div className="bg-white dark:bg-[#2b2616] rounded-2xl border border-slate-200 dark:border-[#f4c025]/10 shadow-sm overflow-hidden">
+            {/* Watchlist Header & Search */}
+            <div className="bg-white dark:bg-[#2b2616] rounded-2xl border border-slate-200 dark:border-[#f4c025]/10 shadow-sm overflow-visible">
                 <div className="p-4 md:p-6 border-b border-slate-100 dark:border-[#f4c025]/10 flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
                     <div>
                         <h3 className="text-slate-800 dark:text-white font-bold text-lg">{t('crypto.watchlist')}</h3>
                         <p className="text-xs text-slate-500 dark:text-[#cbbc90]">{t('crypto.watchlistDesc')}</p>
                     </div>
-                    <div className="flex gap-2">
+
+                    <div className="relative z-20">
                         {showAddForm ? (
-                            <div className="flex gap-2">
-                                <input
-                                    type="text"
-                                    value={addInput}
-                                    onChange={(e) => setAddInput(e.target.value)}
-                                    onKeyDown={(e) => e.key === 'Enter' && addToWatchlist()}
-                                    placeholder="BTC, ETH..."
-                                    className="w-32 bg-slate-50 dark:bg-[#1e1b10] border border-slate-200 dark:border-[#f4c025]/10 rounded-lg py-2 px-3 text-sm text-slate-800 dark:text-white focus:outline-none focus:border-amber-400"
-                                    autoFocus
-                                />
-                                <button
-                                    onClick={addToWatchlist}
-                                    className="bg-amber-500 dark:bg-[#f4c025] text-white dark:text-[#2b2616] px-3 py-2 rounded-lg font-bold text-sm"
-                                >
-                                    {t('common.add')}
-                                </button>
-                                <button
-                                    onClick={() => { setShowAddForm(false); setAddInput(''); }}
-                                    className="text-slate-400 hover:text-slate-600 dark:hover:text-white px-2 py-2 rounded-lg text-sm"
-                                >
-                                    {t('common.cancel')}
-                                </button>
+                            <div className="relative">
+                                <div className="flex gap-2">
+                                    <input
+                                        type="text"
+                                        value={searchQuery}
+                                        onChange={(e) => setSearchQuery(e.target.value)}
+                                        placeholder="BTC, ETH..."
+                                        className="w-48 bg-slate-50 dark:bg-[#1e1b10] border border-slate-200 dark:border-[#f4c025]/10 rounded-lg py-2 px-3 text-sm text-slate-800 dark:text-white focus:outline-none focus:border-amber-400"
+                                        autoFocus
+                                    />
+                                    <button
+                                        onClick={() => { setShowAddForm(false); setSearchQuery(''); setSearchResults([]); }}
+                                        className="text-slate-400 hover:text-slate-600 dark:hover:text-white px-2 py-2 rounded-lg text-sm"
+                                    >
+                                        {t('common.cancel')}
+                                    </button>
+                                </div>
+
+                                {/* Autocomplete Dropdown */}
+                                {(searchResults.length > 0 || isSearching) && (
+                                    <div className="absolute top-full left-0 w-64 mt-2 bg-white dark:bg-[#1e1b10] border border-slate-200 dark:border-[#f4c025]/10 rounded-xl shadow-xl overflow-hidden max-h-64 overflow-y-auto">
+                                        {isSearching ? (
+                                            <div className="p-3 text-center text-xs text-slate-400">Searching...</div>
+                                        ) : (
+                                            searchResults.map(coin => (
+                                                <div
+                                                    key={coin.id}
+                                                    onClick={() => addToWatchlist(coin.symbol)}
+                                                    className="px-4 py-3 hover:bg-slate-50 dark:hover:bg-[#2b2616] cursor-pointer flex items-center justify-between group border-b border-slate-50 dark:border-[#f4c025]/5 last:border-0"
+                                                >
+                                                    <div className="flex items-center gap-2">
+                                                        <div className="w-6 h-6 rounded-full bg-slate-100 dark:bg-[#2b2616] flex items-center justify-center text-[10px] font-bold text-slate-500 dark:text-[#cbbc90]">
+                                                            {coin.symbol[0]}
+                                                        </div>
+                                                        <div>
+                                                            <p className="font-bold text-sm text-slate-800 dark:text-white">{coin.name}</p>
+                                                            <p className="text-xs text-slate-400 dark:text-[#8e8568]">{coin.symbol}</p>
+                                                        </div>
+                                                    </div>
+                                                    <span className="material-symbols-outlined text-slate-300 dark:text-[#f4c025]/30 group-hover:text-amber-500 dark:group-hover:text-[#f4c025] text-lg">add_circle</span>
+                                                </div>
+                                            ))
+                                        )}
+                                    </div>
+                                )}
                             </div>
                         ) : (
                             <button
@@ -191,7 +251,7 @@ const CryptoWatchlist = () => {
                 </div>
 
                 {/* Coin Cards */}
-                <div className="p-4 md:p-6">
+                <div className="p-4 md:p-6 z-10 relative">
                     {loading ? (
                         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                             {Array(6).fill(0).map((_, i) => (
@@ -218,7 +278,6 @@ const CryptoWatchlist = () => {
                                         key={id}
                                         className="bg-slate-50 dark:bg-[#1e1b10] rounded-2xl border border-slate-100 dark:border-[#f4c025]/10 p-4 hover:border-amber-300 dark:hover:border-[#f4c025]/30 transition-all group relative"
                                     >
-                                        {/* Remove button */}
                                         <button
                                             onClick={() => removeFromWatchlist(id, symbol)}
                                             className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity text-slate-300 hover:text-rose-400 dark:text-[#8e8568] dark:hover:text-rose-400"
@@ -226,7 +285,6 @@ const CryptoWatchlist = () => {
                                             <span className="material-symbols-outlined text-[18px]">close</span>
                                         </button>
 
-                                        {/* Header */}
                                         <div className="flex items-center gap-3 mb-3">
                                             {info?.logo ? (
                                                 <img src={info.logo} alt={symbol} className="w-9 h-9 rounded-full" />
@@ -241,7 +299,6 @@ const CryptoWatchlist = () => {
                                             </div>
                                         </div>
 
-                                        {/* Price */}
                                         <div className="flex items-end justify-between mb-3">
                                             <p className="text-xl font-bold text-slate-800 dark:text-white">{formatPrice(quote?.price)}</p>
                                             <div className="text-right">
@@ -252,7 +309,6 @@ const CryptoWatchlist = () => {
                                             </div>
                                         </div>
 
-                                        {/* Holdings */}
                                         <div className="border-t border-slate-100 dark:border-[#f4c025]/10 pt-3">
                                             {editingHolding === symbol ? (
                                                 <div className="flex gap-2">
