@@ -70,17 +70,17 @@ const Settings: React.FC = () => {
         fetchData();
     }, []);
 
-    // Accordion State
-    const [openSection, setOpenSection] = useState<string | null>(''); // Default open 'account'
-    const [openSubSection, setOpenSubSection] = useState<string | null>(null);
+    // Tab State
+    const [activeTab, setActiveTab] = useState('account');
 
-    const toggleSection = (section: string) => {
-        setOpenSection(openSection === section ? null : section);
-    };
+    const tabs = [
+        { id: 'account', label: t('settings.account'), icon: 'manage_accounts' },
+        { id: 'finance', label: t('settings.features'), icon: 'account_balance_wallet' }, // Reusing 'features' label/icon for Finance
+        { id: 'appearance', label: t('settings.appearance'), icon: 'palette' },
+        { id: 'notifications', label: t('settings.notifications'), icon: 'notifications' },
+    ];
 
-    const toggleSubSection = (sub: string) => {
-        setOpenSubSection(openSubSection === sub ? null : sub);
-    };
+    // ... existing handlers ...
 
     const handleSaveBudget = async () => {
         setLoading(true);
@@ -332,20 +332,503 @@ const Settings: React.FC = () => {
     // Removed handleResetApp in favor of handleResetAppClick & handleConfirmAction
 
     return (
-        <div className="max-w-4xl mx-auto w-full p-4 md:p-8 flex flex-col gap-8 relative">
-            <ConfirmationModal
-                isOpen={confirmation.isOpen}
-                onClose={() => setConfirmation({ ...confirmation, isOpen: false })}
-                onConfirm={handleConfirmAction}
-                title={confirmation.title}
-                message={confirmation.message}
-                variant="danger"
-                confirmText={confirmation.type === 'reset_app' ? 'Yes, Reset Everything' : 'Delete'}
-                isLoading={confirmation.isLoading}
-            />
+        <div className="flex flex-col md:flex-row h-full min-h-screen bg-slate-50 dark:bg-background-dark">
+            {/* Desktop Sidebar */}
+            <div className="hidden md:flex flex-col w-64 bg-white dark:bg-[#2b2616] border-r border-slate-200 dark:border-[#493f22] h-screen sticky top-0 overflow-y-auto">
+                <div className="p-6">
+                    <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">{t('settings.title')}</h1>
+                    <p className="text-xs text-slate-500 dark:text-[#cbbc90] mt-1">{t('settings.subtitle')}</p>
+                </div>
+                <nav className="flex flex-col px-3 gap-1">
+                    {tabs.map(tab => (
+                        <button
+                            key={tab.id}
+                            onClick={() => setActiveTab(tab.id)}
+                            className={`flex items-center gap-3 p-3 rounded-xl text-left transition-all ${activeTab === tab.id
+                                ? 'bg-primary text-slate-900 font-bold shadow-sm'
+                                : 'text-slate-600 dark:text-[#cbbc90] hover:bg-slate-50 dark:hover:bg-[#36301d]'
+                                }`}
+                        >
+                            <span className="material-symbols-outlined">{tab.icon}</span>
+                            <span className="text-sm font-medium">{tab.label}</span>
+                        </button>
+                    ))}
+                </nav>
+            </div>
 
+            {/* Mobile Tab Bar (Sticky Top) */}
+            <div className="md:hidden sticky top-0 z-40 bg-white/80 dark:bg-[#2b2616]/80 backdrop-blur-md border-b border-slate-200 dark:border-[#493f22] overflow-x-auto no-scrollbar">
+                <div className="flex p-2 gap-2 min-w-max">
+                    {tabs.map(tab => (
+                        <button
+                            key={tab.id}
+                            onClick={() => setActiveTab(tab.id)}
+                            className={`flex items-center gap-2 px-4 py-2 rounded-full whitespace-nowrap text-sm font-bold transition-all ${activeTab === tab.id
+                                ? 'bg-primary text-slate-900 shadow-sm'
+                                : 'bg-slate-100 dark:bg-[#36301d] text-slate-500 dark:text-[#cbbc90]'
+                                }`}
+                        >
+                            <span className="material-symbols-outlined text-[18px]">{tab.icon}</span>
+                            {tab.label}
+                        </button>
+                    ))}
+                </div>
+            </div>
 
-            {/* Add Recurring Modal */}
+            {/* Main Content Area */}
+            <div className="flex-1 p-4 md:p-8 overflow-y-auto w-full max-w-5xl mx-auto">
+                {/* Mobile Header (Page Title) */}
+                <div className="md:hidden mb-6 mt-2">
+                    <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">{tabs.find(t => t.id === activeTab)?.label}</h1>
+                </div>
+
+                <ConfirmationModal
+                    isOpen={confirmation.isOpen}
+                    onClose={() => setConfirmation({ ...confirmation, isOpen: false })}
+                    onConfirm={handleConfirmAction}
+                    title={confirmation.title}
+                    message={confirmation.message}
+                    variant="danger"
+                    confirmText={confirmation.type === 'reset_app' ? 'Yes, Reset Everything' : 'Delete'}
+                    isLoading={confirmation.isLoading}
+                />
+
+                <ProfilePictureModal
+                    isOpen={isProfileModalOpen}
+                    onClose={() => setIsProfileModalOpen(false)}
+                    currentUser={currentUser}
+                    onUpdate={(newImage) => setCurrentUser((prev: any) => ({ ...prev, image: newImage }))}
+                />
+
+                {/* ACCOUNT TAB */}
+                {activeTab === 'account' && (
+                    <div className="flex flex-col gap-6 animate-fade-in">
+                        {/* Profile Card */}
+                        <div className="bg-white dark:bg-[#342d18] rounded-2xl border border-slate-100 dark:border-[#493f22] p-6 flex flex-col md:flex-row items-center gap-6 shadow-sm">
+                            <div className="relative group cursor-pointer" onClick={() => setIsProfileModalOpen(true)}>
+                                {currentUser?.image ? (
+                                    <img src={currentUser.image} alt="Profile" className="w-24 h-24 rounded-full object-cover border-4 border-slate-50 dark:border-[#493f22]" />
+                                ) : (
+                                    <div className="w-24 h-24 rounded-full bg-slate-100 dark:bg-[#2b2616] flex items-center justify-center text-slate-400">
+                                        <span className="material-symbols-outlined text-4xl">person</span>
+                                    </div>
+                                )}
+                                <div className="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <span className="material-symbols-outlined text-white">edit</span>
+                                </div>
+                            </div>
+                            <div className="flex-1 text-center md:text-left">
+                                <h2 className="text-2xl font-black text-slate-900 dark:text-white">{currentUser?.name || 'User'}</h2>
+                                <p className="text-slate-500 dark:text-[#cbbc90] mb-3">{currentUser?.email}</p>
+                                {currentUser?.plan && (
+                                    <span className={`inline-block px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider shadow-sm border ${getPlanBadgeStyles(currentUser.plan)}`}>
+                                        {currentUser.plan} Plan
+                                    </span>
+                                )}
+                            </div>
+                            {currentUser?.role === 'ADMIN' && (
+                                <Link
+                                    to="/admin"
+                                    className="px-6 py-3 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold border border-slate-900 dark:border-white hover:opacity-90 transition-all flex items-center gap-2"
+                                >
+                                    <span className="material-symbols-outlined">admin_panel_settings</span>
+                                    {t('sidebar.admin')}
+                                </Link>
+                            )}
+                            <button
+                                onClick={handleLogout}
+                                className="px-6 py-3 rounded-xl bg-red-50 dark:bg-red-900/10 text-red-600 dark:text-red-400 font-bold border border-red-100 dark:border-red-900/30 hover:bg-red-100 dark:hover:bg-red-900/20 transition-all flex items-center gap-2"
+                            >
+                                <span className="material-symbols-outlined">logout</span>
+                                {t('sidebar.logout')}
+                            </button>
+                        </div>
+
+                        {/* Profile Details Form */}
+                        <div className="bg-white dark:bg-[#342d18] rounded-2xl border border-slate-100 dark:border-[#493f22] p-6 shadow-sm">
+                            <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-6 border-b border-slate-100 dark:border-[#493f22] pb-4">{t('settings.profileDetails')}</h3>
+                            <form onSubmit={handleUpdateName} className="flex flex-col gap-4 max-w-lg">
+                                <div className="flex flex-col gap-3">
+                                    <label className="text-sm font-bold text-slate-700 dark:text-[#cbbc90]">{t('settings.profilePicture')}</label>
+                                    <div className="flex flex-wrap gap-4">
+                                        {currentUser?.image && !currentUser.image.startsWith('/default-profiles/') && (
+                                            <div className="relative group cursor-pointer">
+                                                <img
+                                                    src={currentUser.image}
+                                                    alt="Current"
+                                                    className="w-16 h-16 rounded-full object-cover border-2 border-primary"
+                                                />
+                                                <div className="absolute inset-0 bg-black/50 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                                    <span className="text-white text-xs font-bold">Current</span>
+                                                </div>
+                                            </div>
+                                        )}
+                                        {[1, 2, 3, 4].map((num) => {
+                                            const imgPath = `/default-profiles/profilepict${num}.png`;
+                                            const isSelected = currentUser?.image === imgPath;
+                                            return (
+                                                <button
+                                                    key={num}
+                                                    type="button"
+                                                    onClick={() => handleUpdateProfilePicture(imgPath)}
+                                                    className={`relative w-16 h-16 rounded-full overflow-hidden border-2 transition-all ${isSelected ? 'border-primary ring-2 ring-primary/30 scale-105' : 'border-transparent hover:border-slate-300 dark:hover:border-slate-600'}`}
+                                                >
+                                                    <img
+                                                        src={imgPath}
+                                                        alt={`Profile ${num}`}
+                                                        className="w-full h-full object-cover"
+                                                    />
+                                                    {isSelected && (
+                                                        <div className="absolute inset-0 bg-primary/20 flex items-center justify-center">
+                                                            <span className="material-symbols-outlined text-white drop-shadow-md">check</span>
+                                                        </div>
+                                                    )}
+                                                </button>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+                                <div className="flex flex-col gap-2">
+                                    <label className="text-sm font-bold text-slate-700 dark:text-[#cbbc90]">{t('settings.displayName')}</label>
+                                    <div className="flex gap-2">
+                                        <input
+                                            type="text"
+                                            value={nameForm.name}
+                                            onChange={e => setNameForm({ ...nameForm, name: e.target.value })}
+                                            className="w-full bg-slate-50 dark:bg-[#2b2616] border border-slate-200 dark:border-[#493f22] rounded-xl px-4 py-2 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary"
+                                        />
+                                        <button
+                                            type="submit"
+                                            disabled={isUpdatingName}
+                                            className="bg-slate-900 dark:bg-slate-700 text-white font-bold px-4 py-2 rounded-xl text-sm hover:opacity-90"
+                                        >
+                                            {isUpdatingName ? t('common.loading') : t('common.save')}
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+
+                        {/* Security Section (Password, Email, Sessions) */}
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            {/* Password & Email */}
+                            <div className="bg-white dark:bg-[#342d18] rounded-2xl border border-slate-100 dark:border-[#493f22] p-6 shadow-sm flex flex-col gap-8">
+                                <div>
+                                    <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+                                        <span className="material-symbols-outlined text-primary">lock</span>
+                                        {t('settings.changePassword')}
+                                    </h3>
+                                    <form onSubmit={handleChangePassword} className="flex flex-col gap-3">
+                                        <input
+                                            type="password"
+                                            placeholder={t('settings.currentPassword')}
+                                            value={passwordForm.currentPassword}
+                                            onChange={e => setPasswordForm({ ...passwordForm, currentPassword: e.target.value })}
+                                            className="w-full bg-slate-50 dark:bg-[#2b2616] border border-slate-200 dark:border-[#493f22] rounded-xl px-4 py-2 text-sm text-slate-900 dark:text-white"
+                                            required
+                                        />
+                                        <input
+                                            type="password"
+                                            placeholder={t('settings.newPassword')}
+                                            value={passwordForm.newPassword}
+                                            onChange={e => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
+                                            className="w-full bg-slate-50 dark:bg-[#2b2616] border border-slate-200 dark:border-[#493f22] rounded-xl px-4 py-2 text-sm text-slate-900 dark:text-white"
+                                            required
+                                        />
+                                        <input
+                                            type="password"
+                                            placeholder={t('settings.confirmPassword')}
+                                            value={passwordForm.confirmPassword}
+                                            onChange={e => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
+                                            className="w-full bg-slate-50 dark:bg-[#2b2616] border border-slate-200 dark:border-[#493f22] rounded-xl px-4 py-2 text-sm text-slate-900 dark:text-white"
+                                            required
+                                        />
+                                        <button type="submit" disabled={isChangingPassword} className="bg-slate-900 dark:bg-slate-700 text-white font-bold py-2 rounded-xl text-sm hover:opacity-90 mt-2">
+                                            {isChangingPassword ? t('common.loading') : t('settings.updatePassword')}
+                                        </button>
+                                    </form>
+                                </div>
+                                <div className="border-t border-slate-100 dark:border-[#493f22] pt-6">
+                                    <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+                                        <span className="material-symbols-outlined text-primary">mail</span>
+                                        {t('settings.changeEmail')}
+                                    </h3>
+                                    <form onSubmit={handleChangeEmail} className="flex flex-col gap-3">
+                                        <input
+                                            type="email"
+                                            placeholder={t('settings.newEmail')}
+                                            value={emailForm.newEmail}
+                                            onChange={e => setEmailForm({ ...emailForm, newEmail: e.target.value })}
+                                            className="w-full bg-slate-50 dark:bg-[#2b2616] border border-slate-200 dark:border-[#493f22] rounded-xl px-4 py-2 text-sm text-slate-900 dark:text-white"
+                                            required
+                                        />
+                                        <button type="submit" disabled={isChangingEmail} className="bg-slate-900 dark:bg-slate-700 text-white font-bold py-2 rounded-xl text-sm hover:opacity-90 mt-2">
+                                            {isChangingEmail ? t('common.loading') : t('settings.updateEmail')}
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+
+                            {/* Login History */}
+                            <div className="bg-white dark:bg-[#342d18] rounded-2xl border border-slate-100 dark:border-[#493f22] p-6 shadow-sm">
+                                <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+                                    <span className="material-symbols-outlined text-primary">security</span>
+                                    Login History
+                                </h3>
+                                <SessionList />
+                            </div>
+                        </div>
+
+                        {/* Danger Zone */}
+                        <div className="bg-red-50 dark:bg-red-900/10 rounded-2xl border border-red-100 dark:border-red-900/30 p-6 flex flex-col md:flex-row items-center justify-between gap-4">
+                            <div>
+                                <h3 className="text-lg font-bold text-red-700 dark:text-red-400">{t('settings.dangerZone')}</h3>
+                                <p className="text-sm text-red-600/70 dark:text-red-400/70">{t('settings.resetWarning')}</p>
+                            </div>
+                            <button
+                                onClick={handleResetAppClick}
+                                className="px-6 py-3 bg-white dark:bg-red-900/20 text-red-600 dark:text-red-400 font-bold rounded-xl border border-red-200 dark:border-red-800 hover:bg-red-100 transition-colors"
+                            >
+                                {t('settings.resetApp')}
+                            </button>
+                        </div>
+                    </div>
+                )}
+
+                {/* FINANCE TAB */}
+                {activeTab === 'finance' && (
+                    <div className="flex flex-col gap-6 animate-fade-in">
+                        {/* Budget Config */}
+                        <div className="bg-white dark:bg-[#342d18] rounded-2xl border border-slate-100 dark:border-[#493f22] p-6 shadow-sm">
+                            <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+                                <span className="material-symbols-outlined text-primary">account_balance_wallet</span>
+                                Monthly Budget
+                            </h2>
+                            <p className="text-sm text-slate-500 dark:text-[#cbbc90] mb-4">{t('settings.budgetDescription')}</p>
+                            <div className="flex flex-col gap-2 max-w-md">
+                                <label className="text-sm font-bold text-slate-700 dark:text-[#cbbc90]">{t('settings.budgetLimit')}</label>
+                                <div className="relative">
+                                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-600 font-bold">Rp</span>
+                                    <CurrencyInput
+                                        value={budgetLimit}
+                                        onChange={(val) => setBudgetLimit(val.toString())}
+                                        placeholder="e.g. 5.000.000"
+                                        className="w-full bg-slate-50 dark:bg-[#1a160b] border border-slate-200 dark:border-[#493f22] rounded-xl pl-12 pr-4 py-3 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all font-bold text-lg"
+                                    />
+                                </div>
+                                <button
+                                    onClick={handleSaveBudget}
+                                    disabled={loading}
+                                    className="bg-primary hover:bg-[#dca60e] text-slate-900 font-bold py-3 rounded-xl transition-all shadow-lg hover:shadow-primary/25 mt-2"
+                                >
+                                    {loading ? t('common.loading') : t('settings.saveBudget')}
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Recurring Transactions */}
+                        <div className="bg-white dark:bg-[#342d18] rounded-2xl border border-slate-100 dark:border-[#493f22] p-6 shadow-sm">
+                            <div className="flex justify-between items-center mb-6">
+                                <h2 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                                    <span className="material-symbols-outlined text-primary">update</span>
+                                    {t('settings.recurringTransactions')}
+                                </h2>
+                                <button
+                                    onClick={() => setIsRecurringModalOpen(true)}
+                                    className="flex items-center gap-2 px-4 py-2 rounded-xl bg-primary text-slate-900 font-bold text-sm shadow-sm hover:bg-[#dca60e] transition-colors"
+                                >
+                                    <span className="material-symbols-outlined text-lg">add</span>
+                                    {t('settings.addTransaction')}
+                                </button>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                {recurringTransactions.map(trans => (
+                                    <div key={trans.id} className="p-4 rounded-xl border border-slate-100 dark:border-[#493f22] flex flex-col gap-3 hover:shadow-md transition-all relative group bg-slate-50 dark:bg-[#1a160b]">
+                                        <div className="flex justify-between items-start">
+                                            <div className="w-10 h-10 rounded-full bg-purple-100 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 flex items-center justify-center">
+                                                <span className="material-symbols-outlined">{trans.icon}</span>
+                                            </div>
+                                            <button
+                                                onClick={() => handleDeleteRecurringClick(trans.id)}
+                                                className="text-slate-300 dark:text-[#cbbc90] hover:text-red-500 transition-colors"
+                                            >
+                                                <span className="material-symbols-outlined">delete</span>
+                                            </button>
+                                        </div>
+                                        <div>
+                                            <h3 className="font-bold text-slate-900 dark:text-white line-clamp-1">{trans.name}</h3>
+                                            <p className="text-primary font-bold">{formatCurrency(trans.amount)}</p>
+                                        </div>
+                                        <div className="mt-auto pt-3 border-t border-slate-200 dark:border-[#493f22] flex items-center gap-2 text-xs text-slate-500 dark:text-[#cbbc90]">
+                                            <span className="material-symbols-outlined text-[16px]">event_repeat</span>
+                                            <span>Every {trans.date}th of {trans.frequency.toLowerCase()}</span>
+                                        </div>
+                                    </div>
+                                ))}
+                                {recurringTransactions.length === 0 && (
+                                    <div className="col-span-full text-center py-8 text-slate-500 dark:text-[#cbbc90]">
+                                        No recurring transactions yet.
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* APPEARANCE TAB */}
+                {activeTab === 'appearance' && (
+                    <div className="flex flex-col gap-6 animate-fade-in">
+                        {/* Theme */}
+                        <div className="bg-white dark:bg-[#342d18] rounded-2xl border border-slate-100 dark:border-[#493f22] p-6 shadow-sm">
+                            <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-4">{t('settings.theme')}</h2>
+                            <div className="grid grid-cols-3 gap-4">
+                                {(['light', 'dark', 'system'] as const).map((themeOption) => (
+                                    <button
+                                        key={themeOption}
+                                        onClick={() => setTheme(themeOption)}
+                                        className={`
+                                            flex flex-col items-center justify-center gap-3 p-6 rounded-2xl border-2 transition-all
+                                            ${theme === themeOption
+                                                ? 'bg-primary/10 border-primary text-slate-900 dark:text-white'
+                                                : 'bg-slate-50 dark:bg-[#1a160b] border-transparent text-slate-500 hover:bg-slate-100 dark:hover:bg-[#2b2616]'
+                                            }
+                                        `}
+                                    >
+                                        <div className={`w-12 h-12 rounded-full flex items-center justify-center ${theme === themeOption ? 'bg-primary text-slate-900' : 'bg-slate-200 dark:bg-slate-800'}`}>
+                                            <span className="material-symbols-outlined text-2xl">
+                                                {themeOption === 'light' ? 'light_mode' : themeOption === 'dark' ? 'dark_mode' : 'settings_brightness'}
+                                            </span>
+                                        </div>
+                                        <span className="capitalize font-bold">{t(`settings.${themeOption}` as any)}</span>
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Language */}
+                        <div className="bg-white dark:bg-[#342d18] rounded-2xl border border-slate-100 dark:border-[#493f22] p-6 shadow-sm">
+                            <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-4">{t('settings.language')}</h2>
+                            <div className="flex gap-4">
+                                <button
+                                    onClick={() => setLanguage('en')}
+                                    className={`flex-1 p-4 rounded-xl border-2 transition-all flex items-center justify-center gap-2 font-bold ${language === 'en' ? 'border-primary bg-primary/5' : 'border-slate-100 dark:border-[#493f22]'
+                                        }`}
+                                >
+                                    <span className="text-2xl">🇺🇸</span> {t('settings.english')}
+                                </button>
+                                <button
+                                    onClick={() => setLanguage('id')}
+                                    className={`flex-1 p-4 rounded-xl border-2 transition-all flex items-center justify-center gap-2 font-bold ${language === 'id' ? 'border-primary bg-primary/5' : 'border-slate-100 dark:border-[#493f22]'
+                                        }`}
+                                >
+                                    <span className="text-2xl">🇮🇩</span> {t('settings.indonesian')}
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Privacy */}
+                        <div className="bg-white dark:bg-[#342d18] rounded-2xl border border-slate-100 dark:border-[#493f22] p-6 shadow-sm">
+                            <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-4">{t('settings.hideBalance')}</h2>
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <button
+                                    onClick={() => setPrivacyMode('none')}
+                                    className={`p-4 rounded-xl border max-md:flex max-md:items-center max-md:gap-4 text-left transition-all ${privacyMode === 'none' ? 'border-primary bg-primary/5 ring-1 ring-primary' : 'border-slate-100 dark:border-[#493f22]'
+                                        }`}
+                                >
+                                    <div className="mb-2 w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/20 text-blue-600 flex items-center justify-center">
+                                        <span className="material-symbols-outlined">visibility</span>
+                                    </div>
+                                    <div>
+                                        <h3 className="font-bold text-slate-900 dark:text-white">{t('settings.showAll')}</h3>
+                                        <p className="text-xs text-slate-500">{t('settings.defaultVisibility')}</p>
+                                    </div>
+                                </button>
+                                <button
+                                    onClick={() => setPrivacyMode('hidden')}
+                                    className={`p-4 rounded-xl border max-md:flex max-md:items-center max-md:gap-4 text-left transition-all ${privacyMode === 'hidden' ? 'border-primary bg-primary/5 ring-1 ring-primary' : 'border-slate-100 dark:border-[#493f22]'
+                                        }`}
+                                >
+                                    <div className="mb-2 w-10 h-10 rounded-full bg-yellow-100 dark:bg-yellow-900/20 text-yellow-600 flex items-center justify-center">
+                                        <span className="material-symbols-outlined">visibility_off</span>
+                                    </div>
+                                    <div>
+                                        <h3 className="font-bold text-slate-900 dark:text-white">{t('settings.softHide')}</h3>
+                                        <p className="text-xs text-slate-500">{t('settings.hideTotalBalance')}</p>
+                                    </div>
+                                </button>
+                                <button
+                                    onClick={() => setPrivacyMode('extreme')}
+                                    className={`p-4 rounded-xl border max-md:flex max-md:items-center max-md:gap-4 text-left transition-all ${privacyMode === 'extreme' ? 'border-primary bg-primary/5 ring-1 ring-primary' : 'border-slate-100 dark:border-[#493f22]'
+                                        }`}
+                                >
+                                    <div className="mb-2 w-10 h-10 rounded-full bg-purple-100 dark:bg-purple-900/20 text-purple-600 flex items-center justify-center">
+                                        <span className="material-symbols-outlined">password</span>
+                                    </div>
+                                    <div>
+                                        <h3 className="font-bold text-slate-900 dark:text-white">{t('settings.extremeHide')}</h3>
+                                        <p className="text-xs text-slate-500">{t('settings.hideAllNumbers')}</p>
+                                    </div>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* NOTIFICATIONS TAB */}
+                {activeTab === 'notifications' && (
+                    <div className="bg-white dark:bg-[#342d18] rounded-2xl border border-slate-100 dark:border-[#493f22] p-6 shadow-sm animate-fade-in">
+                        <div className="flex items-center justify-between mb-8">
+                            <div>
+                                <h2 className="text-lg font-bold text-slate-900 dark:text-white">{t('settings.enablePush')}</h2>
+                                <p className="text-sm text-slate-500 dark:text-[#cbbc90]">{t('settings.enablePushDesc')}</p>
+                            </div>
+                            <button
+                                onClick={isSubscribed ? unsubscribe : subscribe}
+                                disabled={pushLoading}
+                                className={`relative w-14 h-8 rounded-full transition-colors ${isSubscribed ? 'bg-primary' : 'bg-slate-200 dark:bg-slate-700'}`}
+                            >
+                                <span className={`absolute top-1 left-1 w-6 h-6 rounded-full bg-white transition-transform ${isSubscribed ? 'translate-x-6' : 'translate-x-0'}`} />
+                            </button>
+                        </div>
+
+                        {isSubscribed && (
+                            <div className="grid grid-cols-1 gap-6">
+                                {[
+                                    { key: 'notifyRecurring', label: t('settings.notifyRecurring'), desc: t('settings.notifyRecurringDesc') },
+                                    { key: 'notifyBudget50', label: 'Budget Alert (50%)', desc: 'Notify when 50% of budget is used' },
+                                    { key: 'notifyBudget80', label: 'Budget Alert (80%)', desc: 'Notify when 80% of budget is used' },
+                                    { key: 'notifyBudget95', label: 'Budget Alert (95%)', desc: 'Notify when 95% of budget is used' },
+                                    { key: 'notifyBudget100', label: 'Budget Alert (100%)', desc: 'Notify when budget is fully used' },
+                                    { key: 'notifyDaily', label: t('settings.notifyDaily'), desc: t('settings.notifyDailyDesc') },
+                                    { key: 'notifyLunch', label: t('settings.notifyLunch'), desc: t('settings.notifyLunchDesc') },
+                                ].map((pref) => (
+                                    <div key={pref.key} className="flex items-start justify-between p-4 rounded-xl hover:bg-slate-50 dark:hover:bg-[#2b2616] transition-colors">
+                                        <div>
+                                            <h4 className="font-bold text-slate-900 dark:text-white">{pref.label}</h4>
+                                            <p className="text-xs text-slate-500 dark:text-[#cbbc90]">{pref.desc}</p>
+                                        </div>
+                                        <button
+                                            onClick={() => handleUpdatePref(pref.key, !currentUser?.[pref.key])}
+                                            className={`relative w-10 h-6 rounded-full transition-colors flex-shrink-0 mt-1 ${currentUser?.[pref.key] !== false ? 'bg-primary' : 'bg-slate-200 dark:bg-slate-700'}`}
+                                        >
+                                            <span className={`absolute top-1 left-1 w-4 h-4 rounded-full bg-white transition-transform ${currentUser?.[pref.key] !== false ? 'translate-x-4' : 'translate-x-0'}`} />
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+
+                        {!isSupported && (
+                            <div className="p-4 bg-red-50 dark:bg-red-900/10 text-red-600 rounded-xl text-center font-bold">
+                                Push notifications are not supported in this browser.
+                            </div>
+                        )}
+                    </div>
+                )}
+            </div>
+
+            {/* Recurring Modal (Global) */}
             {isRecurringModalOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
                     <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsRecurringModalOpen(false)}></div>
@@ -415,629 +898,6 @@ const Settings: React.FC = () => {
                     </div>
                 </div>
             )}
-
-            {/* Mobile Profile & Logout Section (Visible only on mobile) */}
-            <div className="md:hidden mb-2 p-6 bg-white dark:bg-[#342d18] rounded-2xl border border-slate-100 dark:border-[#493f22] flex flex-col items-center gap-4 shadow-sm relative overflow-hidden">
-                <div className="absolute top-0 left-0 w-full h-24 bg-gradient-to-b from-primary/10 to-transparent"></div>
-                <div
-                    className="relative z-10 w-24 h-24 rounded-full border-4 border-white dark:border-[#342d18] shadow-lg flex items-center justify-center bg-primary/20 text-primary mb-2 cursor-pointer group"
-                    onClick={() => setIsProfileModalOpen(true)}
-                >
-                    {currentUser?.image ? (
-                        <img src={currentUser.image} alt="Profile" className="w-full h-full rounded-full object-cover" />
-                    ) : (
-                        <span className="material-symbols-outlined text-5xl">person</span>
-                    )}
-                    {/* Pencil Overlay */}
-                    <div className="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                        <span className="material-symbols-outlined text-white text-2xl">edit</span>
-                    </div>
-                    <div className="absolute bottom-0 right-0 bg-white dark:bg-[#342d18] rounded-full p-1 shadow-sm md:hidden">
-                        <div className="bg-slate-100 dark:bg-[#493f22] rounded-full p-1.5 flex items-center justify-center">
-                            <span className="material-symbols-outlined text-slate-600 dark:text-[#cbbc90] text-sm">edit</span>
-                        </div>
-                    </div>
-                </div>
-                <div className="text-center relative z-10">
-                    <h2 className="text-2xl font-black text-slate-800 dark:text-white">{currentUser?.name || 'User'}</h2>
-                    <p className="text-slate-500 dark:text-[#cbbc90] font-medium">{currentUser?.email || 'user@example.com'}</p>
-                    {currentUser?.plan && (
-                        <span className={`inline-block mt-2 px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider shadow-sm border ${getPlanBadgeStyles(currentUser.plan)}`}>
-                            {currentUser.plan} Plan
-                        </span>
-                    )}
-                </div>
-                {currentUser?.role === 'ADMIN' && (
-                    <Link
-                        to="/admin"
-                        className="w-full py-4 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold border border-slate-900 dark:border-white hover:opacity-90 transition-all flex items-center justify-center gap-2 mt-4 active:scale-95"
-                    >
-                        <span className="material-symbols-outlined">admin_panel_settings</span>
-                        {t('sidebar.admin')}
-                    </Link>
-                )}
-                <button
-                    onClick={handleLogout}
-                    className="w-full py-4 rounded-xl bg-red-50 dark:bg-red-900/10 text-red-600 dark:text-red-400 font-bold border border-red-100 dark:border-red-900/30 hover:bg-red-100 dark:hover:bg-red-900/20 transition-all flex items-center justify-center gap-2 mt-2 active:scale-95"
-                >
-                    <span className="material-symbols-outlined">logout</span>
-                    {t('sidebar.logout')}
-                </button>
-            </div>
-
-            <ProfilePictureModal
-                isOpen={isProfileModalOpen}
-                onClose={() => setIsProfileModalOpen(false)}
-                currentUser={currentUser}
-                onUpdate={(newImage) => setCurrentUser((prev: any) => ({ ...prev, image: newImage }))}
-            />
-
-            {/* Page Header */}
-            <div className="flex flex-col gap-1">
-                <h1 className="text-3xl md:text-4xl font-black text-slate-900 dark:text-white tracking-tight">{t('settings.title')}</h1>
-                <p className="text-slate-500 dark:text-[#cbbc90] text-base">{t('settings.subtitle')}</p>
-            </div>
-
-            {/* Accordion Categories */}
-            <div className="flex flex-col gap-4">
-
-                {/* Appearance Category */}
-                <div className="bg-white dark:bg-[#342d18] rounded-2xl border border-slate-100 dark:border-[#493f22] overflow-hidden shadow-sm">
-                    <button
-                        onClick={() => toggleSection('appearance')}
-                        className="w-full flex items-center justify-between p-6 bg-surface-light dark:bg-[#2b2616] hover:bg-slate-50 dark:hover:bg-[#36301d] transition-colors text-left"
-                    >
-                        <div className="flex items-center gap-3">
-                            <span className="material-symbols-outlined text-primary text-2xl">palette</span>
-                            <div>
-                                <h2 className="text-lg font-bold text-slate-900 dark:text-white">{t('settings.appearance')}</h2>
-                                <p className="text-sm text-slate-500 dark:text-[#cbbc90]">{t('settings.appearanceDesc')}</p>
-                            </div>
-                        </div>
-                        <span className={`material-symbols-outlined text-slate-400 transition-transform ${openSection === 'appearance' ? 'rotate-180' : ''}`}>expand_more</span>
-                    </button>
-
-                    {openSection === 'appearance' && (
-                        <div className="p-6 border-t border-slate-100 dark:border-[#493f22] flex flex-col gap-8 animate-fade-in">
-
-                            {/* Theme Selection */}
-                            <div className="flex flex-col gap-3">
-                                <h3 className="font-bold text-slate-900 dark:text-white">{t('settings.theme')}</h3>
-                                <div className="grid grid-cols-3 gap-3">
-                                    {(['light', 'dark', 'system'] as const).map((themeOption) => (
-                                        <button
-                                            key={themeOption}
-                                            onClick={() => setTheme(themeOption)}
-                                            className={`
-                                                flex flex-col items-center justify-center gap-2 p-4 rounded-xl border transition-all
-                                                ${theme === themeOption
-                                                    ? 'bg-primary text-slate-900 border-primary font-bold shadow-md'
-                                                    : 'bg-slate-50 dark:bg-[#1a160b] border-slate-200 dark:border-[#493f22] text-slate-600 dark:text-[#cbbc90] hover:bg-slate-100 dark:hover:bg-[#493f22]/50'
-                                                }
-                                            `}
-                                        >
-                                            <span className="material-symbols-outlined">
-                                                {themeOption === 'light' ? 'light_mode' : themeOption === 'dark' ? 'dark_mode' : 'settings_brightness'}
-                                            </span>
-                                            <span className="capitalize text-sm">{t(`settings.${themeOption}` as any)}</span>
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
-
-                            {/* Language Selection */}
-                            <div className="flex flex-col gap-3">
-                                <h3 className="font-bold text-slate-900 dark:text-white">{t('settings.language')}</h3>
-                                <div className="relative">
-                                    <select
-                                        value={language}
-                                        onChange={(e) => setLanguage(e.target.value as 'en' | 'id')}
-                                        className="w-full md:w-auto bg-slate-50 dark:bg-[#1a160b] border border-slate-200 dark:border-[#493f22] rounded-xl px-4 py-3 pr-10 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all appearance-none cursor-pointer font-medium"
-                                    >
-                                        <option value="en">🇺🇸 {t('settings.english')}</option>
-                                        <option value="id">🇮🇩 {t('settings.indonesian')}</option>
-                                    </select>
-                                    <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">expand_more</span>
-                                </div>
-                            </div>
-
-                            {/* Privacy Mode Selection */}
-                            <div className="flex flex-col gap-3">
-                                <h3 className="font-bold text-slate-900 dark:text-white">{t('settings.hideBalance')}</h3>
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                                    <button
-                                        onClick={() => setPrivacyMode('none')}
-                                        className={`
-                                            flex items-center gap-3 p-4 rounded-xl border transition-all text-left
-                                            ${privacyMode === 'none'
-                                                ? 'bg-primary text-slate-900 border-primary font-bold shadow-md'
-                                                : 'bg-slate-50 dark:bg-[#1a160b] border-slate-200 dark:border-[#493f22] text-slate-600 dark:text-[#cbbc90] hover:bg-slate-100 dark:hover:bg-[#493f22]/50'
-                                            }
-                                        `}
-                                    >
-                                        <span className="material-symbols-outlined">visibility</span>
-                                        <div className="flex flex-col">
-                                            <span className="text-sm font-bold">{t('settings.showAll')}</span>
-                                            <span className="text-xs opacity-80">{t('settings.defaultVisibility')}</span>
-                                        </div>
-                                    </button>
-
-                                    <button
-                                        onClick={() => setPrivacyMode('hidden')}
-                                        className={`
-                                            flex items-center gap-3 p-4 rounded-xl border transition-all text-left
-                                            ${privacyMode === 'hidden'
-                                                ? 'bg-primary text-slate-900 border-primary font-bold shadow-md'
-                                                : 'bg-slate-50 dark:bg-[#1a160b] border-slate-200 dark:border-[#493f22] text-slate-600 dark:text-[#cbbc90] hover:bg-slate-100 dark:hover:bg-[#493f22]/50'
-                                            }
-                                        `}
-                                    >
-                                        <span className="material-symbols-outlined">visibility_off</span>
-                                        <div className="flex flex-col">
-                                            <span className="text-sm font-bold">{t('settings.softHide')}</span>
-                                            <span className="text-xs opacity-80">{t('settings.hideTotalBalance')}</span>
-                                        </div>
-                                    </button>
-
-                                    <button
-                                        onClick={() => setPrivacyMode('extreme')}
-                                        className={`
-                                            flex items-center gap-3 p-4 rounded-xl border transition-all text-left
-                                            ${privacyMode === 'extreme'
-                                                ? 'bg-primary text-slate-900 border-primary font-bold shadow-md'
-                                                : 'bg-slate-50 dark:bg-[#1a160b] border-slate-200 dark:border-[#493f22] text-slate-600 dark:text-[#cbbc90] hover:bg-slate-100 dark:hover:bg-[#493f22]/50'
-                                            }
-                                        `}
-                                    >
-                                        <span className="material-symbols-outlined">password</span>
-                                        <div className="flex flex-col">
-                                            <span className="text-sm font-bold">{t('settings.extremeHide')}</span>
-                                            <span className="text-xs opacity-80">{t('settings.hideAllNumbers')}</span>
-                                        </div>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-                </div>
-
-                {/* Notifications Category */}
-                <div className="bg-white dark:bg-[#342d18] rounded-2xl border border-slate-100 dark:border-[#493f22] overflow-hidden shadow-sm">
-                    <button
-                        onClick={() => toggleSection('notifications')}
-                        className="w-full flex items-center justify-between p-6 bg-surface-light dark:bg-[#2b2616] hover:bg-slate-50 dark:hover:bg-[#36301d] transition-colors text-left"
-                    >
-                        <div className="flex items-center gap-3">
-                            <span className="material-symbols-outlined text-primary text-2xl">notifications</span>
-                            <div>
-                                <h2 className="text-lg font-bold text-slate-900 dark:text-white">{t('settings.notifications')}</h2>
-                                <p className="text-sm text-slate-500 dark:text-[#cbbc90]">{t('settings.notificationsDesc')}</p>
-                            </div>
-                        </div>
-                        <span className={`material-symbols-outlined text-slate-400 transition-transform ${openSection === 'notifications' ? 'rotate-180' : ''}`}>expand_more</span>
-                    </button>
-
-                    {openSection === 'notifications' && (
-                        <div className="p-6 border-t border-slate-100 dark:border-[#493f22] flex flex-col gap-6 animate-fade-in">
-
-                            {/* Master Toggle */}
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <h3 className="font-bold text-slate-900 dark:text-white">{t('settings.enablePush')}</h3>
-                                    <p className="text-sm text-slate-500 dark:text-[#cbbc90]">{t('settings.enablePushDesc')}</p>
-                                </div>
-                                <button
-                                    onClick={isSubscribed ? unsubscribe : subscribe}
-                                    disabled={pushLoading}
-                                    className={`relative w-12 h-6 rounded-full transition-colors ${isSubscribed ? 'bg-primary' : 'bg-slate-200 dark:bg-slate-700'
-                                        }`}
-                                >
-                                    <span
-                                        className={`absolute top-1 left-1 w-4 h-4 rounded-full bg-white transition-transform ${isSubscribed ? 'translate-x-6' : 'translate-x-0'
-                                            }`}
-                                    />
-                                </button>
-                            </div>
-
-                            {/* Preference Toggles (Only visible if subscribed) */}
-                            {isSubscribed && (
-                                <div className="pl-4 border-l-2 border-slate-100 dark:border-[#493f22] flex flex-col gap-4">
-                                    {[
-                                        { key: 'notifyRecurring', label: t('settings.notifyRecurring'), desc: t('settings.notifyRecurringDesc') },
-                                        { key: 'notifyBudget50', label: 'Budget Alert (50%)', desc: 'Notify when 50% of budget is used' },
-                                        { key: 'notifyBudget80', label: 'Budget Alert (80%)', desc: 'Notify when 80% of budget is used' },
-                                        { key: 'notifyBudget95', label: 'Budget Alert (95%)', desc: 'Notify when 95% of budget is used' },
-                                        { key: 'notifyBudget100', label: 'Budget Alert (100%)', desc: 'Notify when budget is fully used' },
-                                        { key: 'notifyDaily', label: t('settings.notifyDaily'), desc: t('settings.notifyDailyDesc') },
-                                        { key: 'notifyLunch', label: t('settings.notifyLunch'), desc: t('settings.notifyLunchDesc') },
-                                    ].map((pref) => (
-                                        <div key={pref.key} className="flex items-center justify-between">
-                                            <div>
-                                                <h4 className="font-bold text-slate-800 dark:text-white text-sm">{pref.label}</h4>
-                                                <p className="text-xs text-slate-500 dark:text-[#cbbc90]">{pref.desc}</p>
-                                            </div>
-                                            <button
-                                                onClick={() => handleUpdatePref(pref.key, !currentUser?.[pref.key])}
-                                                className={`relative w-10 h-5 rounded-full transition-colors ${currentUser?.[pref.key] !== false ? 'bg-primary/80' : 'bg-slate-200 dark:bg-slate-700'
-                                                    }`}
-                                            >
-                                                <span
-                                                    className={`absolute top-1 left-1 w-3 h-3 rounded-full bg-white transition-transform ${currentUser?.[pref.key] !== false ? 'translate-x-5' : 'translate-x-0'
-                                                        }`}
-                                                />
-                                            </button>
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-
-                            {!isSupported && (
-                                <div className="p-4 bg-red-50 dark:bg-red-900/10 text-red-600 dark:text-red-400 rounded-xl text-sm border border-red-100 dark:border-red-900/30">
-                                    Push notifications are not supported in this browser.
-                                </div>
-                            )}
-                        </div>
-                    )}
-                </div>
-
-                {/* Account Category */}
-                <div className="bg-white dark:bg-[#342d18] rounded-2xl border border-slate-100 dark:border-[#493f22] overflow-hidden shadow-sm">
-                    <button
-                        onClick={() => toggleSection('account')}
-                        className="w-full flex items-center justify-between p-6 bg-surface-light dark:bg-[#2b2616] hover:bg-slate-50 dark:hover:bg-[#36301d] transition-colors text-left"
-                    >
-                        <div className="flex items-center gap-3">
-                            <span className="material-symbols-outlined text-primary text-2xl">manage_accounts</span>
-                            <div>
-                                <h2 className="text-lg font-bold text-slate-900 dark:text-white">{t('settings.account')}</h2>
-                                <p className="text-sm text-slate-500 dark:text-[#cbbc90]">{t('settings.accountDesc')}</p>
-                            </div>
-                        </div>
-                        <span className={`material-symbols-outlined text-slate-400 transition-transform ${openSection === 'account' ? 'rotate-180' : ''}`}>expand_more</span>
-                    </button>
-
-                    {openSection === 'account' && (
-                        <div className="p-6 border-t border-slate-100 dark:border-[#493f22] flex flex-col gap-8 animate-fade-in">
-                            {/* Account Management Content */}
-                            <div className="flex flex-col gap-6">
-                                <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-xl border border-blue-100 dark:border-blue-900/30 text-sm text-blue-600 dark:text-blue-400">
-                                    <strong>Note:</strong> {t('settings.googleNote')}
-                                </div>
-
-                                {/* Profile Name */}
-                                <div className="border border-slate-200 dark:border-[#493f22] rounded-xl overflow-hidden">
-                                    <button
-                                        onClick={() => toggleSubSection('profile')}
-                                        className="w-full flex items-center justify-between p-4 bg-slate-50 dark:bg-[#2b2616] hover:bg-slate-100 dark:hover:bg-[#36301d] transition-colors"
-                                    >
-                                        <div className="flex items-center gap-3">
-                                            <span className="material-symbols-outlined text-slate-500 dark:text-[#cbbc90]">badge</span>
-                                            <span className="font-bold text-slate-900 dark:text-white">{t('settings.profileDetails')}</span>
-                                        </div>
-                                        <span className={`material-symbols-outlined text-slate-400 transition-transform ${openSubSection === 'profile' ? 'rotate-180' : ''}`}>expand_more</span>
-                                    </button>
-
-                                    {openSubSection === 'profile' && (
-                                        <div className="p-4 border-t border-slate-200 dark:border-[#493f22] bg-white dark:bg-[#1a160b] animate-fade-in">
-                                            <form onSubmit={handleUpdateName} className="flex flex-col gap-6">
-                                                {/* Profile Picture Selection */}
-                                                <div className="flex flex-col gap-3">
-                                                    <label className="text-sm font-bold text-slate-700 dark:text-[#cbbc90]">{t('settings.profilePicture')}</label>
-                                                    <div className="flex flex-wrap gap-4">
-                                                        {currentUser?.image && !currentUser.image.startsWith('/default-profiles/') && (
-                                                            <div className="relative group cursor-pointer">
-                                                                <img
-                                                                    src={currentUser.image}
-                                                                    alt="Current"
-                                                                    className="w-16 h-16 rounded-full object-cover border-2 border-primary"
-                                                                />
-                                                                <div className="absolute inset-0 bg-black/50 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                                                                    <span className="text-white text-xs font-bold">Current</span>
-                                                                </div>
-                                                            </div>
-                                                        )}
-                                                        {[1, 2, 3, 4].map((num) => {
-                                                            const imgPath = `/default-profiles/profilepict${num}.png`;
-                                                            const isSelected = currentUser?.image === imgPath;
-                                                            return (
-                                                                <button
-                                                                    key={num}
-                                                                    type="button"
-                                                                    onClick={() => handleUpdateProfilePicture(imgPath)}
-                                                                    className={`relative w-16 h-16 rounded-full overflow-hidden border-2 transition-all ${isSelected ? 'border-primary ring-2 ring-primary/30 scale-105' : 'border-transparent hover:border-slate-300 dark:hover:border-slate-600'}`}
-                                                                >
-                                                                    <img
-                                                                        src={imgPath}
-                                                                        alt={`Profile ${num}`}
-                                                                        className="w-full h-full object-cover"
-                                                                    />
-                                                                    {isSelected && (
-                                                                        <div className="absolute inset-0 bg-primary/20 flex items-center justify-center">
-                                                                            <span className="material-symbols-outlined text-white drop-shadow-md">check</span>
-                                                                        </div>
-                                                                    )}
-                                                                </button>
-                                                            );
-                                                        })}
-                                                    </div>
-                                                </div>
-
-                                                <div className="flex flex-col gap-2">
-                                                    <label className="text-sm font-bold text-slate-700 dark:text-[#cbbc90]">{t('settings.displayName')}</label>
-                                                    <div className="flex gap-2">
-                                                        <input
-                                                            type="text"
-                                                            placeholder="Your Name"
-                                                            value={nameForm.name}
-                                                            onChange={e => setNameForm({ ...nameForm, name: e.target.value })}
-                                                            className="w-full bg-slate-50 dark:bg-[#2b2616] border border-slate-200 dark:border-[#493f22] rounded-xl px-4 py-2 text-sm"
-                                                            required
-                                                        />
-                                                        <button
-                                                            type="submit"
-                                                            disabled={isUpdatingName}
-                                                            className="whitespace-nowrap bg-slate-900 dark:bg-slate-700 text-white font-bold px-4 py-2 rounded-xl text-sm hover:opacity-90 transition-opacity"
-                                                        >
-                                                            {isUpdatingName ? t('common.loading') : t('common.save')}
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </form>
-                                        </div>
-                                    )}
-                                </div>
-
-                                {/* Change Password */}
-                                <div className="border border-slate-200 dark:border-[#493f22] rounded-xl overflow-hidden">
-                                    <button
-                                        onClick={() => toggleSubSection('password')}
-                                        className="w-full flex items-center justify-between p-4 bg-slate-50 dark:bg-[#2b2616] hover:bg-slate-100 dark:hover:bg-[#36301d] transition-colors"
-                                    >
-                                        <div className="flex items-center gap-3">
-                                            <span className="material-symbols-outlined text-slate-500 dark:text-[#cbbc90]">lock</span>
-                                            <span className="font-bold text-slate-900 dark:text-white">{t('settings.changePassword')}</span>
-                                        </div>
-                                        <span className={`material-symbols-outlined text-slate-400 transition-transform ${openSubSection === 'password' ? 'rotate-180' : ''}`}>expand_more</span>
-                                    </button>
-
-                                    {openSubSection === 'password' && (
-                                        <div className="p-4 border-t border-slate-200 dark:border-[#493f22] bg-white dark:bg-[#1a160b] animate-fade-in">
-                                            <form onSubmit={handleChangePassword} className="flex flex-col gap-3">
-                                                <div className="flex flex-col gap-2">
-                                                    <input
-                                                        type="password"
-                                                        placeholder={t('settings.currentPassword')}
-                                                        value={passwordForm.currentPassword}
-                                                        onChange={e => setPasswordForm({ ...passwordForm, currentPassword: e.target.value })}
-                                                        className="w-full bg-slate-50 dark:bg-[#2b2616] border border-slate-200 dark:border-[#493f22] rounded-xl px-4 py-2 text-sm"
-                                                        required
-                                                    />
-                                                    <input
-                                                        type="password"
-                                                        placeholder={t('settings.newPassword')}
-                                                        value={passwordForm.newPassword}
-                                                        onChange={e => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
-                                                        className="w-full bg-slate-50 dark:bg-[#2b2616] border border-slate-200 dark:border-[#493f22] rounded-xl px-4 py-2 text-sm"
-                                                        required
-                                                    />
-                                                    <input
-                                                        type="password"
-                                                        placeholder={t('settings.confirmPassword')}
-                                                        value={passwordForm.confirmPassword}
-                                                        onChange={e => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
-                                                        className="w-full bg-slate-50 dark:bg-[#2b2616] border border-slate-200 dark:border-[#493f22] rounded-xl px-4 py-2 text-sm"
-                                                        required
-                                                    />
-                                                    <button
-                                                        type="submit"
-                                                        disabled={isChangingPassword}
-                                                        className="bg-slate-900 dark:bg-slate-700 text-white font-bold py-2 rounded-xl text-sm hover:opacity-90 transition-opacity mt-2"
-                                                    >
-                                                        {isChangingPassword ? t('common.loading') : t('settings.updatePassword')}
-                                                    </button>
-                                                </div>
-                                            </form>
-                                        </div>
-                                    )}
-                                </div>
-
-                                {/* Change Email */}
-                                <div className="border border-slate-200 dark:border-[#493f22] rounded-xl overflow-hidden">
-                                    <button
-                                        onClick={() => toggleSubSection('email')}
-                                        className="w-full flex items-center justify-between p-4 bg-slate-50 dark:bg-[#2b2616] hover:bg-slate-100 dark:hover:bg-[#36301d] transition-colors"
-                                    >
-                                        <div className="flex items-center gap-3">
-                                            <span className="material-symbols-outlined text-slate-500 dark:text-[#cbbc90]">mail</span>
-                                            <span className="font-bold text-slate-900 dark:text-white">{t('settings.changeEmail')}</span>
-                                        </div>
-                                        <span className={`material-symbols-outlined text-slate-400 transition-transform ${openSubSection === 'email' ? 'rotate-180' : ''}`}>expand_more</span>
-                                    </button>
-
-                                    {openSubSection === 'email' && (
-                                        <div className="p-4 border-t border-slate-200 dark:border-[#493f22] bg-white dark:bg-[#1a160b] animate-fade-in">
-                                            <form onSubmit={handleChangeEmail} className="flex flex-col gap-3">
-                                                <div className="flex flex-col gap-2">
-                                                    <input
-                                                        type="email"
-                                                        placeholder={t('settings.newEmail')}
-                                                        value={emailForm.newEmail}
-                                                        onChange={e => setEmailForm({ ...emailForm, newEmail: e.target.value })}
-                                                        className="w-full bg-slate-50 dark:bg-[#2b2616] border border-slate-200 dark:border-[#493f22] rounded-xl px-4 py-2 text-sm"
-                                                        required
-                                                    />
-                                                    <input
-                                                        type="password"
-                                                        placeholder="Current Password (to verify)"
-                                                        value={emailForm.password}
-                                                        onChange={e => setEmailForm({ ...emailForm, password: e.target.value })}
-                                                        className="w-full bg-slate-50 dark:bg-[#2b2616] border border-slate-200 dark:border-[#493f22] rounded-xl px-4 py-2 text-sm"
-                                                        required
-                                                    />
-                                                    <button
-                                                        type="submit"
-                                                        disabled={isChangingEmail}
-                                                        className="bg-slate-900 dark:bg-slate-700 text-white font-bold py-2 rounded-xl text-sm hover:opacity-90 transition-opacity mt-2"
-                                                    >
-                                                        {isChangingEmail ? t('common.loading') : t('settings.updateEmail')}
-                                                    </button>
-                                                </div>
-                                            </form>
-                                        </div>
-                                    )}
-                                </div>
-
-                                {/* Danger Zone */}
-                                <div className="pt-8 border-t border-slate-200 dark:border-[#493f22]">
-                                    <div className="flex flex-col gap-2">
-                                        <div className="pb-8 mb-8 border-b border-slate-100 dark:border-[#493f22]">
-                                            <Link to="/privacy" className="flex items-center justify-between p-4 rounded-xl bg-slate-50 dark:bg-[#1a160b] border border-slate-100 dark:border-[#493f22] hover:border-primary/50 hover:bg-white dark:hover:bg-[#2b2616] transition-all group">
-                                                <div className="flex items-center gap-3">
-                                                    <span className="material-symbols-outlined text-slate-500 dark:text-[#cbbc90] group-hover:text-primary">verified_user</span>
-                                                    <span className="font-bold text-slate-700 dark:text-slate-300 group-hover:text-primary">{t('privacy.title')}</span>
-                                                </div>
-                                                <span className="material-symbols-outlined text-slate-400 group-hover:text-primary group-hover:translate-x-1 transition-all">arrow_forward</span>
-                                            </Link>
-                                        </div>
-
-                                        <h3 className="font-bold text-slate-900 dark:text-white">{t('settings.dangerZone')}</h3>
-                                        <div className="flex flex-col md:flex-row items-start md:items-center justify-between p-4 rounded-xl bg-red-50 dark:bg-red-900/10 border border-red-100 dark:border-red-900/30 gap-4 md:gap-0">
-                                            <div>
-                                                <p className="font-bold text-red-700 dark:text-red-400">{t('settings.resetAllData')}</p>
-                                                <p className="text-xs text-red-600/70 dark:text-red-400/70">{t('settings.resetWarning')}</p>
-                                            </div>
-                                            <button
-                                                onClick={handleResetAppClick}
-                                                className="w-full md:w-auto px-4 py-2 bg-white dark:bg-red-900/20 text-red-600 dark:text-red-400 font-bold text-sm rounded-lg border border-red-200 dark:border-red-800 hover:bg-red-100 dark:hover:bg-red-900/40 transition-colors"
-                                            >
-                                                {t('settings.resetApp')}
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-                </div>
-
-                {/* Security Category */}
-                <div className="bg-white dark:bg-[#342d18] rounded-2xl border border-slate-100 dark:border-[#493f22] overflow-hidden shadow-sm">
-                    <button
-                        onClick={() => toggleSection('security')}
-                        className="w-full flex items-center justify-between p-6 bg-surface-light dark:bg-[#2b2616] hover:bg-slate-50 dark:hover:bg-[#36301d] transition-colors text-left"
-                    >
-                        <div className="flex items-center gap-3">
-                            <span className="material-symbols-outlined text-primary text-2xl">security</span>
-                            <div>
-                                <h2 className="text-lg font-bold text-slate-900 dark:text-white">Security</h2>
-                                <p className="text-sm text-slate-500 dark:text-[#cbbc90]">Login History & Active Sessions</p>
-                            </div>
-                        </div>
-                        <span className={`material-symbols-outlined text-slate-400 transition-transform ${openSection === 'security' ? 'rotate-180' : ''}`}>expand_more</span>
-                    </button>
-
-                    {openSection === 'security' && (
-                        <div className="p-6 border-t border-slate-100 dark:border-[#493f22] flex flex-col gap-6 animate-fade-in">
-                            <SessionList />
-                        </div>
-                    )}
-                </div>
-
-                {/* Features Category */}
-                <div className="bg-white dark:bg-[#342d18] rounded-2xl border border-slate-100 dark:border-[#493f22] overflow-hidden shadow-sm">
-                    <button
-                        onClick={() => toggleSection('features')}
-                        className="w-full flex items-center justify-between p-6 bg-surface-light dark:bg-[#2b2616] hover:bg-slate-50 dark:hover:bg-[#36301d] transition-colors text-left"
-                    >
-                        <div className="flex items-center gap-3">
-                            <span className="material-symbols-outlined text-primary text-2xl">extension</span>
-                            <div>
-                                <h2 className="text-lg font-bold text-slate-900 dark:text-white">{t('settings.features')}</h2>
-                                <p className="text-sm text-slate-500 dark:text-[#cbbc90]">{t('settings.featuresDesc')}</p>
-                            </div>
-                        </div>
-                        <span className={`material-symbols-outlined text-slate-400 transition-transform ${openSection === 'features' ? 'rotate-180' : ''}`}>expand_more</span>
-                    </button>
-
-                    {openSection === 'features' && (
-                        <div className="p-6 border-t border-slate-100 dark:border-[#493f22] flex flex-col gap-8 animate-fade-in">
-                            {/* Global Monthly Budget */}
-                            <div className="flex flex-col gap-4">
-                                <div className="flex items-center gap-2 text-slate-900 dark:text-white font-bold text-xl">
-                                    <span className="material-symbols-outlined text-primary">account_balance_wallet</span>
-                                    <h2>Monthly Budget</h2>
-                                </div>
-                                <div className="bg-slate-50 dark:bg-[#2b2616] rounded-xl border border-slate-100 dark:border-[#493f22] p-6 flex flex-col gap-4">
-                                    <p className="text-sm text-slate-500 dark:text-[#cbbc90]">{t('settings.budgetDescription')}</p>
-                                    <div className="flex flex-col gap-2">
-                                        <label className="text-sm font-bold text-slate-700 dark:text-[#cbbc90]">{t('settings.budgetLimit')}</label>
-                                        <div className="relative">
-                                            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-600 font-bold">Rp</span>
-                                            <CurrencyInput
-                                                value={budgetLimit}
-                                                onChange={(val) => setBudgetLimit(val.toString())}
-                                                placeholder="e.g. 5.000.000"
-                                                className="w-full bg-white dark:bg-[#1a160b] border border-slate-200 dark:border-[#493f22] rounded-xl pl-12 pr-4 py-3 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-slate-600 font-bold text-lg"
-                                            />
-                                        </div>
-                                    </div>
-                                    <button
-                                        onClick={handleSaveBudget}
-                                        disabled={loading}
-                                        className="w-full bg-primary hover:bg-[#dca60e] text-slate-900 font-bold py-3 rounded-xl transition-all shadow-lg hover:shadow-primary/25 active:scale-95 mt-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                                    >
-                                        {loading ? t('common.loading') : t('settings.saveBudget')}
-                                    </button>
-                                </div>
-                            </div>
-
-                            {/* Recurring Transactions (Full Width) */}
-                            <div className="flex flex-col gap-4">
-                                <div className="flex items-center gap-2 text-slate-900 dark:text-white font-bold text-xl">
-                                    <span className="material-symbols-outlined text-primary">update</span>
-                                    <h2>{t('settings.recurringTransactions')}</h2>
-                                </div>
-                                <div>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        {recurringTransactions.map(trans => (
-                                            <div key={trans.id} className="p-4 rounded-xl border border-slate-100 dark:border-[#493f22] flex flex-col gap-3 hover:shadow-md transition-all hover:border-primary/50 relative group bg-white dark:bg-[#1a160b]">
-                                                <div className="flex justify-between items-start">
-                                                    <div className="w-10 h-10 rounded-full bg-purple-100 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 flex items-center justify-center">
-                                                        <span className="material-symbols-outlined">{trans.icon}</span>
-                                                    </div>
-                                                    <button
-                                                        onClick={() => handleDeleteRecurringClick(trans.id)}
-                                                        className="text-slate-300 dark:text-[#cbbc90] hover:text-red-500 transition-colors"
-                                                    >
-                                                        <span className="material-symbols-outlined">delete</span>
-                                                    </button>
-                                                </div>
-                                                <div>
-                                                    <h3 className="font-bold text-slate-900 dark:text-white">{trans.name}</h3>
-                                                    <p className="text-primary font-bold">{formatCurrency(trans.amount)}</p>
-                                                </div>
-                                                <div className="mt-auto pt-3 border-t border-slate-100 dark:border-[#493f22] flex items-center gap-2 text-xs text-slate-500 dark:text-[#cbbc90]">
-                                                    <span className="material-symbols-outlined text-[16px]">event_repeat</span>
-                                                    <span>Every {trans.date}th of {trans.frequency.toLowerCase()}</span>
-                                                </div>
-                                            </div>
-                                        ))}
-
-                                        {/* Add New Button */}
-                                        <button
-                                            onClick={() => setIsRecurringModalOpen(true)}
-                                            className="p-4 rounded-xl border-2 border-dashed border-slate-200 dark:border-[#493f22] flex flex-col items-center justify-center gap-2 text-slate-400 hover:text-primary hover:border-primary hover:bg-slate-50 dark:hover:bg-[#493f22]/30 transition-all min-h-[160px]"
-                                        >
-                                            <span className="material-symbols-outlined text-3xl">add_circle</span>
-                                            <span className="font-bold">{t('settings.addRecurring')}</span>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-                </div>
-            </div>
         </div>
     );
 };
