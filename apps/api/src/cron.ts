@@ -55,10 +55,32 @@ export const startCronJobs = () => {
         }
     }, { timezone: 'Asia/Jakarta' });
 
+    // 📈 Market Update — Every 12 hours (00:00 & 12:00)
+    cron.schedule('0 0,12 * * *', async () => {
+        console.log('[CRON] Running market update check...');
+        try {
+            await notificationService.checkMarketUpdates();
+        } catch (error) {
+            console.error('[CRON] Error checking market updates:', error);
+        }
+    }, { timezone: 'Asia/Jakarta' });
+
+    // 🛡️ Security Check — Every 10 minutes
+    cron.schedule('*/10 * * * *', async () => {
+        // console.log('[CRON] Running security IP check...');
+        try {
+            await notificationService.checkSecurityAlerts();
+        } catch (error) {
+            console.error('[CRON] Error checking security alerts:', error);
+        }
+    });
+
     console.log('[CRON] Jobs scheduled:');
     console.log('  - Recurring Transactions (Daily at midnight WIB)');
     console.log('  - Lunch Reminder (Daily at 12:00 PM WIB)');
     console.log('  - Daily Summary (Daily at 8:00 PM WIB)');
     console.log('  - Recurring Reminder (Daily at 8:00 AM WIB)');
     console.log('  - Budget Alert (Daily at 9:00 AM WIB)');
+    console.log('  - Market Update (Every 12h)');
+    console.log('  - Security Check (Every 10m)');
 };
