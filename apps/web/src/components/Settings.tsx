@@ -97,10 +97,10 @@ const Settings: React.FC = () => {
 
     // Account Management State
     const [passwordForm, setPasswordForm] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' });
-    const [emailForm, setEmailForm] = useState({ newEmail: '', password: '' });
+
     const [nameForm, setNameForm] = useState({ name: '' });
     const [isChangingPassword, setIsChangingPassword] = useState(false);
-    const [isChangingEmail, setIsChangingEmail] = useState(false);
+
     const [isUpdatingName, setIsUpdatingName] = useState(false);
 
     // Modal State
@@ -150,23 +150,7 @@ const Settings: React.FC = () => {
         }
     };
 
-    const handleChangeEmail = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setIsChangingEmail(true);
-        try {
-            await authClient.changeEmail({
-                newEmail: emailForm.newEmail,
-                // password removed based on better-auth capabilities
-            });
-            showNotification("Email update initiated! Please check your new email for verification.");
-            setEmailForm({ newEmail: '', password: '' });
-        } catch (error: any) {
-            console.error("Failed to update email", error);
-            showNotification(error.message || "Failed to update email", 'error');
-        } finally {
-            setIsChangingEmail(false);
-        }
-    };
+
 
     const handleUpdateName = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -475,26 +459,7 @@ const Settings: React.FC = () => {
                         </form>
                     </div>
 
-                    {/* Change Email - Hidden on Mobile Account Dropdown as requested */}
-                    <div className={`border-t border-slate-100 dark:border-[#493f22] pt-6 ${isMobile ? 'hidden' : 'block'}`}>
-                        <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
-                            <span className="material-symbols-outlined text-primary">mail</span>
-                            {t('settings.changeEmail')}
-                        </h3>
-                        <form onSubmit={handleChangeEmail} className="flex flex-col gap-3">
-                            <input
-                                type="email"
-                                placeholder={t('settings.newEmail')}
-                                value={emailForm.newEmail}
-                                onChange={e => setEmailForm({ ...emailForm, newEmail: e.target.value })}
-                                className="w-full bg-slate-50 dark:bg-[#2b2616] border border-slate-200 dark:border-[#493f22] rounded-xl px-4 py-2 text-sm text-slate-900 dark:text-white"
-                                required
-                            />
-                            <button type="submit" disabled={isChangingEmail} className="bg-slate-900 dark:bg-slate-700 text-white font-bold py-2 rounded-xl text-sm hover:opacity-90 mt-2">
-                                {isChangingEmail ? t('common.loading') : t('settings.updateEmail')}
-                            </button>
-                        </form>
-                    </div>
+
                 </div>
 
                 {/* Login History (Collapsible) */}
