@@ -12,45 +12,10 @@ interface DashboardLayoutProps {
     onLogout: () => void;
 }
 
-const INITIAL_NOTIFICATIONS = [
-    {
-        id: 1,
-        title: 'Bill Reminder',
-        message: 'Spotify Premium is due tomorrow ($10.99)',
-        time: '2h ago',
-        type: 'bill',
-        read: false
-    },
-    {
-        id: 2,
-        title: 'Budget Alert',
-        message: 'You have exceeded 80% of your Dining budget',
-        time: '5h ago',
-        type: 'warning',
-        read: false
-    },
-    {
-        id: 3,
-        title: 'Market Update',
-        message: 'Bitcoin (BTC) is up +5.2% today!',
-        time: '1d ago',
-        type: 'trend',
-        read: true
-    },
-    {
-        id: 4,
-        title: 'Security Alert',
-        message: 'New login detected from Mac OS',
-        time: '2d ago',
-        type: 'security',
-        read: true
-    }
-];
-
 const DashboardContent: React.FC<DashboardLayoutProps> = ({ children, onLogout }) => {
     const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);
     const [isNotificationsOpen, setIsNotificationsOpen] = React.useState(false);
-    const [notifications, setNotifications] = React.useState(INITIAL_NOTIFICATIONS);
+    const [notifications, setNotifications] = React.useState<any[]>([]);
     const { isQuickAddOpen, closeQuickAdd, editingTransaction } = useUI();
 
     const navigate = useNavigate();
@@ -169,9 +134,9 @@ const DashboardContent: React.FC<DashboardLayoutProps> = ({ children, onLogout }
                                             <div key={notif.id} className={`p-4 border-b border-slate-50 dark:border-white/5 hover:bg-slate-50 dark:hover:bg-white/5 transition-colors ${!notif.read ? 'bg-blue-50/30 dark:bg-blue-500/5' : ''}`}>
                                                 <div className="flex gap-3">
                                                     <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${notif.type === 'bill' ? 'bg-rose-100 text-rose-600 dark:bg-rose-500/20 dark:text-rose-400' :
-                                                            notif.type === 'warning' || notif.type === 'budget' ? 'bg-amber-100 text-amber-600 dark:bg-amber-500/20 dark:text-amber-400' :
-                                                                notif.type === 'trend' || notif.type === 'market' ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400' :
-                                                                    'bg-blue-100 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400'
+                                                        notif.type === 'warning' || notif.type === 'budget' ? 'bg-amber-100 text-amber-600 dark:bg-amber-500/20 dark:text-amber-400' :
+                                                            notif.type === 'trend' || notif.type === 'market' ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400' :
+                                                                'bg-blue-100 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400'
                                                         }`}>
                                                         <span className="material-symbols-outlined text-sm">
                                                             {notif.type === 'bill' ? 'receipt_long' :
