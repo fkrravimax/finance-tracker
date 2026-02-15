@@ -52,10 +52,6 @@ const DashboardContent: React.FC<DashboardLayoutProps> = ({ children, onLogout }
     const [isNotificationsOpen, setIsNotificationsOpen] = React.useState(false);
     const { isQuickAddOpen, closeQuickAdd, editingTransaction } = useUI();
 
-    const toggleSidebar = () => {
-        setIsSidebarOpen(!isSidebarOpen);
-    };
-
     const navigate = useNavigate();
     const location = useLocation();
 
