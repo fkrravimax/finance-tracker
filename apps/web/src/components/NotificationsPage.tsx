@@ -103,15 +103,15 @@ const NotificationsPage: React.FC = () => {
                                         className={`p-4 flex gap-4 ${index !== items.length - 1 ? 'border-b border-slate-100 dark:border-white/5' : ''} ${!notif.isRead ? 'bg-blue-50/10 dark:bg-blue-500/5' : ''}`}
                                     >
                                         <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${notif.type === 'bill' ? 'bg-rose-100 text-rose-600 dark:bg-rose-500/20 dark:text-rose-400' :
-                                                notif.type === 'warning' || notif.type === 'budget' ? 'bg-amber-100 text-amber-600 dark:bg-amber-500/20 dark:text-amber-400' :
-                                                    notif.type === 'trend' || notif.type === 'market' ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400' :
-                                                        notif.type === 'success' ? 'bg-blue-100 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400' :
-                                                            'bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300'
+                                            notif.type === 'warning' || notif.type === 'budget' ? 'bg-amber-100 text-amber-600 dark:bg-amber-500/20 dark:text-amber-400' :
+                                                notif.type === 'market' ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400' :
+                                                    notif.type === 'success' ? 'bg-blue-100 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400' :
+                                                        'bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300'
                                             }`}>
                                             <span className="material-symbols-outlined text-xl">
                                                 {notif.type === 'bill' ? 'receipt_long' :
                                                     notif.type === 'warning' || notif.type === 'budget' ? 'warning' :
-                                                        notif.type === 'trend' || notif.type === 'market' ? 'trending_up' :
+                                                        notif.type === 'market' ? 'trending_up' :
                                                             notif.type === 'success' ? 'celebration' :
                                                                 notif.type === 'security' ? 'security' : 'notifications'}
                                             </span>
