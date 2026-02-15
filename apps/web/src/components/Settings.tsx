@@ -63,7 +63,7 @@ const Settings: React.FC = () => {
     const [activeTab, setActiveTab] = useState('account');
 
     // Accordion State (Mobile)
-    const [openSection, setOpenSection] = useState<string | null>('account');
+    const [openSection, setOpenSection] = useState<string | null>(null); // Default closed
     const toggleSection = (id: string) => setOpenSection(prev => prev === id ? null : id);
 
     // Sub-section State (e.g. Login History)
@@ -321,49 +321,54 @@ const Settings: React.FC = () => {
         }
     };
 
-    // RENDER HELPERS
-    const renderAccountContent = () => (
-        <div className="flex flex-col gap-6 animate-fade-in">
-            {/* Profile Card */}
-            <div className="bg-white dark:bg-[#342d18] rounded-2xl border border-slate-100 dark:border-[#493f22] p-6 flex flex-col md:flex-row items-center gap-6 shadow-sm">
-                <div className="relative group cursor-pointer" onClick={() => setIsProfileModalOpen(true)}>
-                    {currentUser?.image ? (
-                        <img src={currentUser.image} alt="Profile" className="w-24 h-24 rounded-full object-cover border-4 border-slate-50 dark:border-[#493f22]" />
-                    ) : (
-                        <div className="w-24 h-24 rounded-full bg-slate-100 dark:bg-[#2b2616] flex items-center justify-center text-slate-400">
-                            <span className="material-symbols-outlined text-4xl">person</span>
-                        </div>
-                    )}
-                    <div className="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                        <span className="material-symbols-outlined text-white">edit</span>
+    // RENDER HELPERS - COMPONENTIZED
+
+    const renderProfileCard = () => (
+        <div className="bg-white dark:bg-[#342d18] rounded-2xl border border-slate-100 dark:border-[#493f22] p-6 flex flex-col md:flex-row items-center gap-6 shadow-sm">
+            <div className="relative group cursor-pointer" onClick={() => setIsProfileModalOpen(true)}>
+                {currentUser?.image ? (
+                    <img src={currentUser.image} alt="Profile" className="w-24 h-24 rounded-full object-cover border-4 border-slate-50 dark:border-[#493f22]" />
+                ) : (
+                    <div className="w-24 h-24 rounded-full bg-slate-100 dark:bg-[#2b2616] flex items-center justify-center text-slate-400">
+                        <span className="material-symbols-outlined text-4xl">person</span>
                     </div>
-                </div>
-                <div className="flex-1 text-center md:text-left">
-                    <h2 className="text-2xl font-black text-slate-900 dark:text-white">{currentUser?.name || 'User'}</h2>
-                    <p className="text-slate-500 dark:text-[#cbbc90] mb-3">{currentUser?.email}</p>
-                    {currentUser?.plan && (
-                        <span className={`inline-block px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider shadow-sm border ${getPlanBadgeStyles(currentUser.plan)}`}>
-                            {currentUser.plan} Plan
-                        </span>
-                    )}
-                </div>
-                {currentUser?.role === 'ADMIN' && (
-                    <Link
-                        to="/admin"
-                        className="px-6 py-3 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold border border-slate-900 dark:border-white hover:opacity-90 transition-all flex items-center gap-2"
-                    >
-                        <span className="material-symbols-outlined">admin_panel_settings</span>
-                        {t('sidebar.admin')}
-                    </Link>
                 )}
-                <button
-                    onClick={handleLogout}
-                    className="px-6 py-3 rounded-xl bg-red-50 dark:bg-red-900/10 text-red-600 dark:text-red-400 font-bold border border-red-100 dark:border-red-900/30 hover:bg-red-100 dark:hover:bg-red-900/20 transition-all flex items-center gap-2"
-                >
-                    <span className="material-symbols-outlined">logout</span>
-                    {t('sidebar.logout')}
-                </button>
+                <div className="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                    <span className="material-symbols-outlined text-white">edit</span>
+                </div>
             </div>
+            <div className="flex-1 text-center md:text-left">
+                <h2 className="text-2xl font-black text-slate-900 dark:text-white">{currentUser?.name || 'User'}</h2>
+                <p className="text-slate-500 dark:text-[#cbbc90] mb-3">{currentUser?.email}</p>
+                {currentUser?.plan && (
+                    <span className={`inline-block px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider shadow-sm border ${getPlanBadgeStyles(currentUser.plan)}`}>
+                        {currentUser.plan} Plan
+                    </span>
+                )}
+            </div>
+            {currentUser?.role === 'ADMIN' && (
+                <Link
+                    to="/admin"
+                    className="px-6 py-3 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold border border-slate-900 dark:border-white hover:opacity-90 transition-all flex items-center gap-2"
+                >
+                    <span className="material-symbols-outlined">admin_panel_settings</span>
+                    {t('sidebar.admin')}
+                </Link>
+            )}
+            <button
+                onClick={handleLogout}
+                className="px-6 py-3 rounded-xl bg-red-50 dark:bg-red-900/10 text-red-600 dark:text-red-400 font-bold border border-red-100 dark:border-red-900/30 hover:bg-red-100 dark:hover:bg-red-900/20 transition-all flex items-center gap-2"
+            >
+                <span className="material-symbols-outlined">logout</span>
+                {t('sidebar.logout')}
+            </button>
+        </div>
+    );
+
+    const renderAccountContent = (isMobile: boolean = false) => (
+        <div className="flex flex-col gap-6 animate-fade-in">
+            {/* Desktop: Profile Card Inside. Mobile: Profile Card is Outside */}
+            {!isMobile && renderProfileCard()}
 
             {/* Profile Details Form */}
             <div className="bg-white dark:bg-[#342d18] rounded-2xl border border-slate-100 dark:border-[#493f22] p-6 shadow-sm">
@@ -469,7 +474,9 @@ const Settings: React.FC = () => {
                             </button>
                         </form>
                     </div>
-                    <div className="border-t border-slate-100 dark:border-[#493f22] pt-6">
+
+                    {/* Change Email - Hidden on Mobile Account Dropdown as requested */}
+                    <div className={`border-t border-slate-100 dark:border-[#493f22] pt-6 ${isMobile ? 'hidden' : 'block'}`}>
                         <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
                             <span className="material-symbols-outlined text-primary">mail</span>
                             {t('settings.changeEmail')}
@@ -500,9 +507,15 @@ const Settings: React.FC = () => {
                             <span className="material-symbols-outlined text-primary">security</span>
                             Login History
                         </h3>
-                        <span className={`material-symbols-outlined text-slate-400 transition-transform duration-300 ${openSubSection === 'login_history' ? 'rotate-180' : ''}`}>
-                            expand_more
-                        </span>
+                        <div className="flex items-center gap-2">
+                            {/* Hint for limit on mobile */}
+                            {isMobile && openSubSection !== 'login_history' && (
+                                <span className="text-xs text-slate-400">View recent</span>
+                            )}
+                            <span className={`material-symbols-outlined text-slate-400 transition-transform duration-300 ${openSubSection === 'login_history' ? 'rotate-180' : ''}`}>
+                                expand_more
+                            </span>
+                        </div>
                     </button>
                     <div className={`grid transition-[grid-template-rows] duration-300 ease-out ${openSubSection === 'login_history' ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}>
                         <div className="overflow-hidden">
@@ -530,7 +543,7 @@ const Settings: React.FC = () => {
         </div>
     );
 
-    const renderFinanceContent = () => (
+    const renderFinanceContent = (isMobile: boolean = false) => (
         <div className="flex flex-col gap-6 animate-fade-in">
             {/* Budget Config */}
             <div className="bg-white dark:bg-[#342d18] rounded-2xl border border-slate-100 dark:border-[#493f22] p-6 shadow-sm">
@@ -569,10 +582,13 @@ const Settings: React.FC = () => {
                     </h2>
                     <button
                         onClick={() => setIsRecurringModalOpen(true)}
-                        className="flex items-center gap-2 px-4 py-2 rounded-xl bg-primary text-slate-900 font-bold text-sm shadow-sm hover:bg-[#dca60e] transition-colors"
+                        className={`
+                            flex items-center gap-2 rounded-xl bg-primary text-slate-900 font-bold shadow-sm hover:bg-[#dca60e] transition-colors
+                            ${isMobile ? 'p-2' : 'px-4 py-2 text-sm'}
+                        `}
                     >
                         <span className="material-symbols-outlined text-lg">add</span>
-                        {t('settings.addTransaction')}
+                        {!isMobile && t('settings.addTransaction')}
                     </button>
                 </div>
 
@@ -633,7 +649,12 @@ const Settings: React.FC = () => {
                                     {themeOption === 'light' ? 'light_mode' : themeOption === 'dark' ? 'dark_mode' : 'settings_brightness'}
                                 </span>
                             </div>
-                            <span className="capitalize font-bold">{t(`settings.${themeOption}` as any)}</span>
+                            <div className="hidden md:block">
+                                <span className="capitalize font-bold">{t(`settings.${themeOption}` as any)}</span>
+                            </div>
+                            <div className="md:hidden">
+                                <span className="capitalize font-bold text-xs">{t(`settings.${themeOption}` as any)}</span>
+                            </div>
                         </button>
                     ))}
                 </div>
@@ -784,10 +805,7 @@ const Settings: React.FC = () => {
                 </nav>
             </div>
 
-            {/* Mobile Header (Fixed Top) - Title Only, no Tabs */}
-            <div className="md:hidden sticky top-0 z-40 bg-white/80 dark:bg-[#2b2616]/80 backdrop-blur-md border-b border-slate-200 dark:border-[#493f22] p-4 flex items-center justify-between">
-                <h1 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">{t('settings.title')}</h1>
-            </div>
+            {/* Mobile Header REMOVED as requested */}
 
             {/* Main Content Area */}
             <div className="flex-1 p-4 md:p-8 overflow-y-auto w-full max-w-5xl mx-auto">
@@ -812,14 +830,18 @@ const Settings: React.FC = () => {
                 {/* DESKTOP CONTENT VIEW */}
                 <div className="hidden md:block">
                     <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight mb-8">{tabs.find(t => t.id === activeTab)?.label}</h1>
-                    {activeTab === 'account' && renderAccountContent()}
-                    {activeTab === 'finance' && renderFinanceContent()}
+                    {activeTab === 'account' && renderAccountContent(false)}
+                    {activeTab === 'finance' && renderFinanceContent(false)}
                     {activeTab === 'appearance' && renderAppearanceContent()}
                     {activeTab === 'notifications' && renderNotificationContent()}
                 </div>
 
                 {/* MOBILE ACCORDION VIEW */}
                 <div className="md:hidden flex flex-col gap-4">
+                    {/* Profile Card FIRST (Outside Accordion) */}
+                    {renderProfileCard()}
+
+                    {/* Accordions */}
                     {tabs.map(tab => (
                         <div key={tab.id} className="bg-white dark:bg-[#342d18] rounded-2xl border border-slate-100 dark:border-[#493f22] overflow-hidden shadow-sm">
                             <button
@@ -838,8 +860,8 @@ const Settings: React.FC = () => {
                             <div className={`grid transition-[grid-template-rows] duration-300 ease-out ${openSection === tab.id ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}>
                                 <div className="overflow-hidden">
                                     <div className="p-4 border-t border-slate-100 dark:border-[#493f22]">
-                                        {tab.id === 'account' && renderAccountContent()}
-                                        {tab.id === 'finance' && renderFinanceContent()}
+                                        {tab.id === 'account' && renderAccountContent(true)}
+                                        {tab.id === 'finance' && renderFinanceContent(true)}
                                         {tab.id === 'appearance' && renderAppearanceContent()}
                                         {tab.id === 'notifications' && renderNotificationContent()}
                                     </div>

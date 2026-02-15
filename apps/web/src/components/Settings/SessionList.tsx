@@ -69,6 +69,12 @@ const SessionList: React.FC = () => {
         }
     };
 
+    const [showAll, setShowAll] = useState(false);
+    const initialLimit = 5;
+
+    const visibleSessions = showAll ? sessions : sessions.slice(0, initialLimit);
+    const hasMore = sessions.length > initialLimit;
+
     if (loading) {
         return (
             <div className="flex justify-center p-8">
@@ -90,7 +96,7 @@ const SessionList: React.FC = () => {
                 isLoading={confirmation.isLoading}
             />
 
-            {sessions.map((session) => (
+            {visibleSessions.map((session) => (
                 <div
                     key={session.id}
                     className={`flex items-center justify-between p-4 rounded-xl border transition-all ${session.isCurrent
@@ -140,6 +146,15 @@ const SessionList: React.FC = () => {
                     )}
                 </div>
             ))}
+
+            {hasMore && (
+                <button
+                    onClick={() => setShowAll(!showAll)}
+                    className="w-full py-3 bg-slate-50 dark:bg-[#2b2616] text-slate-600 dark:text-[#cbbc90] font-bold rounded-xl border border-slate-200 dark:border-[#493f22] hover:bg-slate-100 dark:hover:bg-[#36301d] transition-colors"
+                >
+                    {showAll ? 'Show Less' : `View All (${sessions.length - initialLimit} more)`}
+                </button>
+            )}
 
             {sessions.length === 0 && (
                 <div className="text-center p-8 text-slate-500 dark:text-[#cbbc90]">
