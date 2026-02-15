@@ -2,12 +2,15 @@
 import React, { useState } from 'react';
 import api from '../services/api';
 
+import { useNotification } from '../contexts/NotificationContext';
+
 interface ExportModalProps {
     isOpen: boolean;
     onClose: () => void;
 }
 
 const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
+    const { showNotification } = useNotification();
     const [walletFilter, setWalletFilter] = useState('');
     const [loading, setLoading] = useState(false);
 
@@ -29,15 +32,44 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
             const url = window.URL.createObjectURL(new Blob([response.data]));
             const link = document.createElement('a');
             link.href = url;
-            link.setAttribute('download', 'Rupiku_Report.xlsx');
+            link.setAttribute('download', `Rupiku_Report_${new Date().toISOString().split('T')[0]}.xlsx`);
             document.body.appendChild(link);
-            link.click();
-            link.remove();
+
+            // Timeout to ensure mobile browsers process the click
+            setTimeout(() => {
+                link.click();
+                setTimeout(() => {
+                    document.body.removeChild(link);
+                    window.URL.revokeObjectURL(url);
+                }, 100);
+            }, 0);
 
             onClose();
-        } catch (error) {
+            showNotification("Report downloaded successfully!", "success");
+        } catch (error: any) {
             console.error("Export failed", error);
-            alert("Failed to export report.");
+
+            let errorMessage = "Failed to export report. Please try again.";
+
+            // Handle Blob error response (when backend returns JSON error as Blob)
+            if (error.response?.data instanceof Blob) {
+                try {
+                    const text = await error.response.data.text();
+                    const errorJson = JSON.parse(text);
+                    if (errorJson.error) errorMessage = errorJson.error;
+                    if (errorJson.message) errorMessage = errorJson.message;
+                } catch (e) {
+                    // Fail silently and use default message
+                }
+            } else if (error.message) {
+                errorMessage = error.message;
+            }
+
+            // Specific user-friendly messages for common errors
+            if (errorMessage.includes("401")) errorMessage = "Session expired. Please log in again.";
+            if (errorMessage.includes("Network Error")) errorMessage = "Connection failed. Please checks your internet.";
+
+            showNotification(errorMessage, 'error');
         } finally {
             setLoading(false);
         }
