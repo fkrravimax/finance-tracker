@@ -1,11 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { useLanguage } from '../../contexts/LanguageContext';
 import { sessionService, type Session } from '../../services/sessionService';
 import { useNotification } from '../../contexts/NotificationContext';
 import ConfirmationModal from '../ConfirmationModal';
 
 const SessionList: React.FC = () => {
-    const { t } = useLanguage();
     const { showNotification } = useNotification();
     const [sessions, setSessions] = useState<Session[]>([]);
     const [loading, setLoading] = useState(true);
@@ -96,14 +94,14 @@ const SessionList: React.FC = () => {
                 <div
                     key={session.id}
                     className={`flex items-center justify-between p-4 rounded-xl border transition-all ${session.isCurrent
-                            ? 'bg-primary/5 border-primary/20 dark:bg-primary/10 dark:border-primary/20'
-                            : 'bg-white dark:bg-[#2b2616] border-slate-100 dark:border-[#493f22] hover:border-slate-300 dark:hover:border-[#493f22]/80'
+                        ? 'bg-primary/5 border-primary/20 dark:bg-primary/10 dark:border-primary/20'
+                        : 'bg-white dark:bg-[#2b2616] border-slate-100 dark:border-[#493f22] hover:border-slate-300 dark:hover:border-[#493f22]/80'
                         }`}
                 >
                     <div className="flex items-center gap-4">
                         <div className={`w-12 h-12 rounded-full flex items-center justify-center ${session.isCurrent
-                                ? 'bg-primary text-white'
-                                : 'bg-slate-100 dark:bg-[#1a160b] text-slate-500 dark:text-[#cbbc90]'
+                            ? 'bg-primary text-white'
+                            : 'bg-slate-100 dark:bg-[#1a160b] text-slate-500 dark:text-[#cbbc90]'
                             }`}>
                             <span className="material-symbols-outlined text-2xl">
                                 {getDeviceIcon(session.device.type)}
