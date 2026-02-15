@@ -99,46 +99,52 @@ const SessionList: React.FC = () => {
             {visibleSessions.map((session) => (
                 <div
                     key={session.id}
-                    className={`flex items-center justify-between p-4 rounded-xl border transition-all ${session.isCurrent
+                    className={`flex items-start gap-4 p-4 rounded-xl border transition-all ${session.isCurrent
                         ? 'bg-primary/5 border-primary/20 dark:bg-primary/10 dark:border-primary/20'
                         : 'bg-white dark:bg-[#2b2616] border-slate-100 dark:border-[#493f22] hover:border-slate-300 dark:hover:border-[#493f22]/80'
                         }`}
                 >
-                    <div className="flex items-center gap-4">
-                        <div className={`w-12 h-12 rounded-full flex items-center justify-center ${session.isCurrent
-                            ? 'bg-primary text-white'
-                            : 'bg-slate-100 dark:bg-[#1a160b] text-slate-500 dark:text-[#cbbc90]'
-                            }`}>
-                            <span className="material-symbols-outlined text-2xl">
-                                {getDeviceIcon(session.device.type)}
-                            </span>
+                    <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full flex-shrink-0 flex items-center justify-center ${session.isCurrent
+                        ? 'bg-primary text-white'
+                        : 'bg-slate-100 dark:bg-[#1a160b] text-slate-500 dark:text-[#cbbc90]'
+                        }`}>
+                        <span className="material-symbols-outlined text-xl sm:text-2xl">
+                            {getDeviceIcon(session.device.type)}
+                        </span>
+                    </div>
+
+                    <div className="flex-1 min-w-0">
+                        <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mb-1">
+                            <h4 className="font-bold text-slate-900 dark:text-white text-sm sm:text-base break-words">
+                                {session.os.name || 'Unknown OS'} {session.os.version}
+                                {session.browser.name && ` • ${session.browser.name}`}
+                            </h4>
+                            {session.isCurrent && (
+                                <span className="px-2 py-0.5 rounded-full bg-primary text-white text-[10px] font-bold uppercase tracking-wider whitespace-nowrap">
+                                    Active Now
+                                </span>
+                            )}
                         </div>
-                        <div>
-                            <div className="flex items-center gap-2">
-                                <h4 className="font-bold text-slate-900 dark:text-white">
-                                    {session.os.name || 'Unknown OS'} {session.os.version}
-                                    {session.browser.name && ` • ${session.browser.name}`}
-                                </h4>
-                                {session.isCurrent && (
-                                    <span className="px-2 py-0.5 rounded-full bg-primary text-white text-[10px] font-bold uppercase tracking-wider">
-                                        Active Now
-                                    </span>
-                                )}
+
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 text-xs sm:text-sm text-slate-500 dark:text-[#cbbc90]">
+                            <div className="flex items-center gap-1.5">
+                                <span className="material-symbols-outlined text-[14px] flex-shrink-0">public</span>
+                                <span className="truncate">{session.ipAddress}</span>
                             </div>
-                            <p className="text-sm text-slate-500 dark:text-[#cbbc90] flex items-center gap-2 mt-0.5">
-                                <span className="material-symbols-outlined text-[14px]">public</span>
-                                {session.ipAddress}
-                                <span className="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-600"></span>
-                                <span className="material-symbols-outlined text-[14px]">schedule</span>
-                                {new Date(session.lastActive).toLocaleDateString()} {new Date(session.lastActive).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                            </p>
+                            <span className="hidden sm:block w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-600"></span>
+                            <div className="flex items-center gap-1.5">
+                                <span className="material-symbols-outlined text-[14px] flex-shrink-0">schedule</span>
+                                <span className="truncate">
+                                    {new Date(session.lastActive).toLocaleDateString()} {new Date(session.lastActive).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                </span>
+                            </div>
                         </div>
                     </div>
 
                     {!session.isCurrent && (
                         <button
                             onClick={() => handleRevokeClick(session.id)}
-                            className="p-2 text-slate-400 hover:text-red-500 dark:text-[#cbbc90] dark:hover:text-red-400 transition-colors"
+                            className="p-2 -mr-2 sm:mr-0 text-slate-400 hover:text-red-500 dark:text-[#cbbc90] dark:hover:text-red-400 transition-colors flex-shrink-0"
                             title="Revoke access"
                         >
                             <span className="material-symbols-outlined">delete</span>
