@@ -131,7 +131,7 @@ const DashboardContent: React.FC<DashboardLayoutProps> = ({ children, onLogout }
 
             <main className="flex-1 h-full overflow-y-auto overflow-x-hidden relative flex flex-col w-full max-w-full pb-[calc(80px+env(safe-area-inset-bottom))] md:pb-0">
                 {/* Mobile Header (Visible only on small screens) */}
-                <div className="md:hidden flex items-center justify-between px-4 pb-4 pt-[calc(env(safe-area-inset-top)+1rem)] border-b border-slate-200 dark:border-white/5 bg-surface-light dark:bg-background-dark sticky top-0 z-30 shadow-sm">
+                <div className="md:hidden flex items-center justify-between px-4 pb-4 pt-[calc(env(safe-area-inset-top)+1rem)] border-b border-slate-200 dark:border-white/5 bg-surface-light dark:bg-background-dark sticky top-0 z-50 shadow-sm">
                     <div className="flex items-center gap-2">
                         <span className="w-8 h-8 bg-slate-900 dark:bg-slate-800 text-white rounded-xl flex items-center justify-center shadow-md shadow-slate-900/30 transform rotate-3">
                             <img src="/logo.png" alt="Logo" className="w-5 h-5 object-contain" />
