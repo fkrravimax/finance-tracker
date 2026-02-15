@@ -4,6 +4,7 @@ import { eq, lte, and, desc } from 'drizzle-orm';
 import { cryptoService } from './encryption.service.js';
 import { pushService, type PushPayload } from './push.service.js';
 import { randomUUID } from 'crypto';
+import { cryptoService as marketService } from './market.service.js';
 
 export const notificationService = {
     // --- Persistence Helper ---
@@ -290,6 +291,92 @@ export const notificationService = {
 
     // Stub for Market Update (to be implemented next)
     async checkMarketUpdates() {
-        console.log('[NOTIFY] Market update check triggered (NOT IMPLEMENTED YET)');
+        console.log('[NOTIFY] Checking market updates...');
+
+        // 1. Get all watchlist items with user info
+        const allItems = await db.select({
+            id: watchlists.id,
+            userId: watchlists.userId,
+            symbol: watchlists.symbol,
+            lastPrice: watchlists.lastPrice,
+        })
+            .from(watchlists)
+            .leftJoin(users, eq(watchlists.userId, users.id));
+
+        if (allItems.length === 0) return;
+
+        // 2. Get distinct symbols to fetch prices efficiently
+        const distinctSymbols = [...new Set(allItems.map(i => i.symbol))];
+        const chunks = [];
+        for (let i = 0; i < distinctSymbols.length; i += 50) {
+            chunks.push(distinctSymbols.slice(i, i + 50));
+        }
+
+        let allQuotes: Record<string, any> = {};
+        for (const chunk of chunks) {
+            try {
+                const chunkQuotes = await marketService.getQuotes(chunk.join(','));
+                allQuotes = { ...allQuotes, ...chunkQuotes };
+            } catch (e) {
+                console.error('[NOTIFY] Failed to fetch quotes for chunk:', chunk, e);
+            }
+        }
+
+        for (const item of allItems) {
+            try {
+                const quote = allQuotes[item.symbol];
+                if (!quote) continue;
+
+                const currentPrice = quote.price;
+                const lastPriceEncrypted = item.lastPrice;
+
+                // If no last price, just update it and continue (first run)
+                if (!lastPriceEncrypted) {
+                    await db.update(watchlists)
+                        .set({
+                            lastPrice: cryptoService.encrypt(currentPrice),
+                            lastCheckedAt: new Date()
+                        })
+                        .where(eq(watchlists.id, item.id));
+                    continue;
+                }
+
+                const lastPrice = cryptoService.decryptToNumber(lastPriceEncrypted);
+                const percentChange = ((currentPrice - lastPrice) / lastPrice) * 100;
+
+                // Threshold: 5% change since LAST CHECK (12h ago)
+                if (Math.abs(percentChange) >= 5) {
+                    const direction = percentChange > 0 ? 'naik 🚀' : 'turun 🔻';
+                    const title = `${item.symbol} ${direction}`;
+                    const body = `${item.symbol} bergerak ${percentChange.toFixed(2)}% menjadi $${currentPrice.toLocaleString()}.`;
+
+                    const payload: PushPayload = {
+                        title,
+                        body,
+                        icon: '/icon-192.png',
+                        badge: '/icon-192.png',
+                        tag: `market-${item.symbol}`,
+                        data: { url: '/crypto', action: 'open-app' }
+                    };
+
+                    await this.createAndSend(item.userId, 'market', title, body, payload, {
+                        symbol: item.symbol,
+                        change: percentChange,
+                        price: currentPrice
+                    });
+                }
+
+                // Always update last price to establish new baseline for next 12h
+                await db.update(watchlists)
+                    .set({
+                        lastPrice: cryptoService.encrypt(currentPrice),
+                        lastCheckedAt: new Date()
+                    })
+                    .where(eq(watchlists.id, item.id));
+
+            } catch (error) {
+                console.error(`[NOTIFY] Market check failed for ${item.userId} - ${item.symbol}:`, error);
+            }
+        }
     }
 };

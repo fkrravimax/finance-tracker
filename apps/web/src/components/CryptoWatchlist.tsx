@@ -1,18 +1,18 @@
 import { useState, useEffect, useCallback } from 'react';
 import { cryptoService, type CryptoQuote, type CryptoInfo } from '../services/cryptoService';
+import api from '../services/api';
 import { useLanguage } from '../contexts/LanguageContext';
 import Skeleton from './Skeleton';
-
-const WATCHLIST_KEY = 'crypto_watchlist';
-const DEFAULT_WATCHLIST = ['BTC', 'ETH', 'BNB', 'SOL', 'XRP'];
 
 const CryptoWatchlist = () => {
     const { t } = useLanguage();
 
-    const [watchlist, setWatchlist] = useState<string[]>(() => {
-        const saved = localStorage.getItem(WATCHLIST_KEY);
-        return saved ? JSON.parse(saved) : DEFAULT_WATCHLIST;
-    });
+    interface WatchlistItem {
+        id: string;
+        symbol: string;
+    }
+
+    const [watchlistItems, setWatchlistItems] = useState<WatchlistItem[]>([]);
     const [quotes, setQuotes] = useState<Record<string, CryptoQuote>>({});
     const [infos, setInfos] = useState<Record<string, CryptoInfo>>({});
     const [loading, setLoading] = useState(true);
@@ -25,13 +25,31 @@ const CryptoWatchlist = () => {
     const [editingHolding, setEditingHolding] = useState<string | null>(null);
     const [holdingInput, setHoldingInput] = useState('');
 
-    const fetchData = useCallback(async () => {
-        if (watchlist.length === 0) {
-            setLoading(false);
-            return;
-        }
+    const fetchWatchlist = useCallback(async () => {
         try {
-            const symbols = watchlist.join(',');
+            const res = await api.get('/notifications/watchlist');
+            setWatchlistItems(res.data);
+            return res.data as WatchlistItem[];
+        } catch (error) {
+            console.error('Failed to fetch watchlist:', error);
+            return [];
+        }
+    }, []);
+
+    const fetchData = useCallback(async () => {
+        try {
+            // 1. Get watchlist from DB (or use local state if not first load)
+            let items = watchlistItems;
+            if (loading) {
+                items = await fetchWatchlist();
+            }
+
+            if (items.length === 0) {
+                setLoading(false);
+                return;
+            }
+
+            const symbols = items.map(i => i.symbol).join(',');
             const [quotesData, infosData] = await Promise.all([
                 cryptoService.getQuotes(symbols),
                 cryptoService.getInfo(symbols),
@@ -43,37 +61,47 @@ const CryptoWatchlist = () => {
         } finally {
             setLoading(false);
         }
-    }, [watchlist]);
+    }, [watchlistItems, loading, fetchWatchlist]);
 
     useEffect(() => {
         fetchData();
-        const interval = setInterval(fetchData, 3 * 60 * 1000);
+        const interval = setInterval(fetchData, 3 * 60 * 1000); // Refresh prices every 3m
         return () => clearInterval(interval);
     }, [fetchData]);
-
-    useEffect(() => {
-        localStorage.setItem(WATCHLIST_KEY, JSON.stringify(watchlist));
-    }, [watchlist]);
 
     useEffect(() => {
         localStorage.setItem('crypto_holdings', JSON.stringify(holdings));
     }, [holdings]);
 
-    const addToWatchlist = () => {
+    const addToWatchlist = async () => {
         const symbol = addInput.trim().toUpperCase();
-        if (symbol && !watchlist.includes(symbol)) {
-            setWatchlist([...watchlist, symbol]);
-            setAddInput('');
-            setShowAddForm(false);
-            setLoading(true);
+        if (symbol && !watchlistItems.some(i => i.symbol === symbol)) {
+            try {
+                setLoading(true);
+                await api.post('/notifications/watchlist', { symbol });
+                setAddInput('');
+                setShowAddForm(false);
+                await fetchWatchlist(); // Refresh list to get ID
+            } catch (error) {
+                console.error('Failed to add to watchlist:', error);
+                setLoading(false);
+            }
         }
     };
 
-    const removeFromWatchlist = (symbol: string) => {
-        setWatchlist(watchlist.filter((s) => s !== symbol));
-        const newHoldings = { ...holdings };
-        delete newHoldings[symbol];
-        setHoldings(newHoldings);
+    const removeFromWatchlist = async (id: string, symbol: string) => {
+        try {
+            // Optimistic update
+            setWatchlistItems(prev => prev.filter(i => i.id !== id));
+            await api.delete(`/notifications/watchlist/${id}`);
+
+            const newHoldings = { ...holdings };
+            delete newHoldings[symbol];
+            setHoldings(newHoldings);
+        } catch (error) {
+            console.error('Failed to remove from watchlist:', error);
+            fetchWatchlist(); // Revert on error
+        }
     };
 
     const saveHolding = (symbol: string) => {
@@ -99,9 +127,9 @@ const CryptoWatchlist = () => {
     };
 
     // Calculate total portfolio
-    const totalPortfolioValue = watchlist.reduce((total, symbol) => {
-        const quote = quotes[symbol];
-        const amount = holdings[symbol] || 0;
+    const totalPortfolioValue = watchlistItems.reduce((total, item) => {
+        const quote = quotes[item.symbol];
+        const amount = holdings[item.symbol] || 0;
         return total + (quote?.price || 0) * amount;
     }, 0);
 
@@ -114,7 +142,7 @@ const CryptoWatchlist = () => {
                 <div className="bg-gradient-to-r from-amber-500 to-amber-600 dark:from-[#f4c025] dark:to-[#dca60e] rounded-2xl p-6 text-white dark:text-[#2b2616] shadow-lg shadow-amber-500/20">
                     <p className="text-sm font-bold opacity-80 mb-1">{t('crypto.portfolioValue')}</p>
                     <p className="text-3xl md:text-4xl font-black">{formatValue(totalPortfolioValue)}</p>
-                    <p className="text-xs mt-2 opacity-70">{watchlist.length} {t('crypto.assetsTracked')}</p>
+                    <p className="text-xs mt-2 opacity-70">{watchlistItems.length} {t('crypto.assetsTracked')}</p>
                 </div>
             )}
 
@@ -170,7 +198,7 @@ const CryptoWatchlist = () => {
                                 <Skeleton key={i} className="h-32 rounded-2xl bg-slate-200 dark:bg-[#f4c025]/10" />
                             ))}
                         </div>
-                    ) : watchlist.length === 0 ? (
+                    ) : watchlistItems.length === 0 ? (
                         <div className="text-center py-12 text-slate-400 dark:text-[#cbbc90]">
                             <span className="material-symbols-outlined text-4xl mb-3 block">visibility</span>
                             <p className="font-bold">{t('crypto.emptyWatchlist')}</p>
@@ -178,7 +206,8 @@ const CryptoWatchlist = () => {
                         </div>
                     ) : (
                         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-                            {watchlist.map((symbol) => {
+                            {watchlistItems.map((item) => {
+                                const { symbol, id } = item;
                                 const quote = quotes[symbol];
                                 const info = infos[symbol];
                                 const holding = holdings[symbol] || 0;
@@ -186,12 +215,12 @@ const CryptoWatchlist = () => {
 
                                 return (
                                     <div
-                                        key={symbol}
+                                        key={id}
                                         className="bg-slate-50 dark:bg-[#1e1b10] rounded-2xl border border-slate-100 dark:border-[#f4c025]/10 p-4 hover:border-amber-300 dark:hover:border-[#f4c025]/30 transition-all group relative"
                                     >
                                         {/* Remove button */}
                                         <button
-                                            onClick={() => removeFromWatchlist(symbol)}
+                                            onClick={() => removeFromWatchlist(id, symbol)}
                                             className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity text-slate-300 hover:text-rose-400 dark:text-[#8e8568] dark:hover:text-rose-400"
                                         >
                                             <span className="material-symbols-outlined text-[18px]">close</span>
