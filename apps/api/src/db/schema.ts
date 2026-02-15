@@ -12,6 +12,8 @@ export const users = pgTable("user", {
     plan: text("plan").default("FREE").notNull(),
     notifyBudget50: boolean("notify_budget_50").default(true),
     notifyBudget80: boolean("notify_budget_80").default(true),
+    notifyBudget95: boolean("notify_budget_95").default(true),
+    notifyBudget100: boolean("notify_budget_100").default(true),
     notifyDaily: boolean("notify_daily").default(false),
     notifyLunch: boolean("notify_lunch").default(true),
     notifyRecurring: boolean("notify_recurring").default(true),

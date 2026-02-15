@@ -179,18 +179,40 @@ export const notificationService = {
         }
     },
 
-    async checkBudgetAlerts() {
-        console.log('[NOTIFY] Checking budget alerts...');
-        const allUsers = await db.select({
-            id: users.id,
-            notifyBudget50: users.notifyBudget50,
-            notifyBudget80: users.notifyBudget80
-        }).from(users);
+    async checkBudgetAlerts(specificUserId?: string) {
+        console.log(`[NOTIFY] Checking budget alerts${specificUserId ? ` for ${specificUserId}` : '...'}`);
+
+        let targetUsers: {
+            id: string;
+            notifyBudget50: boolean | null;
+            notifyBudget80: boolean | null;
+            notifyBudget95: boolean | null;
+            notifyBudget100: boolean | null;
+        }[] = [];
+
+        if (specificUserId) {
+            const user = await db.select({
+                id: users.id,
+                notifyBudget50: users.notifyBudget50,
+                notifyBudget80: users.notifyBudget80,
+                notifyBudget95: users.notifyBudget95,
+                notifyBudget100: users.notifyBudget100,
+            }).from(users).where(eq(users.id, specificUserId));
+            if (user[0]) targetUsers = [user[0]];
+        } else {
+            targetUsers = await db.select({
+                id: users.id,
+                notifyBudget50: users.notifyBudget50,
+                notifyBudget80: users.notifyBudget80,
+                notifyBudget95: users.notifyBudget95,
+                notifyBudget100: users.notifyBudget100,
+            }).from(users);
+        }
 
         const now = new Date();
         const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
 
-        for (const user of allUsers) {
+        for (const user of targetUsers) {
             try {
                 const budgetResult = await db.select().from(budgets).where(eq(budgets.userId, user.id));
                 if (!budgetResult[0]) continue;
@@ -209,24 +231,20 @@ export const notificationService = {
                 const percentage = Math.round((monthlyExpense / budgetLimit) * 100);
                 const formatNum = (n: number) => n.toLocaleString('id-ID');
 
-                // Check which threshold was crossed today or recently
-                // Ideally we should track 'last_notified_threshold' to avoid spam. 
-                // For now, we rely on the daily cron nature. If run once a day, it might spam if they stay at 80% for days.
-                // Improvement: Check `notifications` table for recent alerts of same type this month.
-
-                let alertType: 'warning' | 'error' | null = null;
+                // Determine highest crossed threshold
                 let threshold = 0;
+                let alertType: 'warning' | 'error' | null = null;
 
-                if (percentage >= 100) {
+                if (percentage >= 100 && user.notifyBudget100 !== false) {
                     threshold = 100;
                     alertType = 'error';
-                } else if (percentage >= 95) {
+                } else if (percentage >= 95 && user.notifyBudget95 !== false) {
                     threshold = 95;
                     alertType = 'warning';
-                } else if (percentage >= 80 && user.notifyBudget80) {
+                } else if (percentage >= 80 && user.notifyBudget80 !== false) {
                     threshold = 80;
                     alertType = 'warning';
-                } else if (percentage >= 50 && user.notifyBudget50 && percentage < 80) {
+                } else if (percentage >= 50 && user.notifyBudget50 !== false && percentage < 80) {
                     threshold = 50;
                     alertType = 'warning';
                 }
@@ -235,11 +253,9 @@ export const notificationService = {
                     // Anti-Spam: Check if we already sent THIS threshold alert this month
                     const existing = await db.select().from(notifications).where(and(
                         eq(notifications.userId, user.id),
-                        eq(notifications.type, 'budget'),
-                        // Check if metadata contains threshold (we'll save it there) or checking title/body
+                        eq(notifications.type, 'budget')
                     ));
 
-                    // Simple check on metadata
                     const alreadySent = existing.some(n => {
                         try {
                             const meta = JSON.parse(n.metadata || '{}');
@@ -266,9 +282,8 @@ export const notificationService = {
                         await this.createAndSend(user.id, 'budget', title, body, payload, { threshold });
                     }
                 }
-
             } catch (error) {
-                console.error(`[NOTIFY] Budget alert failed for ${user.id}:`, error);
+                console.error(`[NOTIFY] Budget alert check failed for ${user.id}:`, error);
             }
         }
     },
