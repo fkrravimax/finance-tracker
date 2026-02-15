@@ -20,7 +20,10 @@ export const exportController = {
 
         } catch (error) {
             console.error("Export failed:", error);
-            res.status(500).json({ error: 'Failed to generate export' });
+            res.status(500).json({
+                error: 'Failed to generate export',
+                message: error instanceof Error ? error.message : 'Unknown error'
+            });
         }
     }
 };
