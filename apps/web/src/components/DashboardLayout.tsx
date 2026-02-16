@@ -8,6 +8,7 @@ import { UIProvider, useUI } from '../contexts/UIContext';
 import { useSwipeable, type SwipeEventData } from 'react-swipeable';
 import NotificationBell from './NotificationBell';
 import api from '../services/api';
+import InstallPrompt from './InstallPrompt';
 
 interface DashboardLayoutProps {
     children: React.ReactNode;
@@ -164,6 +165,8 @@ const DashboardContent: React.FC<DashboardLayoutProps> = ({ children, onLogout }
             </main>
 
             <BottomNavbar />
+
+            <InstallPrompt />
 
             <QuickAddTransactionModal
                 isOpen={isQuickAddOpen}
