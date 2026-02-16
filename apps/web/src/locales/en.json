@@ -417,5 +417,10 @@
             "title": "Contact Us",
             "content": "If you have any questions about this Privacy Policy, please contact us at:"
         }
+    },
+    "install": {
+        "title": "Install Rupiku",
+        "description": "Install Rupiku for a better experience. Works offline and loads faster!",
+        "button": "Install App"
     }
 }

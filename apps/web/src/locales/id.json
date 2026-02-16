@@ -417,5 +417,10 @@
             "title": "Hubungi Kami",
             "content": "Jika Anda memiliki pertanyaan tentang Kebijakan Privasi ini, silakan hubungi kami di:"
         }
+    },
+    "install": {
+        "title": "Install Rupiku",
+        "description": "Install Rupiku untuk pengalaman yang lebih baik. Bisa akses offline dan lebih cepat!",
+        "button": "Install Aplikasi"
     }
 }
