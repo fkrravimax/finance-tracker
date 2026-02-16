@@ -24,7 +24,28 @@ router.get('/users', async (req: Request, res: Response) => {
             image: users.image,
             lastActiveAt: users.lastActiveAt,
         }).from(users);
-        res.json(allUsers);
+
+        // Fetch all sessions to find the latest login for users with null lastActiveAt (fallback)
+        const allSessions = await db.select({
+            userId: sessions.userId,
+            createdAt: sessions.createdAt
+        }).from(sessions);
+
+        // Create a map of userId -> latest session createdAt
+        const userLastSession = new Map<string, Date>();
+        allSessions.forEach(session => {
+            const existing = userLastSession.get(session.userId);
+            if (!existing || session.createdAt > existing) {
+                userLastSession.set(session.userId, session.createdAt);
+            }
+        });
+
+        const usersWithActivity = allUsers.map(user => ({
+            ...user,
+            lastActiveAt: user.lastActiveAt || userLastSession.get(user.id) || null
+        }));
+
+        res.json(usersWithActivity);
     } catch (error) {
         console.error("Error fetching users:", error);
         res.status(500).json({ error: "Failed to fetch users" });
