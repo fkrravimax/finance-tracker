@@ -12,6 +12,7 @@ import ClosePositionModal from './ClosePositionModal';
 import Skeleton from './Skeleton';
 import CryptoMarket from './CryptoMarket';
 import CryptoWatchlist from './CryptoWatchlist';
+import CryptoSentiment from './CryptoSentiment';
 import { cryptoService } from '../services/cryptoService';
 
 const TradingDashboard = () => {
@@ -618,7 +619,12 @@ const TradingDashboard = () => {
                 </>
             )}
 
-            {activeTab === 'market' && <CryptoMarket />}
+            {activeTab === 'market' && (
+                <div className="space-y-6">
+                    <CryptoSentiment />
+                    <CryptoMarket />
+                </div>
+            )}
             {activeTab === 'watchlist' && <CryptoWatchlist />}
 
             <LogTradeModal
