@@ -6,6 +6,20 @@ import { db } from '../db/index.js';
 import { sessions, users } from '../db/schema.js';
 import { eq, and, gt } from 'drizzle-orm';
 
+// Helper to track activity
+const trackActivity = (user: any) => {
+    const now = new Date();
+    const lastActive = user.lastActiveAt ? new Date(user.lastActiveAt) : null;
+
+    if (!lastActive || (now.getTime() - lastActive.getTime() > 5 * 60 * 1000)) {
+        // Fire and forget update
+        db.update(users)
+            .set({ lastActiveAt: now })
+            .where(eq(users.id, user.id))
+            .catch(err => console.error("Failed to update lastActiveAt:", err));
+    }
+}
+
 export const authMiddleware = async (req: Request, res: Response, next: NextFunction) => {
     try {
         // 1. Try Better Auth cookie-based session first (email/password login)
@@ -18,6 +32,8 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
             (req as any).session = session.session;
             res.locals.user = session.user;
             res.locals.session = session.session;
+
+            trackActivity(session.user);
             return next();
         }
 
@@ -49,6 +65,8 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
                     (req as any).session = dbSession;
                     res.locals.user = user;
                     res.locals.session = dbSession;
+
+                    trackActivity(user);
                     return next();
                 }
             }

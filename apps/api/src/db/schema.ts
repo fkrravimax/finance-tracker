@@ -21,6 +21,7 @@ export const users = pgTable("user", {
     tradingBalance: text("trading_balance").default("0").notNull(),
     createdAt: timestamp("created_at").notNull(),
     updatedAt: timestamp("updated_at").notNull(),
+    lastActiveAt: timestamp("last_active_at"),
 });
 
 export const sessions = pgTable("session", {
