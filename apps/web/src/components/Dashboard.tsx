@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import DashboardSkeleton from './skeletons/DashboardSkeleton';
 import CashFlowChart from './CashFlowChart';
-import CryptoSentiment from './CryptoSentiment';
+
 import TransactionList from './TransactionList';
 import HiddenAmount from './HiddenAmount';
 // QuickAddTransactionModal removed (global)
@@ -297,8 +297,7 @@ const Dashboard: React.FC = () => {
                 <TransactionList limit={4} />
             </div>
 
-            {/* Crypto Market Sentiment Widget (Platinum only) */}
-            <CryptoSentiment />
+
 
             {/* Bottom decorative element */}
             <div className="pb-8 text-center text-xs font-bold text-slate-400 flex items-center justify-center gap-2">
