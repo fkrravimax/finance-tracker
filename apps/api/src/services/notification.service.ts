@@ -378,5 +378,10 @@ export const notificationService = {
                 console.error(`[NOTIFY] Market check failed for ${item.userId} - ${item.symbol}:`, error);
             }
         }
+    },
+
+    async checkSecurityAlerts() {
+        // Placeholder for security check logic
+        // console.log('[NOTIFY] Checking security alerts...');
     }
 };

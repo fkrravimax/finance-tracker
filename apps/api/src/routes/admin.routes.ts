@@ -22,6 +22,7 @@ router.get('/users', async (req: Request, res: Response) => {
             plan: users.plan,
             createdAt: users.createdAt,
             image: users.image,
+            lastActiveAt: users.lastActiveAt,
         }).from(users);
         res.json(allUsers);
     } catch (error) {

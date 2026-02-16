@@ -11,7 +11,22 @@ interface User {
     role: 'USER' | 'ADMIN';
     plan: 'FREE' | 'PREMIUM' | 'PLATINUM';
     createdAt: string;
+    lastActiveAt?: string;
 }
+
+// Helper to format last active time
+const formatLastActive = (dateString?: string) => {
+    if (!dateString) return 'Never';
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+
+    if (diffInSeconds < 60) return 'Just now';
+    if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m ago`;
+    if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h ago`;
+    if (diffInSeconds < 604800) return `${Math.floor(diffInSeconds / 86400)}d ago`;
+    return date.toLocaleDateString();
+};
 
 interface UpgradeRequest {
     id: string;
@@ -528,8 +543,9 @@ const AdminDashboard = () => {
                                 <th className="px-6 py-4 font-semibold whitespace-nowrap w-[35%] tracking-wide text-xs uppercase text-gray-500 dark:text-gray-400">{t('admin.users')}</th>
                                 <th className="px-6 py-4 font-semibold whitespace-nowrap w-[18%] tracking-wide text-xs uppercase text-gray-500 dark:text-gray-400">{t('admin.role')}</th>
                                 <th className="px-6 py-4 font-semibold whitespace-nowrap w-[18%] tracking-wide text-xs uppercase text-gray-500 dark:text-gray-400">{t('admin.plan')}</th>
+                                <th className="px-6 py-4 font-semibold whitespace-nowrap w-[15%] tracking-wide text-xs uppercase text-gray-500 dark:text-gray-400">Last Active</th>
                                 <th className="px-6 py-4 font-semibold whitespace-nowrap w-[18%] tracking-wide text-xs uppercase text-gray-500 dark:text-gray-400">{t('admin.joinedDate')}</th>
-                                <th className="px-6 py-4 font-semibold whitespace-nowrap w-[11%] text-center tracking-wide text-xs uppercase text-gray-500 dark:text-gray-400">Actions</th>
+                                <th className="px-6 py-4 font-semibold whitespace-nowrap w-[10%] text-center tracking-wide text-xs uppercase text-gray-500 dark:text-gray-400">Actions</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
@@ -574,6 +590,12 @@ const AdminDashboard = () => {
                                             {user.plan === 'PREMIUM' && <CreditCard className="w-3.5 h-3.5" />}
                                             {user.plan}
                                         </span>
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-gray-500 text-xs font-mono">
+                                        <div className="flex items-center gap-2">
+                                            <div className={`w-2 h-2 rounded-full ${user.lastActiveAt && (new Date().getTime() - new Date(user.lastActiveAt).getTime() < 15 * 60 * 1000) ? 'bg-green-500 animate-pulse' : 'bg-gray-300'}`}></div>
+                                            {formatLastActive(user.lastActiveAt)}
+                                        </div>
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-gray-500 text-xs font-mono">
                                         {new Date(user.createdAt).toLocaleDateString(undefined, {
@@ -652,6 +674,10 @@ const AdminDashboard = () => {
                                 <div className="flex flex-col">
                                     <span className="font-medium text-gray-900 dark:text-white text-base">{user.name}</span>
                                     <span className="text-xs text-gray-500">{user.email}</span>
+                                    <span className="text-[10px] text-gray-400 flex items-center gap-1 mt-1">
+                                        <div className={`w-1.5 h-1.5 rounded-full ${user.lastActiveAt && (new Date().getTime() - new Date(user.lastActiveAt).getTime() < 15 * 60 * 1000) ? 'bg-green-500 animate-pulse' : 'bg-gray-300'}`}></div>
+                                        Active: {formatLastActive(user.lastActiveAt)}
+                                    </span>
                                 </div>
                                 <div className="flex items-center gap-2">
                                     <span className="text-xs text-gray-400 font-mono">
