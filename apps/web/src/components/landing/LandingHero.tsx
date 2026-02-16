@@ -11,8 +11,8 @@ const LandingHero: React.FC<LandingHeroProps> = ({ isActive }) => {
     return (
         <div
             className={`absolute inset-0 flex items-center justify-center transition-all duration-500 ease-in-out ${isActive
-                    ? 'opacity-100 translate-x-0'
-                    : 'opacity-0 -translate-x-full' // Simplified for now, parent handles direction if needed or we assume simple fade/slide
+                ? 'opacity-100 translate-x-0'
+                : 'opacity-0 -translate-x-full' // Simplified for now, parent handles direction if needed or we assume simple fade/slide
                 }`}
             style={{
                 transform: isActive ? 'translateX(0)' : 'translateX(-100%)', // Override for simple slide logic managed by parent index
@@ -30,7 +30,7 @@ const LandingHero: React.FC<LandingHeroProps> = ({ isActive }) => {
                     href="/privacy"
                     className="mt-6 md:hidden text-xs font-bold text-slate-400 dark:text-[#cbbc90]/70 hover:text-primary transition-colors flex items-center gap-1"
                 >
-                    <span className="material-symbols-outlined text-sm">verified_user</span>
+                    <span className="material-symbols-outlined text-sm" aria-hidden="true" translate="no">verified_user</span>
                     {language === 'en' ? 'View Privacy Policy' : 'Lihat Kebijakan Privasi'}
                 </a>
             </div>
