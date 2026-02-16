@@ -56,9 +56,9 @@ const Sidebar: React.FC<SidebarProps> = ({ onLogout, isOpen = false, onClose }) 
                 fixed inset-y-0 left-0 z-50 w-72 bg-white/80 backdrop-blur-xl border border-white/50 dark:bg-background-dark dark:border-white/5 pt-6 px-6 pb-6 md:p-6 flex flex-col justify-between transition-transform duration-300 ease-in-out md:static md:translate-x-0 md:m-4 md:rounded-3xl shadow-soft
                 ${isOpen ? 'translate-x-0' : '-translate-x-full'}
             `}>
-                <div className="flex flex-col gap-8 h-full pt-[calc(env(safe-area-inset-top)+1rem)] md:pt-0">
+                <div className="flex flex-col gap-8 h-full pt-28 md:pt-0">
                     {/* Brand */}
-                    <div className="flex items-start justify-between px-2">
+                    <div className="hidden md:flex items-start justify-between px-2">
                         <div className="flex flex-col">
                             <h1 className="text-3xl font-black tracking-tight text-slate-800 dark:text-white flex items-center gap-2">
                                 <span className="w-10 h-10 bg-slate-900 dark:bg-slate-800 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-slate-900/30 rotate-3">
