@@ -9,19 +9,17 @@ export const transactionService = {
         return data;
     },
 
-    create: async (transaction: Omit<Transaction, 'id' | 'userId'>, aggregates?: AggregatePayload): Promise<Transaction> => {
-        const { data } = await api.post('/transactions', { ...transaction, aggregates });
+    create: async (transaction: Omit<Transaction, 'id' | 'userId'>): Promise<Transaction> => {
+        const { data } = await api.post('/transactions', transaction);
         return data;
     },
 
-    delete: async (id: string, aggregates?: AggregatePayload): Promise<void> => {
-        // Delete usually doesn't have a body in standard REST, but some APIs allow it.
-        // Express allows body in DELETE. axios.delete(url, { data: payload })
-        await api.delete(`/transactions/${id}`, { data: { aggregates } });
+    delete: async (id: string): Promise<void> => {
+        await api.delete(`/transactions/${id}`);
     },
 
-    update: async (id: string, transaction: Partial<Transaction>, aggregates?: AggregatePayload): Promise<Transaction> => {
-        const { data } = await api.put(`/transactions/${id}`, { ...transaction, aggregates });
+    update: async (id: string, transaction: Partial<Transaction>): Promise<Transaction> => {
+        const { data } = await api.put(`/transactions/${id}`, transaction);
         return data;
     }
 };

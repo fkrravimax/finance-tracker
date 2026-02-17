@@ -4,14 +4,10 @@ import { eq, desc, and, sql } from "drizzle-orm";
 import { randomUUID } from "crypto";
 import { cryptoService } from "./encryption.service.js";
 import { notificationService } from './notification.service.js';
-import { aggregateService } from './aggregate.service.js';
+
 import { walletService } from './wallet.service.js';
 
-interface AggregatePayload {
-    monthly?: { monthKey: string, income: string, expense: string, version: number };
-    daily?: { dayKey: string, income: string, expense: string };
-    category?: { monthKey: string, category: string, type: string, amount: string };
-}
+
 
 export const transactionService = {
     async getAll(userId: string) {
@@ -25,7 +21,7 @@ export const transactionService = {
         }));
     },
 
-    async create(userId: string, data: typeof transactions.$inferInsert, aggregates?: AggregatePayload) {
+    async create(userId: string, data: typeof transactions.$inferInsert) {
         return await db.transaction(async (tx) => {
             // 1. Insert Transaction
             const newTransaction = {
@@ -38,10 +34,7 @@ export const transactionService = {
             };
             const [t] = await tx.insert(transactions).values(newTransaction).returning();
 
-            // 2. Upsert Aggregates (if provided)
-            if (aggregates?.monthly) await aggregateService.upsertMonthly(userId, aggregates.monthly.monthKey, aggregates.monthly);
-            if (aggregates?.daily) await aggregateService.upsertDaily(userId, aggregates.daily.dayKey, aggregates.daily);
-            if (aggregates?.category) await aggregateService.upsertCategory(userId, aggregates.category.monthKey, aggregates.category.category, aggregates.category.type, aggregates.category.amount);
+
 
             // 3. Update Wallet Balance
             if (data.walletId) {
@@ -62,7 +55,7 @@ export const transactionService = {
         });
     },
 
-    async update(userId: string, id: string, data: Partial<typeof transactions.$inferInsert>, aggregates?: AggregatePayload) {
+    async update(userId: string, id: string, data: Partial<typeof transactions.$inferInsert>) {
         return await db.transaction(async (tx) => {
             // Get old transaction and Revert Wallet Balance
             const [oldT] = await tx.select().from(transactions).where(and(eq(transactions.id, id), eq(transactions.userId, userId)));
@@ -103,10 +96,7 @@ export const transactionService = {
                 await walletService.updateBalance(finalWalletId, applyChange);
             }
 
-            // Upsert Aggregates
-            if (aggregates?.monthly) await aggregateService.upsertMonthly(userId, aggregates.monthly.monthKey, aggregates.monthly);
-            if (aggregates?.daily) await aggregateService.upsertDaily(userId, aggregates.daily.dayKey, aggregates.daily);
-            if (aggregates?.category) await aggregateService.upsertCategory(userId, aggregates.category.monthKey, aggregates.category.category, aggregates.category.type, aggregates.category.amount);
+
 
             notificationService.checkBudgetAlerts(userId).catch(err => console.error(err));
 
@@ -119,7 +109,7 @@ export const transactionService = {
         });
     },
 
-    async delete(userId: string, id: string, aggregates?: AggregatePayload) {
+    async delete(userId: string, id: string) {
         return await db.transaction(async (tx) => {
             const [deleted] = await tx.delete(transactions)
                 .where(and(eq(transactions.id, id), eq(transactions.userId, userId)))
@@ -134,10 +124,7 @@ export const transactionService = {
                 await walletService.updateBalance(deleted.walletId, change);
             }
 
-            // Update Aggregates
-            if (aggregates?.monthly) await aggregateService.upsertMonthly(userId, aggregates.monthly.monthKey, aggregates.monthly);
-            if (aggregates?.daily) await aggregateService.upsertDaily(userId, aggregates.daily.dayKey, aggregates.daily);
-            if (aggregates?.category) await aggregateService.upsertCategory(userId, aggregates.category.monthKey, aggregates.category.category, aggregates.category.type, aggregates.category.amount);
+
 
             notificationService.checkBudgetAlerts(userId).catch(err => console.error(err));
 

@@ -28,58 +28,41 @@ const ExpensesByCategory: React.FC = () => {
             // Check if range matches a full month
             const start = new Date(startDate);
             const end = new Date(endDate);
-            // normalization
-            const sYear = start.getFullYear();
-            const sMonth = start.getMonth();
-            const eYear = end.getFullYear();
-            const eMonth = end.getMonth();
 
-            // Check if start is 1st and end is last day of SAME month
-            const isFirstDay = start.getDate() === 1;
-            const lastDayOfEndMonth = new Date(eYear, eMonth + 1, 0).getDate();
-            const isLastDay = end.getDate() === lastDayOfEndMonth;
-            const isSameMonth = sYear === eYear && sMonth === eMonth;
+            // Always use Transactions (Legacy Path)
+            const { transactionService } = await import('../services/transactionService');
+            const transactions = await transactionService.getAll();
 
-            if (isFirstDay && isLastDay && isSameMonth) {
-                // Use Aggregates!
-                const { reportsService } = await import('../services/reportsService'); // Dynamic import to avoid circular dependencies if any
-                const monthKey = `${sYear}-${String(sMonth + 1).padStart(2, '0')}`;
-                const data = await reportsService.getCategoryBreakdown(monthKey);
-                setCategories(data);
-            } else {
-                // Fallback to Transactions (Legacy Slow Path)
-                const { transactionService } = await import('../services/transactionService');
-                const transactions = await transactionService.getAll();
+            // Filter by date and type 'expense'
+            // Ensure end date includes the full day
+            const endOfDay = new Date(end);
+            endOfDay.setHours(23, 59, 59, 999);
 
-                // Filter by date and type 'expense'
-                end.setHours(23, 59, 59, 999); // Include full end day
+            const filtered = transactions.filter(t => {
+                const tDate = new Date(t.date);
+                return t.type === 'expense' && tDate >= start && tDate <= endOfDay;
+            });
 
-                const filtered = transactions.filter(t => {
-                    const tDate = new Date(t.date);
-                    return t.type === 'expense' && tDate >= start && tDate <= end;
-                });
+            // Group by category
+            const grouped: Record<string, number> = {};
+            let total = 0;
 
-                // Group by category
-                const grouped: Record<string, number> = {};
-                let total = 0;
+            filtered.forEach(t => {
+                const amount = Number(t.amount);
+                grouped[t.category] = (grouped[t.category] || 0) + amount;
+                total += amount;
+            });
 
-                filtered.forEach(t => {
-                    const amount = Number(t.amount);
-                    grouped[t.category] = (grouped[t.category] || 0) + amount;
-                    total += amount;
-                });
+            // Format for display
+            const result = Object.entries(grouped)
+                .map(([category, amount]) => ({
+                    category,
+                    amount,
+                    percentage: total > 0 ? (amount / total) * 100 : 0
+                }))
+                .sort((a, b) => b.amount - a.amount); // Sort by highest expense
 
-                // Format for display
-                const result = Object.entries(grouped)
-                    .map(([category, amount]) => ({
-                        category,
-                        amount,
-                        percentage: total > 0 ? (amount / total) * 100 : 0
-                    }))
-                    .sort((a, b) => b.amount - a.amount); // Sort by highest expense
-
-                setCategories(result);
-            }
+            setCategories(result);
         } catch (error) {
             console.error("Failed to fetch category data", error);
             setError("Failed to load category data.");

@@ -64,6 +64,7 @@ export const dashboardService = {
             totalBalance,
             income,
             expense,
+            monthlyIncome, // Added this
             monthlyExpense,
             wallets,
             budget: budget ? {
