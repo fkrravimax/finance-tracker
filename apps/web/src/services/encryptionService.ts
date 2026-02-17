@@ -114,13 +114,13 @@ export const encryptionService = {
         return iv.toString(CryptoJS.enc.Hex) + ':' + encrypted.ciphertext.toString(CryptoJS.enc.Hex);
     },
 
-    decrypt: (text: string): string => {
+    decrypt: (text: string): string | null => {
         if (!text || !text.includes(':')) return text;
-        if (!ENCRYPTION_KEY) return text; // Or throw
+        if (!ENCRYPTION_KEY) return null;
 
         try {
             const parts = text.split(':');
-            if (parts.length !== 2) return text;
+            if (parts.length !== 2) return null; // Invalid format
             const ivHex = parts[0];
             const encryptedHex = parts[1];
 
@@ -152,16 +152,18 @@ export const encryptionService = {
                 }
             );
 
+            // This throws if malformed
             return decrypted.toString(CryptoJS.enc.Utf8);
         } catch (e) {
             console.error("Decryption failed", e);
-            return text;
+            return null; // Signal failure
         }
     },
 
     decryptToNumber: (text: string | null | undefined): number => {
         if (text === null || text === undefined) return 0;
         const dec = encryptionService.decrypt(text);
+        if (dec === null) return 0; // Decryption failed -> 0 (Reset corrupted data)
         const num = parseFloat(dec);
         return isNaN(num) ? 0 : num;
     }
