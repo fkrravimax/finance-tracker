@@ -20,9 +20,9 @@ export const encryptionService = {
             // Node: crypto.createCipheriv('aes-256-cbc', Buffer.from(KEY, 'hex'), iv)
             // Crypto-JS equivalent needed.
 
-            ENCRYPTION_KEY = data.key ? data.key.trim() : null;
+            ENCRYPTION_KEY = data.key; // Keep raw, do not trim yet (needed for legacy fallback)
             if (ENCRYPTION_KEY) {
-                console.log("[Encryption] Key loaded (masked):", ENCRYPTION_KEY.substring(0, 4) + '...' + ENCRYPTION_KEY.substring(ENCRYPTION_KEY.length - 4), "Length:", ENCRYPTION_KEY.length);
+                console.log("[Encryption] Key loaded. Length:", ENCRYPTION_KEY.length);
             }
         } catch (error) {
             console.error('Failed to initialize encryption service:', error);
@@ -54,13 +54,13 @@ export const encryptionService = {
 
         // Match Backend Logic EXACTLY:
         // 1. Try Hex (32 bytes = 64 chars)
-        // Note: We trimmed the key in init().
-        if (/^[0-9a-fA-F]+$/.test(ENCRYPTION_KEY) && ENCRYPTION_KEY.length === 64) {
-            keyWords = CryptoJS.enc.Hex.parse(ENCRYPTION_KEY);
+        const cleanKey = ENCRYPTION_KEY.trim();
+        if (/^[0-9a-fA-F]+$/.test(cleanKey) && cleanKey.length === 64) {
+            keyWords = CryptoJS.enc.Hex.parse(cleanKey);
         }
         // 2. Try Raw (32 chars)
-        else if (ENCRYPTION_KEY.length === 32) {
-            keyWords = CryptoJS.enc.Utf8.parse(ENCRYPTION_KEY);
+        else if (cleanKey.length === 32) {
+            keyWords = CryptoJS.enc.Utf8.parse(cleanKey);
         }
         // 3. Fallback: Pad or Truncate to 32 bytes (Zero Padding)
         else {
@@ -131,25 +131,52 @@ export const encryptionService = {
             const iv = CryptoJS.enc.Hex.parse(ivHex);
             const ciphertext = CryptoJS.enc.Hex.parse(encryptedHex);
 
-            // Parse Key (Exact same logic as encrypt)
+            // Strategy 1: Try Correct Key (Trimmed -> Hex)
+            // This matches the Backend and New Frontend logic.
             let keyWords;
-            // Note: We trimmed the key in init().
-            if (/^[0-9a-fA-F]+$/.test(ENCRYPTION_KEY) && ENCRYPTION_KEY.length === 64) {
-                keyWords = CryptoJS.enc.Hex.parse(ENCRYPTION_KEY);
-            } else if (ENCRYPTION_KEY.length === 32) {
-                keyWords = CryptoJS.enc.Utf8.parse(ENCRYPTION_KEY);
+            const cleanKey = ENCRYPTION_KEY.trim(); // Ensure we use the clean key
+
+            if (/^[0-9a-fA-F]+$/.test(cleanKey) && cleanKey.length === 64) {
+                keyWords = CryptoJS.enc.Hex.parse(cleanKey);
+            } else if (cleanKey.length === 32) {
+                keyWords = CryptoJS.enc.Utf8.parse(cleanKey);
             } else {
-                const tempKey = CryptoJS.enc.Utf8.parse(ENCRYPTION_KEY);
-                const paddedKey = CryptoJS.lib.WordArray.create(new Array(8).fill(0), 32);
-                for (let i = 0; i < 8; i++) {
-                    paddedKey.words[i] = (tempKey.words[i] || 0);
-                }
-                keyWords = paddedKey;
+                // Fallback for weird keys (shouldn't happen with valid env)
+                keyWords = CryptoJS.enc.Utf8.parse(cleanKey);
             }
 
-            const decrypted = CryptoJS.AES.decrypt(
+            try {
+                const decrypted = CryptoJS.AES.decrypt(
+                    { ciphertext: ciphertext } as CryptoJS.lib.CipherParams,
+                    keyWords,
+                    {
+                        iv: iv,
+                        mode: CryptoJS.mode.CBC,
+                        padding: CryptoJS.pad.Pkcs7
+                    }
+                );
+                const str = decrypted.toString(CryptoJS.enc.Utf8);
+                if (str) return str;
+            } catch (ignore) {
+                // First attempt failed, proceed to legacy
+            }
+
+            // Strategy 2: Legacy Fallback (Untrimmed -> Utf8)
+            // This matches the OLD Frontend logic (which included whitespace).
+            // We use the raw ENCRYPTION_KEY (potentially with whitespace).
+            let legacyKeyWords;
+
+            // Replicate the OLD logic exactly:
+            if (/^[0-9a-fA-F]+$/.test(ENCRYPTION_KEY) && ENCRYPTION_KEY.length === 64) {
+                legacyKeyWords = CryptoJS.enc.Hex.parse(ENCRYPTION_KEY);
+            } else {
+                // This is where the old code went for 65-char keys
+                legacyKeyWords = CryptoJS.enc.Utf8.parse(ENCRYPTION_KEY);
+            }
+
+            const legacyDecrypted = CryptoJS.AES.decrypt(
                 { ciphertext: ciphertext } as CryptoJS.lib.CipherParams,
-                keyWords,
+                legacyKeyWords,
                 {
                     iv: iv,
                     mode: CryptoJS.mode.CBC,
@@ -157,8 +184,11 @@ export const encryptionService = {
                 }
             );
 
-            // This throws if malformed
-            return decrypted.toString(CryptoJS.enc.Utf8);
+            const legacyStr = legacyDecrypted.toString(CryptoJS.enc.Utf8);
+            if (legacyStr) return legacyStr;
+
+            return null; // Both failed
+
         } catch (e) {
             console.error("Decryption failed", e);
             return null; // Signal failure
