@@ -62,8 +62,9 @@ export const dashboardService = {
         }
 
         const monthlyExpense = expense;
-        const cashFlow = income - expense;
-        const savingsRate = income > 0 ? ((income - expense) / income) * 100 : 0;
+        // cashFlow and savingsRate were unused and causing build errors
+        // const cashFlow = income - expense;
+        // const savingsRate = income > 0 ? ((income - expense) / income) * 100 : 0;
 
         // 3. Process Budget
         let budget = null;
