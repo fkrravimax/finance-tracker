@@ -42,9 +42,14 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
         if (authHeader?.startsWith('Bearer ')) {
             const token = authHeader.substring(7);
 
-            const [dbSession] = await db
-                .select()
+            // Optimization: Fetch Session AND User in one query
+            const result = await db
+                .select({
+                    user: users,
+                    session: sessions
+                })
                 .from(sessions)
+                .innerJoin(users, eq(sessions.userId, users.id))
                 .where(
                     and(
                         eq(sessions.token, token),
@@ -53,22 +58,16 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
                 )
                 .limit(1);
 
-            if (dbSession) {
-                const [user] = await db
-                    .select()
-                    .from(users)
-                    .where(eq(users.id, dbSession.userId))
-                    .limit(1);
+            const data = result[0];
 
-                if (user) {
-                    (req as any).user = user;
-                    (req as any).session = dbSession;
-                    res.locals.user = user;
-                    res.locals.session = dbSession;
+            if (data) {
+                (req as any).user = data.user;
+                (req as any).session = data.session;
+                res.locals.user = data.user;
+                res.locals.session = data.session;
 
-                    trackActivity(user);
-                    return next();
-                }
+                trackActivity(data.user);
+                return next();
             }
         }
 
