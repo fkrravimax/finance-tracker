@@ -61,8 +61,9 @@ export const transactionService = {
             const [oldT] = await tx.select().from(transactions).where(and(eq(transactions.id, id), eq(transactions.userId, userId)));
             if (!oldT) throw new Error("Transaction not found");
 
+            let oldAmount = 0;
             if (oldT.walletId) {
-                const oldAmount = cryptoService.decryptToNumber(oldT.amount);
+                oldAmount = cryptoService.decryptToNumber(oldT.amount);
                 const revertChange = oldT.type === 'income' ? -oldAmount : oldAmount;
                 await walletService.updateBalance(oldT.walletId, revertChange);
             }
@@ -91,6 +92,8 @@ export const transactionService = {
 
                 // We need the NEW type
                 const newType = data.type || oldT.type;
+
+                console.log(`Updating wallet ${finalWalletId}. Old Amount: ${oldAmount}, New Amount: ${newAmount}, New Type: ${newType}`);
 
                 const applyChange = newType === 'income' ? newAmount : -newAmount;
                 await walletService.updateBalance(finalWalletId, applyChange);

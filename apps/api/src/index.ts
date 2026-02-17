@@ -12,6 +12,11 @@ const PORT = process.env.PORT || 3000;
 // Trust Vercel's reverse proxy (required for secure cookies behind proxy)
 app.set('trust proxy', 1);
 
+console.log("Environment Check:");
+console.log("PORT:", process.env.PORT);
+console.log("ENCRYPTION_KEY Defined:", !!process.env.ENCRYPTION_KEY);
+console.log("DATABASE_URL Defined:", !!process.env.DATABASE_URL);
+
 // CORS configuration
 const corsOptions = {
     origin: process.env.FRONTEND_URL ? [process.env.FRONTEND_URL, "https://rupiku.vercel.app", "https://finance-web-five-coral.vercel.app", "https://financetrx.vercel.app", "https://finance-web-git-main-rafis-projects-acb0d393.vercel.app", "http://localhost:5173", "http://localhost:5174"] : ["https://rupiku.vercel.app", "https://financetrx.vercel.app", "https://finance-web-git-main-rafis-projects-acb0d393.vercel.app", "http://localhost:5173", "http://localhost:5174"],

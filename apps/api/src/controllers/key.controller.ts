@@ -16,9 +16,16 @@ export const keyController = {
             // This is sensitive! Ensure HTTPS is used.
             const key = process.env.ENCRYPTION_KEY;
 
+            console.log("Requesting encryption key. Key exists:", !!key, "User:", userId);
+
+            if (!key) {
+                console.error("CRITICAL: ENCRYPTION_KEY is not defined in environment variables");
+                return res.status(500).json({ error: 'Encryption key configuration missing' });
+            }
+
             res.json({ key });
         } catch (error) {
-            console.error(error);
+            console.error("Error in getKey:", error);
             res.status(500).json({ error: 'Failed to retrieve encryption key' });
         }
     }
