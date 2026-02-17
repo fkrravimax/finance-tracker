@@ -66,7 +66,7 @@ export const cryptoService = {
 
             return decrypted.toString();
         } catch (e) {
-            // console.error('Decryption error:', e); 
+            console.error('Decryption error:', e);
             return text;
         }
     },

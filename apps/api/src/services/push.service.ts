@@ -5,11 +5,20 @@ import { eq, and } from 'drizzle-orm';
 import { randomUUID } from 'crypto';
 
 // Configure web-push with VAPID keys
-webpush.setVapidDetails(
-    process.env.VAPID_EMAIL || 'mailto:rupiku@app.com',
-    process.env.VAPID_PUBLIC_KEY || '',
-    process.env.VAPID_PRIVATE_KEY || ''
-);
+// Configure web-push with VAPID keys
+try {
+    const vapidEmail = process.env.VAPID_EMAIL || 'mailto:rupiku@app.com';
+    const vapidPublic = process.env.VAPID_PUBLIC_KEY;
+    const vapidPrivate = process.env.VAPID_PRIVATE_KEY;
+
+    if (vapidPublic && vapidPrivate) {
+        webpush.setVapidDetails(vapidEmail, vapidPublic, vapidPrivate);
+    } else {
+        console.warn("[PushService] VAPID keys are missing. Push notifications will not work.");
+    }
+} catch (error) {
+    console.error("[PushService] Failed to set VAPID details:", error);
+}
 
 export interface PushPayload {
     title: string;
