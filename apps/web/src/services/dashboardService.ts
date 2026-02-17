@@ -93,10 +93,9 @@ export const dashboardService = {
             // So, `income` and `expense` from `monthlyAgg` OUGHT to be encrypted strings.
             // `wallets` from `/wallets` are likely decrypted numbers (based on previous file view).
 
-            const limit = encryptionService.decryptToNumber(b.limit);
-            // If b.limit is already number (because backend decrypted), decryptToNumber might return 0 if it expects string?
-            // My decryptToNumber: "if (!text || !text.includes(':')) return text;" -> parseFloat(text).
-            // So it handles plain numbers/strings fine.
+            // budgetService.get() returns DECRYPTED limit.
+            // Just cast it to number (it is number from backend service).
+            const limit = Number(b.limit);
 
             const percentage = limit > 0 ? Math.min(Math.round((monthlyExpense / limit) * 100), 100) : 0;
 
