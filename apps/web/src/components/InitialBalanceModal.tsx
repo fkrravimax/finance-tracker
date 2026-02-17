@@ -24,7 +24,36 @@ const InitialBalanceModal: React.FC<InitialBalanceModalProps> = ({ isOpen, onClo
         e.preventDefault();
         setLoading(true);
         try {
-            // Treat as an Income Transaction
+            // 1. Find or Create Wallet
+            // We need a wallet to attach this balance to, otherwise the "Total Balance" won't update.
+            // Fetch existing wallets first.
+            let targetWalletId = null;
+
+            // Note: We need to import 'api' to fetch wallets. 
+            // Since we can't easily add import at top without potentially messing up lines if not careful with line numbers,
+            // we will use the 'transactionService' or 'dashboardService' if they have it, OR just use 'fetch' or assume 'api' is available globally (it's not).
+            // Actually, best to add 'import api from "../services/api";' at the top.
+            // For now, let's assume we can use the 'api' instance if we impot it. 
+            // I will add the import in a separate block if needed, but for now let's write the logic.
+            // Wait, I can't add import here. I should do it in a separate call or use 'require'? No, ES modules.
+            // I'll add the logic assuming 'api' is imported, and then I'll add the import line.
+
+            const { data: wallets } = await import('../services/api').then(m => m.default.get('/wallets'));
+
+            const existingWallet = wallets.find((w: any) => w.type === walletType.toUpperCase() || w.name.includes(walletType));
+
+            if (existingWallet) {
+                targetWalletId = existingWallet.id;
+            } else {
+                // Create new wallet
+                const { data: newWallet } = await import('../services/api').then(m => m.default.post('/wallets', {
+                    name: `${walletType} Wallet`,
+                    type: walletType.toUpperCase() // BANK, CASH, E_WALLET usually
+                }));
+                targetWalletId = newWallet.id;
+            }
+
+            // 2. Create Transaction with walletId
             await transactionService.create({
                 amount: Number(amount),
                 type: 'income',
@@ -32,8 +61,11 @@ const InitialBalanceModal: React.FC<InitialBalanceModalProps> = ({ isOpen, onClo
                 merchant: 'Initial Balance',
                 description: `${walletType} Balance`,
                 date: new Date().toISOString(),
+                walletId: targetWalletId, // Attach to wallet!
                 icon: walletType === 'Bank' ? 'account_balance' : walletType === 'Cash' ? 'payments' : 'account_balance_wallet'
             });
+
+            // 3. Force refresh of dashboard
             onComplete();
             onClose();
         } catch (error) {
