@@ -38,74 +38,25 @@ export const encryptionService = {
     encrypt: (text: string | number): string => {
         if (!ENCRYPTION_KEY) {
             console.error("Encryption key not initialized!");
-            return String(text); // Fail safe? Or throw? Better throw or return as is for now?
-            // Returning as is might save it unencrypted!
             throw new Error("Encryption key not initialized");
         }
 
         const stringText = String(text);
-
-        // Generate random IV (16 bytes)
         const iv = CryptoJS.lib.WordArray.random(16);
 
-        // Parse Key
-        // If key is 32-byte hex string, parse as Hex. If raw string, parse as Utf8.
-        let keyWords;
+        // Parse Key: Match Backend's "Fallback" Logic (Ascii -> Truncate/Pad)
+        // We suspect Backend falls into 'else' block due to whitespace, 
+        // effectively using the Raw String bytes (truncated to 32).
 
-        // Match Backend Logic EXACTLY:
-        // 1. Try Hex (32 bytes = 64 chars)
-        const cleanKey = ENCRYPTION_KEY.trim();
-        if (/^[0-9a-fA-F]+$/.test(cleanKey) && cleanKey.length === 64) {
-            keyWords = CryptoJS.enc.Hex.parse(cleanKey);
+        const tempKey = CryptoJS.enc.Utf8.parse(ENCRYPTION_KEY);
+        const paddedKey = CryptoJS.lib.WordArray.create(new Array(8).fill(0), 32);
+
+        // Copy first 32 bytes (truncate if longer, pad if shorter)
+        for (let i = 0; i < 8; i++) {
+            paddedKey.words[i] = (tempKey.words[i] || 0);
         }
-        // 2. Try Raw (32 chars)
-        else if (cleanKey.length === 32) {
-            keyWords = CryptoJS.enc.Utf8.parse(cleanKey);
-        }
-        // 3. Fallback: Pad or Truncate to 32 bytes (Zero Padding)
-        else {
-            const tempKey = CryptoJS.enc.Utf8.parse(ENCRYPTION_KEY);
 
-            // Create a 32-byte (8-word) zero-filled WordArray
-            const paddedKey = CryptoJS.lib.WordArray.create(new Array(8).fill(0), 32); // 8 words * 4 bytes = 32 bytes
-
-            // Copy bytes from tempKey to paddedKey
-            // WordArray logic is a bit manual, identifying effective bytes.
-            // Easier approach: Use manual padding helper if needed, or simple clamping.
-
-            // Actually, simpler approach to match `Buffer.alloc(32).write(str)`:
-            // If we have "abc", Buffer is [61, 62, 63, 00, 00...]
-
-            // Let's implement manual padding on the words array.
-            for (let i = 0; i < 8; i++) { // 32 bytes = 8 words
-                if (i < tempKey.words.length) {
-                    paddedKey.words[i] = tempKey.words[i];
-                } else {
-                    paddedKey.words[i] = 0;
-                }
-            }
-
-            // Handle sigBytes mismatch (utf8 parse might set sigBytes to e.g. 13)
-            // But we want STRICTLY 32 bytes.
-            // If original string was short, sigBytes is small.
-            // We want to FORCE it to 32.
-            // However, we must ensure the 'undefined' words are 0.
-
-            // Wait, simply assigning words might copy garbage if `tempKey` has fewer words.
-            // tempKey.words elements beyond length are undefined.
-
-            // Refined Loop:
-            for (let i = 0; i < 8; i++) {
-                paddedKey.words[i] = (tempKey.words[i] || 0);
-            }
-
-            // If the string was LONGER than 32 bytes?
-            // `Buffer.write` truncates.
-            // `tempKey.words` will have more than 8 words.
-            // Our loop only takes first 8. That matches truncation.
-
-            keyWords = paddedKey;
-        }
+        const keyWords = paddedKey;
 
         const encrypted = CryptoJS.AES.encrypt(stringText, keyWords, {
             iv: iv,
@@ -113,8 +64,6 @@ export const encryptionService = {
             padding: CryptoJS.pad.Pkcs7
         });
 
-        // Backend expects: iv_hex:ciphertext_hex
-        // CryptoJS ciphertext is Base64 by default when toString(), but `encrypted.ciphertext` is WordArray
         return iv.toString(CryptoJS.enc.Hex) + ':' + encrypted.ciphertext.toString(CryptoJS.enc.Hex);
     },
 
@@ -124,26 +73,21 @@ export const encryptionService = {
 
         try {
             const parts = text.split(':');
-            if (parts.length !== 2) return null; // Invalid format
+            if (parts.length !== 2) return null;
             const ivHex = parts[0];
             const encryptedHex = parts[1];
 
             const iv = CryptoJS.enc.Hex.parse(ivHex);
             const ciphertext = CryptoJS.enc.Hex.parse(encryptedHex);
 
-            // Strategy 1: Try Correct Key (Trimmed -> Hex)
-            // This matches the Backend and New Frontend logic.
-            let keyWords;
-            const cleanKey = ENCRYPTION_KEY.trim(); // Ensure we use the clean key
-
-            if (/^[0-9a-fA-F]+$/.test(cleanKey) && cleanKey.length === 64) {
-                keyWords = CryptoJS.enc.Hex.parse(cleanKey);
-            } else if (cleanKey.length === 32) {
-                keyWords = CryptoJS.enc.Utf8.parse(cleanKey);
-            } else {
-                // Fallback for weird keys (shouldn't happen with valid env)
-                keyWords = CryptoJS.enc.Utf8.parse(cleanKey);
+            // Strategy 1: Try Backend "Fallback" Logic (Ascii -> Truncate/Pad)
+            // This is our Primary Strategy now.
+            const tempKey = CryptoJS.enc.Utf8.parse(ENCRYPTION_KEY);
+            const paddedKey = CryptoJS.lib.WordArray.create(new Array(8).fill(0), 32);
+            for (let i = 0; i < 8; i++) {
+                paddedKey.words[i] = (tempKey.words[i] || 0);
             }
+            const keyWords = paddedKey;
 
             try {
                 const decrypted = CryptoJS.AES.decrypt(
@@ -157,48 +101,40 @@ export const encryptionService = {
                 );
                 const str = decrypted.toString(CryptoJS.enc.Utf8);
                 if (str) return str;
-            } catch (ignore) {
-                // First attempt failed, proceed to legacy
+            } catch (ignore) { }
+
+            // Strategy 2: Try Hex Key (Trimmed)
+            // Just in case Backend somehow succeeds with Hex sometimes, or for migration.
+            const cleanKey = ENCRYPTION_KEY.trim();
+            if (/^[0-9a-fA-F]+$/.test(cleanKey) && cleanKey.length === 64) {
+                const hexKey = CryptoJS.enc.Hex.parse(cleanKey);
+                try {
+                    const decrypted = CryptoJS.AES.decrypt(
+                        { ciphertext: ciphertext } as CryptoJS.lib.CipherParams,
+                        hexKey,
+                        {
+                            iv: iv,
+                            mode: CryptoJS.mode.CBC,
+                            padding: CryptoJS.pad.Pkcs7
+                        }
+                    );
+                    const str = decrypted.toString(CryptoJS.enc.Utf8);
+                    if (str) return str;
+                } catch (ignore) { }
             }
 
-            // Strategy 2: Legacy Fallback (Untrimmed -> Utf8)
-            // This matches the OLD Frontend logic (which included whitespace).
-            // We use the raw ENCRYPTION_KEY (potentially with whitespace).
-            let legacyKeyWords;
-
-            // Replicate the OLD logic exactly:
-            if (/^[0-9a-fA-F]+$/.test(ENCRYPTION_KEY) && ENCRYPTION_KEY.length === 64) {
-                legacyKeyWords = CryptoJS.enc.Hex.parse(ENCRYPTION_KEY);
-            } else {
-                // This is where the old code went for 65-char keys
-                legacyKeyWords = CryptoJS.enc.Utf8.parse(ENCRYPTION_KEY);
-            }
-
-            const legacyDecrypted = CryptoJS.AES.decrypt(
-                { ciphertext: ciphertext } as CryptoJS.lib.CipherParams,
-                legacyKeyWords,
-                {
-                    iv: iv,
-                    mode: CryptoJS.mode.CBC,
-                    padding: CryptoJS.pad.Pkcs7
-                }
-            );
-
-            const legacyStr = legacyDecrypted.toString(CryptoJS.enc.Utf8);
-            if (legacyStr) return legacyStr;
-
-            return null; // Both failed
+            return null;
 
         } catch (e) {
             console.error("Decryption failed", e);
-            return null; // Signal failure
+            return null;
         }
     },
 
     decryptToNumber: (text: string | null | undefined): number => {
         if (text === null || text === undefined) return 0;
         const dec = encryptionService.decrypt(text);
-        if (dec === null) return 0; // Decryption failed -> 0 (Reset corrupted data)
+        if (dec === null) return 0;
         const num = parseFloat(dec);
         return isNaN(num) ? 0 : num;
     }
