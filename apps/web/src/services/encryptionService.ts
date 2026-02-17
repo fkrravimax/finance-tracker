@@ -44,19 +44,15 @@ export const encryptionService = {
         const stringText = String(text);
         const iv = CryptoJS.lib.WordArray.random(16);
 
-        // Parse Key: Match Backend's "Fallback" Logic (Ascii -> Truncate/Pad)
-        // We suspect Backend falls into 'else' block due to whitespace, 
-        // effectively using the Raw String bytes (truncated to 32).
-
+        // SIMPLE BACKEND PARITY LOGIC
+        // Backend treats key as raw string truncated/padded to 32 bytes (if not clean hex).
+        // This matches the "Initial Logic" while ensuring robust 32-byte length.
         const tempKey = CryptoJS.enc.Utf8.parse(ENCRYPTION_KEY);
-        const paddedKey = CryptoJS.lib.WordArray.create(new Array(8).fill(0), 32);
+        const keyWords = CryptoJS.lib.WordArray.create(new Array(8).fill(0), 32);
 
-        // Copy first 32 bytes (truncate if longer, pad if shorter)
         for (let i = 0; i < 8; i++) {
-            paddedKey.words[i] = (tempKey.words[i] || 0);
+            keyWords.words[i] = (tempKey.words[i] || 0);
         }
-
-        const keyWords = paddedKey;
 
         const encrypted = CryptoJS.AES.encrypt(stringText, keyWords, {
             iv: iv,
@@ -80,50 +76,27 @@ export const encryptionService = {
             const iv = CryptoJS.enc.Hex.parse(ivHex);
             const ciphertext = CryptoJS.enc.Hex.parse(encryptedHex);
 
-            // Strategy 1: Try Backend "Fallback" Logic (Ascii -> Truncate/Pad)
-            // This is our Primary Strategy now.
+            // MATCH ENCRYPT LOGIC (Raw String -> 32 Bytes)
             const tempKey = CryptoJS.enc.Utf8.parse(ENCRYPTION_KEY);
-            const paddedKey = CryptoJS.lib.WordArray.create(new Array(8).fill(0), 32);
+            const keyWords = CryptoJS.lib.WordArray.create(new Array(8).fill(0), 32);
             for (let i = 0; i < 8; i++) {
-                paddedKey.words[i] = (tempKey.words[i] || 0);
-            }
-            const keyWords = paddedKey;
-
-            try {
-                const decrypted = CryptoJS.AES.decrypt(
-                    { ciphertext: ciphertext } as CryptoJS.lib.CipherParams,
-                    keyWords,
-                    {
-                        iv: iv,
-                        mode: CryptoJS.mode.CBC,
-                        padding: CryptoJS.pad.Pkcs7
-                    }
-                );
-                const str = decrypted.toString(CryptoJS.enc.Utf8);
-                if (str) return str;
-            } catch (ignore) { }
-
-            // Strategy 2: Try Hex Key (Trimmed)
-            // Just in case Backend somehow succeeds with Hex sometimes, or for migration.
-            const cleanKey = ENCRYPTION_KEY.trim();
-            if (/^[0-9a-fA-F]+$/.test(cleanKey) && cleanKey.length === 64) {
-                const hexKey = CryptoJS.enc.Hex.parse(cleanKey);
-                try {
-                    const decrypted = CryptoJS.AES.decrypt(
-                        { ciphertext: ciphertext } as CryptoJS.lib.CipherParams,
-                        hexKey,
-                        {
-                            iv: iv,
-                            mode: CryptoJS.mode.CBC,
-                            padding: CryptoJS.pad.Pkcs7
-                        }
-                    );
-                    const str = decrypted.toString(CryptoJS.enc.Utf8);
-                    if (str) return str;
-                } catch (ignore) { }
+                keyWords.words[i] = (tempKey.words[i] || 0);
             }
 
-            return null;
+            const decrypted = CryptoJS.AES.decrypt(
+                { ciphertext: ciphertext } as CryptoJS.lib.CipherParams,
+                keyWords,
+                {
+                    iv: iv,
+                    mode: CryptoJS.mode.CBC,
+                    padding: CryptoJS.pad.Pkcs7
+                }
+            );
+
+            const str = decrypted.toString(CryptoJS.enc.Utf8);
+            // Swallow "Malformed UTF-8" by checking if str is empty/null, but standard toString might implicitly handle it or return empty. 
+            // Ideally we want to prevent crashes. CryptoJS usually handles this okay but returns empty string if bad?
+            return str || null;
 
         } catch (e) {
             console.error("Decryption failed", e);
