@@ -24,7 +24,8 @@
         "monthly": "Bulanan",
         "yearly": "Tahunan",
         "month": "Bulan",
-        "year": "Tahun"
+        "year": "Tahun",
+        "retry": "Coba Lagi"
     },
     "sidebar": {
         "overview": "Ringkasan",

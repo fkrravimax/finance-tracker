@@ -24,7 +24,8 @@
         "monthly": "Monthly",
         "yearly": "Yearly",
         "month": "Month",
-        "year": "Year"
+        "year": "Year",
+        "retry": "Retry"
     },
     "sidebar": {
         "overview": "Overview",
