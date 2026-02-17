@@ -20,7 +20,10 @@ export const encryptionService = {
             // Node: crypto.createCipheriv('aes-256-cbc', Buffer.from(KEY, 'hex'), iv)
             // Crypto-JS equivalent needed.
 
-            ENCRYPTION_KEY = data.key;
+            ENCRYPTION_KEY = data.key ? data.key.trim() : null;
+            if (ENCRYPTION_KEY) {
+                console.log("[Encryption] Key loaded (masked):", ENCRYPTION_KEY.substring(0, 4) + '...' + ENCRYPTION_KEY.substring(ENCRYPTION_KEY.length - 4), "Length:", ENCRYPTION_KEY.length);
+            }
         } catch (error) {
             console.error('Failed to initialize encryption service:', error);
             throw new Error("Failed to load encryption keys");
@@ -51,6 +54,7 @@ export const encryptionService = {
 
         // Match Backend Logic EXACTLY:
         // 1. Try Hex (32 bytes = 64 chars)
+        // Note: We trimmed the key in init().
         if (/^[0-9a-fA-F]+$/.test(ENCRYPTION_KEY) && ENCRYPTION_KEY.length === 64) {
             keyWords = CryptoJS.enc.Hex.parse(ENCRYPTION_KEY);
         }
@@ -129,6 +133,7 @@ export const encryptionService = {
 
             // Parse Key (Exact same logic as encrypt)
             let keyWords;
+            // Note: We trimmed the key in init().
             if (/^[0-9a-fA-F]+$/.test(ENCRYPTION_KEY) && ENCRYPTION_KEY.length === 64) {
                 keyWords = CryptoJS.enc.Hex.parse(ENCRYPTION_KEY);
             } else if (ENCRYPTION_KEY.length === 32) {
