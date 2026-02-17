@@ -5,6 +5,7 @@ import { useLanguage } from '../contexts/LanguageContext';
 import { useUI } from '../contexts/UIContext';
 import { useNotification } from '../contexts/NotificationContext';
 import { transactionService } from '../services/transactionService';
+import { aggregatorService } from '../services/aggregatorService';
 import ConfirmationModal from './ConfirmationModal';
 
 type TimeRange = 'day' | 'week' | 'month' | 'year';
@@ -90,7 +91,19 @@ const Transactions: React.FC = () => {
         if (!transactionToDelete) return;
 
         try {
-            await transactionService.delete(transactionToDelete);
+            // Find transaction details for aggregation update
+            const tx = transactions.find(t => t.id === transactionToDelete);
+            let aggregates;
+            if (tx) {
+                aggregates = await aggregatorService.prepareDelete({
+                    amount: Number(tx.amount),
+                    type: tx.type,
+                    date: tx.date,
+                    category: tx.category
+                });
+            }
+
+            await transactionService.delete(transactionToDelete, aggregates);
             showNotification(t('transactions.deleteSuccess'));
             fetchTransactions();
             // Trigger global update

@@ -4,6 +4,8 @@ import { recurringTransactions, transactions } from '../db/schema.js';
 import { eq, and, lte } from 'drizzle-orm';
 import { randomUUID } from "crypto";
 import { cryptoService } from './encryption.service.js';
+import { transactionService } from './transaction.service.js';
+import { aggregateService } from './aggregate.service.js';
 
 export const recurringService = {
     async getAll(userId: string) {
@@ -67,22 +69,79 @@ export const recurringService = {
 
             const decryptedName = cryptoService.decrypt(item.name);
             const decryptedAmount = cryptoService.decryptToNumber(item.amount);
+            const type = 'expense'; // Recurring transactions currently only support expenses in schema
 
-            // 1. Create the actual transaction
-            await db.insert(transactions).values({
-                id: randomUUID(),
-                userId: item.userId,
-                merchant: cryptoService.encrypt(decryptedName), // Re-encrypt for transaction
-                category: 'Recurring',
-                date: new Date(),
-                amount: cryptoService.encrypt(decryptedAmount), // Re-encrypt
-                type: 'expense',
+            // Prepare Aggregates
+            const date = new Date();
+            const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+            const dayKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+
+            // 1. Monthly
+            let monthlyAgg = await aggregateService.getMonthly(item.userId, monthKey);
+            let mIncome = 0, mExpense = 0, mVersion = 1;
+            if (monthlyAgg) {
+                mIncome = cryptoService.decryptToNumber(monthlyAgg.income);
+                mExpense = cryptoService.decryptToNumber(monthlyAgg.expense);
+                mVersion = monthlyAgg.version + 1;
+            }
+            // type is always expense for now
+            mExpense += decryptedAmount;
+
+            // 2. Daily
+            let dailyAgg = await aggregateService.getDaily(item.userId, dayKey);
+            let dIncome = 0, dExpense = 0;
+            if (dailyAgg) {
+                dIncome = cryptoService.decryptToNumber(dailyAgg.income);
+                dExpense = cryptoService.decryptToNumber(dailyAgg.expense);
+            }
+            // type is always expense
+            dExpense += decryptedAmount;
+
+            // 3. Category
+            const category = 'Recurring';
+            let catAggs = await aggregateService.getCategories(item.userId, monthKey);
+            let targetCat = catAggs.find(c => c.category === category && c.type === type);
+            let cAmount = 0;
+            if (targetCat) {
+                cAmount = cryptoService.decryptToNumber(targetCat.amount);
+            }
+            cAmount += decryptedAmount;
+
+            const aggregates = {
+                monthly: {
+                    monthKey,
+                    income: cryptoService.encrypt(mIncome.toString()),
+                    expense: cryptoService.encrypt(mExpense.toString()),
+                    version: mVersion
+                },
+                daily: {
+                    dayKey,
+                    income: cryptoService.encrypt(dIncome.toString()),
+                    expense: cryptoService.encrypt(dExpense.toString())
+                },
+                category: {
+                    monthKey,
+                    category,
+                    type,
+                    amount: cryptoService.encrypt(cAmount.toString())
+                }
+            };
+
+            // Call TransactionService to create transaction + update aggregates + update wallet
+            await transactionService.create(item.userId, {
+                amount: decryptedAmount.toString(),
+                merchant: decryptedName,
+                category: category,
+                date: now,
+                type: type,
                 icon: item.icon,
-                description: cryptoService.encrypt(`Recurring: ${item.frequency}`)
-            });
+                description: `Recurring: ${item.frequency}`,
+                // walletId: null - implicitly null
+            } as any, aggregates);
 
             // 2. Update nextDueDate
             const nextDate = new Date(item.nextDueDate || now);
+
             if (item.frequency === 'Monthly') {
                 nextDate.setMonth(nextDate.getMonth() + 1);
             } else if (item.frequency === 'Weekly') {

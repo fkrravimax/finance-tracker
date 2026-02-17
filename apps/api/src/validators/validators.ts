@@ -2,6 +2,26 @@ import { z } from 'zod';
 
 // ─── Transaction Schemas ────────────────────────────────────────────────────
 
+const aggregatesSchema = z.object({
+    monthly: z.object({
+        monthKey: z.string(),
+        income: z.string(),
+        expense: z.string(),
+        version: z.number(),
+    }).optional(),
+    daily: z.object({
+        dayKey: z.string(),
+        income: z.string(),
+        expense: z.string(),
+    }).optional(),
+    category: z.object({
+        monthKey: z.string(),
+        category: z.string(),
+        type: z.string(),
+        amount: z.string(),
+    }).optional(),
+});
+
 export const createTransactionSchema = z.object({
     amount: z.union([z.number(), z.string()])
         .transform((v) => Number(v))
@@ -13,6 +33,7 @@ export const createTransactionSchema = z.object({
     icon: z.string().optional(),
     description: z.string().max(500).optional(),
     walletId: z.string().uuid().optional(),
+    aggregates: aggregatesSchema.optional(),
 });
 
 export const updateTransactionSchema = z.object({
@@ -27,6 +48,7 @@ export const updateTransactionSchema = z.object({
     icon: z.string().optional(),
     description: z.string().max(500).optional(),
     walletId: z.string().uuid().optional(),
+    aggregates: aggregatesSchema.optional(),
 }).refine((data) => Object.keys(data).length > 0, {
     message: 'At least one field must be provided for update',
 });

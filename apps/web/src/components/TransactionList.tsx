@@ -13,19 +13,23 @@ const TransactionList: React.FC<TransactionListProps> = ({ limit }) => {
     const { t } = useLanguage();
     const [transactions, setTransactions] = useState<Transaction[]>([]);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+
+    const fetchTransactions = async () => {
+        setLoading(true);
+        setError(null);
+        try {
+            const data = await transactionService.getAll();
+            setTransactions(data);
+        } catch (error) {
+            console.error("Failed to fetch transactions", error);
+            setError("Failed to load transactions");
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
-        const fetchTransactions = async () => {
-            try {
-                const data = await transactionService.getAll();
-                setTransactions(data);
-            } catch (error) {
-                console.error("Failed to fetch transactions", error);
-            } finally {
-                setLoading(false);
-            }
-        };
-
         fetchTransactions();
     }, []);
 
@@ -38,7 +42,15 @@ const TransactionList: React.FC<TransactionListProps> = ({ limit }) => {
                 <Link to="/transactions" className="text-sm font-medium text-primary hover:text-[#dcb02d] transition-colors">{t('dashboard.viewAll')}</Link>
             </div>
             <div className="flex flex-col gap-4 flex-1 overflow-y-auto pr-1">
-                {transactions.length === 0 ? (
+                {loading ? (
+                    <div className="text-center py-4 text-slate-500">{t('common.loading')}</div>
+                ) : error ? (
+                    <div className="text-center py-4 text-red-500 flex flex-col items-center gap-2">
+                        <span className="material-symbols-outlined">error</span>
+                        <p className="text-sm">{error}</p>
+                        <button onClick={fetchTransactions} className="text-xs font-bold text-primary underline">Retry</button>
+                    </div>
+                ) : transactions.length === 0 ? (
                     <p className="text-gray-500 text-sm">{t('transactions.noTransactions')}</p>
                 ) : (
                     transactions.slice(0, limit || transactions.length).map((transaction) => (

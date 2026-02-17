@@ -15,48 +15,74 @@ const ExpensesByCategory: React.FC = () => {
     const [categories, setCategories] = useState<{ category: string, amount: number, percentage: number }[]>([]);
     const [loading, setLoading] = useState(false);
 
+    const [error, setError] = useState<string | null>(null);
+
     useEffect(() => {
         fetchCategoryData();
     }, [startDate, endDate]);
 
     const fetchCategoryData = async () => {
         setLoading(true);
+        setError(null);
         try {
-            const { transactionService } = await import('../services/transactionService');
-            const transactions = await transactionService.getAll();
-
-            // Filter by date and type 'expense'
+            // Check if range matches a full month
             const start = new Date(startDate);
             const end = new Date(endDate);
-            end.setHours(23, 59, 59, 999); // Include full end day
+            // normalization
+            const sYear = start.getFullYear();
+            const sMonth = start.getMonth();
+            const eYear = end.getFullYear();
+            const eMonth = end.getMonth();
 
-            const filtered = transactions.filter(t => {
-                const tDate = new Date(t.date);
-                return t.type === 'expense' && tDate >= start && tDate <= end;
-            });
+            // Check if start is 1st and end is last day of SAME month
+            const isFirstDay = start.getDate() === 1;
+            const lastDayOfEndMonth = new Date(eYear, eMonth + 1, 0).getDate();
+            const isLastDay = end.getDate() === lastDayOfEndMonth;
+            const isSameMonth = sYear === eYear && sMonth === eMonth;
 
-            // Group by category
-            const grouped: Record<string, number> = {};
-            let total = 0;
+            if (isFirstDay && isLastDay && isSameMonth) {
+                // Use Aggregates!
+                const { reportsService } = await import('../services/reportsService'); // Dynamic import to avoid circular dependencies if any
+                const monthKey = `${sYear}-${String(sMonth + 1).padStart(2, '0')}`;
+                const data = await reportsService.getCategoryBreakdown(monthKey);
+                setCategories(data);
+            } else {
+                // Fallback to Transactions (Legacy Slow Path)
+                const { transactionService } = await import('../services/transactionService');
+                const transactions = await transactionService.getAll();
 
-            filtered.forEach(t => {
-                const amount = Number(t.amount);
-                grouped[t.category] = (grouped[t.category] || 0) + amount;
-                total += amount;
-            });
+                // Filter by date and type 'expense'
+                end.setHours(23, 59, 59, 999); // Include full end day
 
-            // Format for display
-            const result = Object.entries(grouped)
-                .map(([category, amount]) => ({
-                    category,
-                    amount,
-                    percentage: total > 0 ? (amount / total) * 100 : 0
-                }))
-                .sort((a, b) => b.amount - a.amount); // Sort by highest expense
+                const filtered = transactions.filter(t => {
+                    const tDate = new Date(t.date);
+                    return t.type === 'expense' && tDate >= start && tDate <= end;
+                });
 
-            setCategories(result);
+                // Group by category
+                const grouped: Record<string, number> = {};
+                let total = 0;
+
+                filtered.forEach(t => {
+                    const amount = Number(t.amount);
+                    grouped[t.category] = (grouped[t.category] || 0) + amount;
+                    total += amount;
+                });
+
+                // Format for display
+                const result = Object.entries(grouped)
+                    .map(([category, amount]) => ({
+                        category,
+                        amount,
+                        percentage: total > 0 ? (amount / total) * 100 : 0
+                    }))
+                    .sort((a, b) => b.amount - a.amount); // Sort by highest expense
+
+                setCategories(result);
+            }
         } catch (error) {
             console.error("Failed to fetch category data", error);
+            setError("Failed to load category data.");
         } finally {
             setLoading(false);
         }
@@ -85,7 +111,20 @@ const ExpensesByCategory: React.FC = () => {
                 </div>
             </div>
 
-            {loading ? (
+            {error ? (
+                <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 p-4 rounded-xl flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                        <span className="material-symbols-outlined">error</span>
+                        <p className="font-bold">{error}</p>
+                    </div>
+                    <button
+                        onClick={fetchCategoryData}
+                        className="px-4 py-2 bg-white dark:bg-red-900/50 rounded-lg text-sm font-bold shadow-sm hover:bg-red-50 transition-colors"
+                    >
+                        {t('common.retry')}
+                    </button>
+                </div>
+            ) : loading ? (
                 <div className="text-center py-8 text-slate-500">{t('common.loading')}</div>
             ) : categories.length === 0 ? (
                 <div className="text-center py-8 text-slate-500 dark:text-[#cbbc90] flex flex-col items-center gap-2">

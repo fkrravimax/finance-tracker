@@ -41,6 +41,12 @@ app.use('/api/budgets', authMiddleware, budgetRoutes);
 import dashboardRoutes from './routes/dashboard.routes.js';
 app.use('/api/dashboard', authMiddleware, dashboardRoutes);
 
+import aggregateRoutes from './routes/aggregate.routes.js';
+app.use('/api/aggregates', authMiddleware, aggregateRoutes);
+
+import keyRoutes from './routes/key.routes.js';
+app.use('/api/keys', authMiddleware, keyRoutes);
+
 import exportRoutes from './routes/export.routes.js';
 app.use('/api/export', authMiddleware, exportRoutes);
 

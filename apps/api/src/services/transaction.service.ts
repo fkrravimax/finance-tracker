@@ -1,10 +1,17 @@
 import { db } from '../db/index.js';
-import { transactions } from '../db/schema.js';
-import { eq, desc, and } from "drizzle-orm";
+import { transactions, wallets } from '../db/schema.js';
+import { eq, desc, and, sql } from "drizzle-orm";
 import { randomUUID } from "crypto";
 import { cryptoService } from "./encryption.service.js";
-
 import { notificationService } from './notification.service.js';
+import { aggregateService } from './aggregate.service.js';
+import { walletService } from './wallet.service.js';
+
+interface AggregatePayload {
+    monthly?: { monthKey: string, income: string, expense: string, version: number };
+    daily?: { dayKey: string, income: string, expense: string };
+    category?: { monthKey: string, category: string, type: string, amount: string };
+}
 
 export const transactionService = {
     async getAll(userId: string) {
@@ -14,71 +21,127 @@ export const transactionService = {
             ...t,
             amount: cryptoService.decryptToNumber(t.amount), // Decrypting amount
             merchant: cryptoService.decrypt(t.merchant), // Decrypting merchant
-            description: cryptoService.decrypt(t.description || '') // Decrypting description
+            description: cryptoService.decrypt(t.description || ''), // Decrypting description
         }));
     },
 
-    async create(userId: string, data: typeof transactions.$inferInsert) {
-        // Force userId and id
-        const newTransaction = {
-            ...data,
-            userId,
-            id: randomUUID(),
-            amount: cryptoService.encrypt(data.amount), // Encrypt amount
-            merchant: cryptoService.encrypt(data.merchant), // Encrypt merchant
-            description: cryptoService.encrypt(data.description || ''), // Encrypt description
-            // Ensure walletId is present if possible, or it will be null and caught by migration later
-        };
-        const result = await db.insert(transactions).values(newTransaction).returning();
+    async create(userId: string, data: typeof transactions.$inferInsert, aggregates?: AggregatePayload) {
+        return await db.transaction(async (tx) => {
+            // 1. Insert Transaction
+            const newTransaction = {
+                ...data,
+                userId,
+                id: randomUUID(),
+                amount: cryptoService.encrypt(data.amount),
+                merchant: cryptoService.encrypt(data.merchant),
+                description: cryptoService.encrypt(data.description || ''),
+            };
+            const [t] = await tx.insert(transactions).values(newTransaction).returning();
 
-        // Trigger Real-time Budget Check
-        // we don't await this to keep UI fast
-        notificationService.checkBudgetAlerts(userId).catch(err => console.error(err));
+            // 2. Upsert Aggregates (if provided)
+            if (aggregates?.monthly) await aggregateService.upsertMonthly(userId, aggregates.monthly.monthKey, aggregates.monthly);
+            if (aggregates?.daily) await aggregateService.upsertDaily(userId, aggregates.daily.dayKey, aggregates.daily);
+            if (aggregates?.category) await aggregateService.upsertCategory(userId, aggregates.category.monthKey, aggregates.category.category, aggregates.category.type, aggregates.category.amount);
 
-        const t = result[0];
-        return {
-            ...t,
-            amount: cryptoService.decryptToNumber(t.amount),
-            merchant: cryptoService.decrypt(t.merchant),
-            description: cryptoService.decrypt(t.description || '')
-        };
+            // 3. Update Wallet Balance
+            if (data.walletId) {
+                const amount = Number(data.amount);
+                const change = data.type === 'income' ? amount : -amount;
+                await walletService.updateBalance(data.walletId, change); // This runs in its own tx/savepoint
+            }
+
+            // Trigger Real-time Budget Check (Async)
+            notificationService.checkBudgetAlerts(userId).catch(err => console.error(err));
+
+            return {
+                ...t,
+                amount: cryptoService.decryptToNumber(t.amount),
+                merchant: cryptoService.decrypt(t.merchant),
+                description: cryptoService.decrypt(t.description || '')
+            };
+        });
     },
 
-    async update(userId: string, id: string, data: Partial<typeof transactions.$inferInsert>) {
-        const updateData: any = { ...data, updatedAt: new Date() };
+    async update(userId: string, id: string, data: Partial<typeof transactions.$inferInsert>, aggregates?: AggregatePayload) {
+        return await db.transaction(async (tx) => {
+            // Get old transaction and Revert Wallet Balance
+            const [oldT] = await tx.select().from(transactions).where(and(eq(transactions.id, id), eq(transactions.userId, userId)));
+            if (!oldT) throw new Error("Transaction not found");
 
-        if (data.amount !== undefined) updateData.amount = cryptoService.encrypt(data.amount);
-        if (data.merchant !== undefined) updateData.merchant = cryptoService.encrypt(data.merchant);
-        if (data.description !== undefined) updateData.description = cryptoService.encrypt(data.description || '');
+            if (oldT.walletId) {
+                const oldAmount = cryptoService.decryptToNumber(oldT.amount);
+                const revertChange = oldT.type === 'income' ? -oldAmount : oldAmount;
+                await walletService.updateBalance(oldT.walletId, revertChange);
+            }
 
-        const result = await db.update(transactions)
-            .set(updateData)
-            .where(and(eq(transactions.id, id), eq(transactions.userId, userId)))
-            .returning();
+            // Prepare update
+            const updateData: any = { ...data, updatedAt: new Date() };
+            if (data.amount !== undefined) updateData.amount = cryptoService.encrypt(data.amount);
+            if (data.merchant !== undefined) updateData.merchant = cryptoService.encrypt(data.merchant);
+            if (data.description !== undefined) updateData.description = cryptoService.encrypt(data.description || '');
 
-        // Trigger Real-time Budget Check
-        notificationService.checkBudgetAlerts(userId).catch(err => console.error(err));
+            const [t] = await tx.update(transactions)
+                .set(updateData)
+                .where(and(eq(transactions.id, id), eq(transactions.userId, userId)))
+                .returning();
 
-        const t = result[0];
-        if (!t) return null;
+            // Apply New Wallet Balance
+            const finalWalletId = data.walletId !== undefined ? data.walletId : oldT.walletId;
+            // Note: if data.walletId is null, it means we removed it from wallet.
+            // But if it is undefined, we keep old wallet.
 
-        return {
-            ...t,
-            amount: cryptoService.decryptToNumber(t.amount),
-            merchant: cryptoService.decrypt(t.merchant),
-            description: cryptoService.decrypt(t.description || '')
-        };
+            if (finalWalletId) {
+                // We need the NEW amount. If data.amount is provided use it, else use decrypt(oldT.amount)
+                let newAmount = 0;
+                if (data.amount !== undefined) newAmount = Number(data.amount);
+                else newAmount = cryptoService.decryptToNumber(oldT.amount);
+
+                // We need the NEW type
+                const newType = data.type || oldT.type;
+
+                const applyChange = newType === 'income' ? newAmount : -newAmount;
+                await walletService.updateBalance(finalWalletId, applyChange);
+            }
+
+            // Upsert Aggregates
+            if (aggregates?.monthly) await aggregateService.upsertMonthly(userId, aggregates.monthly.monthKey, aggregates.monthly);
+            if (aggregates?.daily) await aggregateService.upsertDaily(userId, aggregates.daily.dayKey, aggregates.daily);
+            if (aggregates?.category) await aggregateService.upsertCategory(userId, aggregates.category.monthKey, aggregates.category.category, aggregates.category.type, aggregates.category.amount);
+
+            notificationService.checkBudgetAlerts(userId).catch(err => console.error(err));
+
+            return {
+                ...t,
+                amount: cryptoService.decryptToNumber(t.amount),
+                merchant: cryptoService.decrypt(t.merchant),
+                description: cryptoService.decrypt(t.description || '')
+            };
+        });
     },
 
-    async delete(userId: string, id: string) {
-        const result = await db.delete(transactions)
-            .where(and(eq(transactions.id, id), eq(transactions.userId, userId)))
-            .returning();
+    async delete(userId: string, id: string, aggregates?: AggregatePayload) {
+        return await db.transaction(async (tx) => {
+            const [deleted] = await tx.delete(transactions)
+                .where(and(eq(transactions.id, id), eq(transactions.userId, userId)))
+                .returning();
 
-        // Trigger Real-time Budget Check (in case they go back under budget?)
-        // Useful if we add logic later to "clear" alerts, but harmless now.
-        notificationService.checkBudgetAlerts(userId).catch(err => console.error(err));
+            if (!deleted) return null;
 
-        return result[0];
+            // Revert Wallet Balance
+            if (deleted.walletId) {
+                const amount = cryptoService.decryptToNumber(deleted.amount);
+                const change = deleted.type === 'income' ? -amount : amount;
+                await walletService.updateBalance(deleted.walletId, change);
+            }
+
+            // Update Aggregates
+            if (aggregates?.monthly) await aggregateService.upsertMonthly(userId, aggregates.monthly.monthKey, aggregates.monthly);
+            if (aggregates?.daily) await aggregateService.upsertDaily(userId, aggregates.daily.dayKey, aggregates.daily);
+            if (aggregates?.category) await aggregateService.upsertCategory(userId, aggregates.category.monthKey, aggregates.category.category, aggregates.category.type, aggregates.category.amount);
+
+            notificationService.checkBudgetAlerts(userId).catch(err => console.error(err));
+
+            return deleted;
+        });
     }
 };

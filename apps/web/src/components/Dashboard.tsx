@@ -12,13 +12,14 @@ import ExportModal from './ExportModal';
 import BudgetBreakdownModal from './BudgetBreakdownModal';
 import WalletListModal from './WalletListModal';
 import { dashboardService, type DashboardStats } from '../services/dashboardService';
+import { reportsService } from '../services/reportsService';
 import { authService } from '../services/authService';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useUI } from '../contexts/UIContext';
 import { useAppearance } from '../contexts/AppearanceContext';
 import api from '../services/api';
 
-import { transactionService } from '../services/transactionService';
+
 
 const Dashboard: React.FC = () => {
     const { openQuickAdd } = useUI();
@@ -28,20 +29,24 @@ const Dashboard: React.FC = () => {
     const [isBudgetModalOpen, setIsBudgetModalOpen] = useState(false);
     const [isWalletModalOpen, setIsWalletModalOpen] = useState(false);
     const [stats, setStats] = useState<DashboardStats | null>(null);
+    const [dailyStats, setDailyStats] = useState<any>({});
     const [loading, setLoading] = useState(true);
-    const [transactions, setTransactions] = useState<any[]>([]);
+
+
+    const [error, setError] = useState<string | null>(null);
 
     const [user, setUser] = useState<any>(null);
     const { t } = useLanguage();
 
     const fetchStats = async () => {
+        setError(null);
         try {
             const data = await dashboardService.getStats();
             setStats(data);
 
-            // Onboarding Logic Sequence:
-            // 1. If no budget set -> Show Budget Modal
-            // 2. If budget set BUT total balance is 0 and income is 0 (new account) -> Show Balance Modal
+            const daily = await reportsService.getDailyStats(new Date());
+            setDailyStats(daily);
+
             if (!data.budget) {
                 setIsOnboardingOpen(true);
             } else if (data.totalBalance === 0 && data.income === 0) {
@@ -49,19 +54,13 @@ const Dashboard: React.FC = () => {
             }
         } catch (error) {
             console.error("Failed to fetch dashboard stats", error);
+            setError("Failed to load dashboard data. Please check your connection.");
         } finally {
             setLoading(false);
         }
     };
 
-    const fetchTransactions = async () => {
-        try {
-            const data = await transactionService.getAll();
-            setTransactions(data);
-        } catch (error) {
-            console.error("Failed to fetch transactions", error);
-        }
-    };
+
 
     const handleAddWallet = async (name: string, type: string) => {
         try {
@@ -76,12 +75,10 @@ const Dashboard: React.FC = () => {
         const currentUser = authService.getCurrentUser();
         setUser(currentUser);
         fetchStats();
-        fetchTransactions();
 
         // Listen for global transaction updates
         const handleTransactionUpdate = () => {
             fetchStats();
-            fetchTransactions();
         };
         window.addEventListener('transaction-updated', handleTransactionUpdate);
 
@@ -143,6 +140,21 @@ const Dashboard: React.FC = () => {
                 wallets={stats?.wallets || []}
                 onAddWallet={handleAddWallet}
             />
+
+            {error && (
+                <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 p-4 rounded-xl flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                        <span className="material-symbols-outlined">error</span>
+                        <p className="font-bold">{error}</p>
+                    </div>
+                    <button
+                        onClick={() => { setLoading(true); fetchStats(); }}
+                        className="px-4 py-2 bg-white dark:bg-red-900/50 rounded-lg text-sm font-bold shadow-sm hover:bg-red-50 transition-colors"
+                    >
+                        {t('common.retry')}
+                    </button>
+                </div>
+            )}
 
             {/* Page Heading - Glassmorphism */}
             <header className="flex flex-wrap justify-between items-center md:items-end gap-4 md:gap-6 bg-transparent md:bg-white/60 dark:bg-transparent md:dark:bg-white/5 p-0 md:p-6 rounded-none md:rounded-bubbly shadow-none md:shadow-sm backdrop-blur-none md:backdrop-blur-sm border-none md:border md:border-white/60 md:dark:border-white/5">
@@ -293,7 +305,7 @@ const Dashboard: React.FC = () => {
 
             {/* Middle Row: Charts & Lists */}
             <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-                <CashFlowChart income={stats?.income || 0} expense={stats?.expense || 0} transactions={transactions} />
+                <CashFlowChart income={stats?.income || 0} expense={stats?.expense || 0} dailyData={dailyStats} />
                 <TransactionList limit={4} />
             </div>
 

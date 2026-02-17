@@ -4,6 +4,7 @@ import { transactionService } from '../services/transactionService';
 import { useNotification } from '../contexts/NotificationContext';
 import { aiService } from '../services/aiService';
 import api from '../services/api';
+import { aggregatorService } from '../services/aggregatorService';
 
 interface QuickAddTransactionModalProps {
     isOpen: boolean;
@@ -122,11 +123,33 @@ const QuickAddTransactionModal: React.FC<QuickAddTransactionModalProps> = ({ isO
                 walletId: walletSource // Send the ID directly
             };
 
+            // Prepare Aggregates
+            let aggregates;
             if (initialData) {
-                await transactionService.update(initialData.id, payload);
+                aggregates = await aggregatorService.prepareUpdate(
+                    {
+                        amount: Number(initialData.amount),
+                        type: initialData.type,
+                        date: initialData.date,
+                        category: initialData.category
+                    },
+                    {
+                        amount: payload.amount,
+                        type: payload.type,
+                        date: payload.date,
+                        category: payload.category
+                    }
+                );
+                await transactionService.update(initialData.id, payload, aggregates);
                 showNotification("Transaction updated successfully!");
             } else {
-                await transactionService.create(payload);
+                aggregates = await aggregatorService.prepareAggregates(
+                    payload.amount,
+                    payload.type,
+                    new Date(payload.date),
+                    payload.category
+                );
+                await transactionService.create(payload, aggregates);
                 showNotification("Transaction saved successfully!");
             }
 

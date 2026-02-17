@@ -236,3 +236,52 @@ export const watchlists = pgTable("watchlist", {
     lastCheckedAt: timestamp("last_checked_at"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
 });
+
+// --- Aggregates Tables (Encrypted Client-Side) ---
+
+export const monthlyAggregates = pgTable("monthly_aggregate", {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: text("user_id").notNull().references(() => users.id),
+    monthKey: text("month_key").notNull(), // Format: "YYYY-MM"
+    income: text("income").notNull(), // Encrypted
+    expense: text("expense").notNull(), // Encrypted
+    version: integer("version").default(1).notNull(), // For optimistic concurrency
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+}, (table) => {
+    return {
+        userIdIdx: index("monthly_agg_user_id_idx").on(table.userId),
+        monthKeyIdx: index("monthly_agg_month_key_idx").on(table.monthKey),
+        uniqueUserMonth: index("monthly_agg_unique_idx").on(table.userId, table.monthKey), // Should be unique ideally
+    };
+});
+
+export const dailyAggregates = pgTable("daily_aggregate", {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: text("user_id").notNull().references(() => users.id),
+    dayKey: text("day_key").notNull(), // Format: "YYYY-MM-DD"
+    income: text("income").notNull(), // Encrypted
+    expense: text("expense").notNull(), // Encrypted
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+}, (table) => {
+    return {
+        userIdIdx: index("daily_agg_user_id_idx").on(table.userId),
+        dayKeyIdx: index("daily_agg_day_key_idx").on(table.dayKey),
+        uniqueUserDay: index("daily_agg_unique_idx").on(table.userId, table.dayKey),
+    };
+});
+
+export const categoryAggregates = pgTable("category_aggregate", {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: text("user_id").notNull().references(() => users.id),
+    monthKey: text("month_key").notNull(), // Format: "YYYY-MM"
+    category: text("category").notNull(),
+    type: text("type").notNull(), // 'income' | 'expense'
+    amount: text("amount").notNull(), // Encrypted
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+}, (table) => {
+    return {
+        userIdIdx: index("category_agg_user_id_idx").on(table.userId),
+        monthKeyIdx: index("category_agg_month_key_idx").on(table.monthKey),
+        uniqueUserCategory: index("category_agg_unique_idx").on(table.userId, table.monthKey, table.category, table.type),
+    };
+});

@@ -2,20 +2,17 @@ import React, { useState, useMemo } from 'react';
 import { useAppearance } from '../contexts/AppearanceContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import HiddenAmount from './HiddenAmount';
-import type { Transaction } from '../types';
 
 interface CashFlowChartProps {
     income: number;
     expense: number;
-    transactions: Transaction[];
+    dailyData?: Record<number, { income: number; expense: number; net: number }>;
 }
 
-const CashFlowChart: React.FC<CashFlowChartProps> = ({ income, expense, transactions = [] }) => {
+const CashFlowChart: React.FC<CashFlowChartProps> = ({ income, expense, dailyData = {} }) => {
     const { t } = useLanguage();
     const { privacyMode } = useAppearance();
     const [viewMode, setViewMode] = useState<'chart' | 'calendar'>('chart');
-
-    // ... (inside map)
 
     const [currentDate, setCurrentDate] = useState(new Date());
 
@@ -38,33 +35,9 @@ const CashFlowChart: React.FC<CashFlowChartProps> = ({ income, expense, transact
         return new Date(year, month, 1).getDay();
     }, [currentDate]);
 
-    const dailyStats = useMemo(() => {
-        const stats: Record<number, { income: number; expense: number; net: number }> = {};
-        const year = currentDate.getFullYear();
-        const month = currentDate.getMonth();
-
-        transactions.forEach(t => {
-            const tDate = new Date(t.date);
-            if (tDate.getFullYear() === year && tDate.getMonth() === month) {
-                const day = tDate.getDate();
-                if (!stats[day]) stats[day] = { income: 0, expense: 0, net: 0 };
-
-                if (t.type === 'income') {
-                    stats[day].income += Number(t.amount);
-                } else {
-                    stats[day].expense += Number(t.amount);
-                }
-            }
-        });
-
-        // Calculate Net
-        Object.keys(stats).forEach(day => {
-            const d = Number(day);
-            stats[d].net = stats[d].income - stats[d].expense;
-        });
-
-        return stats;
-    }, [transactions, currentDate]);
+    // Use passed dailyData directly (assuming it matches current month for now, 
+    // or parent manages it. Ideally parent passes data for "currentDate")
+    const dailyStats = dailyData;
 
     const formatCompact = (amount: number) => {
         if (amount >= 1000000) {

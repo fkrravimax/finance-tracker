@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { dashboardService } from '../services/dashboardService';
+import { reportsService } from '../services/reportsService';
 import ExpensesByCategory from './ExpensesByCategory';
 
 import ReportsSkeleton from './skeletons/ReportsSkeleton';
@@ -11,6 +11,8 @@ const Reports: React.FC = () => {
     const [timeRange, setTimeRange] = useState('Monthly');
     const [reportData, setReportData] = useState<any>(null);
     const [loading, setLoading] = useState(true);
+
+    const [error, setError] = useState<string | null>(null);
 
     const timeOptions = [
         { value: 'Daily', label: t('common.daily') },
@@ -35,14 +37,15 @@ const Reports: React.FC = () => {
     useEffect(() => {
         const fetchReport = async () => {
             setLoading(true);
+            setError(null);
             try {
-                // ... fetch logic
-                // Artificial delay for smooth UX
-                await new Promise(resolve => setTimeout(resolve, 300));
-                const data = await dashboardService.getReport(timeRange.toLowerCase());
+                // Cast range to expected type
+                const rangeType = timeRange.toLowerCase() as 'daily' | 'weekly' | 'monthly' | 'yearly';
+                const data = await reportsService.getReport(rangeType);
                 setReportData(data);
             } catch (error) {
                 console.error("Failed to fetch report", error);
+                setError("Failed to load report data. Please check your connection.");
             } finally {
                 setLoading(false);
             }
@@ -60,6 +63,21 @@ const Reports: React.FC = () => {
             <header className="flex flex-wrap justify-between items-center gap-4">
                 <h2 className="text-xl font-bold text-slate-900 dark:text-white">{t('reports.title')}</h2>
             </header>
+
+            {error && (
+                <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 p-4 rounded-xl flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                        <span className="material-symbols-outlined">error</span>
+                        <p className="font-bold">{error}</p>
+                    </div>
+                    <button
+                        onClick={() => setTimeRange(timeRange)} // Trigger re-effect
+                        className="px-4 py-2 bg-white dark:bg-red-900/50 rounded-lg text-sm font-bold shadow-sm hover:bg-red-50 transition-colors"
+                    >
+                        {t('common.retry')}
+                    </button>
+                </div>
+            )}
 
             {/* Title Section */}
             <div className="flex flex-col gap-1">

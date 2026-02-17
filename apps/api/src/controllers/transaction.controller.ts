@@ -15,12 +15,14 @@ export const transactionController = {
     create: async (req: Request, res: Response) => {
         try {
             const userId = (req as any).user.id;
+            const { aggregates, ...data } = req.body;
+
             const payload = {
-                ...req.body,
-                date: new Date(req.body.date), // Ensure date is Date object
-                amount: req.body.amount.toString(), // Ensure amount is string for decimal
+                ...data,
+                date: new Date(data.date), // Ensure date is Date object
+                amount: data.amount.toString(), // Ensure amount is string for decimal
             };
-            const result = await transactionService.create(userId, payload);
+            const result = await transactionService.create(userId, payload, aggregates);
             res.json(result);
         } catch (error) {
             console.error(error);
@@ -42,7 +44,7 @@ export const transactionController = {
             if (req.body.description) payload.description = req.body.description;
             // Do not allow updating id, userId, createdAt, etc.
 
-            const result = await transactionService.update(userId, id, payload);
+            const result = await transactionService.update(userId, id, payload, req.body.aggregates);
 
             if (!result) {
                 return res.status(404).json({ error: 'Transaction not found' });
@@ -59,7 +61,8 @@ export const transactionController = {
         try {
             const userId = (req as any).user.id;
             const { id } = req.params as { id: string };
-            await transactionService.delete(userId, id);
+            const { aggregates } = req.body; // Delete might have body now
+            await transactionService.delete(userId, id, aggregates);
             res.json({ success: true });
         } catch (error) {
             res.status(500).json({ error: 'Failed to delete transaction' });
