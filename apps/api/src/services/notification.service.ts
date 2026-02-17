@@ -1,6 +1,6 @@
 import { db } from '../db/index.js';
 import { users, transactions, budgets, recurringTransactions, notifications, watchlists } from '../db/schema.js';
-import { eq, lte, and, desc } from 'drizzle-orm';
+import { eq, lte, and, desc, gte, lt } from 'drizzle-orm';
 import { cryptoService } from './encryption.service.js';
 import { pushService, type PushPayload } from './push.service.js';
 import { randomUUID } from 'crypto';
@@ -80,21 +80,28 @@ export const notificationService = {
 
         for (const user of eligibleUsers) {
             try {
-                const allTx = await db.select().from(transactions).where(eq(transactions.userId, user.id));
                 const today = new Date();
                 const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
                 const endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1);
+
+                // Optimization: Filter by date in SQL
+                const allTx = await db.select()
+                    .from(transactions)
+                    .where(
+                        and(
+                            eq(transactions.userId, user.id),
+                            gte(transactions.date, startOfDay),
+                            lt(transactions.date, endOfDay)
+                        )
+                    );
 
                 let todayIncome = 0;
                 let todayExpense = 0;
 
                 allTx.forEach(tx => {
-                    const txDate = new Date(tx.date);
-                    if (txDate >= startOfDay && txDate < endOfDay) {
-                        const amount = cryptoService.decryptToNumber(tx.amount);
-                        if (tx.type === 'income') todayIncome += amount;
-                        if (tx.type === 'expense') todayExpense += amount;
-                    }
+                    const amount = cryptoService.decryptToNumber(tx.amount);
+                    if (tx.type === 'income') todayIncome += amount;
+                    if (tx.type === 'expense') todayExpense += amount;
                 });
 
                 // Get budget context
@@ -107,13 +114,23 @@ export const notificationService = {
                 if (budgetLimit > 0) {
                     // Calculate monthly expense
                     const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+
+                    // Optimization: Filter by date in SQL
+                    const monthlyTx = await db.select()
+                        .from(transactions)
+                        .where(
+                            and(
+                                eq(transactions.userId, user.id),
+                                gte(transactions.date, startOfMonth),
+                                eq(transactions.type, 'expense')
+                            )
+                        );
+
                     let monthlyExpense = 0;
-                    allTx.forEach(tx => {
-                        const txDate = new Date(tx.date);
-                        if (txDate >= startOfMonth && tx.type === 'expense') {
-                            monthlyExpense += cryptoService.decryptToNumber(tx.amount);
-                        }
+                    monthlyTx.forEach(tx => {
+                        monthlyExpense += cryptoService.decryptToNumber(tx.amount);
                     });
+
                     const remaining = budgetLimit - monthlyExpense;
                     body += ` | Sisa: Rp ${formatNum(Math.max(0, remaining))}`;
                 }
@@ -221,12 +238,20 @@ export const notificationService = {
                 const budgetLimit = cryptoService.decryptToNumber(budgetResult[0].limit);
                 if (budgetLimit <= 0) continue;
 
-                const allTx = await db.select().from(transactions).where(eq(transactions.userId, user.id));
+                // Optimization: Filter by date in SQL
+                const allTx = await db.select()
+                    .from(transactions)
+                    .where(
+                        and(
+                            eq(transactions.userId, user.id),
+                            gte(transactions.date, startOfMonth),
+                            eq(transactions.type, 'expense')
+                        )
+                    );
+
                 let monthlyExpense = 0;
                 allTx.forEach(tx => {
-                    if (new Date(tx.date) >= startOfMonth && tx.type === 'expense') {
-                        monthlyExpense += cryptoService.decryptToNumber(tx.amount);
-                    }
+                    monthlyExpense += cryptoService.decryptToNumber(tx.amount);
                 });
 
                 const percentage = Math.round((monthlyExpense / budgetLimit) * 100);

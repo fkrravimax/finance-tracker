@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, boolean, uuid, integer, decimal } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, boolean, uuid, integer, decimal, index } from "drizzle-orm/pg-core";
 
 // --- Auth Tables (Better Auth) ---
 
@@ -33,6 +33,10 @@ export const sessions = pgTable("session", {
     ipAddress: text("ip_address"),
     userAgent: text("user_agent"),
     userId: text("user_id").notNull().references(() => users.id),
+}, (table) => {
+    return {
+        userIdIdx: index("session_user_id_idx").on(table.userId),
+    };
 });
 
 export const accounts = pgTable("account", {
@@ -49,6 +53,10 @@ export const accounts = pgTable("account", {
     password: text("password"),
     createdAt: timestamp("created_at").notNull(),
     updatedAt: timestamp("updated_at").notNull(),
+}, (table) => {
+    return {
+        userIdIdx: index("account_user_id_idx").on(table.userId),
+    };
 });
 
 export const verifications = pgTable("verification", {
@@ -71,6 +79,10 @@ export const wallets = pgTable("wallet", {
     isDefault: boolean("is_default").default(false),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
+}, (table) => {
+    return {
+        userIdIdx: index("wallet_user_id_idx").on(table.userId),
+    };
 });
 
 // Update transactions table to include walletId
@@ -87,6 +99,12 @@ export const transactions = pgTable("transaction", {
     description: text("description"), // Encrypted
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
+}, (table) => {
+    return {
+        userIdIdx: index("transaction_user_id_idx").on(table.userId),
+        walletIdIdx: index("transaction_wallet_id_idx").on(table.walletId),
+        dateIdx: index("transaction_date_idx").on(table.date),
+    };
 });
 
 export const savingsGoals = pgTable("savings_goal", {
@@ -100,6 +118,10 @@ export const savingsGoals = pgTable("savings_goal", {
     image: text("image"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
+}, (table) => {
+    return {
+        userIdIdx: index("savings_goal_user_id_idx").on(table.userId),
+    };
 });
 
 export const budgets = pgTable("budget", {
@@ -110,6 +132,10 @@ export const budgets = pgTable("budget", {
     icon: text("icon"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
+}, (table) => {
+    return {
+        userIdIdx: index("budget_user_id_idx").on(table.userId),
+    };
 });
 
 export const recurringTransactions = pgTable("recurring_transaction", {
@@ -123,6 +149,10 @@ export const recurringTransactions = pgTable("recurring_transaction", {
     nextDueDate: timestamp("next_due_date"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
+}, (table) => {
+    return {
+        userIdIdx: index("recurring_transaction_user_id_idx").on(table.userId),
+    };
 });
 
 export const trades = pgTable("trade", {
@@ -142,6 +172,10 @@ export const trades = pgTable("trade", {
     closedAt: timestamp("closed_at"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
+}, (table) => {
+    return {
+        userIdIdx: index("trade_user_id_idx").on(table.userId),
+    };
 });
 
 // --- Upgrade Requests Table ---
@@ -154,6 +188,10 @@ export const upgradeRequests = pgTable("upgrade_request", {
     status: text("status").notNull().default("PENDING"), // PENDING | APPROVED | REJECTED
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
+}, (table) => {
+    return {
+        userIdIdx: index("upgrade_request_user_id_idx").on(table.userId),
+    };
 });
 
 // --- Push Subscriptions Table ---
@@ -165,6 +203,10 @@ export const pushSubscriptions = pgTable("push_subscription", {
     p256dh: text("p256dh").notNull(),
     auth: text("auth").notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
+}, (table) => {
+    return {
+        userIdIdx: index("push_subscription_user_id_idx").on(table.userId),
+    };
 });
 
 // --- Notifications Table ---
@@ -178,6 +220,10 @@ export const notifications = pgTable("notification", {
     isRead: boolean("is_read").default(false).notNull(),
     metadata: text("metadata"), // JSON stringified extra data
     createdAt: timestamp("created_at").defaultNow().notNull(),
+}, (table) => {
+    return {
+        userIdIdx: index("notification_user_id_idx").on(table.userId),
+    };
 });
 
 // --- Watchlists Table ---
