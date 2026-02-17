@@ -48,31 +48,59 @@ export const encryptionService = {
         // Parse Key
         // If key is 32-byte hex string, parse as Hex. If raw string, parse as Utf8.
         let keyWords;
-        // Basic heuristic: check if hex and length is 64 chars (32 bytes)
-        const isHex = /^[0-9a-fA-F]+$/.test(ENCRYPTION_KEY) && ENCRYPTION_KEY.length === 64;
 
-        if (isHex) {
+        // Match Backend Logic EXACTLY:
+        // 1. Try Hex (32 bytes = 64 chars)
+        if (/^[0-9a-fA-F]+$/.test(ENCRYPTION_KEY) && ENCRYPTION_KEY.length === 64) {
             keyWords = CryptoJS.enc.Hex.parse(ENCRYPTION_KEY);
-        } else {
-            // Check if backend treats it as hex or raw. Backend does:
-            // if (Buffer.from(RAW, 'hex').length === 32) -> Use Hex
-            // else -> Use Raw (Buffer.from(RAW))
-            // So we strictly follow backend logic:
+        }
+        // 2. Try Raw (32 chars)
+        else if (ENCRYPTION_KEY.length === 32) {
+            keyWords = CryptoJS.enc.Utf8.parse(ENCRYPTION_KEY);
+        }
+        // 3. Fallback: Pad or Truncate to 32 bytes (Zero Padding)
+        else {
+            const tempKey = CryptoJS.enc.Utf8.parse(ENCRYPTION_KEY);
 
-            // Re-implement backend logic for key parsing:
-            if (/^[0-9a-fA-F]+$/.test(ENCRYPTION_KEY) && ENCRYPTION_KEY.length === 64) {
-                keyWords = CryptoJS.enc.Hex.parse(ENCRYPTION_KEY);
-            } else if (ENCRYPTION_KEY.length === 32) {
-                // Raw 32 chars
-                keyWords = CryptoJS.enc.Utf8.parse(ENCRYPTION_KEY);
-            } else {
-                // Backend truncates/pads. 
-                // Assuming standard usage, we hopefully have a good key.
-                // Let's assume Utf8 if not hex 64.
-                keyWords = CryptoJS.enc.Utf8.parse(ENCRYPTION_KEY);
-                // Note: Frontend padding/truncating to match backend might be tricky if backend allocs buffer.
-                // Ideally valid keys are used.
+            // Create a 32-byte (8-word) zero-filled WordArray
+            const paddedKey = CryptoJS.lib.WordArray.create(new Array(8).fill(0), 32); // 8 words * 4 bytes = 32 bytes
+
+            // Copy bytes from tempKey to paddedKey
+            // WordArray logic is a bit manual, identifying effective bytes.
+            // Easier approach: Use manual padding helper if needed, or simple clamping.
+
+            // Actually, simpler approach to match `Buffer.alloc(32).write(str)`:
+            // If we have "abc", Buffer is [61, 62, 63, 00, 00...]
+
+            // Let's implement manual padding on the words array.
+            for (let i = 0; i < 8; i++) { // 32 bytes = 8 words
+                if (i < tempKey.words.length) {
+                    paddedKey.words[i] = tempKey.words[i];
+                } else {
+                    paddedKey.words[i] = 0;
+                }
             }
+
+            // Handle sigBytes mismatch (utf8 parse might set sigBytes to e.g. 13)
+            // But we want STRICTLY 32 bytes.
+            // If original string was short, sigBytes is small.
+            // We want to FORCE it to 32.
+            // However, we must ensure the 'undefined' words are 0.
+
+            // Wait, simply assigning words might copy garbage if `tempKey` has fewer words.
+            // tempKey.words elements beyond length are undefined.
+
+            // Refined Loop:
+            for (let i = 0; i < 8; i++) {
+                paddedKey.words[i] = (tempKey.words[i] || 0);
+            }
+
+            // If the string was LONGER than 32 bytes?
+            // `Buffer.write` truncates.
+            // `tempKey.words` will have more than 8 words.
+            // Our loop only takes first 8. That matches truncation.
+
+            keyWords = paddedKey;
         }
 
         const encrypted = CryptoJS.AES.encrypt(stringText, keyWords, {
@@ -106,7 +134,12 @@ export const encryptionService = {
             } else if (ENCRYPTION_KEY.length === 32) {
                 keyWords = CryptoJS.enc.Utf8.parse(ENCRYPTION_KEY);
             } else {
-                keyWords = CryptoJS.enc.Utf8.parse(ENCRYPTION_KEY);
+                const tempKey = CryptoJS.enc.Utf8.parse(ENCRYPTION_KEY);
+                const paddedKey = CryptoJS.lib.WordArray.create(new Array(8).fill(0), 32);
+                for (let i = 0; i < 8; i++) {
+                    paddedKey.words[i] = (tempKey.words[i] || 0);
+                }
+                keyWords = paddedKey;
             }
 
             const decrypted = CryptoJS.AES.decrypt(
