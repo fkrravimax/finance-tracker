@@ -22,7 +22,7 @@ export const reportsService = {
         };
     },
 
-    getDailyStats: async (month: Date) => {
+    getDailyStats: async () => {
         // This was used for the Calendar Chart (CashFlowChart). 
         // We probably need a specific endpoint for this or reuse getReport('daily').
         // However, getReport('daily') returns array, not map.

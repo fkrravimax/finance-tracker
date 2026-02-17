@@ -1,7 +1,7 @@
 import api from './api';
 import type { Transaction } from '../types';
 
-import type { AggregatePayload } from './aggregatorService';
+
 
 export const transactionService = {
     getAll: async (): Promise<Transaction[]> => {

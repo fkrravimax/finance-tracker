@@ -44,7 +44,7 @@ const Dashboard: React.FC = () => {
             const data = await dashboardService.getStats();
             setStats(data);
 
-            const daily = await reportsService.getDailyStats(new Date());
+            const daily = await reportsService.getDailyStats();
             setDailyStats(daily);
 
             if (!data.budget) {
