@@ -4,7 +4,7 @@ import { useAppearance } from '../../contexts/AppearanceContext';
 import LogoText from '../LogoText';
 
 const LandingHeader: React.FC = () => {
-    const { language, setLanguage } = useLanguage();
+    const { t, language, setLanguage } = useLanguage();
     const { theme, setTheme } = useAppearance();
 
     return (
@@ -20,13 +20,13 @@ const LandingHeader: React.FC = () => {
                     href="mailto:ahmadfikriraf@gmail.com"
                     className="text-slate-500 dark:text-[#cbbc90] hover:text-primary cursor-pointer transition-all font-bold text-sm"
                 >
-                    Help Center
+                    {t('landing.header.helpCenter')}
                 </a>
                 <a
                     href="/privacy"
                     className="text-slate-500 dark:text-[#cbbc90] hover:text-primary cursor-pointer transition-all font-bold text-sm"
                 >
-                    {language === 'en' ? 'Privacy' : 'Privasi'}
+                    {t('landing.header.privacy')}
                 </a>
             </nav>
 

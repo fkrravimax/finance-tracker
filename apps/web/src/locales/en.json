@@ -296,6 +296,10 @@
         "notifyLunchDesc": "Get a friendly lunch reminder at 12:00 PM"
     },
     "landing": {
+        "header": {
+            "helpCenter": "Help Center",
+            "privacy": "Privacy"
+        },
         "hero": {
             "title": "Track Your Finances",
             "titleHighlight": "with Joy",
@@ -305,6 +309,7 @@
         },
         "features": {
             "title": "Powerful Features",
+            "subtitle": "Everything you need to manage your wealth in one place.",
             "dashboard": "Dashboard",
             "dashboardDesc": "Get a complete overview of your finances",
             "transactions": "Transactions",
@@ -312,7 +317,8 @@
             "savings": "Savings Goals",
             "savingsDesc": "Set and achieve your financial goals",
             "trading": "Trading Terminal",
-            "tradingDesc": "Log and analyze your trades"
+            "tradingDesc": "Log and analyze your trades",
+            "learnMore": "Learn more"
         },
         "howItWorks": {
             "title": "How It Works",
