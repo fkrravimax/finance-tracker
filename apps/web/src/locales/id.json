@@ -296,6 +296,10 @@
         "notifyLunchDesc": "Dapatkan pengingat makan siang jam 12:00 siang"
     },
     "landing": {
+        "header": {
+            "helpCenter": "Pusat Bantuan",
+            "privacy": "Privasi"
+        },
         "hero": {
             "title": "Kelola Keuangan",
             "titleHighlight": "dengan Ceria",
@@ -305,6 +309,7 @@
         },
         "features": {
             "title": "Fitur Unggulan",
+            "subtitle": "Segala yang Anda butuhkan untuk mengelola kekayaan Anda di satu tempat.",
             "dashboard": "Dashboard",
             "dashboardDesc": "Lihat ringkasan lengkap keuangan Anda",
             "transactions": "Transaksi",
@@ -312,7 +317,8 @@
             "savings": "Target Tabungan",
             "savingsDesc": "Tetapkan dan raih target keuangan Anda",
             "trading": "Terminal Trading",
-            "tradingDesc": "Catat dan analisis aktivitas trading"
+            "tradingDesc": "Catat dan analisis aktivitas trading",
+            "learnMore": "Pelajari selengkapnya"
         },
         "howItWorks": {
             "title": "Cara Kerja",

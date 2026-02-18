@@ -2,38 +2,51 @@ import React from 'react';
 import { useLanguage } from '../../contexts/LanguageContext';
 
 interface LandingHeroProps {
-    isActive: boolean;
+    onSignUp: () => void;
 }
 
-const LandingHero: React.FC<LandingHeroProps> = ({ isActive }) => {
+const LandingHero: React.FC<LandingHeroProps> = ({ onSignUp }) => {
     const { t, language } = useLanguage();
 
     return (
-        <div
-            className={`absolute inset-0 flex items-center justify-center transition-all duration-500 ease-in-out ${isActive
-                ? 'opacity-100 translate-x-0'
-                : 'opacity-0 -translate-x-full' // Simplified for now, parent handles direction if needed or we assume simple fade/slide
-                }`}
-            style={{
-                transform: isActive ? 'translateX(0)' : 'translateX(-100%)', // Override for simple slide logic managed by parent index
-                opacity: isActive ? 1 : 0
-            }}
-        >
-            <div className="flex flex-col items-center text-center px-4">
-                <h1 className="text-3xl md:text-5xl lg:text-6xl font-black text-slate-900 dark:text-white mb-4 md:mb-6">
-                    {t('landing.hero.title')} <span className="text-primary">{t('landing.hero.titleHighlight')}</span>
+        <div className="w-full max-w-7xl mx-auto px-4 md:px-8 flex flex-col md:flex-row items-center gap-12 md:gap-8">
+            {/* Text Content */}
+            <div className="flex-1 flex flex-col items-center md:items-start text-center md:text-left z-10">
+                <div className="inline-block px-3 py-1 bg-primary/10 dark:bg-primary/20 rounded-full mb-6 border border-primary/20">
+                    <span className="text-xs font-bold text-primary uppercase tracking-wider">
+                        {language === 'en' ? 'The Ultimate Finance Tracker' : 'Aplikasi Keuangan Terbaik'}
+                    </span>
+                </div>
+
+                <h1 className="text-4xl md:text-6xl lg:text-7xl font-black text-slate-900 dark:text-white mb-6 leading-tight">
+                    {t('landing.hero.title')} <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-yellow-300">{t('landing.hero.titleHighlight')}</span>
                 </h1>
-                <p className="text-base md:text-xl text-slate-500 dark:text-[#cbbc90] max-w-xl">
+
+                <p className="text-lg md:text-xl text-slate-600 dark:text-[#cbbc90] mb-8 max-w-xl leading-relaxed">
                     {t('landing.hero.subtitle')}
                 </p>
-                <a
-                    href="/privacy"
-                    className="mt-6 md:hidden text-xs font-bold text-slate-400 dark:text-[#cbbc90]/70 hover:text-primary transition-colors flex items-center gap-1"
-                >
-                    <span className="material-symbols-outlined text-sm" aria-hidden="true" translate="no">verified_user</span>
-                    {language === 'en' ? 'View Privacy Policy' : 'Lihat Kebijakan Privasi'}
-                </a>
+
+                <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
+                    <button
+                        onClick={onSignUp}
+                        className="w-full sm:w-auto px-8 py-4 bg-primary hover:bg-primary-hover text-slate-900 font-bold text-lg rounded-2xl transition-all shadow-xl hover:shadow-primary/25 active:scale-[0.98] flex items-center justify-center gap-2"
+                    >
+                        {t('landing.hero.getStarted')}
+                        <span className="material-symbols-outlined">arrow_forward</span>
+                    </button>
+
+                    <a
+                        href="/privacy"
+                        className="text-sm font-bold text-slate-500 dark:text-[#cbbc90]/70 hover:text-primary transition-colors flex items-center gap-2 px-4 py-2 md:hidden"
+                    >
+                        <span className="material-symbols-outlined text-lg">verified_user</span>
+                        {language === 'en' ? 'Privacy Policy' : 'Kebijakan Privasi'}
+                    </a>
+                </div>
             </div>
+
+            {/* Hero Image */}
+
         </div>
     );
 };
