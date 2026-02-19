@@ -1,5 +1,6 @@
 import React from 'react';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { FadeIn } from '../ui/Motion';
 
 interface LandingFeaturesProps {
     onSignUp: () => void;
@@ -51,8 +52,9 @@ const LandingFeatures: React.FC<LandingFeaturesProps> = ({ onSignUp }) => {
             </div>
 
             {features.map((feature, index) => (
-                <div
+                <FadeIn
                     key={index}
+                    direction={feature.align === 'left' ? 'right' : 'left'}
                     className={`flex flex-col md:flex-row items-center gap-12 lg:gap-20 ${feature.align === 'left' ? 'md:flex-row-reverse' : ''
                         }`}
                 >
@@ -94,7 +96,7 @@ const LandingFeatures: React.FC<LandingFeaturesProps> = ({ onSignUp }) => {
                             />
                         </div>
                     </div>
-                </div>
+                </FadeIn>
             ))}
         </div>
     );
