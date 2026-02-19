@@ -55,7 +55,11 @@ const ClosePositionModal: React.FC<ClosePositionModalProps> = ({ isOpen, onClose
                 body: JSON.stringify({ closePrice: parseFloat(closePrice) })
             });
 
-            if (onSave) onSave();
+            if (onSave) {
+                setTimeout(() => {
+                    onSave();
+                }, 300);
+            }
             onClose();
             setClosePrice('');
         } catch (error) {

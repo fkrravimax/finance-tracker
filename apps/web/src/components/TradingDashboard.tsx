@@ -461,9 +461,15 @@ const TradingDashboard = () => {
                         </div>
 
                         {/* Open Positions Section */}
-                        {
-                            (loading || openPositions.length > 0) && (
-                                <StaggerItem className="bg-white dark:bg-[#2b2616] rounded-2xl border border-slate-200 dark:border-[#f4c025]/10 p-4 md:p-6 shadow-sm">
+                        <AnimatePresence>
+                            {(loading || openPositions.length > 0) && (
+                                <StaggerItem
+                                    key="open-positions-section"
+                                    initial={{ opacity: 0, height: 0 }}
+                                    animate={{ opacity: 1, height: 'auto' }}
+                                    exit={{ opacity: 0, height: 0 }}
+                                    className="bg-white dark:bg-[#2b2616] rounded-2xl border border-slate-200 dark:border-[#f4c025]/10 p-4 md:p-6 shadow-sm overflow-hidden"
+                                >
                                     <div className="flex items-center justify-between mb-4">
                                         <div className="flex items-center gap-2">
                                             <Target size={18} className="text-amber-500 dark:text-[#f4c025]" />
@@ -546,8 +552,8 @@ const TradingDashboard = () => {
                                         )}
                                     </div>
                                 </StaggerItem>
-                            )
-                        }
+                            )}
+                        </AnimatePresence>
 
                         {/* Trade Log */}
                         <StaggerItem className="bg-white dark:bg-[#2b2616] rounded-2xl border border-slate-200 dark:border-[#f4c025]/10 p-4 md:p-6 shadow-sm">
