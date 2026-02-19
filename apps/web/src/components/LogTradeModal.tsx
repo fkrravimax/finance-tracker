@@ -69,7 +69,11 @@ const LogTradeModal: React.FC<LogTradeModalProps> = ({ isOpen, onClose, onSave, 
                 body: JSON.stringify(payload)
             });
 
-            if (onSave) onSave();
+            if (onSave) {
+                setTimeout(() => {
+                    onSave();
+                }, 300);
+            }
             onClose();
         } catch (error) {
             console.error(error);
