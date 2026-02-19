@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { AreaChart, Area, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { Wallet, Plus, Lock, Crown, Clock, Target } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import PageTransition from './ui/PageTransition';
 import { StaggerContainer, StaggerItem, ScaleButton } from './ui/Motion';
 import { authService } from '../services/authService';
@@ -53,9 +53,9 @@ const TradingDashboard = () => {
         }
         try {
             const [statsRes, tradesRes, openRes] = await Promise.all([
-                authService.fetchWithAuth('/api/trading/stats'),
-                authService.fetchWithAuth('/api/trading'),
-                authService.fetchWithAuth('/api/trading/open')
+                authService.fetchWithAuth(`/api/trading/stats?t=${Date.now()}`),
+                authService.fetchWithAuth(`/api/trading?t=${Date.now()}`),
+                authService.fetchWithAuth(`/api/trading/open?t=${Date.now()}`)
             ]);
             setStats(await statsRes.json());
             setTrades(await tradesRes.json());
@@ -494,45 +494,55 @@ const TradingDashboard = () => {
                                                 </div>
                                             ))
                                         ) : (
-                                            openPositions.map((pos) => (
-                                                <div key={pos.id} className="bg-slate-50 dark:bg-[#1e1b10] rounded-xl p-4 border border-slate-200 dark:border-[#f4c025]/10 hover:border-amber-300 dark:hover:border-[#f4c025]/30 transition-all group">
-                                                    <div className="flex items-center justify-between mb-3">
-                                                        <span className="font-bold text-slate-800 dark:text-white text-base">{pos.pair}</span>
-                                                        <span className={`px-2 py-0.5 rounded text-[10px] uppercase font-bold border ${pos.type === 'LONG'
-                                                            ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20'
-                                                            : 'bg-rose-500/10 text-rose-500 border-rose-500/20'
-                                                            }`}>
-                                                            {pos.type}
-                                                        </span>
-                                                    </div>
-                                                    <div className="grid grid-cols-3 gap-2 mb-3">
-                                                        <div>
-                                                            <p className="text-[10px] text-slate-400 dark:text-[#cbbc90] uppercase">Entry</p>
-                                                            <p className="text-sm font-bold text-slate-700 dark:text-white">${pos.entryPrice.toLocaleString()}</p>
+                                            <AnimatePresence mode="popLayout">
+                                                {openPositions.map((pos) => (
+                                                    <motion.div
+                                                        key={pos.id}
+                                                        layout
+                                                        initial={{ opacity: 0, scale: 0.9 }}
+                                                        animate={{ opacity: 1, scale: 1 }}
+                                                        exit={{ opacity: 0, scale: 0.9 }}
+                                                        transition={{ duration: 0.2 }}
+                                                        className="bg-slate-50 dark:bg-[#1e1b10] rounded-xl p-4 border border-slate-200 dark:border-[#f4c025]/10 hover:border-amber-300 dark:hover:border-[#f4c025]/30 transition-all group"
+                                                    >
+                                                        <div className="flex items-center justify-between mb-3">
+                                                            <span className="font-bold text-slate-800 dark:text-white text-base">{pos.pair}</span>
+                                                            <span className={`px-2 py-0.5 rounded text-[10px] uppercase font-bold border ${pos.type === 'LONG'
+                                                                ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20'
+                                                                : 'bg-rose-500/10 text-rose-500 border-rose-500/20'
+                                                                }`}>
+                                                                {pos.type}
+                                                            </span>
                                                         </div>
-                                                        <div>
-                                                            <p className="text-[10px] text-slate-400 dark:text-[#cbbc90] uppercase">Margin</p>
-                                                            <p className="text-sm font-bold text-slate-700 dark:text-white">${pos.amount.toLocaleString()}</p>
+                                                        <div className="grid grid-cols-3 gap-2 mb-3">
+                                                            <div>
+                                                                <p className="text-[10px] text-slate-400 dark:text-[#cbbc90] uppercase">Entry</p>
+                                                                <p className="text-sm font-bold text-slate-700 dark:text-white">${pos.entryPrice.toLocaleString()}</p>
+                                                            </div>
+                                                            <div>
+                                                                <p className="text-[10px] text-slate-400 dark:text-[#cbbc90] uppercase">Margin</p>
+                                                                <p className="text-sm font-bold text-slate-700 dark:text-white">${pos.amount.toLocaleString()}</p>
+                                                            </div>
+                                                            <div>
+                                                                <p className="text-[10px] text-slate-400 dark:text-[#cbbc90] uppercase">Leverage</p>
+                                                                <p className="text-sm font-bold text-slate-700 dark:text-white">{pos.leverage}x</p>
+                                                            </div>
                                                         </div>
-                                                        <div>
-                                                            <p className="text-[10px] text-slate-400 dark:text-[#cbbc90] uppercase">Leverage</p>
-                                                            <p className="text-sm font-bold text-slate-700 dark:text-white">{pos.leverage}x</p>
+                                                        <div className="flex items-center justify-between">
+                                                            <div className="flex items-center gap-1.5">
+                                                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                                                                <span className="text-[10px] text-slate-400 dark:text-[#cbbc90] uppercase">Active</span>
+                                                            </div>
+                                                            <button
+                                                                onClick={() => { setSelectedPosition(pos); setIsCloseModalOpen(true); }}
+                                                                className="text-xs font-bold px-3 py-1.5 rounded-lg bg-amber-500/10 text-amber-600 dark:text-[#f4c025] border border-amber-500/20 hover:bg-amber-500/20 transition-all"
+                                                            >
+                                                                Close Position
+                                                            </button>
                                                         </div>
-                                                    </div>
-                                                    <div className="flex items-center justify-between">
-                                                        <div className="flex items-center gap-1.5">
-                                                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                                                            <span className="text-[10px] text-slate-400 dark:text-[#cbbc90] uppercase">Active</span>
-                                                        </div>
-                                                        <button
-                                                            onClick={() => { setSelectedPosition(pos); setIsCloseModalOpen(true); }}
-                                                            className="text-xs font-bold px-3 py-1.5 rounded-lg bg-amber-500/10 text-amber-600 dark:text-[#f4c025] border border-amber-500/20 hover:bg-amber-500/20 transition-all"
-                                                        >
-                                                            Close Position
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            ))
+                                                    </motion.div>
+                                                ))}
+                                            </AnimatePresence>
                                         )}
                                     </div>
                                 </StaggerItem>
