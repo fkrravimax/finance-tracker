@@ -1,12 +1,12 @@
 import React from 'react';
-import { useLanguage } from '../../contexts/LanguageContext';
+
 
 interface LandingFooterProps {
     onSignIn: () => void;
 }
 
-const LandingFooter: React.FC<LandingFooterProps> = ({ onSignIn }) => {
-    const { t } = useLanguage();
+const LandingFooter: React.FC<LandingFooterProps> = () => {
+
 
     return (
         <footer className="px-4 md:px-12 lg:px-20 py-8 shrink-0 mt-auto relative z-10">
