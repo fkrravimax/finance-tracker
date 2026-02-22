@@ -39,6 +39,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onLogout, isOpen = false, onClose }) 
         { id: 'trading', label: t('sidebar.trading'), icon: 'candlestick_chart' },
         { id: 'savings', label: t('sidebar.savings'), icon: 'savings' },
         { id: 'settings', label: t('sidebar.settings'), icon: 'settings' },
+        { id: 'split-bill', label: t('sidebar.splitBill'), icon: 'receipt_long', isNew: true },
     ];
 
     if (isAdmin) {
@@ -99,7 +100,12 @@ const Sidebar: React.FC<SidebarProps> = ({ onLogout, isOpen = false, onClose }) 
                                         {() => (
                                             <>
                                                 <span className="material-symbols-outlined">{item.icon}</span>
-                                                <span className="text-base">{item.label}</span>
+                                                <span className="text-base flex-1">{item.label}</span>
+                                                {item.isNew && (
+                                                    <span className="text-[10px] font-black tracking-wider bg-gradient-to-r from-amber-400 to-orange-500 text-white px-2 py-0.5 rounded-full ml-auto shadow-sm">
+                                                        NEW
+                                                    </span>
+                                                )}
                                             </>
                                         )}
                                     </NavLink>
