@@ -34,7 +34,11 @@ const Dashboard: React.FC = () => {
     const [transactions, setTransactions] = useState<any[]>([]);
 
     const [user, setUser] = useState<any>(null);
-    const { t } = useLanguage();
+    const { t, language } = useLanguage();
+
+    // For "Updated just now" feature
+    const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+    const [timeAgo, setTimeAgo] = useState<string>('');
 
     const fetchStats = async () => {
         try {
@@ -49,6 +53,8 @@ const Dashboard: React.FC = () => {
             } else if (data.totalBalance === 0 && data.income === 0) {
                 setIsBalanceModalOpen(true);
             }
+            setLastUpdated(new Date());
+
         } catch (error) {
             console.error("Failed to fetch dashboard stats", error);
         } finally {
@@ -102,6 +108,35 @@ const Dashboard: React.FC = () => {
             setPrivacyMode('none');
         }
     };
+
+    // Calculate relative time
+    useEffect(() => {
+        if (!lastUpdated) return;
+
+        const updateAgo = () => {
+            const now = new Date();
+            const diffMs = now.getTime() - lastUpdated.getTime();
+            const diffMins = Math.floor(diffMs / 60000);
+            const diffHours = Math.floor(diffMins / 60);
+
+            if (diffMins < 1) {
+                setTimeAgo(t('dashboard.updatedJustNow') || 'Updated just now');
+            } else if (diffMins < 60) {
+                setTimeAgo(language === 'id' ? `Diperbarui ${diffMins} menit lalu` : `Updated ${diffMins} min${diffMins > 1 ? 's' : ''} ago`);
+            } else if (diffHours < 24) {
+                setTimeAgo(language === 'id' ? `Diperbarui ${diffHours} jam lalu` : `Updated ${diffHours} hour${diffHours > 1 ? 's' : ''} ago`);
+            } else {
+                setTimeAgo(language === 'id' ? 'Diperbarui kemarin' : 'Updated yesterday');
+            }
+        };
+
+        // Initial calculation
+        updateAgo();
+
+        // Update every 30 seconds
+        const interval = setInterval(updateAgo, 30000);
+        return () => clearInterval(interval);
+    }, [lastUpdated, t, language]);
 
     if (loading) {
         return <DashboardSkeleton />;
@@ -229,7 +264,9 @@ const Dashboard: React.FC = () => {
                                         + {t('dashboard.buttons.addBalance')}
                                     </button>
                                 )}
-                                <p className="text-sky-100 text-sm mt-3 font-semibold bg-white/10 inline-block px-3 py-1 rounded-full">{t('dashboard.updatedJustNow')}</p>
+                                <p className="text-sky-100 text-sm mt-3 font-semibold bg-white/10 inline-block px-3 py-1 rounded-full">
+                                    {timeAgo || t('dashboard.updatedJustNow') || 'Updated just now'}
+                                </p>
                             </div>
                         </div>
                     </StaggerItem>
