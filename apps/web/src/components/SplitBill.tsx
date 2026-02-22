@@ -101,7 +101,7 @@ const SplitBill: React.FC = () => {
                 </div>
 
                 {/* Right: Editable Table */}
-                <div className="flex-1 bg-white dark:bg-slate-800 rounded-2xl md:rounded-3xl p-3 md:p-6 shadow-soft border border-slate-100 dark:border-white/5 flex flex-col mb-12">
+                <div className="flex-1 bg-white dark:bg-slate-800 rounded-2xl md:rounded-3xl p-3 md:p-6 shadow-soft border border-slate-100 dark:border-white/5 flex flex-col">
                     <div className="flex justify-between items-center mb-6">
                         <div>
                             <h3 className="text-xl font-bold text-slate-800 dark:text-white">{t('splitBill.reviewTitle') || 'Review Items'}</h3>
@@ -261,7 +261,7 @@ const SplitBill: React.FC = () => {
         return (
             <motion.div
                 initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}
-                className="flex flex-col w-full bg-white dark:bg-slate-800 rounded-2xl md:rounded-3xl p-3 md:p-6 shadow-soft border border-slate-100 dark:border-white/5 mb-12"
+                className="flex flex-col w-full bg-white dark:bg-slate-800 rounded-2xl md:rounded-3xl p-3 md:p-6 shadow-soft border border-slate-100 dark:border-white/5"
             >
                 <div className="mb-6 border-b border-slate-100 dark:border-white/5 pb-6">
                     <h3 className="text-xl font-bold text-slate-800 dark:text-white mb-2">{t('splitBill.assignTitle') || 'Who ate what?'}</h3>
@@ -447,7 +447,7 @@ const SplitBill: React.FC = () => {
                 {/* The "Receipt" Result View to be converted to Image */}
                 <div
                     ref={resultRef}
-                    className="w-full max-w-2xl bg-white dark:bg-slate-900 rounded-2xl md:rounded-3xl p-4 md:p-10 shadow-xl border border-slate-100 dark:border-white/5 relative overflow-hidden mb-12"
+                    className="w-full max-w-2xl bg-white dark:bg-slate-900 rounded-2xl md:rounded-3xl p-4 md:p-10 shadow-xl border border-slate-100 dark:border-white/5 relative overflow-hidden"
                 >
                     {/* Decorative receipt zig-zag top/bottom (optional CSS tricks, pure styling) */}
 
@@ -584,7 +584,7 @@ const SplitBill: React.FC = () => {
     }
 
     return (
-        <div className="flex flex-col pt-6 pb-40 md:py-8 px-2 md:px-8 max-w-7xl mx-auto w-full min-h-screen">
+        <div className="flex flex-col pt-6 pb-8 md:py-8 px-2 md:px-8 max-w-7xl mx-auto w-full">
             {/* Header/Stepper */}
             <div className="mb-8">
                 <h1 className="text-3xl md:text-4xl font-black text-slate-800 dark:text-white tracking-tight leading-none mb-6">
@@ -630,6 +630,9 @@ const SplitBill: React.FC = () => {
                     {splitState.currentStep === 'result' && <div key="result" className="w-full">{renderStep4Result()}</div>}
                 </AnimatePresence>
             </div>
+
+            {/* Mobile Bottom Spacer to clear FAB and Navbar */}
+            <div className="h-40 w-full shrink-0 md:hidden flex-none"></div>
         </div>
     );
 };
