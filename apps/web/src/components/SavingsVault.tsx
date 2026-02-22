@@ -4,6 +4,9 @@ import CurrencyInput from './CurrencyInput';
 import ConfirmationModal from './ConfirmationModal';
 import { useNotification } from '../contexts/NotificationContext';
 import SavingsVaultSkeleton from './skeletons/SavingsVaultSkeleton';
+import PageTransition from './ui/PageTransition';
+import { StaggerContainer, StaggerItem, ScaleButton } from './ui/Motion';
+import { motion } from 'framer-motion';
 
 import { useLanguage } from '../contexts/LanguageContext';
 
@@ -186,288 +189,294 @@ const SavingsVault: React.FC = () => {
     }
 
     return (
-        <div className="max-w-7xl mx-auto w-full p-4 md:p-8 lg:p-12 flex flex-col gap-8 relative">
+        <PageTransition>
+            <div className="max-w-7xl mx-auto w-full p-4 md:p-8 lg:p-12 flex flex-col gap-8 relative">
 
-            <ConfirmationModal
-                isOpen={confirmation.isOpen}
-                onClose={() => setConfirmation({ ...confirmation, isOpen: false })}
-                onConfirm={handleConfirmDelete}
-                title={t('savings.deleteGoal')}
-                message={t('savings.deleteConfirmation')}
-                variant="danger"
-                cancelText={t('common.cancel')}
-                confirmText={t('common.delete')}
-                isLoading={confirmation.isLoading}
-            />
+                <ConfirmationModal
+                    isOpen={confirmation.isOpen}
+                    onClose={() => setConfirmation({ ...confirmation, isOpen: false })}
+                    onConfirm={handleConfirmDelete}
+                    title={t('savings.deleteGoal')}
+                    message={t('savings.deleteConfirmation')}
+                    variant="danger"
+                    cancelText={t('common.cancel')}
+                    confirmText={t('common.delete')}
+                    isLoading={confirmation.isLoading}
+                />
 
-            {/* Create Goal Modal */}
-            {
-                isCreateModalOpen && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-                        <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={handleCloseCreateModal}></div>
-                        <div className="relative bg-white dark:bg-[#2a2515] w-full max-w-md rounded-2xl shadow-2xl overflow-hidden flex flex-col animate-scale-in">
-                            <div className="p-6 border-b border-slate-100 dark:border-[#493f22] flex justify-between items-center bg-surface-light dark:bg-[#342d18]">
-                                <h3 className="text-xl font-bold text-slate-900 dark:text-white">{t('savings.createGoal')}</h3>
-                                <button onClick={handleCloseCreateModal} className="text-slate-400 hover:text-slate-600 dark:text-[#cbbc90] dark:hover:text-white transition-colors">
-                                    <span className="material-symbols-outlined">close</span>
-                                </button>
-                            </div>
-                            <form onSubmit={handleCreateSubmit} className="p-6 flex flex-col gap-6">
-                                <div className="flex flex-col gap-2">
-                                    <label className="text-sm font-bold text-slate-700 dark:text-[#cbbc90]">{t('savings.goalName')}</label>
-                                    <input
-                                        type="text"
-                                        name="name"
-                                        value={createFormData.name}
-                                        onChange={handleCreateInputChange}
-                                        placeholder="e.g. Dream House"
-                                        className="w-full bg-slate-50 dark:bg-[#1a160b] border border-slate-200 dark:border-[#493f22] rounded-xl px-4 py-3 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-slate-600"
-                                        required
-                                    />
+                {/* Create Goal Modal */}
+                {
+                    isCreateModalOpen && (
+                        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={handleCloseCreateModal}></div>
+                            <div className="relative bg-white dark:bg-[#2a2515] w-full max-w-md rounded-2xl shadow-2xl overflow-hidden flex flex-col animate-scale-in">
+                                <div className="p-6 border-b border-slate-100 dark:border-[#493f22] flex justify-between items-center bg-surface-light dark:bg-[#342d18]">
+                                    <h3 className="text-xl font-bold text-slate-900 dark:text-white">{t('savings.createGoal')}</h3>
+                                    <button onClick={handleCloseCreateModal} className="text-slate-400 hover:text-slate-600 dark:text-[#cbbc90] dark:hover:text-white transition-colors">
+                                        <span className="material-symbols-outlined">close</span>
+                                    </button>
                                 </div>
-                                <div className="flex flex-col gap-2">
-                                    <label className="text-sm font-bold text-slate-700 dark:text-[#cbbc90]">{t('savings.targetAmount')}</label>
-                                    <div className="relative">
-                                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-600 font-bold">Rp</span>
-                                        <CurrencyInput
-                                            // name="targetAmount" - Removed as CurrencyInput might not forward currently, logic handled via onChange wrapper
-                                            value={createFormData.targetAmount}
-                                            onChange={(val) => setCreateFormData(prev => ({ ...prev, targetAmount: val.toString() }))}
-                                            placeholder="0"
-                                            className="w-full bg-slate-50 dark:bg-[#1a160b] border border-slate-200 dark:border-[#493f22] rounded-xl pl-12 pr-4 py-3 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-slate-600"
+                                <form onSubmit={handleCreateSubmit} className="p-6 flex flex-col gap-6">
+                                    <div className="flex flex-col gap-2">
+                                        <label className="text-sm font-bold text-slate-700 dark:text-[#cbbc90]">{t('savings.goalName')}</label>
+                                        <input
+                                            type="text"
+                                            name="name"
+                                            value={createFormData.name}
+                                            onChange={handleCreateInputChange}
+                                            placeholder="e.g. Dream House"
+                                            className="w-full bg-slate-50 dark:bg-[#1a160b] border border-slate-200 dark:border-[#493f22] rounded-xl px-4 py-3 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-slate-600"
                                             required
                                         />
                                     </div>
-                                </div>
-                                <div className="flex flex-col gap-2">
-                                    <label className="text-sm font-bold text-slate-700 dark:text-[#cbbc90]">{t('savings.targetDate')}</label>
-                                    <div className="flex gap-2 mb-1">
-                                        {[3, 6, 12].map((months) => (
-                                            <button
-                                                key={months}
-                                                type="button"
-                                                onClick={() => {
-                                                    const date = new Date();
-                                                    date.setMonth(date.getMonth() + months);
-                                                    const dateString = date.toISOString().split('T')[0];
-                                                    setCreateFormData(prev => ({ ...prev, targetDate: dateString }));
-                                                }}
-                                                className="px-3 py-1 text-xs font-bold rounded-lg bg-slate-100 dark:bg-[#342d18] text-slate-600 dark:text-[#cbbc90] hover:bg-primary hover:text-slate-900 border border-slate-200 dark:border-[#493f22] transition-colors"
-                                            >
-                                                +{months === 12 ? '1 Year' : `${months} Months`}
-                                            </button>
-                                        ))}
+                                    <div className="flex flex-col gap-2">
+                                        <label className="text-sm font-bold text-slate-700 dark:text-[#cbbc90]">{t('savings.targetAmount')}</label>
+                                        <div className="relative">
+                                            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-600 font-bold">Rp</span>
+                                            <CurrencyInput
+                                                // name="targetAmount" - Removed as CurrencyInput might not forward currently, logic handled via onChange wrapper
+                                                value={createFormData.targetAmount}
+                                                onChange={(val) => setCreateFormData(prev => ({ ...prev, targetAmount: val.toString() }))}
+                                                placeholder="0"
+                                                className="w-full bg-slate-50 dark:bg-[#1a160b] border border-slate-200 dark:border-[#493f22] rounded-xl pl-12 pr-4 py-3 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-slate-600"
+                                                required
+                                            />
+                                        </div>
                                     </div>
-                                    <input
-                                        type="date"
-                                        name="targetDate"
-                                        value={createFormData.targetDate}
-                                        onChange={handleCreateInputChange}
-                                        className="w-full bg-slate-50 dark:bg-[#1a160b] border border-slate-200 dark:border-[#493f22] rounded-xl px-4 py-3 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all [color-scheme:light] dark:[color-scheme:dark]"
-                                        required
-                                    />
-                                </div>
-                                <div className="pt-2">
-                                    <button type="submit" className="w-full bg-primary hover:bg-[#dca60e] text-slate-900 font-bold py-4 rounded-xl transition-all shadow-lg hover:shadow-primary/25 active:scale-95">
-                                        {t('savings.createGoal')}
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                )
-            }
-
-            {/* Update Savings Modal */}
-            {
-                isUpdateModalOpen && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-                        <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={handleCloseUpdateModal}></div>
-                        <div className="relative bg-white dark:bg-[#2a2515] w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden flex flex-col animate-scale-in">
-                            <div className="p-6 border-b border-slate-100 dark:border-[#493f22] flex justify-between items-center bg-surface-light dark:bg-[#342d18]">
-                                <h3 className="text-xl font-bold text-slate-900 dark:text-white">
-                                    {updateType === 'deposit' ? t('savings.addFunds') : t('savings.withdrawFunds')}
-                                </h3>
-                                <button onClick={handleCloseUpdateModal} className="text-slate-400 hover:text-slate-600 dark:text-[#cbbc90] dark:hover:text-white transition-colors">
-                                    <span className="material-symbols-outlined">close</span>
-                                </button>
-                            </div>
-                            <form onSubmit={handleUpdateSavings} className="p-6 flex flex-col gap-6">
-                                <div className="flex flex-col gap-2">
-                                    <label className="text-sm font-bold text-slate-700 dark:text-[#cbbc90]">{t('settings.amount')}</label>
-                                    <div className="relative">
-                                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-600 font-bold">Rp</span>
-                                        <CurrencyInput
-                                            value={updateAmount}
-                                            onChange={(val) => setUpdateAmount(val.toString())}
-                                            placeholder="0"
-                                            className="w-full bg-slate-50 dark:bg-[#1a160b] border border-slate-200 dark:border-[#493f22] rounded-xl pl-12 pr-4 py-3 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-slate-600"
+                                    <div className="flex flex-col gap-2">
+                                        <label className="text-sm font-bold text-slate-700 dark:text-[#cbbc90]">{t('savings.targetDate')}</label>
+                                        <div className="flex gap-2 mb-1">
+                                            {[3, 6, 12].map((months) => (
+                                                <button
+                                                    key={months}
+                                                    type="button"
+                                                    onClick={() => {
+                                                        const date = new Date();
+                                                        date.setMonth(date.getMonth() + months);
+                                                        const dateString = date.toISOString().split('T')[0];
+                                                        setCreateFormData(prev => ({ ...prev, targetDate: dateString }));
+                                                    }}
+                                                    className="px-3 py-1 text-xs font-bold rounded-lg bg-slate-100 dark:bg-[#342d18] text-slate-600 dark:text-[#cbbc90] hover:bg-primary hover:text-slate-900 border border-slate-200 dark:border-[#493f22] transition-colors"
+                                                >
+                                                    +{months === 12 ? '1 Year' : `${months} Months`}
+                                                </button>
+                                            ))}
+                                        </div>
+                                        <input
+                                            type="date"
+                                            name="targetDate"
+                                            value={createFormData.targetDate}
+                                            onChange={handleCreateInputChange}
+                                            className="w-full bg-slate-50 dark:bg-[#1a160b] border border-slate-200 dark:border-[#493f22] rounded-xl px-4 py-3 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all [color-scheme:light] dark:[color-scheme:dark]"
                                             required
                                         />
                                     </div>
-                                </div>
-                                <div className="pt-2">
-                                    <button
-                                        type="submit"
-                                        className={`w-full font-bold py-4 rounded-xl transition-all shadow-lg active:scale-95 ${updateType === 'deposit' ? 'bg-green-500 hover:bg-green-600 text-white shadow-green-500/25' : 'bg-red-500 hover:bg-red-600 text-white shadow-red-500/25'}`}
-                                    >
-                                        {updateType === 'deposit' ? t('savings.confirmDeposit') : t('savings.confirmWithdraw')}
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                )
-            }
-
-            {/* Page Heading & Actions */}
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
-                <div className="flex flex-col gap-1">
-                    <h1 className="text-3xl md:text-4xl font-black text-slate-900 dark:text-white tracking-tight">{t('savings.title')}</h1>
-                    <p className="text-slate-500 dark:text-[#cbbc90] text-base">{t('savings.subtitle')}</p>
-                </div>
-                <button
-                    onClick={handleOpenCreateModal}
-                    className="group flex items-center justify-center gap-2 bg-primary hover:bg-[#dca60e] text-black px-6 py-3 rounded-xl font-bold transition-all shadow-lg hover:shadow-primary/20 active:scale-95"
-                >
-                    <span className="material-symbols-outlined group-hover:rotate-90 transition-transform">add</span>
-                    <span>{t('savings.createGoal')}</span>
-                </button>
-            </div>
-
-            {/* Stats Section */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {/* Stat 1: Total Saved */}
-                <div className="flex flex-col gap-3 rounded-2xl p-6 bg-white dark:bg-[#342d18] shadow-sm border border-slate-100 dark:border-[#493f22]">
-                    <div className="flex items-center gap-3">
-                        <div className="p-2 rounded-lg bg-green-500/10 text-green-500">
-                            <span className="material-symbols-outlined">account_balance_wallet</span>
-                        </div>
-                        <p className="text-slate-500 dark:text-[#cbbc90] font-medium">{t('savings.totalSaved')}</p>
-                    </div>
-                    <div>
-                        <p className="text-3xl font-bold text-slate-900 dark:text-white">{formatCurrency(totalSaved)}</p>
-                        <div className="flex items-center gap-1 mt-1 text-sm font-medium text-green-500">
-                            <span className="material-symbols-outlined text-base">trending_up</span>
-                            <span>{t('savings.onTrack')}</span>
-                        </div>
-                    </div>
-                </div>
-                {/* Stat 2: Active Goals */}
-                <div className="flex flex-col gap-3 rounded-2xl p-6 bg-white dark:bg-[#342d18] shadow-sm border border-slate-100 dark:border-[#493f22]">
-                    <div className="flex items-center gap-3">
-                        <div className="p-2 rounded-lg bg-blue-500/10 text-blue-500">
-                            <span className="material-symbols-outlined">flag</span>
-                        </div>
-                        <p className="text-slate-500 dark:text-[#cbbc90] font-medium">{t('savings.activeGoals')}</p>
-                    </div>
-                    <div>
-                        <p className="text-3xl font-bold text-slate-900 dark:text-white">{activeGoalsCount} {t('savings.title')}</p>
-                        <p className="text-sm mt-1 text-slate-400 dark:text-[#cbbc90]">Keep it up!</p>
-                    </div>
-                </div>
-                {/* Stat 3: Monthly Save Rate */}
-                <div className="flex flex-col gap-3 rounded-2xl p-6 bg-white dark:bg-[#342d18] shadow-sm border border-slate-100 dark:border-[#493f22]">
-                    <div className="flex items-center gap-3">
-                        <div className="p-2 rounded-lg bg-primary/10 text-primary">
-                            <span className="material-symbols-outlined">calendar_month</span>
-                        </div>
-                        <p className="text-slate-500 dark:text-[#cbbc90] font-medium">{t('savings.monthlyTarget')}</p>
-                    </div>
-                    <div>
-                        <p className="text-3xl font-bold text-slate-900 dark:text-white">{formatCurrency(monthlySavings)}</p>
-                        <p className="text-sm mt-1 text-slate-400 dark:text-[#cbbc90]">{t('savings.neededForTargets')}</p>
-                    </div>
-                </div>
-            </div>
-
-            {/* Goals Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {goals.map((goal) => {
-                    const percentage = getProgress(goal.currentAmount, goal.targetAmount);
-                    return (
-                        <div key={goal.id} className="group flex flex-col bg-white dark:bg-[#342d18] rounded-2xl shadow-sm hover:shadow-md transition-all border border-slate-100 dark:border-[#493f22]">
-                            <div className="h-48 w-full bg-cover bg-center relative rounded-t-2xl" style={{ backgroundImage: `url("${getGoalImage(goal.name)}")` }}>
-                                <div className="absolute top-3 right-3 bg-black/50 backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold text-white border border-white/10">
-                                    {goal.category}
-                                </div>
-                            </div>
-                            <div className="p-5 flex flex-col gap-4 flex-1">
-                                <div className="flex justify-between items-start">
-                                    <div>
-                                        <h3 className="text-xl font-bold text-slate-900 dark:text-white">{goal.name}</h3>
-                                        <p className="text-sm text-slate-500 dark:text-[#cbbc90]">Target: {goal.targetDate ? new Date(goal.targetDate).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : 'Ongoing'}</p>
-                                    </div>
-                                    <div className="relative">
-                                        <button
-                                            onClick={(e) => toggleMenu(e, goal.id)}
-                                            className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors cursor-pointer ${activeMenuId === goal.id ? 'bg-primary text-black' : 'bg-slate-100 dark:bg-[#493f22] text-slate-400 dark:text-[#cbbc90] hover:text-primary'}`}
-                                        >
-                                            <span className="material-symbols-outlined">more_horiz</span>
+                                    <div className="pt-2">
+                                        <button type="submit" className="w-full bg-primary hover:bg-[#dca60e] text-slate-900 font-bold py-4 rounded-xl transition-all shadow-lg hover:shadow-primary/25 active:scale-95">
+                                            {t('savings.createGoal')}
                                         </button>
-
-                                        {activeMenuId === goal.id && (
-                                            <div className="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-[#2f2a1a] rounded-xl shadow-xl border border-slate-100 dark:border-[#493f22] overflow-hidden z-20 animate-scale-in origin-top-right">
-                                                <button
-                                                    onClick={() => handleOpenUpdateModal(goal.id, 'deposit')}
-                                                    className="w-full text-left px-4 py-3 text-sm font-medium text-slate-700 dark:text-[#cbbc90] hover:bg-slate-50 dark:hover:bg-[#3f3823] flex items-center gap-2"
-                                                >
-                                                    <span className="material-symbols-outlined text-green-500">add_circle</span> {t('savings.addFunds')}
-                                                </button>
-                                                <button
-                                                    onClick={() => handleOpenUpdateModal(goal.id, 'withdraw')}
-                                                    className="w-full text-left px-4 py-3 text-sm font-medium text-slate-700 dark:text-[#cbbc90] hover:bg-slate-50 dark:hover:bg-[#3f3823] flex items-center gap-2"
-                                                >
-                                                    <span className="material-symbols-outlined text-orange-500">remove_circle</span> {t('savings.withdrawFunds')}
-                                                </button>
-                                                <div className="h-px bg-slate-100 dark:bg-[#3f3823] mx-3 my-1"></div>
-                                                <button
-                                                    onClick={() => handleDeleteGoalClick(goal.id)}
-                                                    className="w-full text-left px-4 py-3 text-sm font-medium text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center gap-2 transition-colors"
-                                                >
-                                                    <span className="material-symbols-outlined">delete</span> {t('savings.deleteGoal')}
-                                                </button>
-                                            </div>
-                                        )}
                                     </div>
-                                </div>
-
-                                <div className="flex flex-col gap-2 mt-auto">
-                                    <div className="flex justify-between items-end text-sm">
-                                        <span className="font-bold text-slate-900 dark:text-white">{formatCurrency(goal.currentAmount)}</span>
-                                        <span className="text-slate-500 dark:text-[#cbbc90]">of {formatCurrency(goal.targetAmount)}</span>
-                                    </div>
-                                    <div className="w-full h-3 bg-slate-100 dark:bg-[#231e10] rounded-full overflow-hidden">
-                                        <div
-                                            className={`h-full rounded-full ${percentage >= 100 ? 'bg-green-500' : 'bg-primary'}`}
-                                            style={{ width: `${percentage}%` }}
-                                        ></div>
-                                    </div>
-                                    <div className="flex justify-between text-xs font-medium mt-1">
-                                        <span className={`${percentage >= 100 ? 'text-green-500' : 'text-primary'}`}>{percentage}% {t('savings.totalSaved')}</span>
-                                        <span className="text-slate-400 dark:text-[#8e8568]">{percentage >= 100 ? t('savings.completed') : t('savings.onTrack')}</span>
-                                    </div>
-                                </div>
+                                </form>
                             </div>
                         </div>
-                    );
-                })}
+                    )
+                }
 
-                {/* Empty State / Add  */}
-                <button
-                    onClick={handleOpenCreateModal}
-                    className="rounded-2xl border-2 border-dashed border-slate-300 dark:border-[#493f22] p-8 flex flex-col items-center justify-center text-center gap-4 hover:bg-slate-50 dark:hover:bg-[#493f22]/30 transition-colors cursor-pointer group min-h-[300px]"
-                >
-                    <div className="w-16 h-16 rounded-full bg-slate-100 dark:bg-[#231e10] flex items-center justify-center text-slate-400 dark:text-[#cbbc90] group-hover:text-primary group-hover:scale-110 transition-all">
-                        <span className="material-symbols-outlined text-3xl">add_circle</span>
+                {/* Update Savings Modal */}
+                {
+                    isUpdateModalOpen && (
+                        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={handleCloseUpdateModal}></div>
+                            <div className="relative bg-white dark:bg-[#2a2515] w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden flex flex-col animate-scale-in">
+                                <div className="p-6 border-b border-slate-100 dark:border-[#493f22] flex justify-between items-center bg-surface-light dark:bg-[#342d18]">
+                                    <h3 className="text-xl font-bold text-slate-900 dark:text-white">
+                                        {updateType === 'deposit' ? t('savings.addFunds') : t('savings.withdrawFunds')}
+                                    </h3>
+                                    <button onClick={handleCloseUpdateModal} className="text-slate-400 hover:text-slate-600 dark:text-[#cbbc90] dark:hover:text-white transition-colors">
+                                        <span className="material-symbols-outlined">close</span>
+                                    </button>
+                                </div>
+                                <form onSubmit={handleUpdateSavings} className="p-6 flex flex-col gap-6">
+                                    <div className="flex flex-col gap-2">
+                                        <label className="text-sm font-bold text-slate-700 dark:text-[#cbbc90]">{t('settings.amount')}</label>
+                                        <div className="relative">
+                                            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-600 font-bold">Rp</span>
+                                            <CurrencyInput
+                                                value={updateAmount}
+                                                onChange={(val) => setUpdateAmount(val.toString())}
+                                                placeholder="0"
+                                                className="w-full bg-slate-50 dark:bg-[#1a160b] border border-slate-200 dark:border-[#493f22] rounded-xl pl-12 pr-4 py-3 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-slate-600"
+                                                required
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="pt-2">
+                                        <button
+                                            type="submit"
+                                            className={`w-full font-bold py-4 rounded-xl transition-all shadow-lg active:scale-95 ${updateType === 'deposit' ? 'bg-green-500 hover:bg-green-600 text-white shadow-green-500/25' : 'bg-red-500 hover:bg-red-600 text-white shadow-red-500/25'}`}
+                                        >
+                                            {updateType === 'deposit' ? t('savings.confirmDeposit') : t('savings.confirmWithdraw')}
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    )
+                }
+
+                {/* Page Heading & Actions */}
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
+                    <div className="flex flex-col gap-1">
+                        <h1 className="text-3xl md:text-4xl font-black text-slate-900 dark:text-white tracking-tight">{t('savings.title')}</h1>
+                        <p className="text-slate-500 dark:text-[#cbbc90] text-base">{t('savings.subtitle')}</p>
                     </div>
-                    <div>
-                        <h3 className="text-lg font-bold text-slate-900 dark:text-white">{t('savings.addAnother')}</h3>
-                        <p className="text-sm text-slate-500 dark:text-[#cbbc90]">{t('savings.startNew')}</p>
+                    <ScaleButton
+                        onClick={handleOpenCreateModal}
+                        className="group flex items-center justify-center gap-2 bg-primary hover:bg-[#dca60e] text-black px-6 py-3 rounded-xl font-bold transition-all shadow-lg hover:shadow-primary/20"
+                    >
+                        <span className="material-symbols-outlined group-hover:rotate-90 transition-transform">add</span>
+                        <span>{t('savings.createGoal')}</span>
+                    </ScaleButton>
+                </div>
+
+                {/* Stats Section */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {/* Stat 1: Total Saved */}
+                    <div className="flex flex-col gap-3 rounded-2xl p-6 bg-white dark:bg-[#342d18] shadow-sm border border-slate-100 dark:border-[#493f22]">
+                        <div className="flex items-center gap-3">
+                            <div className="p-2 rounded-lg bg-green-500/10 text-green-500">
+                                <span className="material-symbols-outlined">account_balance_wallet</span>
+                            </div>
+                            <p className="text-slate-500 dark:text-[#cbbc90] font-medium">{t('savings.totalSaved')}</p>
+                        </div>
+                        <div>
+                            <p className="text-3xl font-bold text-slate-900 dark:text-white">{formatCurrency(totalSaved)}</p>
+                            <div className="flex items-center gap-1 mt-1 text-sm font-medium text-green-500">
+                                <span className="material-symbols-outlined text-base">trending_up</span>
+                                <span>{t('savings.onTrack')}</span>
+                            </div>
+                        </div>
                     </div>
-                </button>
-            </div>
-        </div >
+                    {/* Stat 2: Active Goals */}
+                    <div className="flex flex-col gap-3 rounded-2xl p-6 bg-white dark:bg-[#342d18] shadow-sm border border-slate-100 dark:border-[#493f22]">
+                        <div className="flex items-center gap-3">
+                            <div className="p-2 rounded-lg bg-blue-500/10 text-blue-500">
+                                <span className="material-symbols-outlined">flag</span>
+                            </div>
+                            <p className="text-slate-500 dark:text-[#cbbc90] font-medium">{t('savings.activeGoals')}</p>
+                        </div>
+                        <div>
+                            <p className="text-3xl font-bold text-slate-900 dark:text-white">{activeGoalsCount} {t('savings.title')}</p>
+                            <p className="text-sm mt-1 text-slate-400 dark:text-[#cbbc90]">Keep it up!</p>
+                        </div>
+                    </div>
+                    {/* Stat 3: Monthly Save Rate */}
+                    <div className="flex flex-col gap-3 rounded-2xl p-6 bg-white dark:bg-[#342d18] shadow-sm border border-slate-100 dark:border-[#493f22]">
+                        <div className="flex items-center gap-3">
+                            <div className="p-2 rounded-lg bg-primary/10 text-primary">
+                                <span className="material-symbols-outlined">calendar_month</span>
+                            </div>
+                            <p className="text-slate-500 dark:text-[#cbbc90] font-medium">{t('savings.monthlyTarget')}</p>
+                        </div>
+                        <div>
+                            <p className="text-3xl font-bold text-slate-900 dark:text-white">{formatCurrency(monthlySavings)}</p>
+                            <p className="text-sm mt-1 text-slate-400 dark:text-[#cbbc90]">{t('savings.neededForTargets')}</p>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Goals Grid */}
+                <StaggerContainer className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {goals.map((goal) => {
+                        const percentage = getProgress(goal.currentAmount, goal.targetAmount);
+                        return (
+                            <StaggerItem key={goal.id} className="group flex flex-col bg-white dark:bg-[#342d18] rounded-2xl shadow-sm hover:shadow-md transition-all border border-slate-100 dark:border-[#493f22]">
+                                <div className="h-48 w-full bg-cover bg-center relative rounded-t-2xl" style={{ backgroundImage: `url("${getGoalImage(goal.name)}")` }}>
+                                    <div className="absolute top-3 right-3 bg-black/50 backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold text-white border border-white/10">
+                                        {goal.category}
+                                    </div>
+                                </div>
+                                <div className="p-5 flex flex-col gap-4 flex-1">
+                                    <div className="flex justify-between items-start">
+                                        <div>
+                                            <h3 className="text-xl font-bold text-slate-900 dark:text-white">{goal.name}</h3>
+                                            <p className="text-sm text-slate-500 dark:text-[#cbbc90]">Target: {goal.targetDate ? new Date(goal.targetDate).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : 'Ongoing'}</p>
+                                        </div>
+                                        <div className="relative">
+                                            <button
+                                                onClick={(e) => toggleMenu(e, goal.id)}
+                                                className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors cursor-pointer ${activeMenuId === goal.id ? 'bg-primary text-black' : 'bg-slate-100 dark:bg-[#493f22] text-slate-400 dark:text-[#cbbc90] hover:text-primary'}`}
+                                            >
+                                                <span className="material-symbols-outlined">more_horiz</span>
+                                            </button>
+
+                                            {activeMenuId === goal.id && (
+                                                <div className="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-[#2f2a1a] rounded-xl shadow-xl border border-slate-100 dark:border-[#493f22] overflow-hidden z-20 animate-scale-in origin-top-right">
+                                                    <button
+                                                        onClick={() => handleOpenUpdateModal(goal.id, 'deposit')}
+                                                        className="w-full text-left px-4 py-3 text-sm font-medium text-slate-700 dark:text-[#cbbc90] hover:bg-slate-50 dark:hover:bg-[#3f3823] flex items-center gap-2"
+                                                    >
+                                                        <span className="material-symbols-outlined text-green-500">add_circle</span> {t('savings.addFunds')}
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleOpenUpdateModal(goal.id, 'withdraw')}
+                                                        className="w-full text-left px-4 py-3 text-sm font-medium text-slate-700 dark:text-[#cbbc90] hover:bg-slate-50 dark:hover:bg-[#3f3823] flex items-center gap-2"
+                                                    >
+                                                        <span className="material-symbols-outlined text-orange-500">remove_circle</span> {t('savings.withdrawFunds')}
+                                                    </button>
+                                                    <div className="h-px bg-slate-100 dark:bg-[#3f3823] mx-3 my-1"></div>
+                                                    <button
+                                                        onClick={() => handleDeleteGoalClick(goal.id)}
+                                                        className="w-full text-left px-4 py-3 text-sm font-medium text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center gap-2 transition-colors"
+                                                    >
+                                                        <span className="material-symbols-outlined">delete</span> {t('savings.deleteGoal')}
+                                                    </button>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    <div className="flex flex-col gap-2 mt-auto">
+                                        <div className="flex justify-between items-end text-sm">
+                                            <span className="font-bold text-slate-900 dark:text-white">{formatCurrency(goal.currentAmount)}</span>
+                                            <span className="text-slate-500 dark:text-[#cbbc90]">of {formatCurrency(goal.targetAmount)}</span>
+                                        </div>
+                                        <div className="w-full h-3 bg-slate-100 dark:bg-[#231e10] rounded-full overflow-hidden">
+                                            <motion.div
+                                                initial={{ width: 0 }}
+                                                animate={{ width: `${percentage}%` }}
+                                                transition={{ duration: 1, ease: "easeOut" }}
+                                                className={`h-full rounded-full ${percentage >= 100 ? 'bg-green-500' : 'bg-primary'}`}
+                                            />
+                                        </div>
+                                        <div className="flex justify-between text-xs font-medium mt-1">
+                                            <span className={`${percentage >= 100 ? 'text-green-500' : 'text-primary'}`}>{percentage}% {t('savings.totalSaved')}</span>
+                                            <span className="text-slate-400 dark:text-[#8e8568]">{percentage >= 100 ? t('savings.completed') : t('savings.onTrack')}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </StaggerItem>
+                        );
+                    })}
+
+                    {/* Empty State / Add  */}
+                    <StaggerItem>
+                        <button
+                            onClick={handleOpenCreateModal}
+                            className="rounded-2xl border-2 border-dashed border-slate-300 dark:border-[#493f22] p-8 flex flex-col items-center justify-center text-center gap-4 hover:bg-slate-50 dark:hover:bg-[#493f22]/30 transition-colors cursor-pointer group min-h-[300px] w-full"
+                        >
+                            <div className="w-16 h-16 rounded-full bg-slate-100 dark:bg-[#231e10] flex items-center justify-center text-slate-400 dark:text-[#cbbc90] group-hover:text-primary group-hover:scale-110 transition-all">
+                                <span className="material-symbols-outlined text-3xl">add_circle</span>
+                            </div>
+                            <div>
+                                <h3 className="text-lg font-bold text-slate-900 dark:text-white">{t('savings.addAnother')}</h3>
+                                <p className="text-sm text-slate-500 dark:text-[#cbbc90]">{t('savings.startNew')}</p>
+                            </div>
+                        </button>
+                    </StaggerItem>
+                </StaggerContainer>
+            </div >
+        </PageTransition>
     );
 };
 

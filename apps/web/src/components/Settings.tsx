@@ -12,6 +12,8 @@ import { useNotification } from '../contexts/NotificationContext';
 import { usePushNotifications } from '../hooks/usePushNotifications';
 import { authService } from '../services/authService';
 import SessionList from './Settings/SessionList';
+import PageTransition from './ui/PageTransition';
+import { StaggerContainer, StaggerItem, ScaleButton } from './ui/Motion';
 
 const Settings: React.FC = () => {
     const { theme, setTheme, privacyMode, setPrivacyMode } = useAppearance();
@@ -350,245 +352,255 @@ const Settings: React.FC = () => {
     );
 
     const renderAccountContent = (isMobile: boolean = false) => (
-        <div className="flex flex-col gap-6 animate-fade-in">
+        <StaggerContainer className="flex flex-col gap-6 animate-fade-in">
             {/* Desktop: Profile Card Inside. Mobile: Profile Card is Outside */}
             {!isMobile && renderProfileCard()}
 
             {/* Profile Details Form */}
-            <div className="bg-white dark:bg-[#342d18] rounded-2xl border border-slate-100 dark:border-[#493f22] p-6 shadow-sm">
-                <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-6 border-b border-slate-100 dark:border-[#493f22] pb-4">{t('settings.profileDetails')}</h3>
-                <form onSubmit={handleUpdateName} className="flex flex-col gap-4 max-w-lg">
-                    <div className="flex flex-col gap-3">
-                        <label className="text-sm font-bold text-slate-700 dark:text-[#cbbc90]">{t('settings.profilePicture')}</label>
-                        <div className="flex flex-wrap gap-4">
-                            {currentUser?.image && !currentUser.image.startsWith('/default-profiles/') && (
-                                <div className="relative group cursor-pointer">
-                                    <img
-                                        src={currentUser.image}
-                                        alt="Current"
-                                        className="w-16 h-16 rounded-full object-cover border-2 border-primary"
-                                    />
-                                    <div className="absolute inset-0 bg-black/50 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                                        <span className="text-white text-xs font-bold">Current</span>
-                                    </div>
-                                </div>
-                            )}
-                            {[1, 2, 3, 4].map((num) => {
-                                const imgPath = `/default-profiles/profilepict${num}.png`;
-                                const isSelected = currentUser?.image === imgPath;
-                                return (
-                                    <button
-                                        key={num}
-                                        type="button"
-                                        onClick={() => handleUpdateProfilePicture(imgPath)}
-                                        className={`relative w-16 h-16 rounded-full overflow-hidden border-2 transition-all ${isSelected ? 'border-primary ring-2 ring-primary/30 scale-105' : 'border-transparent hover:border-slate-300 dark:hover:border-slate-600'}`}
-                                    >
+            <StaggerItem>
+                <div className="bg-white dark:bg-[#342d18] rounded-2xl border border-slate-100 dark:border-[#493f22] p-6 shadow-sm">
+                    <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-6 border-b border-slate-100 dark:border-[#493f22] pb-4">{t('settings.profileDetails')}</h3>
+                    <form onSubmit={handleUpdateName} className="flex flex-col gap-4 max-w-lg">
+                        <div className="flex flex-col gap-3">
+                            <label className="text-sm font-bold text-slate-700 dark:text-[#cbbc90]">{t('settings.profilePicture')}</label>
+                            <div className="flex flex-wrap gap-4">
+                                {currentUser?.image && !currentUser.image.startsWith('/default-profiles/') && (
+                                    <div className="relative group cursor-pointer">
                                         <img
-                                            src={imgPath}
-                                            alt={`Profile ${num}`}
-                                            className="w-full h-full object-cover"
+                                            src={currentUser.image}
+                                            alt="Current"
+                                            className="w-16 h-16 rounded-full object-cover border-2 border-primary"
                                         />
-                                        {isSelected && (
-                                            <div className="absolute inset-0 bg-primary/20 flex items-center justify-center">
-                                                <span className="material-symbols-outlined text-white drop-shadow-md">check</span>
-                                            </div>
-                                        )}
-                                    </button>
-                                );
-                            })}
+                                        <div className="absolute inset-0 bg-black/50 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <span className="text-white text-xs font-bold">Current</span>
+                                        </div>
+                                    </div>
+                                )}
+                                {[1, 2, 3, 4].map((num) => {
+                                    const imgPath = `/default-profiles/profilepict${num}.png`;
+                                    const isSelected = currentUser?.image === imgPath;
+                                    return (
+                                        <button
+                                            key={num}
+                                            type="button"
+                                            onClick={() => handleUpdateProfilePicture(imgPath)}
+                                            className={`relative w-16 h-16 rounded-full overflow-hidden border-2 transition-all ${isSelected ? 'border-primary ring-2 ring-primary/30 scale-105' : 'border-transparent hover:border-slate-300 dark:hover:border-slate-600'}`}
+                                        >
+                                            <img
+                                                src={imgPath}
+                                                alt={`Profile ${num}`}
+                                                className="w-full h-full object-cover"
+                                            />
+                                            {isSelected && (
+                                                <div className="absolute inset-0 bg-primary/20 flex items-center justify-center">
+                                                    <span className="material-symbols-outlined text-white drop-shadow-md">check</span>
+                                                </div>
+                                            )}
+                                        </button>
+                                    );
+                                })}
+                            </div>
                         </div>
-                    </div>
-                    <div className="flex flex-col gap-2">
-                        <label className="text-sm font-bold text-slate-700 dark:text-[#cbbc90]">{t('settings.displayName')}</label>
-                        <div className="flex gap-2">
-                            <input
-                                type="text"
-                                value={nameForm.name}
-                                onChange={e => setNameForm({ ...nameForm, name: e.target.value })}
-                                className="w-full bg-slate-50 dark:bg-[#2b2616] border border-slate-200 dark:border-[#493f22] rounded-xl px-4 py-2 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary"
-                            />
-                            <button
-                                type="submit"
-                                disabled={isUpdatingName}
-                                className="bg-slate-900 dark:bg-slate-700 text-white font-bold px-4 py-2 rounded-xl text-sm hover:opacity-90"
-                            >
-                                {isUpdatingName ? t('common.loading') : t('common.save')}
-                            </button>
+                        <div className="flex flex-col gap-2">
+                            <label className="text-sm font-bold text-slate-700 dark:text-[#cbbc90]">{t('settings.displayName')}</label>
+                            <div className="flex gap-2">
+                                <input
+                                    type="text"
+                                    value={nameForm.name}
+                                    onChange={e => setNameForm({ ...nameForm, name: e.target.value })}
+                                    className="w-full bg-slate-50 dark:bg-[#2b2616] border border-slate-200 dark:border-[#493f22] rounded-xl px-4 py-2 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary"
+                                />
+                                <button
+                                    type="submit"
+                                    disabled={isUpdatingName}
+                                    className="bg-slate-900 dark:bg-slate-700 text-white font-bold px-4 py-2 rounded-xl text-sm hover:opacity-90"
+                                >
+                                    {isUpdatingName ? t('common.loading') : t('common.save')}
+                                </button>
+                            </div>
                         </div>
-                    </div>
-                </form>
-            </div>
+                    </form>
+                </div>
+            </StaggerItem>
 
             {/* Security Section (Password, Email, Sessions) */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* Password & Email */}
-                <div className="bg-white dark:bg-[#342d18] rounded-2xl border border-slate-100 dark:border-[#493f22] p-6 shadow-sm flex flex-col gap-8">
-                    <div>
-                        <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
-                            <span className="material-symbols-outlined text-primary">lock</span>
-                            {t('settings.changePassword')}
-                        </h3>
-                        <form onSubmit={handleChangePassword} className="flex flex-col gap-3">
-                            <input
-                                type="password"
-                                placeholder={t('settings.currentPassword')}
-                                value={passwordForm.currentPassword}
-                                onChange={e => setPasswordForm({ ...passwordForm, currentPassword: e.target.value })}
-                                className="w-full bg-slate-50 dark:bg-[#2b2616] border border-slate-200 dark:border-[#493f22] rounded-xl px-4 py-2 text-sm text-slate-900 dark:text-white"
-                                required
-                            />
-                            <input
-                                type="password"
-                                placeholder={t('settings.newPassword')}
-                                value={passwordForm.newPassword}
-                                onChange={e => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
-                                className="w-full bg-slate-50 dark:bg-[#2b2616] border border-slate-200 dark:border-[#493f22] rounded-xl px-4 py-2 text-sm text-slate-900 dark:text-white"
-                                required
-                            />
-                            <input
-                                type="password"
-                                placeholder={t('settings.confirmPassword')}
-                                value={passwordForm.confirmPassword}
-                                onChange={e => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
-                                className="w-full bg-slate-50 dark:bg-[#2b2616] border border-slate-200 dark:border-[#493f22] rounded-xl px-4 py-2 text-sm text-slate-900 dark:text-white"
-                                required
-                            />
-                            <button type="submit" disabled={isChangingPassword} className="bg-slate-900 dark:bg-slate-700 text-white font-bold py-2 rounded-xl text-sm hover:opacity-90 mt-2">
-                                {isChangingPassword ? t('common.loading') : t('settings.updatePassword')}
-                            </button>
-                        </form>
+            <StaggerItem>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    {/* Password & Email */}
+                    <div className="bg-white dark:bg-[#342d18] rounded-2xl border border-slate-100 dark:border-[#493f22] p-6 shadow-sm flex flex-col gap-8">
+                        <div>
+                            <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+                                <span className="material-symbols-outlined text-primary">lock</span>
+                                {t('settings.changePassword')}
+                            </h3>
+                            <form onSubmit={handleChangePassword} className="flex flex-col gap-3">
+                                <input
+                                    type="password"
+                                    placeholder={t('settings.currentPassword')}
+                                    value={passwordForm.currentPassword}
+                                    onChange={e => setPasswordForm({ ...passwordForm, currentPassword: e.target.value })}
+                                    className="w-full bg-slate-50 dark:bg-[#2b2616] border border-slate-200 dark:border-[#493f22] rounded-xl px-4 py-2 text-sm text-slate-900 dark:text-white"
+                                    required
+                                />
+                                <input
+                                    type="password"
+                                    placeholder={t('settings.newPassword')}
+                                    value={passwordForm.newPassword}
+                                    onChange={e => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
+                                    className="w-full bg-slate-50 dark:bg-[#2b2616] border border-slate-200 dark:border-[#493f22] rounded-xl px-4 py-2 text-sm text-slate-900 dark:text-white"
+                                    required
+                                />
+                                <input
+                                    type="password"
+                                    placeholder={t('settings.confirmPassword')}
+                                    value={passwordForm.confirmPassword}
+                                    onChange={e => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
+                                    className="w-full bg-slate-50 dark:bg-[#2b2616] border border-slate-200 dark:border-[#493f22] rounded-xl px-4 py-2 text-sm text-slate-900 dark:text-white"
+                                    required
+                                />
+                                <button type="submit" disabled={isChangingPassword} className="bg-slate-900 dark:bg-slate-700 text-white font-bold py-2 rounded-xl text-sm hover:opacity-90 mt-2">
+                                    {isChangingPassword ? t('common.loading') : t('settings.updatePassword')}
+                                </button>
+                            </form>
+                        </div>
+
+
                     </div>
 
-
-                </div>
-
-                {/* Login History (Collapsible) */}
-                <div className="bg-white dark:bg-[#342d18] rounded-2xl border border-slate-100 dark:border-[#493f22] overflow-hidden shadow-sm h-fit">
-                    <button
-                        onClick={() => toggleSubSection('login_history')}
-                        className="w-full flex items-center justify-between p-6 transition-colors hover:bg-slate-50 dark:hover:bg-[#2b2616]"
-                    >
-                        <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                            <span className="material-symbols-outlined text-primary">security</span>
-                            Login History
-                        </h3>
-                        <div className="flex items-center gap-2">
-                            {/* Hint for limit on mobile */}
-                            {isMobile && openSubSection !== 'login_history' && (
-                                <span className="text-xs text-slate-400">View recent</span>
-                            )}
-                            <span className={`material-symbols-outlined text-slate-400 transition-transform duration-300 ${openSubSection === 'login_history' ? 'rotate-180' : ''}`}>
-                                expand_more
-                            </span>
-                        </div>
-                    </button>
-                    <div className={`grid transition-[grid-template-rows] duration-300 ease-out ${openSubSection === 'login_history' ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}>
-                        <div className="overflow-hidden">
-                            <div className="p-6 pt-0 border-t border-slate-100 dark:border-[#493f22]">
-                                <SessionList />
+                    {/* Login History (Collapsible) */}
+                    <div className="bg-white dark:bg-[#342d18] rounded-2xl border border-slate-100 dark:border-[#493f22] overflow-hidden shadow-sm h-fit">
+                        <button
+                            onClick={() => toggleSubSection('login_history')}
+                            className="w-full flex items-center justify-between p-6 transition-colors hover:bg-slate-50 dark:hover:bg-[#2b2616]"
+                        >
+                            <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                                <span className="material-symbols-outlined text-primary">security</span>
+                                Login History
+                            </h3>
+                            <div className="flex items-center gap-2">
+                                {/* Hint for limit on mobile */}
+                                {isMobile && openSubSection !== 'login_history' && (
+                                    <span className="text-xs text-slate-400">View recent</span>
+                                )}
+                                <span className={`material-symbols-outlined text-slate-400 transition-transform duration-300 ${openSubSection === 'login_history' ? 'rotate-180' : ''}`}>
+                                    expand_more
+                                </span>
+                            </div>
+                        </button>
+                        <div className={`grid transition-[grid-template-rows] duration-300 ease-out ${openSubSection === 'login_history' ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}>
+                            <div className="overflow-hidden">
+                                <div className="p-6 pt-0 border-t border-slate-100 dark:border-[#493f22]">
+                                    <SessionList />
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            </StaggerItem>
 
             {/* Danger Zone */}
-            <div className="bg-red-50 dark:bg-red-900/10 rounded-2xl border border-red-100 dark:border-red-900/30 p-6 flex flex-col md:flex-row items-center justify-between gap-4">
-                <div>
-                    <h3 className="text-lg font-bold text-red-700 dark:text-red-400">{t('settings.dangerZone')}</h3>
-                    <p className="text-sm text-red-600/70 dark:text-red-400/70">{t('settings.resetWarning')}</p>
+            <StaggerItem>
+                <div className="bg-red-50 dark:bg-red-900/10 rounded-2xl border border-red-100 dark:border-red-900/30 p-6 flex flex-col md:flex-row items-center justify-between gap-4">
+                    <div>
+                        <h3 className="text-lg font-bold text-red-700 dark:text-red-400">{t('settings.dangerZone')}</h3>
+                        <p className="text-sm text-red-600/70 dark:text-red-400/70">{t('settings.resetWarning')}</p>
+                    </div>
+                    <button
+                        onClick={handleResetAppClick}
+                        className="px-6 py-3 bg-white dark:bg-red-900/20 text-red-600 dark:text-red-400 font-bold rounded-xl border border-red-200 dark:border-red-800 hover:bg-red-100 transition-colors"
+                    >
+                        {t('settings.resetApp')}
+                    </button>
                 </div>
-                <button
-                    onClick={handleResetAppClick}
-                    className="px-6 py-3 bg-white dark:bg-red-900/20 text-red-600 dark:text-red-400 font-bold rounded-xl border border-red-200 dark:border-red-800 hover:bg-red-100 transition-colors"
-                >
-                    {t('settings.resetApp')}
-                </button>
-            </div>
-        </div>
+            </StaggerItem>
+        </StaggerContainer>
     );
 
     const renderFinanceContent = (isMobile: boolean = false) => (
-        <div className="flex flex-col gap-6 animate-fade-in">
+        <StaggerContainer className="flex flex-col gap-6 animate-fade-in">
             {/* Budget Config */}
-            <div className="bg-white dark:bg-[#342d18] rounded-2xl border border-slate-100 dark:border-[#493f22] p-6 shadow-sm">
-                <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
-                    <span className="material-symbols-outlined text-primary">account_balance_wallet</span>
-                    Monthly Budget
-                </h2>
-                <p className="text-sm text-slate-500 dark:text-[#cbbc90] mb-4">{t('settings.budgetDescription')}</p>
-                <div className="flex flex-col gap-2 max-w-md">
-                    <label className="text-sm font-bold text-slate-700 dark:text-[#cbbc90]">{t('settings.budgetLimit')}</label>
-                    <div className="relative">
-                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-600 font-bold">Rp</span>
-                        <CurrencyInput
-                            value={budgetLimit}
-                            onChange={(val) => setBudgetLimit(val.toString())}
-                            placeholder="e.g. 5.000.000"
-                            className="w-full bg-slate-50 dark:bg-[#1a160b] border border-slate-200 dark:border-[#493f22] rounded-xl pl-12 pr-4 py-3 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all font-bold text-lg"
-                        />
+            <StaggerItem>
+                <div className="bg-white dark:bg-[#342d18] rounded-2xl border border-slate-100 dark:border-[#493f22] p-6 shadow-sm">
+                    <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+                        <span className="material-symbols-outlined text-primary">account_balance_wallet</span>
+                        Monthly Budget
+                    </h2>
+                    <p className="text-sm text-slate-500 dark:text-[#cbbc90] mb-4">{t('settings.budgetDescription')}</p>
+                    <div className="flex flex-col gap-2 max-w-md">
+                        <label className="text-sm font-bold text-slate-700 dark:text-[#cbbc90]">{t('settings.budgetLimit')}</label>
+                        <div className="relative">
+                            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-600 font-bold">Rp</span>
+                            <CurrencyInput
+                                value={budgetLimit}
+                                onChange={(val) => setBudgetLimit(val.toString())}
+                                placeholder="e.g. 5.000.000"
+                                className="w-full bg-slate-50 dark:bg-[#1a160b] border border-slate-200 dark:border-[#493f22] rounded-xl pl-12 pr-4 py-3 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all font-bold text-lg"
+                            />
+                        </div>
+                        <ScaleButton
+                            onClick={handleSaveBudget}
+                            disabled={loading}
+                            className="bg-primary hover:bg-[#dca60e] text-slate-900 font-bold py-3 rounded-xl transition-all shadow-lg hover:shadow-primary/25 mt-2 w-full"
+                        >
+                            {loading ? t('common.loading') : t('settings.saveBudget')}
+                        </ScaleButton>
                     </div>
-                    <button
-                        onClick={handleSaveBudget}
-                        disabled={loading}
-                        className="bg-primary hover:bg-[#dca60e] text-slate-900 font-bold py-3 rounded-xl transition-all shadow-lg hover:shadow-primary/25 mt-2"
-                    >
-                        {loading ? t('common.loading') : t('settings.saveBudget')}
-                    </button>
                 </div>
-            </div>
+            </StaggerItem>
 
             {/* Recurring Transactions */}
-            <div className="bg-white dark:bg-[#342d18] rounded-2xl border border-slate-100 dark:border-[#493f22] p-6 shadow-sm">
-                <div className="flex justify-between items-center mb-6">
-                    <h2 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                        <span className="material-symbols-outlined text-primary">update</span>
-                        {t('settings.recurringTransactions')}
-                    </h2>
-                    <button
-                        onClick={() => setIsRecurringModalOpen(true)}
-                        className={`
+            <StaggerItem>
+                <div className="bg-white dark:bg-[#342d18] rounded-2xl border border-slate-100 dark:border-[#493f22] p-6 shadow-sm">
+                    <div className="flex justify-between items-center mb-6">
+                        <h2 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                            <span className="material-symbols-outlined text-primary">update</span>
+                            {t('settings.recurringTransactions')}
+                        </h2>
+                        <button
+                            onClick={() => setIsRecurringModalOpen(true)}
+                            className={`
                             flex items-center gap-2 rounded-xl bg-primary text-slate-900 font-bold shadow-sm hover:bg-[#dca60e] transition-colors
                             ${isMobile ? 'p-2' : 'px-4 py-2 text-sm'}
                         `}
-                    >
-                        <span className="material-symbols-outlined text-lg">add</span>
-                        {!isMobile && t('settings.addTransaction')}
-                    </button>
-                </div>
+                        >
+                            <span className="material-symbols-outlined text-lg">add</span>
+                            {!isMobile && t('settings.addTransaction')}
+                        </button>
+                    </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {recurringTransactions.map(trans => (
-                        <div key={trans.id} className="p-4 rounded-xl border border-slate-100 dark:border-[#493f22] flex flex-col gap-3 hover:shadow-md transition-all relative group bg-slate-50 dark:bg-[#1a160b]">
-                            <div className="flex justify-between items-start">
-                                <div className="w-10 h-10 rounded-full bg-purple-100 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 flex items-center justify-center">
-                                    <span className="material-symbols-outlined">{trans.icon}</span>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {recurringTransactions.map(trans => (
+                            <div key={trans.id} className="p-4 rounded-xl border border-slate-100 dark:border-[#493f22] flex flex-col gap-3 hover:shadow-md transition-all relative group bg-slate-50 dark:bg-[#1a160b]">
+                                <div className="flex justify-between items-start">
+                                    <div className="w-10 h-10 rounded-full bg-purple-100 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 flex items-center justify-center">
+                                        <span className="material-symbols-outlined">{trans.icon}</span>
+                                    </div>
+                                    <button
+                                        onClick={() => handleDeleteRecurringClick(trans.id)}
+                                        className="text-slate-300 dark:text-[#cbbc90] hover:text-red-500 transition-colors"
+                                    >
+                                        <span className="material-symbols-outlined">delete</span>
+                                    </button>
                                 </div>
-                                <button
-                                    onClick={() => handleDeleteRecurringClick(trans.id)}
-                                    className="text-slate-300 dark:text-[#cbbc90] hover:text-red-500 transition-colors"
-                                >
-                                    <span className="material-symbols-outlined">delete</span>
-                                </button>
+                                <div>
+                                    <h3 className="font-bold text-slate-900 dark:text-white line-clamp-1">{trans.name}</h3>
+                                    <p className="text-primary font-bold">{formatCurrency(trans.amount)}</p>
+                                </div>
+                                <div className="mt-auto pt-3 border-t border-slate-200 dark:border-[#493f22] flex items-center gap-2 text-xs text-slate-500 dark:text-[#cbbc90]">
+                                    <span className="material-symbols-outlined text-[16px]">event_repeat</span>
+                                    <span>Every {trans.date}th of {trans.frequency.toLowerCase()}</span>
+                                </div>
                             </div>
-                            <div>
-                                <h3 className="font-bold text-slate-900 dark:text-white line-clamp-1">{trans.name}</h3>
-                                <p className="text-primary font-bold">{formatCurrency(trans.amount)}</p>
+                        ))}
+                        {recurringTransactions.length === 0 && (
+                            <div className="col-span-full text-center py-8 text-slate-500 dark:text-[#cbbc90]">
+                                No recurring transactions yet.
                             </div>
-                            <div className="mt-auto pt-3 border-t border-slate-200 dark:border-[#493f22] flex items-center gap-2 text-xs text-slate-500 dark:text-[#cbbc90]">
-                                <span className="material-symbols-outlined text-[16px]">event_repeat</span>
-                                <span>Every {trans.date}th of {trans.frequency.toLowerCase()}</span>
-                            </div>
-                        </div>
-                    ))}
-                    {recurringTransactions.length === 0 && (
-                        <div className="col-span-full text-center py-8 text-slate-500 dark:text-[#cbbc90]">
-                            No recurring transactions yet.
-                        </div>
-                    )}
+                        )}
+                    </div>
                 </div>
-            </div>
-        </div>
+            </StaggerItem>
+        </StaggerContainer>
     );
 
     const renderAppearanceContent = () => (
@@ -746,168 +758,170 @@ const Settings: React.FC = () => {
     );
 
     return (
-        <div className="flex flex-col md:flex-row h-full min-h-screen bg-slate-50 dark:bg-background-dark">
-            {/* Desktop Sidebar (HIDDEN ON MOBILE) */}
-            <div className="hidden md:flex flex-col w-64 bg-white dark:bg-[#2b2616] border-r border-slate-200 dark:border-[#493f22] h-screen sticky top-0 overflow-y-auto">
-                <div className="p-6">
-                    <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">{t('settings.title')}</h1>
-                    <p className="text-xs text-slate-500 dark:text-[#cbbc90] mt-1">{t('settings.subtitle')}</p>
-                </div>
-                <nav className="flex flex-col px-3 gap-1">
-                    {tabs.map(tab => (
-                        <button
-                            key={tab.id}
-                            onClick={() => setActiveTab(tab.id)}
-                            className={`flex items-center gap-3 p-3 rounded-xl text-left transition-all ${activeTab === tab.id
-                                ? 'bg-primary text-slate-900 font-bold shadow-sm'
-                                : 'text-slate-600 dark:text-[#cbbc90] hover:bg-slate-50 dark:hover:bg-[#36301d]'
-                                }`}
-                        >
-                            <span className="material-symbols-outlined">{tab.icon}</span>
-                            <span className="text-sm font-medium">{tab.label}</span>
-                        </button>
-                    ))}
-                </nav>
-            </div>
-
-            {/* Mobile Header REMOVED as requested */}
-
-            {/* Main Content Area */}
-            <div className="flex-1 p-4 md:p-8 overflow-y-auto w-full max-w-5xl mx-auto">
-                <ConfirmationModal
-                    isOpen={confirmation.isOpen}
-                    onClose={() => setConfirmation({ ...confirmation, isOpen: false })}
-                    onConfirm={handleConfirmAction}
-                    title={confirmation.title}
-                    message={confirmation.message}
-                    variant="danger"
-                    confirmText={confirmation.type === 'reset_app' ? 'Yes, Reset Everything' : 'Delete'}
-                    isLoading={confirmation.isLoading}
-                />
-
-                <ProfilePictureModal
-                    isOpen={isProfileModalOpen}
-                    onClose={() => setIsProfileModalOpen(false)}
-                    currentUser={currentUser}
-                    onUpdate={(newImage) => setCurrentUser((prev: any) => ({ ...prev, image: newImage }))}
-                />
-
-                {/* DESKTOP CONTENT VIEW */}
-                <div className="hidden md:block">
-                    <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight mb-8">{tabs.find(t => t.id === activeTab)?.label}</h1>
-                    {activeTab === 'account' && renderAccountContent(false)}
-                    {activeTab === 'finance' && renderFinanceContent(false)}
-                    {activeTab === 'appearance' && renderAppearanceContent()}
-                    {activeTab === 'notifications' && renderNotificationContent()}
-                </div>
-
-                {/* MOBILE ACCORDION VIEW */}
-                <div className="md:hidden flex flex-col gap-4">
-                    {/* Profile Card FIRST (Outside Accordion) */}
-                    {renderProfileCard()}
-
-                    {/* Accordions */}
-                    {tabs.map(tab => (
-                        <div key={tab.id} className="bg-white dark:bg-[#342d18] rounded-2xl border border-slate-100 dark:border-[#493f22] overflow-hidden shadow-sm">
+        <PageTransition>
+            <div className="flex flex-col md:flex-row h-full min-h-screen bg-slate-50 dark:bg-background-dark">
+                {/* Desktop Sidebar (HIDDEN ON MOBILE) */}
+                <div className="hidden md:flex flex-col w-64 bg-white dark:bg-[#2b2616] border-r border-slate-200 dark:border-[#493f22] h-screen sticky top-0 overflow-y-auto">
+                    <div className="p-6">
+                        <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">{t('settings.title')}</h1>
+                        <p className="text-xs text-slate-500 dark:text-[#cbbc90] mt-1">{t('settings.subtitle')}</p>
+                    </div>
+                    <nav className="flex flex-col px-3 gap-1">
+                        {tabs.map(tab => (
                             <button
-                                onClick={() => toggleSection(tab.id)}
-                                className={`w-full flex items-center justify-between p-4 transition-colors ${openSection === tab.id ? 'bg-slate-50 dark:bg-[#2b2616]' : ''}`}
+                                key={tab.id}
+                                onClick={() => setActiveTab(tab.id)}
+                                className={`flex items-center gap-3 p-3 rounded-xl text-left transition-all ${activeTab === tab.id
+                                    ? 'bg-primary text-slate-900 font-bold shadow-sm'
+                                    : 'text-slate-600 dark:text-[#cbbc90] hover:bg-slate-50 dark:hover:bg-[#36301d]'
+                                    }`}
                             >
-                                <div className="flex items-center gap-3">
-                                    <span className="material-symbols-outlined text-slate-500 dark:text-[#cbbc90]">{tab.icon}</span>
-                                    <span className="font-bold text-slate-900 dark:text-white">{tab.label}</span>
-                                </div>
-                                <span className={`material-symbols-outlined text-slate-400 transition-transform duration-300 ${openSection === tab.id ? 'rotate-180' : ''}`}>
-                                    expand_more
-                                </span>
+                                <span className="material-symbols-outlined">{tab.icon}</span>
+                                <span className="text-sm font-medium">{tab.label}</span>
                             </button>
+                        ))}
+                    </nav>
+                </div>
 
-                            <div className={`grid transition-[grid-template-rows] duration-300 ease-out ${openSection === tab.id ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}>
-                                <div className="overflow-hidden">
-                                    <div className="p-4 border-t border-slate-100 dark:border-[#493f22]">
-                                        {tab.id === 'account' && renderAccountContent(true)}
-                                        {tab.id === 'finance' && renderFinanceContent(true)}
-                                        {tab.id === 'appearance' && renderAppearanceContent()}
-                                        {tab.id === 'notifications' && renderNotificationContent()}
+                {/* Mobile Header REMOVED as requested */}
+
+                {/* Main Content Area */}
+                <div className="flex-1 p-4 md:p-8 overflow-y-auto w-full max-w-5xl mx-auto">
+                    <ConfirmationModal
+                        isOpen={confirmation.isOpen}
+                        onClose={() => setConfirmation({ ...confirmation, isOpen: false })}
+                        onConfirm={handleConfirmAction}
+                        title={confirmation.title}
+                        message={confirmation.message}
+                        variant="danger"
+                        confirmText={confirmation.type === 'reset_app' ? 'Yes, Reset Everything' : 'Delete'}
+                        isLoading={confirmation.isLoading}
+                    />
+
+                    <ProfilePictureModal
+                        isOpen={isProfileModalOpen}
+                        onClose={() => setIsProfileModalOpen(false)}
+                        currentUser={currentUser}
+                        onUpdate={(newImage) => setCurrentUser((prev: any) => ({ ...prev, image: newImage }))}
+                    />
+
+                    {/* DESKTOP CONTENT VIEW */}
+                    <div className="hidden md:block">
+                        <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight mb-8">{tabs.find(t => t.id === activeTab)?.label}</h1>
+                        {activeTab === 'account' && renderAccountContent(false)}
+                        {activeTab === 'finance' && renderFinanceContent(false)}
+                        {activeTab === 'appearance' && renderAppearanceContent()}
+                        {activeTab === 'notifications' && renderNotificationContent()}
+                    </div>
+
+                    {/* MOBILE ACCORDION VIEW */}
+                    <div className="md:hidden flex flex-col gap-4">
+                        {/* Profile Card FIRST (Outside Accordion) */}
+                        {renderProfileCard()}
+
+                        {/* Accordions */}
+                        {tabs.map(tab => (
+                            <div key={tab.id} className="bg-white dark:bg-[#342d18] rounded-2xl border border-slate-100 dark:border-[#493f22] overflow-hidden shadow-sm">
+                                <button
+                                    onClick={() => toggleSection(tab.id)}
+                                    className={`w-full flex items-center justify-between p-4 transition-colors ${openSection === tab.id ? 'bg-slate-50 dark:bg-[#2b2616]' : ''}`}
+                                >
+                                    <div className="flex items-center gap-3">
+                                        <span className="material-symbols-outlined text-slate-500 dark:text-[#cbbc90]">{tab.icon}</span>
+                                        <span className="font-bold text-slate-900 dark:text-white">{tab.label}</span>
+                                    </div>
+                                    <span className={`material-symbols-outlined text-slate-400 transition-transform duration-300 ${openSection === tab.id ? 'rotate-180' : ''}`}>
+                                        expand_more
+                                    </span>
+                                </button>
+
+                                <div className={`grid transition-[grid-template-rows] duration-300 ease-out ${openSection === tab.id ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}>
+                                    <div className="overflow-hidden">
+                                        <div className="p-4 border-t border-slate-100 dark:border-[#493f22]">
+                                            {tab.id === 'account' && renderAccountContent(true)}
+                                            {tab.id === 'finance' && renderFinanceContent(true)}
+                                            {tab.id === 'appearance' && renderAppearanceContent()}
+                                            {tab.id === 'notifications' && renderNotificationContent()}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    ))}
+                        ))}
+                    </div>
                 </div>
-            </div>
 
-            {/* Recurring Modal (Global) */}
-            {isRecurringModalOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-                    <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsRecurringModalOpen(false)}></div>
-                    <div className="relative bg-white dark:bg-[#2a2515] w-full max-w-md rounded-2xl shadow-2xl overflow-hidden flex flex-col animate-scale-in">
-                        <div className="p-6 border-b border-slate-100 dark:border-[#493f22] flex justify-between items-center bg-surface-light dark:bg-[#342d18]">
-                            <h3 className="text-xl font-bold text-slate-900 dark:text-white">{t('settings.addRecurring')}</h3>
-                            <button onClick={() => setIsRecurringModalOpen(false)} className="text-slate-400 hover:text-slate-600 dark:text-[#cbbc90] dark:hover:text-white transition-colors">
-                                <span className="material-symbols-outlined">close</span>
-                            </button>
-                        </div>
-                        <form onSubmit={handleAddRecurring} className="p-6 flex flex-col gap-6">
-                            <div className="flex flex-col gap-2">
-                                <label className="text-sm font-bold text-slate-700 dark:text-[#cbbc90]">{t('settings.name')}</label>
-                                <input
-                                    type="text"
-                                    value={newRecurring.name}
-                                    onChange={(e) => setNewRecurring({ ...newRecurring, name: e.target.value })}
-                                    placeholder="e.g. Internet Bill"
-                                    className="w-full bg-slate-50 dark:bg-[#1a160b] border border-slate-200 dark:border-[#493f22] rounded-xl px-4 py-3 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-slate-600"
-                                    required
-                                />
+                {/* Recurring Modal (Global) */}
+                {isRecurringModalOpen && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                        <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsRecurringModalOpen(false)}></div>
+                        <div className="relative bg-white dark:bg-[#2a2515] w-full max-w-md rounded-2xl shadow-2xl overflow-hidden flex flex-col animate-scale-in">
+                            <div className="p-6 border-b border-slate-100 dark:border-[#493f22] flex justify-between items-center bg-surface-light dark:bg-[#342d18]">
+                                <h3 className="text-xl font-bold text-slate-900 dark:text-white">{t('settings.addRecurring')}</h3>
+                                <button onClick={() => setIsRecurringModalOpen(false)} className="text-slate-400 hover:text-slate-600 dark:text-[#cbbc90] dark:hover:text-white transition-colors">
+                                    <span className="material-symbols-outlined">close</span>
+                                </button>
                             </div>
-                            <div className="flex flex-col gap-2">
-                                <label className="text-sm font-bold text-slate-700 dark:text-[#cbbc90]">{t('settings.amount')}</label>
-                                <div className="relative">
-                                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-600 font-bold">Rp</span>
-                                    <CurrencyInput
-                                        value={newRecurring.amount}
-                                        onChange={(val) => setNewRecurring({ ...newRecurring, amount: val.toString() })}
-                                        placeholder="0"
-                                        className="w-full bg-slate-50 dark:bg-[#1a160b] border border-slate-200 dark:border-[#493f22] rounded-xl pl-12 pr-4 py-3 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-slate-600"
-                                        required
-                                    />
-                                </div>
-                            </div>
-                            <div className="grid grid-cols-2 gap-4">
+                            <form onSubmit={handleAddRecurring} className="p-6 flex flex-col gap-6">
                                 <div className="flex flex-col gap-2">
-                                    <label className="text-sm font-bold text-slate-700 dark:text-[#cbbc90]">{t('settings.date')}</label>
+                                    <label className="text-sm font-bold text-slate-700 dark:text-[#cbbc90]">{t('settings.name')}</label>
                                     <input
-                                        type="number"
-                                        min="1"
-                                        max="31"
-                                        value={newRecurring.date}
-                                        onChange={(e) => setNewRecurring({ ...newRecurring, date: e.target.value })}
-                                        placeholder={t('settings.date')}
+                                        type="text"
+                                        value={newRecurring.name}
+                                        onChange={(e) => setNewRecurring({ ...newRecurring, name: e.target.value })}
+                                        placeholder="e.g. Internet Bill"
                                         className="w-full bg-slate-50 dark:bg-[#1a160b] border border-slate-200 dark:border-[#493f22] rounded-xl px-4 py-3 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-slate-600"
                                         required
                                     />
                                 </div>
                                 <div className="flex flex-col gap-2">
-                                    <label className="text-sm font-bold text-slate-700 dark:text-[#cbbc90]">{t('settings.frequency')}</label>
-                                    <select
-                                        value={newRecurring.frequency}
-                                        onChange={(e) => setNewRecurring({ ...newRecurring, frequency: e.target.value })}
-                                        className="w-full bg-slate-50 dark:bg-[#1a160b] border border-slate-200 dark:border-[#493f22] rounded-xl px-4 py-3 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
-                                    >
-                                        <option value="Monthly">{t('settings.monthly')}</option>
-                                        <option value="Weekly">{t('settings.weekly')}</option>
-                                        <option value="Yearly">{t('settings.yearly')}</option>
-                                    </select>
+                                    <label className="text-sm font-bold text-slate-700 dark:text-[#cbbc90]">{t('settings.amount')}</label>
+                                    <div className="relative">
+                                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-600 font-bold">Rp</span>
+                                        <CurrencyInput
+                                            value={newRecurring.amount}
+                                            onChange={(val) => setNewRecurring({ ...newRecurring, amount: val.toString() })}
+                                            placeholder="0"
+                                            className="w-full bg-slate-50 dark:bg-[#1a160b] border border-slate-200 dark:border-[#493f22] rounded-xl pl-12 pr-4 py-3 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-slate-600"
+                                            required
+                                        />
+                                    </div>
                                 </div>
-                            </div>
-                            <button type="submit" className="w-full bg-primary hover:bg-[#dca60e] text-slate-900 font-bold py-4 rounded-xl transition-all shadow-lg hover:shadow-primary/25 active:scale-95">
-                                {t('settings.addTransaction')}
-                            </button>
-                        </form>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="flex flex-col gap-2">
+                                        <label className="text-sm font-bold text-slate-700 dark:text-[#cbbc90]">{t('settings.date')}</label>
+                                        <input
+                                            type="number"
+                                            min="1"
+                                            max="31"
+                                            value={newRecurring.date}
+                                            onChange={(e) => setNewRecurring({ ...newRecurring, date: e.target.value })}
+                                            placeholder={t('settings.date')}
+                                            className="w-full bg-slate-50 dark:bg-[#1a160b] border border-slate-200 dark:border-[#493f22] rounded-xl px-4 py-3 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-slate-600"
+                                            required
+                                        />
+                                    </div>
+                                    <div className="flex flex-col gap-2">
+                                        <label className="text-sm font-bold text-slate-700 dark:text-[#cbbc90]">{t('settings.frequency')}</label>
+                                        <select
+                                            value={newRecurring.frequency}
+                                            onChange={(e) => setNewRecurring({ ...newRecurring, frequency: e.target.value })}
+                                            className="w-full bg-slate-50 dark:bg-[#1a160b] border border-slate-200 dark:border-[#493f22] rounded-xl px-4 py-3 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
+                                        >
+                                            <option value="Monthly">{t('settings.monthly')}</option>
+                                            <option value="Weekly">{t('settings.weekly')}</option>
+                                            <option value="Yearly">{t('settings.yearly')}</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <button type="submit" className="w-full bg-primary hover:bg-[#dca60e] text-slate-900 font-bold py-4 rounded-xl transition-all shadow-lg hover:shadow-primary/25 active:scale-95">
+                                    {t('settings.addTransaction')}
+                                </button>
+                            </form>
+                        </div>
                     </div>
-                </div>
-            )}
-        </div>
+                )}
+            </div>
+        </PageTransition>
     );
 };
 
