@@ -248,7 +248,8 @@
         "assignDesc": "Add people and tap their names on the items they ordered.",
         "addPerson": "Type a name...",
         "noPeople": "No people added yet.",
-        "calculate": "Calculate"
+        "calculate": "Calculate",
+        "upgradeRiskFree": "Cancel anytime. No hidden fees."
     },
     "settings": {
         "title": "Settings",
@@ -447,8 +448,11 @@
         }
     },
     "install": {
-        "title": "Install Rupiku",
-        "description": "Install Rupiku for a better experience. Works offline and loads faster!",
+        "title": "Install Joyful Finance Tracker",
+        "description": "Install Joyful Finance Tracker for a better, offline-capable experience!",
         "button": "Install App"
+    },
+    "pricing": {
+        "upgrade": "Upgrade to Platinum"
     }
 }

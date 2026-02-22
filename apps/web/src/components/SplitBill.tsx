@@ -1,12 +1,12 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useSplitBill } from '../hooks/useSplitBill';
 import * as htmlToImage from 'html-to-image';
 import { formatIDR } from '../services/dashboardService';
 import { authService } from '../services/authService';
-import { useNavigate } from 'react-router-dom';
-import { Lock, Crown, Receipt, Users, PlusCircle, Calculator } from 'lucide-react';
+import { upgradeService } from '../services/upgradeService';
+import { Lock, Crown, Receipt, Users, PlusCircle, Calculator, Clock } from 'lucide-react';
 
 const SplitBill: React.FC = () => {
     const { t } = useLanguage();
@@ -14,10 +14,45 @@ const SplitBill: React.FC = () => {
     const resultRef = useRef<HTMLDivElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [newParticipant, setNewParticipant] = useState('');
-
-    const navigate = useNavigate();
     const [user] = useState(authService.getCurrentUser());
     const isPremium = user?.plan?.toLowerCase() === 'platinum' || user?.role === 'ADMIN';
+
+    // Upgrade request state
+    const [hasPendingRequest, setHasPendingRequest] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [submitMessage, setSubmitMessage] = useState('');
+
+    useEffect(() => {
+        const checkPending = async () => {
+            if (!isPremium) {
+                try {
+                    const { hasPendingRequest: pending } = await upgradeService.checkPendingRequest();
+                    setHasPendingRequest(pending);
+                } catch (e) {
+                    console.error("Failed to check pending request status", e);
+                }
+            }
+        };
+        checkPending();
+    }, [isPremium]);
+
+    const handleUpgradeRequest = async () => {
+        setIsSubmitting(true);
+        setSubmitMessage('');
+        try {
+            const res = await upgradeService.requestUpgrade();
+            if (res.success) {
+                setHasPendingRequest(true);
+                setSubmitMessage(t('trading.requestSuccess') || 'Request sent successfully!');
+            } else {
+                setSubmitMessage(t('trading.requestFailed') || 'Failed to send request. Please try again later.');
+            }
+        } catch (error) {
+            setSubmitMessage(t('trading.requestError') || 'An error occurred. Please try again later.');
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
 
     // --- Format Helper ---
     const formatRp = (value: number) => formatIDR(value);
@@ -32,55 +67,90 @@ const SplitBill: React.FC = () => {
 
         return (
             <motion.div
-                initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}
-                className="flex flex-col items-center justify-center py-12 px-4"
+                initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }}
+                className="w-full flex-1 flex flex-col items-center justify-center py-10"
             >
-                <div className="w-24 h-24 bg-primary/10 text-primary rounded-full flex items-center justify-center mb-6 shadow-glow">
-                    <span className="material-symbols-outlined text-4xl">document_scanner</span>
-                </div>
-                <h2 className="text-2xl font-bold text-slate-800 dark:text-white mb-2">{t('splitBill.captureTitle') || 'Scan Receipt'}</h2>
-                <p className="text-slate-500 dark:text-text-muted text-center max-w-sm mb-8">
-                    {t('splitBill.captureDesc') || 'Upload or take a photo of your receipt to automatically extract items and prices.'}
-                </p>
+                <div
+                    className="w-full max-w-2xl bg-white dark:bg-[#2b2616] rounded-[2rem] border-2 border-dashed border-slate-200 dark:border-[#493f22] p-8 md:p-16 flex flex-col items-center justify-center text-center relative overflow-hidden group hover:border-primary/50 dark:hover:border-primary/50 transition-colors cursor-pointer"
+                    onClick={() => fileInputRef.current?.click()}
+                >
+                    {/* Decorative Background Elements */}
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 group-hover:bg-primary/10 transition-colors"></div>
+                    <div className="absolute bottom-0 left-0 w-64 h-64 bg-blue-500/5 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2 group-hover:bg-blue-500/10 transition-colors"></div>
 
-                <div className="flex flex-col sm:flex-row gap-4 w-full max-w-md">
-                    <button
-                        onClick={() => fileInputRef.current?.click()}
-                        className="flex-1 btn-primary py-4 rounded-xl flex items-center justify-center gap-2 text-lg font-bold"
-                        disabled={splitState.isProcessingIndicator}
-                    >
-                        <span className="material-symbols-outlined">photo_camera</span>
-                        {t('splitBill.takePhoto') || 'Camera / Gallery'}
-                    </button>
-                    <input
-                        type="file"
-                        accept="image/*"
-                        ref={fileInputRef}
-                        onChange={handleFileChange}
-                        className="hidden"
-                    />
-                </div>
+                    {/* Main Content */}
+                    <div className="relative z-10 flex flex-col items-center">
+                        <motion.div
+                            whileHover={{ scale: 1.05, rotate: [0, -5, 5, 0] }}
+                            transition={{ type: "spring", stiffness: 300 }}
+                            className="w-28 h-28 bg-primary/10 dark:bg-primary/20 text-primary rounded-3xl flex items-center justify-center mb-8 shadow-glow shadow-primary/20"
+                        >
+                            <span className="material-symbols-outlined text-[56px]">document_scanner</span>
+                        </motion.div>
 
-                {splitState.isProcessingIndicator && (
-                    <div className="mt-8 w-full max-w-md bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-soft">
-                        <div className="flex flex-col items-center">
-                            <div className="w-12 h-12 border-4 border-primary/30 border-t-primary rounded-full animate-spin mb-4"></div>
-                            <p className="text-slate-700 dark:text-slate-300 font-medium">{t('splitBill.processing') || 'Processing Image...'}</p>
-                            <div className="w-full bg-slate-200 dark:bg-slate-700 h-2 rounded-full mt-4 overflow-hidden">
-                                <div
-                                    className="bg-primary h-full transition-all duration-300"
-                                    style={{ width: `${splitState.processingProgress}%` }}
-                                ></div>
-                            </div>
+                        <h2 className="text-3xl font-black text-slate-900 dark:text-white mb-4 tracking-tight">
+                            {t('splitBill.captureTitle') || 'Scan Your Receipt'}
+                        </h2>
+
+                        <p className="text-slate-500 dark:text-[#cbbc90] text-lg max-w-md mb-8 leading-relaxed">
+                            {t('splitBill.captureDesc') || 'Upload or take a photo of your dining receipt. Our AI will automatically extract all items and calculate the tax/service.'}
+                        </p>
+
+                        <div className="flex flex-col sm:flex-row gap-4 w-full justify-center">
+                            <button
+                                onClick={(e) => {
+                                    e.stopPropagation(); // Prevent triggering outer div click twice
+                                    fileInputRef.current?.click();
+                                }}
+                                className="btn-primary py-4 px-8 rounded-2xl flex items-center justify-center gap-3 text-lg font-bold shadow-xl shadow-primary/20 hover:shadow-primary/40 transition-all hover:-translate-y-1"
+                                disabled={splitState.isProcessingIndicator}
+                            >
+                                <span className="material-symbols-outlined text-[24px]">add_a_photo</span>
+                                {t('splitBill.takePhoto') || 'Choose Image'}
+                            </button>
+                            <input
+                                type="file"
+                                accept="image/*"
+                                ref={fileInputRef}
+                                onChange={handleFileChange}
+                                className="hidden"
+                            />
                         </div>
+
+                        <p className="text-xs text-slate-400 dark:text-slate-500 mt-6 font-medium uppercase tracking-wider">
+                            Supports JPG, PNG • Max 10MB
+                        </p>
                     </div>
-                )}
+
+                    {/* Processing Overlay inside the dropzone */}
+                    <AnimatePresence>
+                        {splitState.isProcessingIndicator && (
+                            <motion.div
+                                initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                                className="absolute inset-0 z-20 bg-white/90 dark:bg-[#2b2616]/90 backdrop-blur-sm flex flex-col items-center justify-center rounded-[2rem]"
+                            >
+                                <div className="w-16 h-16 border-4 border-primary/20 border-t-primary rounded-full animate-spin mb-6"></div>
+                                <p className="text-xl font-bold text-slate-900 dark:text-white mb-2">{t('splitBill.processing') || 'Analyzing Receipt...'}</p>
+                                <p className="text-slate-500 dark:text-[#cbbc90] text-sm mb-6">This usually takes a few seconds</p>
+                                <div className="w-64 bg-slate-100 dark:bg-[#1a160b] h-2.5 rounded-full overflow-hidden shadow-inner">
+                                    <div
+                                        className="bg-primary h-full transition-all duration-300 rounded-full"
+                                        style={{ width: `${splitState.processingProgress}%` }}
+                                    ></div>
+                                </div>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+                </div>
 
                 {splitState.error && (
-                    <div className="mt-6 p-4 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-xl flex items-center gap-3 w-full max-w-md">
-                        <span className="material-symbols-outlined">error</span>
-                        <p className="text-sm font-medium">{splitState.error}</p>
-                    </div>
+                    <motion.div
+                        initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+                        className="mt-6 p-4 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 border border-red-100 dark:border-red-900/30 rounded-2xl flex items-center gap-3 w-full max-w-md mx-auto shadow-sm tracking-tight font-medium"
+                    >
+                        <span className="material-symbols-outlined text-[24px]">error</span>
+                        <p>{splitState.error}</p>
+                    </motion.div>
                 )}
             </motion.div>
         );
@@ -534,52 +604,97 @@ const SplitBill: React.FC = () => {
         <div className="min-h-[60vh] flex items-center justify-center">
             <div className="bg-white dark:bg-[#2b2616] rounded-3xl border border-slate-200 dark:border-[#f4c025]/20 p-8 md:p-12 max-w-lg text-center shadow-xl">
                 {/* Icon */}
-                <div className="w-20 h-20 mx-auto mb-6 rounded-full flex items-center justify-center shadow-lg bg-gradient-to-br from-amber-400 to-amber-600 shadow-amber-500/30">
-                    <Lock className="w-10 h-10 text-white" />
+                <div className={`w-20 h-20 mx-auto mb-6 rounded-full flex items-center justify-center shadow-lg ${hasPendingRequest
+                        ? 'bg-gradient-to-br from-blue-400 to-blue-600 shadow-blue-500/30'
+                        : 'bg-gradient-to-br from-amber-400 to-amber-600 shadow-amber-500/30'
+                    }`}>
+                    {hasPendingRequest ? <Clock className="w-10 h-10 text-white" /> : <Lock className="w-10 h-10 text-white" />}
                 </div>
 
                 {/* Title */}
                 <h1 className="text-2xl md:text-3xl font-bold text-slate-800 dark:text-white mb-3">
-                    Split Bill
+                    {hasPendingRequest ? (t('trading.requestPending') || 'Request Pending') : (t('splitBill.title') || 'Split Bill')}
                 </h1>
 
                 {/* Badge */}
-                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6 bg-amber-100 dark:bg-amber-500/20">
-                    <Crown className="w-4 h-4 text-amber-600 dark:text-amber-400" />
-                    <span className="text-sm font-bold text-amber-700 dark:text-amber-400">Platinum Exclusive</span>
+                <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6 ${hasPendingRequest
+                        ? 'bg-blue-100 dark:bg-blue-500/20'
+                        : 'bg-amber-100 dark:bg-amber-500/20'
+                    }`}>
+                    {hasPendingRequest ? (
+                        <>
+                            <Clock className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                            <span className="text-sm font-bold text-blue-700 dark:text-blue-400">
+                                {t('trading.waitingApproval') || 'Waiting for Admin Approval'}
+                            </span>
+                        </>
+                    ) : (
+                        <>
+                            <Crown className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+                            <span className="text-sm font-bold text-amber-700 dark:text-amber-400">
+                                {t('trading.platinumOnly') || 'Platinum Exclusive'}
+                            </span>
+                        </>
+                    )}
                 </div>
 
                 {/* Description */}
                 <p className="text-slate-500 dark:text-[#cbbc90] mb-8 leading-relaxed">
-                    Unlock the AI-powered Split Bill feature to instantly scan receipts, assign items to friends, and calculate pro-rata tax and service charges.
+                    {hasPendingRequest
+                        ? (t('trading.pendingDescription') || 'Your upgrade request has been submitted. Please wait for admin to review and approve your request.')
+                        : (t('splitBill.upgradeDescription') || 'Unlock the AI-powered Split Bill feature to instantly scan receipts, assign items to friends, and calculate pro-rata tax and service charges.')
+                    }
                 </p>
 
                 {/* Features List */}
-                <div className="grid grid-cols-2 gap-3 mb-8 text-left">
-                    {[
-                        { icon: <Receipt size={18} />, text: 'AI Receipt Scanner' },
-                        { icon: <Users size={18} />, text: 'Friend Assignment' },
-                        { icon: <PlusCircle size={18} />, text: 'Pro-Rata Tax/Svc' },
-                        { icon: <Calculator size={18} />, text: 'Smart Calculation' },
-                    ].map((feature) => (
-                        <div key={feature.text} className="flex items-center gap-2 p-3 bg-slate-50 dark:bg-[#1e1b10] rounded-xl">
-                            <span className="text-amber-500">{feature.icon}</span>
-                            <span className="text-sm font-medium text-slate-700 dark:text-white">{feature.text}</span>
-                        </div>
-                    ))}
-                </div>
+                {!hasPendingRequest && (
+                    <div className="grid grid-cols-2 gap-3 mb-8 text-left">
+                        {[
+                            { icon: <Receipt size={18} />, text: 'AI Receipt Scanner' },
+                            { icon: <Users size={18} />, text: 'Friend Assignment' },
+                            { icon: <PlusCircle size={18} />, text: 'Pro-Rata Tax/Svc' },
+                            { icon: <Calculator size={18} />, text: 'Smart Calculation' },
+                        ].map((feature) => (
+                            <div key={feature.text} className="flex items-center gap-2 p-3 bg-slate-50 dark:bg-[#1e1b10] rounded-xl">
+                                <span className="text-amber-500">{feature.icon}</span>
+                                <span className="text-sm font-medium text-slate-700 dark:text-white">{feature.text}</span>
+                            </div>
+                        ))}
+                    </div>
+                )}
 
                 {/* CTA Button */}
-                <button
-                    onClick={() => navigate('/settings')}
-                    className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold py-4 px-6 rounded-xl transition-all shadow-lg shadow-amber-500/30 hover:shadow-amber-500/50 active:scale-[0.98] flex items-center justify-center gap-2"
-                >
-                    <Crown className="w-5 h-5" />
-                    Upgrade to Platinum
-                </button>
+                {hasPendingRequest ? (
+                    <button
+                        disabled
+                        className="w-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-bold py-4 px-6 rounded-xl cursor-not-allowed flex items-center justify-center gap-2 border border-blue-200 dark:border-blue-800"
+                    >
+                        <Clock className="w-5 h-5" />
+                        {t('trading.requestPending') || 'Request Pending'}
+                    </button>
+                ) : (
+                    <button
+                        onClick={handleUpgradeRequest}
+                        disabled={isSubmitting}
+                        className="w-full bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-slate-900 font-black py-4 px-6 rounded-2xl transition-all shadow-lg shadow-amber-500/30 hover:shadow-amber-500/50 hover:-translate-y-1 active:scale-[0.98] flex items-center justify-center gap-2"
+                    >
+                        <span className="material-symbols-outlined">workspace_premium</span>
+                        {isSubmitting ? (t('common.loading') || 'Loading...') : (t('pricing.upgrade') || 'Upgrade to Platinum')}
+                    </button>
+                )}
 
-                <p className="text-xs text-slate-400 dark:text-[#8e8568] mt-4">
-                    Admin will review your upgrade request
+                {/* Status message */}
+                {submitMessage && (
+                    <p className={`text-sm mt-4 text-center font-medium ${submitMessage.includes('Failed') || submitMessage.includes('error') ? 'text-red-500' : 'text-green-500'}`}>
+                        {submitMessage}
+                    </p>
+                )}
+
+                <p className="text-xs text-slate-400 dark:text-slate-500 text-center mt-6">
+                    {hasPendingRequest
+                        ? (t('trading.notifyWhenProcessed') || 'We will notify you once your request has been processed.')
+                        : (t('splitBill.upgradeRiskFree') || 'Cancel anytime. No hidden fees.')
+                    }
                 </p>
             </div>
         </div>

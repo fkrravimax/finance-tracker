@@ -248,7 +248,8 @@
         "assignDesc": "Tambahkan nama orang lalu sentuh nama mereka pada item yang dipesan.",
         "addPerson": "Ketik nama...",
         "noPeople": "Belum ada orang ditambahkan.",
-        "calculate": "Hitung Tagihan"
+        "calculate": "Hitung Tagihan",
+        "upgradeRiskFree": "Batalkan kapan saja. Bebas biaya tersembunyi."
     },
     "settings": {
         "title": "Pengaturan",
@@ -450,5 +451,8 @@
         "title": "Install Rupiku",
         "description": "Install Rupiku untuk pengalaman yang lebih baik. Bisa akses offline dan lebih cepat!",
         "button": "Install Aplikasi"
+    },
+    "pricing": {
+        "upgrade": "Upgrade ke Platinum"
     }
 }
