@@ -38,8 +38,8 @@ const Sidebar: React.FC<SidebarProps> = ({ onLogout, isOpen = false, onClose }) 
         { id: 'reports', label: t('sidebar.reports'), icon: 'pie_chart' },
         { id: 'trading', label: t('sidebar.trading'), icon: 'candlestick_chart' },
         { id: 'savings', label: t('sidebar.savings'), icon: 'savings' },
-        { id: 'settings', label: t('sidebar.settings'), icon: 'settings' },
         { id: 'split-bill', label: t('sidebar.splitBill'), icon: 'receipt_long', isNew: true },
+        { id: 'settings', label: t('sidebar.settings'), icon: 'settings' },
     ];
 
     if (isAdmin) {
