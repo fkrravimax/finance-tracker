@@ -54,12 +54,9 @@ const Sidebar: React.FC<SidebarProps> = ({ onLogout, isOpen = false, onClose }) 
             />
 
             <AnimatePresence>
-                <motion.aside
-                    initial={{ x: '-100%' }}
-                    animate={{ x: isOpen ? 0 : '-100%' }}
-                    transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                <aside
                     className={`
-                        fixed inset-y-0 left-0 z-50 w-72 bg-white/80 backdrop-blur-xl border border-white/50 dark:bg-background-dark dark:border-white/5 pt-6 px-6 pb-6 md:p-6 flex flex-col justify-between md:static md:translate-x-0 md:m-4 md:rounded-3xl shadow-soft
+                        fixed inset-y-0 left-0 z-50 w-72 bg-white/80 backdrop-blur-xl border border-white/50 dark:bg-background-dark dark:border-white/5 pt-6 px-6 pb-6 md:p-6 flex flex-col justify-between md:static md:translate-x-0 md:m-4 md:rounded-3xl shadow-soft transition-transform duration-300
                         ${isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
                     `}
                 >
@@ -147,7 +144,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onLogout, isOpen = false, onClose }) 
                             </div>
                         </div>
                     </div>
-                </motion.aside>
+                </aside>
             </AnimatePresence>
         </>
     );
