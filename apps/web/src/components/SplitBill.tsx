@@ -447,20 +447,20 @@ const SplitBill: React.FC = () => {
                 {/* The "Receipt" Result View to be converted to Image */}
                 <div
                     ref={resultRef}
-                    className="w-full max-w-2xl bg-white dark:bg-slate-900 rounded-2xl md:rounded-3xl p-4 md:p-10 shadow-xl border border-slate-100 dark:border-white/5 relative overflow-hidden"
+                    className="w-full max-w-2xl bg-white rounded-2xl md:rounded-3xl p-6 md:p-10 shadow-xl border border-slate-100 relative overflow-hidden"
                 >
                     {/* Decorative receipt zig-zag top/bottom (optional CSS tricks, pure styling) */}
 
-                    <div className="text-center mb-8 pb-6 border-b-2 border-dashed border-slate-200 dark:border-slate-700">
+                    <div className="text-center mb-8 pb-6 border-b-2 border-dashed border-slate-200">
                         <div className="w-12 h-12 bg-primary/10 text-primary rounded-2xl flex items-center justify-center mx-auto mb-3">
-                            <span className="material-symbols-outlined">receipt_long</span>
+                            <Receipt className="w-6 h-6" />
                         </div>
-                        <h2 className="text-2xl font-black text-slate-800 dark:text-white uppercase tracking-widest">Split Bill</h2>
+                        <h2 className="text-2xl font-black text-slate-800 uppercase tracking-widest">Split Bill</h2>
                         <p className="text-slate-500 font-medium mt-1">{new Date().toLocaleDateString()}</p>
                     </div>
 
                     {results.unassignedTotal > 0 && (
-                        <div className="mb-6 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 p-4 rounded-xl flex justify-between items-center font-bold">
+                        <div className="mb-6 bg-red-50 text-red-600 p-4 rounded-xl flex justify-between items-center font-bold">
                             <div className="flex items-center gap-2">
                                 <span className="material-symbols-outlined">warning</span>
                                 Unassigned Items
@@ -471,7 +471,7 @@ const SplitBill: React.FC = () => {
 
                     <div className="space-y-6">
                         {results.participants.filter(p => p.total > 0).map(p => (
-                            <div key={p.id} className="bg-slate-50 dark:bg-slate-800/50 rounded-2xl p-5 border border-slate-100 dark:border-white/5">
+                            <div key={p.id} className="bg-slate-50 rounded-2xl p-5 border border-slate-100">
                                 <div className="flex justify-between items-center mb-3">
                                     <h3 className="text-lg font-bold text-primary flex items-center gap-2">
                                         <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-sm font-black">
@@ -479,19 +479,19 @@ const SplitBill: React.FC = () => {
                                         </div>
                                         {p.name}
                                     </h3>
-                                    <div className="text-xl font-black text-slate-800 dark:text-white font-mono">
+                                    <div className="text-xl font-black text-slate-800 font-mono">
                                         {formatRp(p.total)}
                                     </div>
                                 </div>
                                 <div className="space-y-2 mt-4 text-sm">
                                     {p.items.map(item => (
-                                        <div key={item.id} className="flex justify-between text-slate-600 dark:text-slate-400">
+                                        <div key={item.id} className="flex justify-between text-slate-600">
                                             <span>{item.name}</span>
                                             <span className="font-mono">{formatRp(item.amount)}</span>
                                         </div>
                                     ))}
                                     {(p.taxShare > 0 || p.serviceShare > 0 || p.discountShare > 0) && (
-                                        <div className="flex justify-between text-slate-400 dark:text-slate-500 pt-2 mt-2 border-t border-slate-200 dark:border-slate-700/50 italic text-xs">
+                                        <div className="flex justify-between text-slate-400 pt-2 mt-2 border-t border-slate-200 italic text-xs">
                                             <span>Pro-rata Tax/Svc/Disc</span>
                                             <span className="font-mono">
                                                 {formatRp(p.taxShare + p.serviceShare - p.discountShare)}
@@ -503,9 +503,20 @@ const SplitBill: React.FC = () => {
                         ))}
                     </div>
 
-                    <div className="mt-8 pt-6 border-t-2 border-dashed border-slate-200 dark:border-slate-700 flex justify-between items-center">
+                    <div className="mt-8 pt-6 border-t-2 border-dashed border-slate-200 flex justify-between items-center">
                         <span className="text-lg font-bold text-slate-500">Total Receipt</span>
-                        <span className="text-2xl font-black text-slate-800 dark:text-white font-mono">{formatRp(splitState.receiptData.grandTotal)}</span>
+                        <span className="text-2xl font-black text-slate-800 font-mono">{formatRp(splitState.receiptData.grandTotal)}</span>
+                    </div>
+
+                    {/* Rupiku Watermark */}
+                    <div className="mt-12 flex flex-col items-center justify-center opacity-40">
+                        <div className="flex items-center gap-2 mb-1">
+                            <span className="w-6 h-6 bg-slate-900 text-white rounded-[8px] flex items-center justify-center transform rotate-3 shadow-sm">
+                                <img src="/logo.png" alt="Logo" className="w-3.5 h-3.5 object-contain" />
+                            </span>
+                            <span className="font-black tracking-tight text-slate-900 text-lg">Rupiku.</span>
+                        </div>
+                        <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">Generated via AI Split Bill</span>
                     </div>
                 </div>
 
