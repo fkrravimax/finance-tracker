@@ -1,5 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
-import api from '../services/api';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import TransactionTableSkeleton from './skeletons/TransactionTableSkeleton';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useUI } from '../contexts/UIContext';
@@ -9,7 +8,6 @@ import ConfirmationModal from './ConfirmationModal';
 import { motion, AnimatePresence } from 'framer-motion';
 import PageTransition from './ui/PageTransition';
 
-type TimeRange = 'day' | 'week' | 'month' | 'year';
 type SortKey = 'category' | 'date' | 'amount';
 type SortDirection = 'asc' | 'desc';
 
@@ -24,9 +22,16 @@ interface Transaction {
     colorClass?: string;
 }
 
+const MONTH_NAMES = [
+    'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+    'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+];
+
 const Transactions: React.FC = () => {
     const { t } = useLanguage();
-    const [timeRange, setTimeRange] = useState<TimeRange>('month');
+    const now = new Date();
+    const [selectedMonth, setSelectedMonth] = useState(now.getMonth());
+    const [selectedYear, setSelectedYear] = useState(now.getFullYear());
     const [transactions, setTransactions] = useState<Transaction[]>([]);
     const [loading, setLoading] = useState(true);
     const [sortConfig, setSortConfig] = useState<{ key: SortKey; direction: SortDirection } | null>(null);
@@ -35,34 +40,54 @@ const Transactions: React.FC = () => {
     const [isConfirmOpen, setIsConfirmOpen] = useState(false);
     const [transactionToDelete, setTransactionToDelete] = useState<string | null>(null);
 
-    const fetchTransactions = async () => {
+    const fetchTransactions = useCallback(async (month: number, year: number) => {
         try {
-            // Add artificial delay ensuring skeleton is visible for UX smooth transition (optional)
-            const [response] = await Promise.all([
-                api.get('/transactions'),
-                new Promise(resolve => setTimeout(resolve, 500))
-            ]);
-            setTransactions(response.data);
+            setLoading(true);
+            const data = await transactionService.getAll(month, year);
+            setTransactions(data);
         } catch (error) {
             console.error("Failed to fetch transactions", error);
         } finally {
             setLoading(false);
         }
-    };
+    }, []);
 
     useEffect(() => {
-        fetchTransactions();
+        fetchTransactions(selectedMonth, selectedYear);
+    }, [selectedMonth, selectedYear, fetchTransactions]);
 
-        // Listen for global transaction updates
+    useEffect(() => {
+        // Listen for global transaction updates (e.g. from QuickAdd modal)
         const handleTransactionUpdate = () => {
-            fetchTransactions();
+            fetchTransactions(selectedMonth, selectedYear);
         };
         window.addEventListener('transaction-updated', handleTransactionUpdate);
-
         return () => {
             window.removeEventListener('transaction-updated', handleTransactionUpdate);
         };
-    }, []);
+    }, [selectedMonth, selectedYear, fetchTransactions]);
+
+    const goToPrevMonth = () => {
+        if (selectedMonth === 0) {
+            setSelectedMonth(11);
+            setSelectedYear(prev => prev - 1);
+        } else {
+            setSelectedMonth(prev => prev - 1);
+        }
+    };
+
+    const goToNextMonth = () => {
+        const isCurrentMonth = selectedMonth === now.getMonth() && selectedYear === now.getFullYear();
+        if (isCurrentMonth) return; // Don't go to future
+        if (selectedMonth === 11) {
+            setSelectedMonth(0);
+            setSelectedYear(prev => prev + 1);
+        } else {
+            setSelectedMonth(prev => prev + 1);
+        }
+    };
+
+    const isCurrentMonth = selectedMonth === now.getMonth() && selectedYear === now.getFullYear();
 
     const handleSort = (key: SortKey) => {
         let direction: SortDirection = 'asc';
@@ -94,7 +119,7 @@ const Transactions: React.FC = () => {
         try {
             await transactionService.delete(transactionToDelete);
             showNotification(t('transactions.deleteSuccess'));
-            fetchTransactions();
+            fetchTransactions(selectedMonth, selectedYear);
             // Trigger global update
             window.dispatchEvent(new Event('transaction-updated'));
         } catch (error) {
@@ -106,26 +131,8 @@ const Transactions: React.FC = () => {
         }
     };
 
-    const filteredTransactions = useMemo(() => {
-        const now = new Date();
-        const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-
-        let result = transactions.filter(t => {
-            const tDate = new Date(t.date);
-            switch (timeRange) {
-                case 'day':
-                    return tDate >= startOfDay;
-                case 'week':
-                    const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-                    return tDate >= oneWeekAgo;
-                case 'month':
-                    return tDate.getMonth() === now.getMonth() && tDate.getFullYear() === now.getFullYear();
-                case 'year':
-                    return tDate.getFullYear() === now.getFullYear();
-                default:
-                    return true;
-            }
-        });
+    const sortedTransactions = useMemo(() => {
+        let result = [...transactions];
 
         if (sortConfig) {
             result.sort((a, b) => {
@@ -154,20 +161,20 @@ const Transactions: React.FC = () => {
         }
 
         return result;
-    }, [timeRange, transactions, sortConfig]);
+    }, [transactions, sortConfig]);
 
     // Pagination Logic
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 10;
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentItems = filteredTransactions.slice(indexOfFirstItem, indexOfLastItem);
-    const totalPages = Math.ceil(filteredTransactions.length / itemsPerPage);
+    const currentItems = sortedTransactions.slice(indexOfFirstItem, indexOfLastItem);
+    const totalPages = Math.ceil(sortedTransactions.length / itemsPerPage);
 
-    // Reset to page 1 when filter changes
+    // Reset to page 1 when data changes
     useEffect(() => {
         setCurrentPage(1);
-    }, [timeRange, transactions]);
+    }, [transactions]);
 
     const formatCurrency = (amount: number | string) => {
         return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'IDR' }).format(Number(amount));
@@ -213,24 +220,31 @@ const Transactions: React.FC = () => {
                         <p className="text-slate-500 dark:text-[#cbbc90] text-base">{t('transactions.subtitle')}</p>
                     </div>
 
-                    {/* Filter Controls */}
-                    <div className="flex w-full md:w-auto bg-slate-100 dark:bg-[#2b2616] p-1 rounded-xl border border-slate-200 dark:border-[#493f22] overflow-x-auto no-scrollbar" data-no-swipe="true">
-                        {(['day', 'week', 'month', 'year'] as TimeRange[]).map((range) => (
-                            <button
-                                key={range}
-                                onClick={() => setTimeRange(range)}
-                                className={`flex-1 md:flex-none px-4 py-2 rounded-lg text-sm font-bold capitalize transition-all whitespace-nowrap ${timeRange === range
-                                    ? 'bg-white dark:bg-[#493f22] text-primary shadow-sm'
-                                    : 'text-slate-500 dark:text-[#cbbc90] hover:text-slate-700 dark:hover:text-white'
-                                    }`}
-                            >
-                                {t(`transactions.ranges.${range}` as any)}
-                            </button>
-                        ))}
+                    {/* Month Picker */}
+                    <div className="flex items-center gap-2 bg-slate-100 dark:bg-[#2b2616] p-1.5 rounded-xl border border-slate-200 dark:border-[#493f22]">
+                        <button
+                            onClick={goToPrevMonth}
+                            className="p-2 rounded-lg text-slate-500 dark:text-[#cbbc90] hover:bg-white dark:hover:bg-[#493f22] hover:text-slate-700 dark:hover:text-white transition-colors"
+                        >
+                            <span className="material-symbols-outlined text-[20px]">chevron_left</span>
+                        </button>
+                        <span className="px-3 py-1.5 min-w-[160px] text-center text-sm font-bold text-slate-800 dark:text-white">
+                            {MONTH_NAMES[selectedMonth]} {selectedYear}
+                        </span>
+                        <button
+                            onClick={goToNextMonth}
+                            disabled={isCurrentMonth}
+                            className={`p-2 rounded-lg transition-colors ${isCurrentMonth
+                                ? 'text-slate-300 dark:text-[#493f22] cursor-not-allowed'
+                                : 'text-slate-500 dark:text-[#cbbc90] hover:bg-white dark:hover:bg-[#493f22] hover:text-slate-700 dark:hover:text-white'
+                                }`}
+                        >
+                            <span className="material-symbols-outlined text-[20px]">chevron_right</span>
+                        </button>
                     </div>
                 </header>
 
-                {/* Stats Overview for Filtered Range */}
+                {/* Stats Overview for Selected Month */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div className="bg-white dark:bg-[#342d18] p-6 rounded-2xl border border-slate-100 dark:border-[#493f22] flex items-center gap-4">
                         <div className="p-3 rounded-full bg-green-100 dark:bg-green-900/20 text-green-600 dark:text-green-400">
@@ -239,7 +253,7 @@ const Transactions: React.FC = () => {
                         <div>
                             <p className="text-sm text-slate-500 dark:text-[#cbbc90]">{t('transactions.income')}</p>
                             <p className="text-2xl font-bold text-slate-900 dark:text-white">
-                                {formatCurrency(filteredTransactions.filter(t => t.type === 'income').reduce((sum, t) => sum + Number(t.amount), 0))}
+                                {formatCurrency(transactions.filter(t => t.type === 'income').reduce((sum, t) => sum + Number(t.amount), 0))}
                             </p>
                         </div>
                     </div>
@@ -250,7 +264,7 @@ const Transactions: React.FC = () => {
                         <div>
                             <p className="text-sm text-slate-500 dark:text-[#cbbc90]">{t('transactions.expense')}</p>
                             <p className="text-2xl font-bold text-slate-900 dark:text-white">
-                                {formatCurrency(filteredTransactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + Number(t.amount), 0))}
+                                {formatCurrency(transactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + Number(t.amount), 0))}
                             </p>
                         </div>
                     </div>
@@ -261,7 +275,7 @@ const Transactions: React.FC = () => {
                         <div>
                             <p className="text-sm text-slate-500 dark:text-[#cbbc90]">{t('transactions.totalTransactions')}</p>
                             <p className="text-2xl font-bold text-slate-900 dark:text-white">
-                                {filteredTransactions.length}
+                                {transactions.length}
                             </p>
                         </div>
                     </div>
@@ -372,7 +386,7 @@ const Transactions: React.FC = () => {
                     {totalPages > 1 && (
                         <div className="flex items-center justify-between p-4 border-t border-slate-100 dark:border-[#493f22] bg-slate-50/50 dark:bg-[#2b2616]/50">
                             <div className="text-sm text-slate-500 dark:text-[#cbbc90]">
-                                Showing <span className="font-bold">{indexOfFirstItem + 1}</span> to <span className="font-bold">{Math.min(indexOfLastItem, filteredTransactions.length)}</span> of <span className="font-bold">{filteredTransactions.length}</span> results
+                                Showing <span className="font-bold">{indexOfFirstItem + 1}</span> to <span className="font-bold">{Math.min(indexOfLastItem, sortedTransactions.length)}</span> of <span className="font-bold">{sortedTransactions.length}</span> results
                             </div>
                             <div className="flex items-center gap-2">
                                 <button

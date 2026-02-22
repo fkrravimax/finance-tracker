@@ -77,7 +77,7 @@ const CryptoWatchlist = () => {
 
     useEffect(() => {
         fetchData();
-        const interval = setInterval(fetchData, 3 * 60 * 1000); // 3 mins
+        const interval = setInterval(fetchData, 5 * 60 * 1000); // 5 mins
         return () => clearInterval(interval);
     }, [fetchData]);
 

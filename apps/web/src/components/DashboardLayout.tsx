@@ -38,15 +38,7 @@ const DashboardContent: React.FC<DashboardLayoutProps> = ({ children, onLogout }
 
     React.useEffect(() => {
         fetchNotifications();
-        // Poll every 1 minute
-        const interval = setInterval(fetchNotifications, 60000);
-        return () => clearInterval(interval);
     }, [fetchNotifications]);
-
-    // Re-fetch when location changes (e.g. returning from notifications page)
-    React.useEffect(() => {
-        fetchNotifications();
-    }, [location.pathname, fetchNotifications]);
 
     const unreadCount = notifications.filter(n => !n.isRead).length;
 

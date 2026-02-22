@@ -6,6 +6,31 @@ import { pushService, type PushPayload } from './push.service.js';
 import { randomUUID } from 'crypto';
 import { cryptoService as marketService } from './market.service.js';
 
+// --- In-memory notification cache (per-user) ---
+interface NotifCacheEntry {
+    data: any[];
+    timestamp: number;
+}
+
+const notifCache: Map<string, NotifCacheEntry> = new Map();
+const NOTIF_CACHE_TTL = 2 * 60 * 1000; // 2 minutes
+
+function getCachedNotifications(userId: string): any[] | null {
+    const entry = notifCache.get(userId);
+    if (entry && Date.now() - entry.timestamp < NOTIF_CACHE_TTL) {
+        return entry.data;
+    }
+    return null;
+}
+
+function setCachedNotifications(userId: string, data: any[]): void {
+    notifCache.set(userId, { data, timestamp: Date.now() });
+}
+
+function invalidateNotifCache(userId: string): void {
+    notifCache.delete(userId);
+}
+
 export const notificationService = {
     // --- Persistence Helper ---
 
@@ -21,31 +46,48 @@ export const notificationService = {
             isRead: false,
         });
 
-        // 2. Send Push
+        // 2. Invalidate cache so next fetch gets fresh data
+        invalidateNotifCache(userId);
+
+        // 3. Send Push
         await pushService.sendToUser(userId, payload);
     },
 
     // --- Public API for Frontend ---
 
     async getNotifications(userId: string, limit = 50, offset = 0) {
-        return await db.select()
+        // Only cache the default first page (limit=50, offset=0)
+        if (limit === 50 && offset === 0) {
+            const cached = getCachedNotifications(userId);
+            if (cached) return cached;
+        }
+
+        const result = await db.select()
             .from(notifications)
             .where(eq(notifications.userId, userId))
             .orderBy(desc(notifications.createdAt))
             .limit(limit)
             .offset(offset);
+
+        if (limit === 50 && offset === 0) {
+            setCachedNotifications(userId, result);
+        }
+
+        return result;
     },
 
     async markAsRead(userId: string, notificationId: string) {
         await db.update(notifications)
             .set({ isRead: true })
             .where(and(eq(notifications.id, notificationId), eq(notifications.userId, userId)));
+        invalidateNotifCache(userId);
     },
 
     async markAllAsRead(userId: string) {
         await db.update(notifications)
             .set({ isRead: true })
             .where(eq(notifications.userId, userId));
+        invalidateNotifCache(userId);
     },
 
     // --- Cron Jobs ---

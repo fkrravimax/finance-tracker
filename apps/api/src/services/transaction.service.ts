@@ -1,6 +1,6 @@
 import { db } from '../db/index.js';
 import { transactions } from '../db/schema.js';
-import { eq, desc, and } from "drizzle-orm";
+import { eq, desc, and, gte, lt } from "drizzle-orm";
 import { randomUUID } from "crypto";
 import { cryptoService } from "./encryption.service.js";
 
@@ -15,6 +15,27 @@ export const transactionService = {
             amount: cryptoService.decryptToNumber(t.amount), // Decrypting amount
             merchant: cryptoService.decrypt(t.merchant), // Decrypting merchant
             description: cryptoService.decrypt(t.description || '') // Decrypting description
+        }));
+    },
+
+    async getByMonth(userId: string, month: number, year: number) {
+        const startOfMonth = new Date(year, month, 1);
+        const startOfNextMonth = new Date(year, month + 1, 1);
+
+        const rawTransactions = await db.select()
+            .from(transactions)
+            .where(and(
+                eq(transactions.userId, userId),
+                gte(transactions.date, startOfMonth),
+                lt(transactions.date, startOfNextMonth)
+            ))
+            .orderBy(desc(transactions.date));
+
+        return rawTransactions.map(t => ({
+            ...t,
+            amount: cryptoService.decryptToNumber(t.amount),
+            merchant: cryptoService.decrypt(t.merchant),
+            description: cryptoService.decrypt(t.description || '')
         }));
     },
 
