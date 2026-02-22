@@ -91,7 +91,7 @@ const SplitBill: React.FC = () => {
         return (
             <motion.div
                 initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}
-                className="flex flex-col lg:flex-row gap-6 h-full"
+                className="flex flex-col lg:flex-row gap-6 w-full"
             >
                 {/* Left: Image Preview (Desktop: Side, Mobile: Top/Hidden/Collapsible) */}
                 <div className="hidden lg:block lg:w-1/3 bg-slate-100 dark:bg-slate-800/50 rounded-2xl overflow-hidden shadow-inner sticky top-6 self-start max-h-[80vh]">
@@ -261,7 +261,7 @@ const SplitBill: React.FC = () => {
         return (
             <motion.div
                 initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}
-                className="flex flex-col h-full bg-white dark:bg-slate-800 rounded-3xl p-4 md:p-6 shadow-soft border border-slate-100 dark:border-white/5"
+                className="flex flex-col w-full bg-white dark:bg-slate-800 rounded-3xl p-4 md:p-6 shadow-soft border border-slate-100 dark:border-white/5"
             >
                 <div className="mb-6 border-b border-slate-100 dark:border-white/5 pb-6">
                     <h3 className="text-xl font-bold text-slate-800 dark:text-white mb-2">{t('splitBill.assignTitle') || 'Who ate what?'}</h3>
@@ -306,7 +306,7 @@ const SplitBill: React.FC = () => {
                 </div>
 
                 {/* Assignment List */}
-                <div className="flex-1 overflow-y-auto pr-2 space-y-3 pb-8">
+                <div className="w-full pr-0 md:pr-2 space-y-3 pb-8">
                     {splitState.receiptData.items.map(item => {
                         const assignedIds = splitState.itemAssignments[item.id] || [];
                         const isFullyAssigned = assignedIds.length > 0;
@@ -423,7 +423,7 @@ const SplitBill: React.FC = () => {
         return (
             <motion.div
                 initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
-                className="flex flex-col h-full items-center relative"
+                className="flex flex-col w-full items-center relative"
             >
                 {/* Export Buttons Header */}
                 <div className="w-full flex justify-between items-center mb-6 max-w-2xl">
@@ -584,7 +584,7 @@ const SplitBill: React.FC = () => {
     }
 
     return (
-        <div className="h-full flex flex-col pt-20 pb-20 md:py-8 px-4 md:px-8 max-w-7xl mx-auto w-full">
+        <div className="flex flex-col pt-20 pb-40 md:py-8 px-4 md:px-8 max-w-7xl mx-auto w-full min-h-screen">
             {/* Header/Stepper */}
             <div className="mb-8">
                 <h1 className="text-3xl md:text-4xl font-black text-slate-800 dark:text-white tracking-tight leading-none mb-6">
@@ -622,12 +622,12 @@ const SplitBill: React.FC = () => {
             </div>
 
             {/* Content Area */}
-            <div className="flex-1 min-h-[500px] sm:mt-8">
+            <div className="w-full sm:mt-8">
                 <AnimatePresence mode='wait'>
-                    {splitState.currentStep === 'capture' && <div key="capture" className="h-full">{renderStep1Capture()}</div>}
-                    {splitState.currentStep === 'review' && <div key="review" className="h-full">{renderStep2Review()}</div>}
-                    {splitState.currentStep === 'assign' && <div key="assign" className="h-full">{renderStep3Assign()}</div>}
-                    {splitState.currentStep === 'result' && <div key="result" className="h-full">{renderStep4Result()}</div>}
+                    {splitState.currentStep === 'capture' && <div key="capture" className="w-full">{renderStep1Capture()}</div>}
+                    {splitState.currentStep === 'review' && <div key="review" className="w-full">{renderStep2Review()}</div>}
+                    {splitState.currentStep === 'assign' && <div key="assign" className="w-full">{renderStep3Assign()}</div>}
+                    {splitState.currentStep === 'result' && <div key="result" className="w-full">{renderStep4Result()}</div>}
                 </AnimatePresence>
             </div>
         </div>
