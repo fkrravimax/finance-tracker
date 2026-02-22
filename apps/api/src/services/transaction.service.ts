@@ -1,5 +1,5 @@
 import { db } from '../db/index.js';
-import { transactions } from '../db/schema.js';
+import { transactions, wallets } from '../db/schema.js';
 import { eq, desc, and, gte, lt } from "drizzle-orm";
 import { randomUUID } from "crypto";
 import { cryptoService } from "./encryption.service.js";
@@ -40,10 +40,20 @@ export const transactionService = {
     },
 
     async create(userId: string, data: typeof transactions.$inferInsert) {
+        let walletId = data.walletId;
+        if (!walletId) {
+            // Fallback: assign to the user's first wallet if not provided
+            const userWallets = await db.select().from(wallets).where(eq(wallets.userId, userId));
+            if (userWallets.length > 0) {
+                walletId = userWallets[0].id;
+            }
+        }
+
         // Force userId and id
         const newTransaction = {
             ...data,
             userId,
+            walletId,
             id: randomUUID(),
             amount: cryptoService.encrypt(data.amount), // Encrypt amount
             merchant: cryptoService.encrypt(data.merchant), // Encrypt merchant
