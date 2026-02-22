@@ -101,7 +101,7 @@ const SplitBill: React.FC = () => {
                 </div>
 
                 {/* Right: Editable Table */}
-                <div className="flex-1 bg-white dark:bg-slate-800 rounded-3xl p-4 md:p-6 shadow-soft border border-slate-100 dark:border-white/5 flex flex-col">
+                <div className="flex-1 bg-white dark:bg-slate-800 rounded-2xl md:rounded-3xl p-3 md:p-6 shadow-soft border border-slate-100 dark:border-white/5 flex flex-col mb-12">
                     <div className="flex justify-between items-center mb-6">
                         <div>
                             <h3 className="text-xl font-bold text-slate-800 dark:text-white">{t('splitBill.reviewTitle') || 'Review Items'}</h3>
@@ -124,44 +124,44 @@ const SplitBill: React.FC = () => {
                                     <th className="pb-3 pl-2 w-10"></th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-slate-100 dark:divide-white/5">
+                            <tbody className="divide-y divide-slate-100 dark:divide-white/5 text-sm">
                                 {splitState.receiptData.items.map((item) => (
                                     <tr key={item.id} className="group transition-colors hover:bg-slate-50 dark:hover:bg-slate-800/50">
-                                        <td className="py-2 pr-4">
+                                        <td className="py-1 pr-2">
                                             <input
                                                 type="text"
                                                 value={item.name}
                                                 onChange={(e) => splitState.updateReceiptItem(item.id, 'name', e.target.value)}
-                                                className="w-full bg-transparent border-0 focus:ring-1 focus:ring-primary rounded px-2 py-1 text-slate-700 dark:text-slate-300 font-medium"
+                                                className="w-full bg-transparent border-0 focus:ring-1 focus:ring-primary rounded px-1 py-1 text-slate-700 dark:text-slate-300 font-medium"
                                                 placeholder="Item name"
                                             />
                                         </td>
-                                        <td className="py-2 px-2">
+                                        <td className="py-1 px-1">
                                             <input
                                                 type="number"
                                                 value={item.qty}
                                                 min="1"
                                                 onChange={(e) => splitState.updateReceiptItem(item.id, 'qty', parseInt(e.target.value) || 1)}
-                                                className="w-full bg-slate-100 dark:bg-slate-900 border-0 focus:ring-1 focus:ring-primary rounded px-2 py-1 text-center text-slate-700 dark:text-slate-300"
+                                                className="w-full bg-slate-100 dark:bg-slate-900 border-0 focus:ring-1 focus:ring-primary rounded px-1 py-1 text-center text-slate-700 dark:text-slate-300"
                                             />
                                         </td>
-                                        <td className="py-2 px-2">
+                                        <td className="py-1 px-1">
                                             <input
                                                 type="number"
                                                 value={item.unitPrice}
                                                 onChange={(e) => splitState.updateReceiptItem(item.id, 'unitPrice', parseFloat(e.target.value) || 0)}
-                                                className="w-full bg-transparent border-0 focus:ring-1 focus:ring-primary rounded px-2 py-1 text-right text-slate-700 dark:text-slate-300 font-mono"
+                                                className="w-full bg-transparent border-0 focus:ring-1 focus:ring-primary rounded px-1 py-1 text-right text-slate-700 dark:text-slate-300 font-mono"
                                             />
                                         </td>
-                                        <td className="py-2 pl-2 text-right font-bold text-slate-800 dark:text-white font-mono">
+                                        <td className="py-1 pl-1 text-right font-bold text-slate-800 dark:text-white font-mono">
                                             {formatRp(item.total)}
                                         </td>
-                                        <td className="py-2 pl-2 text-right">
+                                        <td className="py-1 pl-1 text-right">
                                             <button
                                                 onClick={() => splitState.removeReceiptItem(item.id)}
-                                                className="text-slate-300 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100 p-1"
+                                                className="text-slate-300 hover:text-red-500 transition-colors opacity-100 sm:opacity-0 group-hover:opacity-100 p-1"
                                             >
-                                                <span className="material-symbols-outlined text-[20px]">delete</span>
+                                                <span className="material-symbols-outlined text-[18px]">delete</span>
                                             </button>
                                         </td>
                                     </tr>
@@ -261,7 +261,7 @@ const SplitBill: React.FC = () => {
         return (
             <motion.div
                 initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}
-                className="flex flex-col w-full bg-white dark:bg-slate-800 rounded-3xl p-4 md:p-6 shadow-soft border border-slate-100 dark:border-white/5"
+                className="flex flex-col w-full bg-white dark:bg-slate-800 rounded-2xl md:rounded-3xl p-3 md:p-6 shadow-soft border border-slate-100 dark:border-white/5 mb-12"
             >
                 <div className="mb-6 border-b border-slate-100 dark:border-white/5 pb-6">
                     <h3 className="text-xl font-bold text-slate-800 dark:text-white mb-2">{t('splitBill.assignTitle') || 'Who ate what?'}</h3>
@@ -447,7 +447,7 @@ const SplitBill: React.FC = () => {
                 {/* The "Receipt" Result View to be converted to Image */}
                 <div
                     ref={resultRef}
-                    className="w-full max-w-2xl bg-white dark:bg-slate-900 rounded-3xl p-6 md:p-10 shadow-xl border border-slate-100 dark:border-white/5 relative overflow-hidden"
+                    className="w-full max-w-2xl bg-white dark:bg-slate-900 rounded-2xl md:rounded-3xl p-4 md:p-10 shadow-xl border border-slate-100 dark:border-white/5 relative overflow-hidden mb-12"
                 >
                     {/* Decorative receipt zig-zag top/bottom (optional CSS tricks, pure styling) */}
 
@@ -584,7 +584,7 @@ const SplitBill: React.FC = () => {
     }
 
     return (
-        <div className="flex flex-col pt-20 pb-40 md:py-8 px-4 md:px-8 max-w-7xl mx-auto w-full min-h-screen">
+        <div className="flex flex-col pt-6 pb-40 md:py-8 px-2 md:px-8 max-w-7xl mx-auto w-full min-h-screen">
             {/* Header/Stepper */}
             <div className="mb-8">
                 <h1 className="text-3xl md:text-4xl font-black text-slate-800 dark:text-white tracking-tight leading-none mb-6">
