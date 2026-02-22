@@ -65,8 +65,8 @@ const QuickAddTransactionModal: React.FC<QuickAddTransactionModalProps> = ({ isO
             fetchWallets();
 
             if (initialData) {
-                setAmount(initialData.amount.toString());
-                setNotes(initialData.merchant); // Merchant as notes
+                setAmount(initialData.amount ? initialData.amount.toString() : '0');
+                setNotes(initialData.merchant || ''); // Merchant as notes
                 setTransactionType(initialData.type === 'income' ? 'Income' : 'Expense');
                 // walletSource should be in initialData if we supported editing wallet, but for now we might default or parse description?
                 // For now, let's leave it or try to find it. 
@@ -215,7 +215,9 @@ const QuickAddTransactionModal: React.FC<QuickAddTransactionModalProps> = ({ isO
 
     const formatCurrency = (val: string) => {
         // Simple formatter for display
-        return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(parseInt(val));
+        const parsed = parseInt(val);
+        if (isNaN(parsed)) return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(0);
+        return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(parsed);
     };
 
     if (!isOpen) return null;
