@@ -63,7 +63,7 @@ const Login: React.FC<LoginProps> = ({ onLogin, onBack, defaultSignUp = false })
     };
 
     return (
-        <div className="min-h-screen w-full flex items-center justify-center font-display relative overflow-hidden py-8 px-4 md:px-0">
+        <div className="min-h-screen w-full flex items-center justify-center font-display relative overflow-hidden py-4 md:py-8 px-4 md:px-0">
             {/* Background Image & Overlay */}
             <div className="absolute inset-0 z-0">
                 <img src="/bg.png" alt="Background" className="w-full h-full object-cover object-center opacity-50 dark:opacity-40" />
@@ -72,7 +72,7 @@ const Login: React.FC<LoginProps> = ({ onLogin, onBack, defaultSignUp = false })
 
             <div className="w-full max-w-sm md:max-w-md bg-white dark:bg-[#2a2515] rounded-3xl shadow-2xl overflow-hidden border border-slate-200 dark:border-[#493f22] relative z-10 my-auto">
                 {/* Header */}
-                <div className="bg-surface-light dark:bg-[#342d18] p-6 md:p-8 text-center border-b border-slate-100 dark:border-[#493f22] relative">
+                <div className="bg-surface-light dark:bg-[#342d18] p-5 md:p-8 text-center border-b border-slate-100 dark:border-[#493f22] relative">
                     {onBack && (
                         <button
                             onClick={onBack}
@@ -92,14 +92,14 @@ const Login: React.FC<LoginProps> = ({ onLogin, onBack, defaultSignUp = false })
                         </span>
                     </button>
 
-                    <div className="inline-flex items-center justify-center w-20 h-20 mb-4">
+                    <div className="inline-flex items-center justify-center w-14 h-14 md:w-20 md:h-20 mb-2 md:mb-4">
                         <img src="/logo.png" alt="Rupiku Logo" className="w-full h-full object-contain" />
                     </div>
-                    <div className="mb-1">
-                        <LogoText className="text-3xl" />
+                    <div className="mb-0 md:mb-1">
+                        <LogoText className="text-2xl md:text-3xl" />
                     </div>
-                    <p className="text-sm text-slate-500 dark:text-[#cbbc90]">Joyful Finance Tracker</p>
-                    <p className="text-slate-500 dark:text-[#cbbc90] mt-2">
+                    <p className="hidden md:block text-sm text-slate-500 dark:text-[#cbbc90]">Joyful Finance Tracker</p>
+                    <p className="text-slate-500 dark:text-[#cbbc90] mt-1 md:mt-2 text-sm md:text-base">
                         {isSignUp ? 'Create an account to get started' : 'Welcome back! Please sign in.'}
                     </p>
                 </div>
@@ -112,19 +112,19 @@ const Login: React.FC<LoginProps> = ({ onLogin, onBack, defaultSignUp = false })
                 )}
 
                 {/* Form */}
-                <div className="p-8 flex flex-col gap-5">
+                <div className="p-5 md:p-8 flex flex-col gap-3 md:gap-5">
 
                     {/* Google Button */}
                     <button
                         onClick={handleGoogleSignIn}
                         disabled={isLoading}
-                        className="w-full bg-white dark:bg-[#1f1b10] hover:bg-slate-50 dark:hover:bg-[#342d18] text-slate-700 dark:text-[#cbbc90] font-bold py-3 rounded-xl border border-slate-200 dark:border-[#493f22] transition-all flex items-center justify-center gap-3"
+                        className="w-full bg-white dark:bg-[#1f1b10] hover:bg-slate-50 dark:hover:bg-[#342d18] text-slate-700 dark:text-[#cbbc90] font-bold py-2 md:py-3 rounded-xl border border-slate-200 dark:border-[#493f22] transition-all flex items-center justify-center gap-3"
                     >
                         <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" className="w-6 h-6" />
                         {isSignUp ? 'Sign up with Google' : 'Sign in with Google'}
                     </button>
 
-                    <div className="relative flex items-center py-2">
+                    <div className="relative flex items-center py-1 md:py-2">
                         <div className="flex-grow border-t border-slate-200 dark:border-[#493f22]"></div>
                         <span className="flex-shrink-0 mx-4 text-slate-400 text-sm">Or with email</span>
                         <div className="flex-grow border-t border-slate-200 dark:border-[#493f22]"></div>
@@ -132,37 +132,37 @@ const Login: React.FC<LoginProps> = ({ onLogin, onBack, defaultSignUp = false })
 
                     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
                         {isSignUp && (
-                            <div className="flex flex-col gap-2">
-                                <label className="text-sm font-bold text-slate-700 dark:text-[#cbbc90]">Full Name</label>
+                            <div className="flex flex-col gap-1.5 md:gap-2">
+                                <label className="text-xs md:text-sm font-bold text-slate-700 dark:text-[#cbbc90]">Full Name</label>
                                 <input
                                     type="text"
                                     value={name}
                                     onChange={(e) => setName(e.target.value)}
                                     placeholder="John Doe"
-                                    className="w-full bg-slate-50 dark:bg-[#1a160b] border border-slate-200 dark:border-[#493f22] rounded-xl px-4 py-3 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-slate-600"
+                                    className="w-full bg-slate-50 dark:bg-[#1a160b] border border-slate-200 dark:border-[#493f22] rounded-xl px-4 py-2 md:py-3 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-slate-600"
                                     required={isSignUp}
                                 />
                             </div>
                         )}
-                        <div className="flex flex-col gap-2">
-                            <label className="text-sm font-bold text-slate-700 dark:text-[#cbbc90]">Email Address</label>
+                        <div className="flex flex-col gap-1.5 md:gap-2">
+                            <label className="text-xs md:text-sm font-bold text-slate-700 dark:text-[#cbbc90]">Email Address</label>
                             <input
                                 type="email"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 placeholder="you@example.com"
-                                className="w-full bg-slate-50 dark:bg-[#1a160b] border border-slate-200 dark:border-[#493f22] rounded-xl px-4 py-3 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-slate-600"
+                                className="w-full bg-slate-50 dark:bg-[#1a160b] border border-slate-200 dark:border-[#493f22] rounded-xl px-4 py-2 md:py-3 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-slate-600"
                                 required
                             />
                         </div>
-                        <div className="flex flex-col gap-2">
-                            <label className="text-sm font-bold text-slate-700 dark:text-[#cbbc90]">Password</label>
+                        <div className="flex flex-col gap-1.5 md:gap-2">
+                            <label className="text-xs md:text-sm font-bold text-slate-700 dark:text-[#cbbc90]">Password</label>
                             <input
                                 type="password"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 placeholder="••••••••"
-                                className="w-full bg-slate-50 dark:bg-[#1a160b] border border-slate-200 dark:border-[#493f22] rounded-xl px-4 py-3 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-slate-600"
+                                className="w-full bg-slate-50 dark:bg-[#1a160b] border border-slate-200 dark:border-[#493f22] rounded-xl px-4 py-2 md:py-3 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-slate-600"
                                 required
                             />
                         </div>
@@ -170,7 +170,7 @@ const Login: React.FC<LoginProps> = ({ onLogin, onBack, defaultSignUp = false })
                         <button
                             type="submit"
                             disabled={isLoading}
-                            className="w-full bg-primary hover:bg-[#dca60e] text-slate-900 font-bold py-4 rounded-xl transition-all shadow-lg hover:shadow-primary/25 active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed mt-2 flex items-center justify-center gap-2"
+                            className="w-full bg-primary hover:bg-[#dca60e] text-slate-900 font-bold py-3 md:py-4 rounded-xl transition-all shadow-lg hover:shadow-primary/25 active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed mt-1 md:mt-2 flex items-center justify-center gap-2"
                         >
                             {isLoading ? (
                                 <>
@@ -185,7 +185,7 @@ const Login: React.FC<LoginProps> = ({ onLogin, onBack, defaultSignUp = false })
                 </div>
 
                 {/* Footer */}
-                <div className="p-6 bg-slate-50 dark:bg-[#1f1b10] text-center border-t border-slate-100 dark:border-[#493f22]">
+                <div className="p-4 md:p-6 bg-slate-50 dark:bg-[#1f1b10] text-center border-t border-slate-100 dark:border-[#493f22]">
                     <p className="text-sm text-slate-500 dark:text-[#cbbc90]">
                         {isSignUp ? 'Already have an account?' : "Don't have an account?"}
                         <span
