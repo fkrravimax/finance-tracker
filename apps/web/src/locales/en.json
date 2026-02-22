@@ -231,7 +231,7 @@
         "keepGoal": "Keep Goal"
     },
     "splitBill": {
-        "title": "Split Bill OCR",
+        "title": "Split Bill",
         "captureTitle": "Scan Receipt",
         "captureDesc": "Upload or take a photo of your receipt to automatically extract items and prices using AI.",
         "takePhoto": "Camera / Gallery",

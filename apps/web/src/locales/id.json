@@ -231,7 +231,7 @@
         "keepGoal": "Simpan Target"
     },
     "splitBill": {
-        "title": "Bagi Tagihan (OCR)",
+        "title": "Bagi Tagihan",
         "captureTitle": "Pindai Struk",
         "captureDesc": "Unggah atau ambil foto struk belanja Anda untuk mengekstrak item dan harga menggunakan AI.",
         "takePhoto": "Kamera / Galeri",
