@@ -1,5 +1,6 @@
 import React from 'react';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { motion } from 'framer-motion';
 
 const LandingHowItWorks: React.FC = () => {
     const { t } = useLanguage();
@@ -44,20 +45,52 @@ const LandingHowItWorks: React.FC = () => {
                 {/* Connecting Line */}
                 <div className="absolute top-12 left-[10%] w-[80%] h-0.5 bg-slate-200 dark:bg-[#493f22] -z-10"></div>
 
-                {steps.map((step) => (
-                    <div key={step.num} className="flex flex-col items-center flex-1 max-w-xs relative group">
-                        <div className="w-24 h-24 rounded-3xl bg-white dark:bg-[#2b2616] border-2 border-slate-100 dark:border-[#493f22] flex items-center justify-center mb-6 shadow-xl group-hover:-translate-y-2 transition-transform duration-300">
+                {steps.map((step, index) => (
+                    <motion.div
+                        key={step.num}
+                        initial="initial"
+                        whileHover="hover"
+                        className="flex flex-col items-center flex-1 max-w-xs relative group cursor-pointer"
+                    >
+                        <motion.div
+                            variants={{
+                                initial: { y: 0 },
+                                hover: { y: -8 }
+                            }}
+                            transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                            className="w-24 h-24 rounded-3xl bg-white dark:bg-[#2b2616] border-2 border-slate-100 dark:border-[#493f22] flex items-center justify-center mb-6 shadow-xl relative"
+                        >
                             <div className="w-16 h-16 rounded-2xl bg-primary/10 dark:bg-primary/20 flex items-center justify-center">
                                 <span className="material-symbols-outlined text-3xl text-primary">{step.icon}</span>
                             </div>
-                            <div className="absolute -top-3 -right-3 w-8 h-8 rounded-full bg-primary text-slate-900 font-bold flex items-center justify-center shadow-lg">
-                                {step.num}
-                            </div>
-                        </div>
+
+                            {/* Floating Animated Number */}
+                            <motion.div
+                                animate={{ y: [0, -6, 0] }}
+                                transition={{
+                                    duration: 2.5,
+                                    repeat: Infinity,
+                                    ease: "easeInOut",
+                                    delay: index * 0.3
+                                }}
+                                className="absolute -top-3 -right-3"
+                            >
+                                <motion.div
+                                    variants={{
+                                        initial: { scale: 1, rotate: 0 },
+                                        hover: { scale: 1.15, rotate: [0, -10, 10, -5, 0] }
+                                    }}
+                                    transition={{ type: "spring", stiffness: 400, damping: 10 }}
+                                    className="w-8 h-8 rounded-full bg-primary text-slate-900 font-bold flex items-center justify-center shadow-lg"
+                                >
+                                    {step.num}
+                                </motion.div>
+                            </motion.div>
+                        </motion.div>
 
                         <h3 className="font-bold text-xl text-slate-900 dark:text-white mb-3 text-center">{step.title}</h3>
                         <p className="text-slate-500 dark:text-[#cbbc90] text-center leading-relaxed">{step.desc}</p>
-                    </div>
+                    </motion.div>
                 ))}
             </div>
         </div>
