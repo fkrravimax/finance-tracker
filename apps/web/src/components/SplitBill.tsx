@@ -40,7 +40,7 @@ const SplitBill: React.FC = () => {
                 </div>
                 <h2 className="text-2xl font-bold text-slate-800 dark:text-white mb-2">{t('splitBill.captureTitle') || 'Scan Receipt'}</h2>
                 <p className="text-slate-500 dark:text-text-muted text-center max-w-sm mb-8">
-                    {t('splitBill.captureDesc') || 'Upload or take a photo of your receipt to automatically extract items and prices using AI.'}
+                    {t('splitBill.captureDesc') || 'Upload or take a photo of your receipt to automatically extract items and prices.'}
                 </p>
 
                 <div className="flex flex-col sm:flex-row gap-4 w-full max-w-md">
@@ -540,7 +540,7 @@ const SplitBill: React.FC = () => {
 
                 {/* Title */}
                 <h1 className="text-2xl md:text-3xl font-bold text-slate-800 dark:text-white mb-3">
-                    Split Bill OCR
+                    Split Bill
                 </h1>
 
                 {/* Badge */}
@@ -599,7 +599,7 @@ const SplitBill: React.FC = () => {
             {/* Header/Stepper */}
             <div className="mb-8">
                 <h1 className="text-3xl md:text-4xl font-black text-slate-800 dark:text-white tracking-tight leading-none mb-6">
-                    {t('splitBill.title') || 'Split Bill OCR'}
+                    {t('splitBill.title') || 'Split Bill'}
                 </h1>
 
                 {/* Minimalist Progress Bar */}
