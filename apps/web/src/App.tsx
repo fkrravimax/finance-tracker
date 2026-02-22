@@ -17,6 +17,7 @@ import { authClient } from './lib/auth-client';
 import PrivacyPolicy from './components/PrivacyPolicy';
 import ProtectedRoute from './components/ProtectedRoute';
 import NotificationsPage from './components/NotificationsPage';
+import SplitBill from './components/SplitBill';
 
 function App() {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -127,6 +128,7 @@ function App() {
                     <Route path="/reports" element={<Reports />} />
                     <Route path="/savings" element={<SavingsVault />} />
                     <Route path="/trading" element={<TradingDashboard />} />
+                    <Route path="/split-bill" element={<SplitBill />} />
                     <Route path="/settings" element={<Settings />} />
                     <Route path="/notifications" element={<NotificationsPage />} />
                     <Route element={<ProtectedRoute allowedRoles={['ADMIN']} />}>

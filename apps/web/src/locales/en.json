@@ -36,7 +36,8 @@
         "settings": "Settings",
         "admin": "Admin Dashboard",
         "logout": "Logout",
-        "freePlan": "Free Plan"
+        "freePlan": "Free Plan",
+        "splitBill": "Split Bill"
     },
     "dashboard": {
         "greeting": "Hello, {name}",
@@ -228,6 +229,26 @@
         "withdrawFunds": "Withdraw Funds",
         "deleteConfirmation": "Are you sure you want to delete this goal? All your progress and history for this goal will be removed permanently.",
         "keepGoal": "Keep Goal"
+    },
+    "splitBill": {
+        "title": "Split Bill OCR",
+        "captureTitle": "Scan Receipt",
+        "captureDesc": "Upload or take a photo of your receipt to automatically extract items and prices using AI.",
+        "takePhoto": "Camera / Gallery",
+        "processing": "Processing Image...",
+        "reviewTitle": "Review Items",
+        "reviewDesc": "Correct any mistakes from the AI scan.",
+        "itemName": "Item Name",
+        "price": "Price",
+        "total": "Total",
+        "noItems": "No items found. Add items manually.",
+        "taxInclusive": "Prices include Tax/Service",
+        "taxInclusiveDesc": "Turn off if tax is added at the end.",
+        "assignTitle": "Who ate what?",
+        "assignDesc": "Add people and tap their names on the items they ordered.",
+        "addPerson": "Type a name...",
+        "noPeople": "No people added yet.",
+        "calculate": "Calculate"
     },
     "settings": {
         "title": "Settings",

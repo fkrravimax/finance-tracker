@@ -36,7 +36,8 @@
         "settings": "Pengaturan",
         "admin": "Dashboard Admin",
         "logout": "Keluar",
-        "freePlan": "Paket Gratis"
+        "freePlan": "Paket Gratis",
+        "splitBill": "Bagi Tagihan"
     },
     "dashboard": {
         "greeting": "Halo, {name}",
@@ -228,6 +229,26 @@
         "withdrawFunds": "Tarik Dana",
         "deleteConfirmation": "Apakah Anda yakin ingin menghapus target ini? Semua progres dan riwayat untuk target ini akan dihapus secara permanen.",
         "keepGoal": "Simpan Target"
+    },
+    "splitBill": {
+        "title": "Bagi Tagihan (OCR)",
+        "captureTitle": "Pindai Struk",
+        "captureDesc": "Unggah atau ambil foto struk belanja Anda untuk mengekstrak item dan harga menggunakan AI.",
+        "takePhoto": "Kamera / Galeri",
+        "processing": "Memproses Gambar...",
+        "reviewTitle": "Tinjau Item",
+        "reviewDesc": "Koreksi jika ada kesalahan pembacaan oleh AI.",
+        "itemName": "Nama Item",
+        "price": "Harga",
+        "total": "Total",
+        "noItems": "Tidak ada item. Tambahkan secara manual.",
+        "taxInclusive": "Harga sudah termasuk Pajak/Layanan",
+        "taxInclusiveDesc": "Matikan ini jika pajak ditambahkan di akhir.",
+        "assignTitle": "Siapa makan apa?",
+        "assignDesc": "Tambahkan nama orang lalu sentuh nama mereka pada item yang dipesan.",
+        "addPerson": "Ketik nama...",
+        "noPeople": "Belum ada orang ditambahkan.",
+        "calculate": "Hitung Tagihan"
     },
     "settings": {
         "title": "Pengaturan",
