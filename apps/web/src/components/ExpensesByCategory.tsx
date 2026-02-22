@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
+import { transactionService } from '../services/transactionService';
 
 // Reusable component
 const ExpensesByCategory: React.FC = () => {
@@ -22,15 +23,14 @@ const ExpensesByCategory: React.FC = () => {
     const fetchCategoryData = async () => {
         setLoading(true);
         try {
-            const { transactionService } = await import('../services/transactionService');
-            const transactions = await transactionService.getAll();
+            const start = new Date(startDate);
+            const transactions = await transactionService.getAll(start.getMonth(), start.getFullYear());
 
             // Filter by date and type 'expense'
-            const start = new Date(startDate);
             const end = new Date(endDate);
             end.setHours(23, 59, 59, 999); // Include full end day
 
-            const filtered = transactions.filter(t => {
+            const filtered = transactions.filter((t: any) => {
                 const tDate = new Date(t.date);
                 return t.type === 'expense' && tDate >= start && tDate <= end;
             });

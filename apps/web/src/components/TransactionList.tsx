@@ -17,7 +17,8 @@ const TransactionList: React.FC<TransactionListProps> = ({ limit }) => {
     useEffect(() => {
         const fetchTransactions = async () => {
             try {
-                const data = await transactionService.getAll();
+                const now = new Date();
+                const data = await transactionService.getAll(now.getMonth(), now.getFullYear());
                 setTransactions(data);
             } catch (error) {
                 console.error("Failed to fetch transactions", error);

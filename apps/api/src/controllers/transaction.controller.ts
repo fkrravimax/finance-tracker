@@ -5,7 +5,19 @@ export const transactionController = {
     getAll: async (req: Request, res: Response) => {
         try {
             const userId = (req as any).user.id;
-            const data = await transactionService.getAll(userId);
+            const { month, year } = req.query;
+
+            let data;
+            if (month !== undefined && year !== undefined) {
+                data = await transactionService.getByMonth(
+                    userId,
+                    parseInt(month as string),
+                    parseInt(year as string)
+                );
+            } else {
+                data = await transactionService.getAll(userId);
+            }
+
             res.json(data);
         } catch (error) {
             res.status(500).json({ error: 'Failed to fetch transactions' });
