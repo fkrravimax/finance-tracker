@@ -77,24 +77,24 @@ export const walletService = {
     },
 
     async ensureDefaultWallets(userId: string) {
-        const existing = await this.getAll(userId);
+        let existing = await this.getAll(userId);
 
         if (existing.length === 0) {
             console.log(`[Migration] User ${userId} has no wallets. Creating default 'Main Bank'...`);
-
-            // Migration: Create Main Bank
             const mainBank = await this.create(userId, "Main Bank", "BANK");
-
-            // Migration: Update ALL null-wallet transactions to this new wallet
-            // Note: This SQL query still works because walletId is a UUID and not encrypted.
-            const result = await db.update(transactions)
-                .set({ walletId: mainBank.id })
-                .where(and(eq(transactions.userId, userId), sql`wallet_id IS NULL`));
-
-            console.log(`[Migration] Assigned ${result.rowCount} transactions to 'Main Bank'.`);
-
-            return [{ ...mainBank, balance: 0 }];
+            existing = [{ ...mainBank, balance: 0 }];
         }
+
+        // Migration: Update ALL null-wallet transactions to the first available wallet
+        // This fixes accounts that created an Initial Balance before the walletId patch was deployed
+        const result = await db.update(transactions)
+            .set({ walletId: existing[0].id })
+            .where(and(eq(transactions.userId, userId), sql`wallet_id IS NULL`));
+
+        if (result.rowCount && result.rowCount > 0) {
+            console.log(`[Migration] Assigned ${result.rowCount} orphaned transactions to '${existing[0].name}'.`);
+        }
+
         return existing;
     }
 };
