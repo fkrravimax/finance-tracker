@@ -99,6 +99,7 @@ const Settings: React.FC = () => {
 
     // Account Management State
     const [passwordForm, setPasswordForm] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' });
+    const [showPasswords, setShowPasswords] = useState({ current: false, new: false, confirm: false });
 
     const [nameForm, setNameForm] = useState({ name: '' });
     const [isChangingPassword, setIsChangingPassword] = useState(false);
@@ -434,30 +435,66 @@ const Settings: React.FC = () => {
                                 {t('settings.changePassword')}
                             </h3>
                             <form onSubmit={handleChangePassword} className="flex flex-col gap-3">
-                                <input
-                                    type="password"
-                                    placeholder={t('settings.currentPassword')}
-                                    value={passwordForm.currentPassword}
-                                    onChange={e => setPasswordForm({ ...passwordForm, currentPassword: e.target.value })}
-                                    className="w-full bg-slate-50 dark:bg-[#2b2616] border border-slate-200 dark:border-[#493f22] rounded-xl px-4 py-2 text-sm text-slate-900 dark:text-white"
-                                    required
-                                />
-                                <input
-                                    type="password"
-                                    placeholder={t('settings.newPassword')}
-                                    value={passwordForm.newPassword}
-                                    onChange={e => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
-                                    className="w-full bg-slate-50 dark:bg-[#2b2616] border border-slate-200 dark:border-[#493f22] rounded-xl px-4 py-2 text-sm text-slate-900 dark:text-white"
-                                    required
-                                />
-                                <input
-                                    type="password"
-                                    placeholder={t('settings.confirmPassword')}
-                                    value={passwordForm.confirmPassword}
-                                    onChange={e => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
-                                    className="w-full bg-slate-50 dark:bg-[#2b2616] border border-slate-200 dark:border-[#493f22] rounded-xl px-4 py-2 text-sm text-slate-900 dark:text-white"
-                                    required
-                                />
+                                <div className="relative">
+                                    <input
+                                        type={showPasswords.current ? "text" : "password"}
+                                        placeholder={t('settings.currentPassword')}
+                                        value={passwordForm.currentPassword}
+                                        onChange={e => setPasswordForm({ ...passwordForm, currentPassword: e.target.value })}
+                                        className="w-full bg-slate-50 dark:bg-[#2b2616] border border-slate-200 dark:border-[#493f22] rounded-xl px-4 py-2 pr-10 text-sm text-slate-900 dark:text-white"
+                                        required
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowPasswords(prev => ({ ...prev, current: !prev.current }))}
+                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-[#cbbc90]"
+                                        tabIndex={-1}
+                                    >
+                                        <span className="material-symbols-outlined text-[18px]">
+                                            {showPasswords.current ? 'visibility_off' : 'visibility'}
+                                        </span>
+                                    </button>
+                                </div>
+                                <div className="relative">
+                                    <input
+                                        type={showPasswords.new ? "text" : "password"}
+                                        placeholder={t('settings.newPassword')}
+                                        value={passwordForm.newPassword}
+                                        onChange={e => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
+                                        className="w-full bg-slate-50 dark:bg-[#2b2616] border border-slate-200 dark:border-[#493f22] rounded-xl px-4 py-2 pr-10 text-sm text-slate-900 dark:text-white"
+                                        required
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowPasswords(prev => ({ ...prev, new: !prev.new }))}
+                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-[#cbbc90]"
+                                        tabIndex={-1}
+                                    >
+                                        <span className="material-symbols-outlined text-[18px]">
+                                            {showPasswords.new ? 'visibility_off' : 'visibility'}
+                                        </span>
+                                    </button>
+                                </div>
+                                <div className="relative">
+                                    <input
+                                        type={showPasswords.confirm ? "text" : "password"}
+                                        placeholder={t('settings.confirmPassword')}
+                                        value={passwordForm.confirmPassword}
+                                        onChange={e => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
+                                        className="w-full bg-slate-50 dark:bg-[#2b2616] border border-slate-200 dark:border-[#493f22] rounded-xl px-4 py-2 pr-10 text-sm text-slate-900 dark:text-white"
+                                        required
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowPasswords(prev => ({ ...prev, confirm: !prev.confirm }))}
+                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-[#cbbc90]"
+                                        tabIndex={-1}
+                                    >
+                                        <span className="material-symbols-outlined text-[18px]">
+                                            {showPasswords.confirm ? 'visibility_off' : 'visibility'}
+                                        </span>
+                                    </button>
+                                </div>
                                 <button type="submit" disabled={isChangingPassword} className="bg-slate-900 dark:bg-slate-700 text-white font-bold py-2 rounded-xl text-sm hover:opacity-90 mt-2">
                                     {isChangingPassword ? t('common.loading') : t('settings.updatePassword')}
                                 </button>
