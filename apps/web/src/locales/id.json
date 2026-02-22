@@ -41,6 +41,7 @@
     },
     "dashboard": {
         "greeting": "Halo, {name}",
+        "transactions": "Transaksi",
         "overview": "Dashboard",
         "overviewSuffix": "Ringkasan",
         "export": "Ekspor Data",

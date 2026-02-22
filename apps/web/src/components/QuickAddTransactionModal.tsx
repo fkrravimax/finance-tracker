@@ -163,6 +163,12 @@ const QuickAddTransactionModal: React.FC<QuickAddTransactionModalProps> = ({ isO
         if (!isOpen) return;
 
         const handleKeyDown = (e: KeyboardEvent) => {
+            // Ignore if typing in an input
+            const target = e.target as HTMLElement;
+            if (target.tagName.toLowerCase() === 'input' || target.tagName.toLowerCase() === 'textarea') {
+                return;
+            }
+
             if (e.key >= '0' && e.key <= '9') {
                 handleNumberClick(parseInt(e.key));
             } else if (e.key === 'Backspace') {
@@ -170,13 +176,14 @@ const QuickAddTransactionModal: React.FC<QuickAddTransactionModalProps> = ({ isO
             } else if (e.key === 'Escape') {
                 onClose();
             } else if (e.key === 'Enter') {
+                e.preventDefault(); // Prevent double trigger with form submission if any
                 handleSave();
             }
         };
 
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [isOpen, amount, selectedCategory, transactionType, notes, onClose]); // Removed handleSave from dep to avoid cycle, strictly it should be there but function is stable enough or use useCallback
+    }, [isOpen, amount, selectedCategory, transactionType, notes, onClose]);
 
     const handleAutoCategorize = async () => {
         if (!notes) {

@@ -41,6 +41,7 @@
     },
     "dashboard": {
         "greeting": "Hello, {name}",
+        "transactions": "Transactions",
         "overview": "Dashboard",
         "overviewSuffix": "Overview",
         "export": "Export Data",
