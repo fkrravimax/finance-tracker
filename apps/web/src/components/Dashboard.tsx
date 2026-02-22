@@ -20,7 +20,7 @@ import api from '../services/api';
 
 import { transactionService } from '../services/transactionService';
 import PageTransition from './ui/PageTransition';
-import { StaggerContainer, StaggerItem, ScaleButton } from './ui/Motion';
+import { StaggerContainer, StaggerItem } from './ui/Motion';
 
 const Dashboard: React.FC = () => {
     const { openQuickAdd } = useUI();
