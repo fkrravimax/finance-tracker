@@ -149,11 +149,11 @@ export function isGarbageLine(line: string): boolean {
     // Skip lines that are probably numbered items (e.g. "1. Amoxicillin 500mg")
     if (/^\d+\.\s+[a-zA-Z]/.test(line.trim())) return false;
 
-    // Detect column header lines (ITEM DESCRIPTION, MENU QTY HARGA, etc.)
-    if (/^(item|menu|description|amount|harga|qty|quantity)\b/i.test(line.trim())) {
+    // Detect column header lines (ITEM DESCRIPTION, MENU QTY HARGA, dll.)
+    if (/^(item|menu|description|amount|harga|qty|quantity|nama|nm)\b/i.test(line.trim())) {
         // If line is ONLY column headers (no prices), it's garbage
         const headerWords = line.replace(/[^a-zA-Z\s]/g, '').trim().toLowerCase();
-        const colHeaders = ['item', 'menu', 'description', 'amount', 'harga', 'qty', 'quantity', 'total', 'jumlah', 'nama'];
+        const colHeaders = ['item', 'menu', 'description', 'amount', 'harga', 'qty', 'quantity', 'total', 'jumlah', 'nama', 'barang', 'brg', 'produk', 'product'];
         const words = headerWords.split(/\s+/);
         if (words.every(w => colHeaders.includes(w) || w.length <= 2)) return true;
     }
@@ -220,6 +220,10 @@ export function isGarbageLine(line: string): boolean {
 /** Detect if a line signals entry into the totals/summary section */
 export function isTotalSectionKeyword(line: string): boolean {
     const lower = line.toLowerCase();
+
+    // Ignore if it's clearly a column header line
+    if (lower.includes('nama barang') || lower.includes('item description')) return false;
+
     const keywords = [
         'subtotal', 'sub total', 'sub-total',
         'amount due', 'jumlah',
@@ -230,6 +234,10 @@ export function isTotalSectionKeyword(line: string): boolean {
 /** Detect if a line is a total/grand-total line */
 export function isGrandTotalLine(line: string): boolean {
     const lower = line.toLowerCase();
+
+    // Ignore if it's clearly a column header line (e.g. "NAMA BARANG TOTAL")
+    if (lower.includes('nama barang') || lower.includes('item description')) return false;
+
     return /\b(grand\s*total|total\s*(bayar|pembayaran|akhir|debet|belanja|tagihan)?)\b/i.test(lower) ||
         lower.includes('amount due');
 }
@@ -423,77 +431,16 @@ class SplitBillService {
                         data[i + 2] = gray;
                     }
 
-                    // Step 3: Adaptive contrast enhancement (block-based CLAHE-inspired)
-                    // Divide image into blocks, compute local min/max, stretch contrast
-                    const BLOCK_SIZE = 64;
-                    const blocksX = Math.ceil(w / BLOCK_SIZE);
-                    const blocksY = Math.ceil(h / BLOCK_SIZE);
-
-                    // Compute block stats
-                    const blockMin: number[][] = [];
-                    const blockMax: number[][] = [];
-                    for (let by = 0; by < blocksY; by++) {
-                        blockMin[by] = [];
-                        blockMax[by] = [];
-                        for (let bx = 0; bx < blocksX; bx++) {
-                            let mn = 255, mx = 0;
-                            const startY = by * BLOCK_SIZE;
-                            const startX = bx * BLOCK_SIZE;
-                            const endY = Math.min(startY + BLOCK_SIZE, h);
-                            const endX = Math.min(startX + BLOCK_SIZE, w);
-                            for (let y = startY; y < endY; y++) {
-                                for (let x = startX; x < endX; x++) {
-                                    const idx = (y * w + x) * 4;
-                                    const v = data[idx];
-                                    if (v < mn) mn = v;
-                                    if (v > mx) mx = v;
-                                }
-                            }
-                            // Clamp to avoid extreme stretch on uniform blocks
-                            if (mx - mn < 30) {
-                                const mid = (mn + mx) / 2;
-                                mn = Math.max(0, mid - 40);
-                                mx = Math.min(255, mid + 40);
-                            }
-                            blockMin[by][bx] = mn;
-                            blockMax[by][bx] = mx;
-                        }
-                    }
-
-                    // Apply contrast stretch per pixel using bilinear interpolation of block stats
-                    for (let y = 0; y < h; y++) {
-                        for (let x = 0; x < w; x++) {
-                            const idx = (y * w + x) * 4;
-                            const v = data[idx];
-
-                            // Get block coordinates
-                            const bxf = x / BLOCK_SIZE - 0.5;
-                            const byf = y / BLOCK_SIZE - 0.5;
-                            const bx0 = Math.max(0, Math.floor(bxf));
-                            const by0 = Math.max(0, Math.floor(byf));
-                            const bx1 = Math.min(blocksX - 1, bx0 + 1);
-                            const by1 = Math.min(blocksY - 1, by0 + 1);
-                            const fx = bxf - bx0;
-                            const fy = byf - by0;
-
-                            // Bilinear interpolation of min/max
-                            const mn = blockMin[by0][bx0] * (1 - fx) * (1 - fy) +
-                                blockMin[by0][bx1] * fx * (1 - fy) +
-                                blockMin[by1][bx0] * (1 - fx) * fy +
-                                blockMin[by1][bx1] * fx * fy;
-                            const mx = blockMax[by0][bx0] * (1 - fx) * (1 - fy) +
-                                blockMax[by0][bx1] * fx * (1 - fy) +
-                                blockMax[by1][bx0] * (1 - fx) * fy +
-                                blockMax[by1][bx1] * fx * fy;
-
-                            const range = mx - mn;
-                            const stretched = range > 0 ? ((v - mn) / range) * 255 : v;
-                            const clamped = Math.max(0, Math.min(255, stretched));
-
-                            data[idx] = clamped;
-                            data[idx + 1] = clamped;
-                            data[idx + 2] = clamped;
-                        }
+                    // Step 3: Simple global contrast enhancement
+                    // Tesseract's LSTM handles binarization well, but a slight contrast bump helps.
+                    const contrast = 1.3; // 30% contrast increase
+                    const intercept = 128 * (1 - contrast);
+                    for (let i = 0; i < data.length; i += 4) {
+                        const v = data[i];
+                        const newV = Math.max(0, Math.min(255, v * contrast + intercept));
+                        data[i] = newV;
+                        data[i + 1] = newV;
+                        data[i + 2] = newV;
                     }
 
                     ctx.putImageData(imageData, 0, 0);
@@ -623,8 +570,14 @@ class SplitBillService {
             }
 
             // Skip pure numeric lines (postal codes, phone numbers, IDs)
+            // UNLESS they contain a nicely formatted price or we are in the total section (where pure numbers are often tax/totals)
             const lineNoSpaces = line.replace(/\s/g, '');
-            if (/^[\d.:\-/]+$/.test(lineNoSpaces)) continue;
+            if (/^[\d.:\-/]+$/.test(lineNoSpaces)) {
+                const hasFormattedPrice = extractPricesWithSep(line).length > 0 || extractDecimalPrices(line).length > 0;
+                if (!hasFormattedPrice && !foundTotalSection) {
+                    continue;
+                }
+            }
 
             // Skip lines that are just a single short number (< 4 digits) or QR-like markers
             if (/^\d{1,3}$/.test(line.trim())) continue;
@@ -657,27 +610,29 @@ class SplitBillService {
                 const lastPrice = prices[prices.length - 1];
                 const amount = parsePrice(lastPrice);
 
-                if (foundTotalSection || isTotalSectionKeyword(lowerLine) || isGrandTotalLine(lowerLine)) {
+                const contextText = (pendingNameBuffer.join(' ') + ' ' + lowerLine).toLowerCase();
+
+                if (foundTotalSection || isTotalSectionKeyword(lowerLine) || isGrandTotalLine(lowerLine) || isTotalSectionKeyword(contextText) || isGrandTotalLine(contextText)) {
                     // ── TOTALS SECTION ──
-                    // Priority: grand total > subtotal > specific charges
+                    foundTotalSection = true;
                     // Check grand total FIRST so "Grand Total (Termasuk PPN)" doesn't get classified as tax
-                    if (isGrandTotalLine(lowerLine) && !lowerLine.includes('subtotal')) {
+                    if (isGrandTotalLine(contextText) && !contextText.includes('subtotal')) {
                         if (Math.abs(amount) > grandTotal) grandTotal = Math.abs(amount);
-                    } else if (lowerLine.includes('subtotal') || lowerLine.includes('sub total') || lowerLine.includes('sub-total')) {
+                    } else if (contextText.includes('subtotal') || contextText.includes('sub total') || contextText.includes('sub-total')) {
                         subtotal = Math.abs(amount);
-                    } else if (isDiscountLine(lowerLine)) {
+                    } else if (isDiscountLine(contextText)) {
                         discount += Math.abs(amount);
-                    } else if (isServiceChargeLine(lowerLine)) {
+                    } else if (isServiceChargeLine(contextText)) {
                         serviceCharge += Math.abs(amount);
-                    } else if (isTaxLine(lowerLine)) {
+                    } else if (isTaxLine(contextText)) {
                         tax += Math.abs(amount);
-                    } else if (isPaymentOrChangeLine(lowerLine)) {
+                    } else if (isPaymentOrChangeLine(contextText)) {
                         // Payment method / change line — skip for item purposes
                         // But if it's the "total bayar" it may be grandTotal
-                        if (lowerLine.includes('bayar') || lowerLine.includes('total')) {
+                        if (contextText.includes('bayar') || contextText.includes('total')) {
                             if (Math.abs(amount) > grandTotal) grandTotal = Math.abs(amount);
                         }
-                    } else if (lowerLine.includes('ongkir') || lowerLine.includes('ongkos kirim') || lowerLine.includes('shipping')) {
+                    } else if (contextText.includes('ongkir') || contextText.includes('ongkos kirim') || contextText.includes('shipping')) {
                         // Shipping is an extra charge — treat as service
                         serviceCharge += Math.abs(amount);
                     } else {
@@ -695,8 +650,18 @@ class SplitBillService {
                         if (prices.length > 1) {
                             // Multiple prices on line: first is typically unit price, last is line total
                             // e.g., "2x @55.000   110.000" or "Ayam Goreng  1x   25.000   25.000"
-                            const firstPrice = parsePrice(prices[0]);
+                            let firstPrice = parsePrice(prices[0]);
                             const lastPriceVal = parsePrice(prices[prices.length - 1]);
+
+                            // Handle OCR error where '@' is misread as '8' (e.g., "@39.000" -> "839000")
+                            if (qty > 0) {
+                                const expectedUnit = Math.round(lastPriceVal / qty);
+                                if (firstPrice !== expectedUnit &&
+                                    String(firstPrice).length === String(expectedUnit).length + 1 &&
+                                    String(firstPrice).endsWith(String(expectedUnit))) {
+                                    firstPrice = expectedUnit;
+                                }
+                            }
 
                             // If we have qty × firstPrice ≈ lastPrice, that's the pattern
                             if (prices.length >= 2 && qty > 1 && Math.abs(qty * firstPrice - lastPriceVal) < 2) {
@@ -742,7 +707,7 @@ class SplitBillService {
                 }
             } else {
                 // ── NO PRICE ON THIS LINE ──
-                if (!foundTotalSection && /[a-zA-Z]/.test(line) && line.replace(/[^a-zA-Z]/g, '').length > 1) {
+                if (/[a-zA-Z]/.test(line) && line.replace(/[^a-zA-Z]/g, '').length > 1) {
                     const cleanText = line.trim();
 
                     // Handle modifiers: "- Less Sweet", "* Tidak pedas", "+ Extra cheese"

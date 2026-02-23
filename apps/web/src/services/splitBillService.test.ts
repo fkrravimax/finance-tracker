@@ -865,3 +865,63 @@ Selamat makan!
         expect(parsed.grandTotal).toBe(280885);
     });
 });
+
+describe('Real-World — Dimsum (Wrapped item names)', () => {
+    const receipt = `Siomay Udang Ayam
+1x     @25.000             25.000
+Mie Wonton dengan Ayam Panggang Merah
+HAKA
+1x     @39.000             39.000
+Badak Sarsaparilla
+1x     @20.000             20.000
+Nasi Goreng Telur dengan Chili Oi
+2x     @39.000             78.000
+Es Milo
+1x     @16.000             16.000
+Onde Wijen Hitam
+1x     @26.000             26.000
+Buncis Cah Sapi
+1x     @29.000             29.000
+Lumpia Steam Saus Tiram
+1x     @29.000             29.000
+Es Teh Tawar
+1x     @7.000               7.000
+Stim Nasi Ayam Cincang
+1x     @36.000             36.000
+
+11 items
+
+        Grand Total :      305.000
+
+     Price inclusive of PB1 tax :
+                        27.727
+     --- NOT PAID ---`;
+
+    const parsed = splitBillService.parseReceiptText(receipt);
+
+    it('parses 10 food items', () => {
+        expect(parsed.items.length).toBe(10);
+    });
+    it('parses Siomay Udang Ayam', () => {
+        expect(parsed.items[0].name).toContain('Siomay Udang Ayam');
+        expect(parsed.items[0].qty).toBe(1);
+        expect(parsed.items[0].total).toBe(25000);
+    });
+    it('parses wrapped Mie Wonton name', () => {
+        expect(parsed.items[1].name).toContain('Ayam Panggang');
+        expect(parsed.items[1].qty).toBe(1);
+        expect(parsed.items[1].total).toBe(39000);
+    });
+    it('parses Nasi Goreng with qty 2', () => {
+        const nasi = parsed.items.find(i => i.name.toLowerCase().includes('nasi goreng'));
+        expect(nasi).toBeDefined();
+        expect(nasi!.qty).toBe(2);
+        expect(nasi!.total).toBe(78000);
+    });
+    it('parses PB1 tax', () => {
+        expect(parsed.tax).toBe(27727);
+    });
+    it('parses grand total', () => {
+        expect(parsed.grandTotal).toBe(305000);
+    });
+});
