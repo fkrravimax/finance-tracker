@@ -431,16 +431,44 @@ class SplitBillService {
                         data[i + 2] = gray;
                     }
 
-                    // Step 3: Simple global contrast enhancement
-                    // Tesseract's LSTM handles binarization well, but a slight contrast bump helps.
-                    const contrast = 1.3; // 30% contrast increase
-                    const intercept = 128 * (1 - contrast);
+                    // Step 3: Fast Unsharp Masking (Sharpen text edges while removing noise)
+                    // We apply a small Gaussian blur, then subtract it from the original to find edges.
+                    // This performs much better on Tesseract than global or local binarization.
+                    const blurredData = new Float32Array(data.length);
+                    const kernel = [1, 2, 1, 2, 4, 2, 1, 2, 1]; // 3x3 Gaussian
+
+                    for (let y = 0; y < h; y++) {
+                        for (let x = 0; x < w; x++) {
+                            const dstOff = (y * w + x) * 4;
+                            let val = 0;
+                            for (let cy = 0; cy < 3; cy++) {
+                                for (let cx = 0; cx < 3; cx++) {
+                                    // Mirror edges
+                                    const scy = Math.max(0, Math.min(h - 1, y + cy - 1));
+                                    const scx = Math.max(0, Math.min(w - 1, x + cx - 1));
+                                    const srcOff = (scy * w + scx) * 4;
+                                    val += data[srcOff] * kernel[cy * 3 + cx];
+                                }
+                            }
+                            blurredData[dstOff] = val / 16;
+                        }
+                    }
+
+                    const amount = 1.5; // Sharpening intensity
                     for (let i = 0; i < data.length; i += 4) {
-                        const v = data[i];
-                        const newV = Math.max(0, Math.min(255, v * contrast + intercept));
-                        data[i] = newV;
-                        data[i + 1] = newV;
-                        data[i + 2] = newV;
+                        const origGray = data[i];
+                        const blurGray = blurredData[i];
+
+                        // Unsharp mask formula
+                        let sharpGray = origGray + (origGray - blurGray) * amount;
+                        sharpGray = Math.max(0, Math.min(255, sharpGray));
+
+                        // Push darker grays to black for better contrast
+                        if (sharpGray < 128) sharpGray = Math.max(0, sharpGray * 0.85);
+
+                        data[i] = sharpGray;
+                        data[i + 1] = sharpGray;
+                        data[i + 2] = sharpGray;
                     }
 
                     ctx.putImageData(imageData, 0, 0);
