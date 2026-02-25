@@ -24,22 +24,21 @@ const ExpensesByCategory: React.FC = () => {
         setLoading(true);
         try {
             const start = new Date(startDate);
-            const transactions = await transactionService.getAll(start.getMonth(), start.getFullYear());
-
-            // Filter by date and type 'expense'
             const end = new Date(endDate);
             end.setHours(23, 59, 59, 999); // Include full end day
 
-            const filtered = transactions.filter((t: any) => {
-                const tDate = new Date(t.date);
-                return t.type === 'expense' && tDate >= start && tDate <= end;
-            });
+            const transactions = await transactionService.getAll({ startDate: start.toISOString(), endDate: end.toISOString() });
+
+            // The backend date range filtering returns both income and matching expenses. 
+            // We still need to filter only 'expense' type manually, or backend can do it.
+            // Since getAll returns all type of transactions, filter 'expense' locally.
+            const filtered = transactions.filter((t: any) => t.type === 'expense');
 
             // Group by category
             const grouped: Record<string, number> = {};
             let total = 0;
 
-            filtered.forEach(t => {
+            filtered.forEach((t: any) => {
                 const amount = Number(t.amount);
                 grouped[t.category] = (grouped[t.category] || 0) + amount;
                 total += amount;

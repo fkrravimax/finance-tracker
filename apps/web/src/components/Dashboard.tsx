@@ -65,7 +65,7 @@ const Dashboard: React.FC = () => {
     const fetchTransactions = async () => {
         try {
             const now = new Date();
-            const data = await transactionService.getAll(now.getMonth(), now.getFullYear());
+            const data = await transactionService.getAll({ month: now.getMonth(), year: now.getFullYear() });
             setTransactions(data);
         } catch (error) {
             console.error("Failed to fetch transactions", error);

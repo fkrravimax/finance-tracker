@@ -5,16 +5,23 @@ export const transactionController = {
     getAll: async (req: Request, res: Response) => {
         try {
             const userId = (req as any).user.id;
-            const { month, year } = req.query;
+            const { month, year, startDate, endDate } = req.query;
 
             let data;
-            if (month !== undefined && year !== undefined) {
+            if (startDate && endDate) {
+                // Fetch by specific date range
+                const start = new Date(startDate as string);
+                const end = new Date(endDate as string);
+                data = await transactionService.getByDateRange(userId, start, end);
+            } else if (month !== undefined && year !== undefined) {
+                // Fetch by single month
                 data = await transactionService.getByMonth(
                     userId,
                     parseInt(month as string),
                     parseInt(year as string)
                 );
             } else {
+                // Fetch all history
                 data = await transactionService.getAll(userId);
             }
 

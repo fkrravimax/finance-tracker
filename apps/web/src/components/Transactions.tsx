@@ -43,7 +43,7 @@ const Transactions: React.FC = () => {
     const fetchTransactions = useCallback(async (month: number, year: number) => {
         try {
             setLoading(true);
-            const data = await transactionService.getAll(month, year);
+            const data = await transactionService.getAll({ month, year });
             setTransactions(data);
         } catch (error) {
             console.error("Failed to fetch transactions", error);

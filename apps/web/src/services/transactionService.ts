@@ -2,10 +2,15 @@ import api from './api';
 import type { Transaction } from '../types';
 
 export const transactionService = {
-    getAll: async (month?: number, year?: number): Promise<Transaction[]> => {
-        const params = month !== undefined && year !== undefined
-            ? `?month=${month}&year=${year}` : '';
-        const { data } = await api.get(`/transactions${params}`);
+    getAll: async (params?: { month?: number, year?: number, startDate?: string, endDate?: string }): Promise<Transaction[]> => {
+        const queryParams = new URLSearchParams();
+        if (params?.month !== undefined) queryParams.append('month', params.month.toString());
+        if (params?.year !== undefined) queryParams.append('year', params.year.toString());
+        if (params?.startDate) queryParams.append('startDate', params.startDate);
+        if (params?.endDate) queryParams.append('endDate', params.endDate);
+
+        const queryString = queryParams.toString() ? `?${queryParams.toString()}` : '';
+        const { data } = await api.get(`/transactions${queryString}`);
         return data;
     },
 
