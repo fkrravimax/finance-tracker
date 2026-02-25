@@ -33,10 +33,10 @@ const globalLimiter = rateLimit({
     skip: (req) => req.path.startsWith('/api/cron'), // Cron uses CRON_SECRET
 });
 
-// Strict rate limit for auth endpoints: 5 requests per 15 minutes per IP
+// Strict rate limit for auth endpoints: 15 requests per 15 minutes per IP
 const authLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
-    max: 5,
+    max: 15,
     standardHeaders: true,
     legacyHeaders: false,
     message: { error: 'Too many login attempts, please try again later.' },
