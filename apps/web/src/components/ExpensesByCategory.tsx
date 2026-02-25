@@ -23,23 +23,48 @@ const ExpensesByCategory: React.FC = () => {
     const fetchCategoryData = async () => {
         setLoading(true);
         try {
+            console.log("Fetching category data for:", startDate, "to", endDate);
+            if (!startDate || !endDate) {
+                console.log("Invalid date strings");
+                setCategories([]);
+                return;
+            }
+
             const start = new Date(startDate);
             const end = new Date(endDate);
+            if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+                console.log("Invalid date objects");
+                setCategories([]);
+                return;
+            }
+
             end.setHours(23, 59, 59, 999); // Include full end day
 
-            const transactions = await transactionService.getAll({ startDate: start.toISOString(), endDate: end.toISOString() });
+            // Force cache busting and pass exact ISO strings
+            const bypassCache = Date.now().toString();
+            const transactions = await transactionService.getAll({
+                startDate: start.toISOString(),
+                endDate: end.toISOString(),
+                bypassCache
+            });
 
-            // The backend date range filtering returns both income and matching expenses. 
-            // We still need to filter only 'expense' type manually, or backend can do it.
-            // Since getAll returns all type of transactions, filter 'expense' locally.
-            const filtered = transactions.filter((t: any) => t.type === 'expense');
+            console.log("Returned transactions from API:", transactions?.length);
+
+            if (!transactions || !Array.isArray(transactions)) {
+                setCategories([]);
+                return;
+            }
+
+            const filtered = transactions.filter((t: any) => t?.type === 'expense');
+            console.log("Filtered expenses:", filtered.length);
 
             // Group by category
             const grouped: Record<string, number> = {};
             let total = 0;
 
             filtered.forEach((t: any) => {
-                const amount = Number(t.amount);
+                let amount = Number(t.amount);
+                if (isNaN(amount)) amount = 0;
                 grouped[t.category] = (grouped[t.category] || 0) + amount;
                 total += amount;
             });
@@ -56,6 +81,7 @@ const ExpensesByCategory: React.FC = () => {
             setCategories(result);
         } catch (error) {
             console.error("Failed to fetch category data", error);
+            setCategories([]);
         } finally {
             setLoading(false);
         }

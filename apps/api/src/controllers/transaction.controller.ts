@@ -7,7 +7,7 @@ export const transactionController = {
             const userId = (req as any).user.id;
             const { month, year, startDate, endDate } = req.query;
 
-            let data;
+            console.log("query:", req.query); let data;
             if (startDate && endDate) {
                 // Fetch by specific date range
                 const start = new Date(startDate as string);
@@ -22,9 +22,11 @@ export const transactionController = {
                 );
             } else {
                 // Fetch all history
+                console.log("[API] Fetching all history");
                 data = await transactionService.getAll(userId);
             }
 
+            console.log("[API] Returning transactions length:", data.length);
             res.json(data);
         } catch (error) {
             res.status(500).json({ error: 'Failed to fetch transactions' });
