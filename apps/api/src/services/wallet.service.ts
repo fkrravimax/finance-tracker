@@ -1,7 +1,7 @@
 
 import { db } from '../db/index.js';
 import { wallets, transactions } from '../db/schema.js';
-import { eq, and, sql } from "drizzle-orm";
+import { eq, and, isNull } from "drizzle-orm";
 import { cryptoService } from './encryption.service.js';
 
 export const walletService = {
@@ -89,7 +89,7 @@ export const walletService = {
         // This fixes accounts that created an Initial Balance before the walletId patch was deployed
         const result = await db.update(transactions)
             .set({ walletId: existing[0].id })
-            .where(and(eq(transactions.userId, userId), sql`wallet_id IS NULL`));
+            .where(and(eq(transactions.userId, userId), isNull(transactions.walletId)));
 
         if (result.rowCount && result.rowCount > 0) {
             console.log(`[Migration] Assigned ${result.rowCount} orphaned transactions to '${existing[0].name}'.`);

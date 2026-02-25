@@ -1,6 +1,6 @@
 import { Router, Request, Response } from 'express';
 import { db } from '../db/index.js';
-import { users, upgradeRequests, sessions, accounts, wallets, transactions, savingsGoals, budgets, recurringTransactions, trades, notifications } from '../db/schema.js';
+import { users, upgradeRequests, sessions, accounts, wallets, transactions, savingsGoals, budgets, recurringTransactions, trades, notifications, pushSubscriptions } from '../db/schema.js';
 import { eq, desc } from 'drizzle-orm';
 import { adminMiddleware } from '../middleware/admin.middleware.js';
 import { pushService, type PushPayload } from '../services/push.service.js';
@@ -267,19 +267,24 @@ router.delete('/users/:id', async (req: Request, res: Response) => {
             return res.status(404).json({ error: "User not found" });
         }
 
-        // Delete all user data in order (child tables first)
-        await db.delete(trades).where(eq(trades.userId, id as string));
-        await db.delete(recurringTransactions).where(eq(recurringTransactions.userId, id as string));
-        await db.delete(budgets).where(eq(budgets.userId, id as string));
-        await db.delete(savingsGoals).where(eq(savingsGoals.userId, id as string));
-        await db.delete(transactions).where(eq(transactions.userId, id as string));
-        await db.delete(wallets).where(eq(wallets.userId, id as string));
-        await db.delete(upgradeRequests).where(eq(upgradeRequests.userId, id as string));
-        await db.delete(sessions).where(eq(sessions.userId, id as string));
-        await db.delete(accounts).where(eq(accounts.userId, id as string));
+        // Atomic deletion: all-or-nothing using DB transaction
+        await db.transaction(async (tx) => {
+            // Delete child tables first
+            await tx.delete(notifications).where(eq(notifications.userId, id as string));
+            await tx.delete(pushSubscriptions).where(eq(pushSubscriptions.userId, id as string));
+            await tx.delete(trades).where(eq(trades.userId, id as string));
+            await tx.delete(recurringTransactions).where(eq(recurringTransactions.userId, id as string));
+            await tx.delete(budgets).where(eq(budgets.userId, id as string));
+            await tx.delete(savingsGoals).where(eq(savingsGoals.userId, id as string));
+            await tx.delete(transactions).where(eq(transactions.userId, id as string));
+            await tx.delete(wallets).where(eq(wallets.userId, id as string));
+            await tx.delete(upgradeRequests).where(eq(upgradeRequests.userId, id as string));
+            await tx.delete(sessions).where(eq(sessions.userId, id as string));
+            await tx.delete(accounts).where(eq(accounts.userId, id as string));
 
-        // Finally, delete the user
-        await db.delete(users).where(eq(users.id, id as string));
+            // Finally, delete the user
+            await tx.delete(users).where(eq(users.id, id as string));
+        });
 
         console.log(`Admin ${adminUser.email} deleted user ${targetUser.email} (${id})`);
 

@@ -10,6 +10,7 @@ interface ConfirmationModalProps {
     cancelText?: string;
     variant?: 'danger' | 'warning' | 'info';
     isLoading?: boolean;
+    children?: React.ReactNode;
 }
 
 const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
@@ -21,7 +22,8 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
     confirmText = 'Confirm',
     cancelText = 'Cancel',
     variant = 'danger',
-    isLoading = false
+    isLoading = false,
+    children
 }) => {
     if (!isOpen) return null;
 
@@ -47,8 +49,8 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
             <div className="relative bg-white dark:bg-[#2a2515] w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden flex flex-col animate-scale-in border border-slate-100 dark:border-[#493f22]">
                 <div className="p-6 flex flex-col items-center text-center gap-4">
                     <div className={`w-12 h-12 rounded-full flex items-center justify-center ${variant === 'danger' ? 'bg-red-100 dark:bg-red-900/20 text-red-600 dark:text-red-400' :
-                            variant === 'warning' ? 'bg-yellow-100 dark:bg-yellow-900/20 text-yellow-600 dark:text-yellow-400' :
-                                'bg-blue-100 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400'
+                        variant === 'warning' ? 'bg-yellow-100 dark:bg-yellow-900/20 text-yellow-600 dark:text-yellow-400' :
+                            'bg-blue-100 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400'
                         }`}>
                         <span className="material-symbols-outlined text-2xl">
                             {variant === 'danger' ? 'warning' : 'info'}
@@ -58,6 +60,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
                     <div>
                         <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">{title}</h3>
                         <p className="text-slate-500 dark:text-[#cbbc90] text-sm leading-relaxed">{message}</p>
+                        {children}
                     </div>
 
                     <div className="flex gap-3 w-full mt-2">

@@ -121,6 +121,10 @@ app.get('/api/health', (req, res) => {
     res.json({ status: 'ok', timestamp: new Date() });
 });
 
+// ── Centralized Error Handler (must be last) ─────────────────────────────────
+import { errorHandler } from './middleware/error.middleware.js';
+app.use(errorHandler);
+
 if (process.env.NODE_ENV !== 'production') {
     app.listen(PORT, () => {
         console.log(`Server running on port ${PORT}`);

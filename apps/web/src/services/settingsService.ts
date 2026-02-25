@@ -28,8 +28,8 @@ export const settingsService = {
     },
 
     // Reset
-    resetAllData: async () => {
-        const response = await api.post('/reset', {});
+    resetAllData: async (password?: string) => {
+        const response = await api.post('/reset', { password });
         return response.data;
     }
 };

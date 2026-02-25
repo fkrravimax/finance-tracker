@@ -108,6 +108,7 @@ const Settings: React.FC = () => {
 
     // Modal State
     const [isRecurringModalOpen, setIsRecurringModalOpen] = useState(false);
+    const [resetPassword, setResetPassword] = useState('');
     const [confirmation, setConfirmation] = useState<{
         isOpen: boolean;
         type: 'delete_recurring' | 'reset_app' | null;
@@ -262,6 +263,7 @@ const Settings: React.FC = () => {
     };
 
     const handleResetAppClick = () => {
+        setResetPassword('');
         setConfirmation({
             isOpen: true,
             type: 'reset_app',
@@ -281,13 +283,21 @@ const Settings: React.FC = () => {
                 await settingsService.deleteRecurring(confirmation.id);
                 setRecurringTransactions(recurringTransactions.filter(t => t.id !== confirmation.id));
             } else if (confirmation.type === 'reset_app') {
-                await settingsService.resetAllData();
+                await settingsService.resetAllData(resetPassword || undefined);
                 navigate('/onboarding');
             }
             setConfirmation({ isOpen: false, type: null, title: '', message: '', isLoading: false });
-        } catch (error) {
+        } catch (error: any) {
             console.error("Action failed", error);
-            showNotification("Action failed. Please try again.", 'error');
+            const errorMsg = error?.response?.data?.error || "Action failed. Please try again.";
+
+            if (error?.response?.data?.requiresPassword) {
+                showNotification("Please enter your password to confirm reset", 'error');
+            } else if (error?.response?.status === 401) {
+                showNotification("Incorrect password", 'error');
+            } else {
+                showNotification(errorMsg, 'error');
+            }
             setConfirmation(prev => ({ ...prev, isLoading: false }));
         }
     };
@@ -826,14 +836,30 @@ const Settings: React.FC = () => {
                 <div className="flex-1 p-4 md:p-8 overflow-y-auto w-full max-w-5xl mx-auto">
                     <ConfirmationModal
                         isOpen={confirmation.isOpen}
-                        onClose={() => setConfirmation({ ...confirmation, isOpen: false })}
+                        onClose={() => { setConfirmation({ ...confirmation, isOpen: false }); setResetPassword(''); }}
                         onConfirm={handleConfirmAction}
                         title={confirmation.title}
-                        message={confirmation.message}
+                        message={confirmation.type === 'reset_app'
+                            ? confirmation.message + '\n\nEnter your password to confirm:'
+                            : confirmation.message}
                         variant="danger"
                         confirmText={confirmation.type === 'reset_app' ? 'Yes, Reset Everything' : 'Delete'}
                         isLoading={confirmation.isLoading}
-                    />
+                    >
+                        {confirmation.type === 'reset_app' && (
+                            <div className="w-full mt-3">
+                                <input
+                                    type="password"
+                                    placeholder="Enter your password"
+                                    value={resetPassword}
+                                    onChange={(e) => setResetPassword(e.target.value)}
+                                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-[#493f22] bg-white dark:bg-[#36301d] text-slate-800 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-red-400/40 transition-all placeholder:text-slate-400 dark:placeholder:text-[#8a7d5a]"
+                                    autoFocus
+                                />
+                                <p className="text-xs text-slate-400 dark:text-[#8a7d5a] mt-1.5">Google account users can leave this empty</p>
+                            </div>
+                        )}
+                    </ConfirmationModal>
 
                     <ProfilePictureModal
                         isOpen={isProfileModalOpen}
