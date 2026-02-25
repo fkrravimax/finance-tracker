@@ -1,10 +1,10 @@
-
 import { Router, Request, Response } from 'express';
 import { db } from '../db/index.js';
-import { users, upgradeRequests, sessions, accounts, wallets, transactions, savingsGoals, budgets, recurringTransactions, trades } from '../db/schema.js';
+import { users, upgradeRequests, sessions, accounts, wallets, transactions, savingsGoals, budgets, recurringTransactions, trades, notifications } from '../db/schema.js';
 import { eq, desc } from 'drizzle-orm';
 import { adminMiddleware } from '../middleware/admin.middleware.js';
 import { pushService, type PushPayload } from '../services/push.service.js';
+import { randomUUID } from 'crypto';
 
 const router = Router();
 
@@ -204,6 +204,26 @@ router.post('/notifications/broadcast', async (req: Request, res: Response) => {
                 action: 'open-app',
             },
         };
+
+        // Save to database for all eligible users safely in bulk
+        if (userIds.length > 0) {
+            const dbNotifications = userIds.map(userId => ({
+                id: randomUUID(),
+                userId,
+                title: payload.title,
+                message: payload.body,
+                type: 'info',
+                isRead: false,
+                metadata: JSON.stringify(payload.data)
+            }));
+
+            // Insert in chunks of 500 to prevent parameterized query limits
+            const chunkSize = 500;
+            for (let i = 0; i < dbNotifications.length; i += chunkSize) {
+                const chunk = dbNotifications.slice(i, i + chunkSize);
+                await db.insert(notifications).values(chunk);
+            }
+        }
 
         // Send in background to avoid blocking response for too long
         // UPDATE: Must await in serverless environment!
