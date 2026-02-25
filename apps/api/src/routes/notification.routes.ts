@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { notificationService } from '../services/notification.service.js';
+import { notificationController } from '../controllers/notification.controller.js';
 import { db } from '../db/index.js';
 import { watchlists, notifications } from '../db/schema.js';
 import { eq, and, desc } from 'drizzle-orm';
@@ -7,6 +8,11 @@ import { randomUUID } from 'crypto';
 import { cryptoService } from '../services/encryption.service.js';
 
 const router = Router();
+
+// --- Push Notification Subscription ---
+router.get('/vapid-key', notificationController.getVapidKey);
+router.post('/subscribe', notificationController.subscribe);
+router.delete('/unsubscribe', notificationController.unsubscribe);
 
 // --- Notifications ---
 
