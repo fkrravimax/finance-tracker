@@ -8,10 +8,22 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 
-const ENCRYPTION_KEY_RAW = process.env.ENCRYPTION_KEY || 'default_key_must_be_32_chars_long!';
-const IV_LENGTH = 16;
+// ── Security: ENCRYPTION_KEY is REQUIRED ────────────────────────────────────
+const ENCRYPTION_KEY_RAW = process.env.ENCRYPTION_KEY;
 
-// Determine key buffer
+if (!ENCRYPTION_KEY_RAW) {
+    throw new Error(
+        '[FATAL] ENCRYPTION_KEY environment variable is not set. ' +
+        'Cannot start server without encryption key. ' +
+        'Generate one with: openssl rand -hex 32'
+    );
+}
+
+const IV_LENGTH = 12; // GCM standard IV length (96 bits)
+const AUTH_TAG_LENGTH = 16; // GCM auth tag length (128 bits)
+const CBC_IV_LENGTH = 16; // Legacy CBC IV length
+
+// Determine key buffer (must be exactly 32 bytes for AES-256)
 let ENCRYPTION_KEY: Buffer;
 
 try {
@@ -20,42 +32,77 @@ try {
     } else if (Buffer.byteLength(ENCRYPTION_KEY_RAW) === 32) {
         ENCRYPTION_KEY = Buffer.from(ENCRYPTION_KEY_RAW);
     } else {
-        // Fallback: Pad or truncate to 32 bytes
-        const buf = Buffer.alloc(32);
-        buf.write(ENCRYPTION_KEY_RAW);
-        ENCRYPTION_KEY = buf;
-        console.warn(`[CryptoService] precise key length not met. Adjusted to 32 bytes. Raw length: ${ENCRYPTION_KEY_RAW.length}`);
+        throw new Error(
+            `[FATAL] ENCRYPTION_KEY must be exactly 32 bytes (64 hex characters). ` +
+            `Got ${ENCRYPTION_KEY_RAW.length} characters. ` +
+            `Generate one with: openssl rand -hex 32`
+        );
     }
-} catch (e) {
-    const buf = Buffer.alloc(32);
-    buf.write(ENCRYPTION_KEY_RAW);
-    ENCRYPTION_KEY = buf;
+} catch (e: any) {
+    if (e.message.includes('[FATAL]')) throw e;
+    throw new Error(
+        `[FATAL] Invalid ENCRYPTION_KEY format. ` +
+        `Generate one with: openssl rand -hex 32`
+    );
 }
 
 
 export const cryptoService = {
+    /**
+     * Encrypt using AES-256-GCM (authenticated encryption).
+     * Format: gcm:<iv_hex>:<ciphertext_hex>:<authTag_hex>
+     */
     encrypt(text: string | number | null | undefined): string {
         try {
             if (text === null || text === undefined) return text as any;
             const stringText = String(text);
 
             const iv = crypto.randomBytes(IV_LENGTH);
-            const cipher = crypto.createCipheriv('aes-256-cbc', ENCRYPTION_KEY, iv);
-            let encrypted = cipher.update(stringText);
+            const cipher = crypto.createCipheriv('aes-256-gcm', ENCRYPTION_KEY, iv);
+            let encrypted = cipher.update(stringText, 'utf8');
             encrypted = Buffer.concat([encrypted, cipher.final()]);
+            const authTag = cipher.getAuthTag();
 
-            return iv.toString('hex') + ':' + encrypted.toString('hex');
+            return `gcm:${iv.toString('hex')}:${encrypted.toString('hex')}:${authTag.toString('hex')}`;
         } catch (e) {
             console.error('Encryption error:', e);
-            throw e; // Rethrow to catch in migration script
+            throw e;
         }
     },
 
+    /**
+     * Decrypt with automatic format detection.
+     * Supports:
+     *   - GCM format: gcm:<iv>:<ciphertext>:<authTag>
+     *   - Legacy CBC format: <iv>:<ciphertext>
+     */
     decrypt(text: string): string {
         try {
             if (!text) return text;
+
+            // ── GCM format detection ─────────────────────────────────────
+            if (text.startsWith('gcm:')) {
+                const parts = text.split(':');
+                if (parts.length !== 4) {
+                    console.error('Decryption error: invalid GCM format');
+                    throw new Error('Invalid GCM ciphertext format');
+                }
+
+                const iv = Buffer.from(parts[1], 'hex');
+                const encryptedText = Buffer.from(parts[2], 'hex');
+                const authTag = Buffer.from(parts[3], 'hex');
+
+                const decipher = crypto.createDecipheriv('aes-256-gcm', ENCRYPTION_KEY, iv);
+                decipher.setAuthTag(authTag);
+                let decrypted = decipher.update(encryptedText);
+                decrypted = Buffer.concat([decrypted, decipher.final()]);
+
+                return decrypted.toString('utf8');
+            }
+
+            // ── Legacy CBC format (backward compatibility) ───────────────
             const textParts = text.split(':');
-            if (textParts.length !== 2) return text;
+            if (textParts.length !== 2) return text; // Not encrypted data
 
             const iv = Buffer.from(textParts[0], 'hex');
             const encryptedText = Buffer.from(textParts[1], 'hex');
@@ -67,7 +114,7 @@ export const cryptoService = {
             return decrypted.toString();
         } catch (e) {
             console.error('Decryption error:', e);
-            return text;
+            throw new Error('Failed to decrypt data. Possible key mismatch or data corruption.');
         }
     },
 

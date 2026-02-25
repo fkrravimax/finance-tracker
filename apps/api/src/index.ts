@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import * as dotenv from 'dotenv';
+import { rateLimit } from 'express-rate-limit';
 import { auth } from './lib/auth.js';
 import { toNodeHandler } from 'better-auth/node';
 
@@ -21,9 +22,35 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
+// ── Rate Limiting ────────────────────────────────────────────────────────────
+// Global rate limit: 100 requests per 15 minutes per IP
+const globalLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 100,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { error: 'Too many requests, please try again later.' },
+    skip: (req) => req.path.startsWith('/api/cron'), // Cron uses CRON_SECRET
+});
+
+// Strict rate limit for auth endpoints: 5 requests per 15 minutes per IP
+const authLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 5,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { error: 'Too many login attempts, please try again later.' },
+});
+
+app.use(globalLimiter);
+
 // Manual Google OAuth routes (bypasses Better Auth's cookie-based state)
 import googleAuthRoutes from './routes/google-auth.routes.js';
-app.use('/api/auth/google', googleAuthRoutes);
+app.use('/api/auth/google', authLimiter, googleAuthRoutes);
+
+// Apply strict rate limit to Better Auth sign-in/sign-up endpoints
+app.use('/api/auth/sign-in', authLimiter);
+app.use('/api/auth/sign-up', authLimiter);
 
 // Better Auth handler for email/password, sessions, etc.
 app.all("/api/auth/*splat", toNodeHandler(auth));

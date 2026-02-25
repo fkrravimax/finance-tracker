@@ -3,6 +3,18 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { db } from "../db/index.js";
 import * as schema from "../db/schema.js";
 
+// ── Security: Validate BETTER_AUTH_SECRET ────────────────────────────────────
+const BETTER_AUTH_SECRET = process.env.BETTER_AUTH_SECRET;
+const INSECURE_SECRETS = ['your_secret_key_here', 'changeme', 'secret', ''];
+
+if (!BETTER_AUTH_SECRET || INSECURE_SECRETS.includes(BETTER_AUTH_SECRET)) {
+    throw new Error(
+        '[FATAL] BETTER_AUTH_SECRET is not set or uses an insecure placeholder. ' +
+        'Session tokens can be forged without a strong secret. ' +
+        'Generate one with: openssl rand -hex 32'
+    );
+}
+
 export const auth = betterAuth({
     database: drizzleAdapter(db, {
         provider: "pg",

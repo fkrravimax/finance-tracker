@@ -1,4 +1,4 @@
-import { Router, Request, Response } from 'express';
+import express, { Router, Request, Response } from 'express';
 import { db } from '../db/index.js';
 import { users, accounts, sessions, verifications } from '../db/schema.js';
 import { eq, and } from 'drizzle-orm';
@@ -237,21 +237,36 @@ router.get('/callback', async (req: Request, res: Response) => {
             .where(eq(users.id, userId))
             .limit(1);
 
-        // 6. Encode user data for frontend
-        const userPayload = encodeURIComponent(
-            JSON.stringify({
-                id: userData.id,
-                name: userData.name,
-                email: userData.email,
-                image: userData.image,
-                role: userData.role,
-                plan: userData.plan,
-            })
-        );
+        const userPayload = JSON.stringify({
+            id: userData.id,
+            name: userData.name,
+            email: userData.email,
+            image: userData.image,
+            role: userData.role,
+            plan: userData.plan,
+        });
 
-        // Redirect to frontend with session token and user data
+        // 6. Store session token + user data with a short-lived authorization code
+        //    instead of exposing session token in URL (security best practice)
+        const authCode = crypto.randomBytes(32).toString('hex');
+        const codeExpiry = new Date(now.getTime() + 60 * 1000); // 60 seconds TTL
+
+        await db.insert(verifications).values({
+            id: randomUUID(),
+            identifier: 'google-oauth-exchange',
+            value: JSON.stringify({
+                code: authCode,
+                sessionToken,
+                user: userPayload,
+            }),
+            expiresAt: codeExpiry,
+            createdAt: now,
+            updatedAt: now,
+        });
+
+        // Redirect to frontend with ONLY the short-lived code (not session token)
         res.redirect(
-            `${FRONTEND_URL}/auth/callback?session_token=${sessionToken}&user=${userPayload}`
+            `${FRONTEND_URL}/auth/callback?code=${authCode}`
         );
     } catch (error: any) {
         console.error('Google OAuth callback error:', error);
@@ -259,4 +274,63 @@ router.get('/callback', async (req: Request, res: Response) => {
     }
 });
 
+/**
+ * POST /api/auth/google/exchange
+ * Frontend exchanges short-lived code for session token + user data.
+ * This keeps the session token out of URLs, browser history, and server logs.
+ */
+router.post('/exchange', express.json(), async (req: Request, res: Response) => {
+    try {
+        const { code } = req.body;
+
+        if (!code) {
+            return res.status(400).json({ error: 'Authorization code is required' });
+        }
+
+        // Find the stored exchange data
+        const records = await db
+            .select()
+            .from(verifications)
+            .where(eq(verifications.identifier, 'google-oauth-exchange'));
+
+        let matchedRecord = null;
+        for (const record of records) {
+            try {
+                const data = JSON.parse(record.value);
+                if (data.code === code) {
+                    matchedRecord = { record, data };
+                    break;
+                }
+            } catch {
+                continue;
+            }
+        }
+
+        if (!matchedRecord) {
+            return res.status(400).json({ error: 'Invalid or expired authorization code' });
+        }
+
+        const { record, data } = matchedRecord;
+
+        // Check expiration
+        if (new Date() > record.expiresAt) {
+            await db.delete(verifications).where(eq(verifications.id, record.id));
+            return res.status(400).json({ error: 'Authorization code has expired' });
+        }
+
+        // Delete used code (one-time use)
+        await db.delete(verifications).where(eq(verifications.id, record.id));
+
+        // Return session token + user data via response body (secure)
+        res.json({
+            token: data.sessionToken,
+            user: JSON.parse(data.user),
+        });
+    } catch (error: any) {
+        console.error('Token exchange error:', error);
+        res.status(500).json({ error: 'Failed to exchange authorization code' });
+    }
+});
+
 export default router;
+

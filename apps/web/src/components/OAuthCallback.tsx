@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import api from '../services/api';
 
 interface OAuthCallbackProps {
     onLogin: () => void;
@@ -11,8 +12,7 @@ const OAuthCallback: React.FC<OAuthCallbackProps> = ({ onLogin }) => {
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        const sessionToken = searchParams.get('session_token');
-        const userParam = searchParams.get('user');
+        const code = searchParams.get('code');
         const errorParam = searchParams.get('error');
 
         if (errorParam) {
@@ -21,22 +21,25 @@ const OAuthCallback: React.FC<OAuthCallbackProps> = ({ onLogin }) => {
             return;
         }
 
-        if (sessionToken && userParam) {
-            try {
-                const user = JSON.parse(decodeURIComponent(userParam));
+        if (code) {
+            // Exchange short-lived code for session token via secure POST request
+            api.post('/auth/google/exchange', { code })
+                .then(({ data }) => {
+                    const { token, user } = data;
 
-                // Store session and user data in localStorage
-                localStorage.setItem('token', sessionToken);
-                localStorage.setItem('user', JSON.stringify(user));
+                    // Store session and user data in localStorage
+                    localStorage.setItem('token', token);
+                    localStorage.setItem('user', JSON.stringify(user));
 
-                // Trigger login and navigate to dashboard
-                onLogin();
-                navigate('/dashboard', { replace: true });
-            } catch (err) {
-                console.error('Failed to process OAuth callback:', err);
-                setError('Failed to process authentication');
-                setTimeout(() => navigate('/login', { replace: true }), 3000);
-            }
+                    // Trigger login and navigate to dashboard
+                    onLogin();
+                    navigate('/dashboard', { replace: true });
+                })
+                .catch((err) => {
+                    console.error('Failed to exchange auth code:', err);
+                    setError('Failed to complete authentication');
+                    setTimeout(() => navigate('/login', { replace: true }), 3000);
+                });
         } else {
             setError('Missing authentication data');
             setTimeout(() => navigate('/login', { replace: true }), 3000);
