@@ -40,9 +40,12 @@ interface UpgradeRequest {
 }
 
 import { useLanguage } from '../contexts/LanguageContext';
+import { useNotification } from '../contexts/NotificationContext';
+import ConfirmationModal from './ConfirmationModal';
 
 const AdminDashboard = () => {
     const { t } = useLanguage();
+    const { showNotification } = useNotification();
     const [users, setUsers] = useState<User[]>([]);
     const [upgradeRequests, setUpgradeRequests] = useState<UpgradeRequest[]>([]);
     const [loading, setLoading] = useState(true);
@@ -124,11 +127,12 @@ const AdminDashboard = () => {
                 method: 'PATCH',
                 body: JSON.stringify({ [field]: value }),
             });
+            showNotification(`Successfully updated user ${field}`, "success");
         } catch (err) {
             console.error("Failed to update user", err);
             // Revert on failure
             setUsers(previousUsers);
-            alert("Failed to update user");
+            showNotification("Failed to update user", "error");
         }
     };
 
@@ -143,8 +147,9 @@ const AdminDashboard = () => {
             if (action === 'approve') {
                 fetchUsers();
             }
+            showNotification(`Request successfully ${action}d`, "success");
         } else {
-            alert(result.error || 'Failed to process request');
+            showNotification(result.error || 'Failed to process request', "error");
         }
         setProcessingId(null);
     };
@@ -174,12 +179,14 @@ const AdminDashboard = () => {
             if (data.success) {
                 setUsers(prev => prev.filter(u => u.id !== deleteTarget.id));
                 closeDeleteConfirm();
+                showNotification(`User deleted perfectly`, "success");
             } else {
-                alert(data.error || 'Failed to delete user');
+                showNotification(data.error || 'Failed to delete user', "error");
                 setIsDeleting(false);
             }
         } catch (err) {
             console.error('Delete user failed:', err);
+            showNotification('Failed to delete user due to an unexpected error', "error");
             setIsDeleting(false);
         }
     };
@@ -188,17 +195,18 @@ const AdminDashboard = () => {
     const [broadcastTitle, setBroadcastTitle] = useState('');
     const [broadcastBody, setBroadcastBody] = useState('');
     const [isSendingBroadcast, setIsSendingBroadcast] = useState(false);
+    const [isBroadcastConfirmOpen, setIsBroadcastConfirmOpen] = useState(false);
 
-    const handleSendBroadcast = async () => {
+    const handleSendBroadcastClick = () => {
         if (!broadcastBody.trim()) {
-            alert("Please enter a message body");
+            showNotification("Please enter a message body", "error");
             return;
         }
 
-        if (!confirm("Are you sure you want to send this notification to ALL users?")) {
-            return;
-        }
+        setIsBroadcastConfirmOpen(true);
+    };
 
+    const confirmSendBroadcast = async () => {
         setIsSendingBroadcast(true);
         try {
             const response = await authService.fetchWithAuth('/api/admin/notifications/broadcast', {
@@ -212,15 +220,16 @@ const AdminDashboard = () => {
             const data = await response.json();
 
             if (data.success) {
-                alert(`Broadcast sent successfully to ${data.count} users!`);
+                showNotification(`Broadcast sent successfully to ${data.count} users!`, "success");
                 setBroadcastTitle('');
                 setBroadcastBody('');
+                setIsBroadcastConfirmOpen(false);
             } else {
-                alert(data.error || "Failed to send broadcast");
+                showNotification(data.error || "Failed to send broadcast", "error");
             }
         } catch (err) {
             console.error("Failed to send broadcast:", err);
-            alert("An error occurred while sending broadcast");
+            showNotification("An error occurred while sending broadcast", "error");
         } finally {
             setIsSendingBroadcast(false);
         }
@@ -433,7 +442,7 @@ const AdminDashboard = () => {
                         </div>
                         <div className="flex justify-end">
                             <button
-                                onClick={handleSendBroadcast}
+                                onClick={handleSendBroadcastClick}
                                 disabled={isSendingBroadcast || !broadcastBody.trim()}
                                 className="flex items-center gap-2 px-6 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed shadow-md shadow-blue-500/20"
                             >
@@ -891,7 +900,6 @@ const AdminDashboard = () => {
                             </>
                         )}
 
-                        {/* Step 2: Type email to confirm */}
                         {deleteStep === 2 && (
                             <>
                                 <div className="flex items-center gap-3">
@@ -938,6 +946,18 @@ const AdminDashboard = () => {
                     </div>
                 </div>
             )}
+
+            {/* Confirmation Modals */}
+            <ConfirmationModal
+                isOpen={isBroadcastConfirmOpen}
+                onClose={() => setIsBroadcastConfirmOpen(false)}
+                onConfirm={confirmSendBroadcast}
+                title="Send Broadcast"
+                message="Are you sure you want to send this notification to ALL eligible users?"
+                confirmText="Send Broadcast"
+                variant="info"
+                isLoading={isSendingBroadcast}
+            />
         </div>
     );
 };
