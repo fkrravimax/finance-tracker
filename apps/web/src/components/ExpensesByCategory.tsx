@@ -7,7 +7,7 @@ const ExpensesByCategory: React.FC = () => {
     const { t } = useLanguage();
     const [startDate, setStartDate] = useState(() => {
         const date = new Date();
-        date.setMonth(date.getMonth() - 1); // Exactly 1 month ago
+        date.setDate(1); // 1st of current month
         return date.toISOString().split('T')[0];
     });
     const [endDate, setEndDate] = useState(() => {
