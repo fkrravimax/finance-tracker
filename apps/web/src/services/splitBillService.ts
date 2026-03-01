@@ -809,7 +809,7 @@ class SplitBillService {
             });
 
             const subtotalRatio = receipt.subtotal > 0 ? (participantSubtotal / receipt.subtotal) : 0;
-            const taxShare = receipt.taxInclusive ? 0 : receipt.tax * subtotalRatio;
+            const taxShare = receipt.tax * subtotalRatio;
             const serviceShare = receipt.serviceCharge * subtotalRatio;
             const discountShare = receipt.discount * subtotalRatio;
             const finalTotal = participantSubtotal + taxShare + serviceShare - discountShare;

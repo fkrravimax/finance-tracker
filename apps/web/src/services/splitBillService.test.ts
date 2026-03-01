@@ -925,3 +925,119 @@ Stim Nasi Ayam Cincang
         expect(parsed.grandTotal).toBe(305000);
     });
 });
+
+
+// ════════════════════════════════════════════
+// UNIT TESTS: calculateSplit
+// ════════════════════════════════════════════
+
+describe('calculateSplit — Pro-rata tax distribution', () => {
+    const makeReceipt = (overrides = {}) => ({
+        items: [
+            { id: 'item-1', name: 'Ayam Bakar', qty: 1, unitPrice: 20000, total: 20000 },
+            { id: 'item-2', name: 'Nasi Putih', qty: 1, unitPrice: 5000, total: 5000 },
+        ],
+        subtotal: 25000,
+        tax: 5000,
+        serviceCharge: 0,
+        discount: 0,
+        grandTotal: 55000,
+        taxInclusive: false,
+        ...overrides,
+    });
+
+    const makeAssignments = (participantItems: { itemId: string; share: number }[]) => ([
+        {
+            participantId: 'p1',
+            participantName: 'Rafi',
+            items: participantItems,
+        },
+        {
+            participantId: 'p2',
+            participantName: 'Sarah',
+            items: participantItems,
+        },
+    ]);
+
+    it('distributes tax pro-rata — bug scenario (50k items + 5k tax = 27.5k each)', () => {
+        // Both people share all items equally (50/50)
+        const receipt = makeReceipt({
+            subtotal: 50000, items: [
+                { id: 'item-1', name: 'Ayam Bakar', qty: 2, unitPrice: 20000, total: 40000 },
+                { id: 'item-2', name: 'Nasi Putih', qty: 2, unitPrice: 5000, total: 10000 },
+            ]
+        });
+        const assignments = makeAssignments([
+            { itemId: 'item-1', share: 0.5 },
+            { itemId: 'item-2', share: 0.5 },
+        ]);
+
+        const result = splitBillService.calculateSplit(receipt, assignments);
+
+        expect(result.participants[0].subtotal).toBe(25000);
+        expect(result.participants[0].taxShare).toBe(2500);
+        expect(result.participants[0].total).toBe(27500);
+        expect(result.participants[1].total).toBe(27500);
+    });
+
+    it('distributes tax even when taxInclusive is true and tax > 0', () => {
+        const receipt = makeReceipt({
+            taxInclusive: true, subtotal: 50000, items: [
+                { id: 'item-1', name: 'Ayam Bakar', qty: 2, unitPrice: 20000, total: 40000 },
+                { id: 'item-2', name: 'Nasi Putih', qty: 2, unitPrice: 5000, total: 10000 },
+            ]
+        });
+        const assignments = makeAssignments([
+            { itemId: 'item-1', share: 0.5 },
+            { itemId: 'item-2', share: 0.5 },
+        ]);
+
+        const result = splitBillService.calculateSplit(receipt, assignments);
+
+        // Tax should still be distributed, not zeroed
+        expect(result.participants[0].taxShare).toBe(2500);
+        expect(result.participants[0].total).toBe(27500);
+    });
+
+    it('distributes service charge and discount pro-rata', () => {
+        const receipt = makeReceipt({
+            subtotal: 50000,
+            tax: 5000,
+            serviceCharge: 2500,
+            discount: 5000,
+            items: [
+                { id: 'item-1', name: 'Ayam Bakar', qty: 2, unitPrice: 20000, total: 40000 },
+                { id: 'item-2', name: 'Nasi Putih', qty: 2, unitPrice: 5000, total: 10000 },
+            ],
+        });
+        const assignments = makeAssignments([
+            { itemId: 'item-1', share: 0.5 },
+            { itemId: 'item-2', share: 0.5 },
+        ]);
+
+        const result = splitBillService.calculateSplit(receipt, assignments);
+
+        // Each person: 25000 + 2500 tax + 1250 svc - 2500 disc = 26250
+        expect(result.participants[0].taxShare).toBe(2500);
+        expect(result.participants[0].serviceShare).toBe(1250);
+        expect(result.participants[0].discountShare).toBe(2500);
+        expect(result.participants[0].total).toBe(26250);
+    });
+
+    it('tracks unassigned total correctly', () => {
+        const receipt = makeReceipt({
+            subtotal: 50000, items: [
+                { id: 'item-1', name: 'Ayam Bakar', qty: 2, unitPrice: 20000, total: 40000 },
+                { id: 'item-2', name: 'Nasi Putih', qty: 2, unitPrice: 5000, total: 10000 },
+            ]
+        });
+        // Only assign item-1, leave item-2 unassigned
+        const assignments = [
+            { participantId: 'p1', participantName: 'Rafi', items: [{ itemId: 'item-1', share: 1 }] },
+        ];
+
+        const result = splitBillService.calculateSplit(receipt, assignments);
+
+        expect(result.unassignedTotal).toBe(10000);
+    });
+});
