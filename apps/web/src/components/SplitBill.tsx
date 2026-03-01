@@ -586,7 +586,7 @@ const SplitBill: React.FC = () => {
                             </span>
                             <span className="font-black tracking-tight text-slate-900 text-lg">Rupiku.</span>
                         </div>
-                        <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest mt-0.5 whitespace-nowrap">Generated via Rupiku - Split Bill</span>
+                        <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest mt-0.5 whitespace-nowrap">Generated via Rupiku App</span>
                     </div>
                 </div>
 
