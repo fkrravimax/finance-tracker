@@ -30,7 +30,28 @@ const TransactionList: React.FC<TransactionListProps> = ({ limit }) => {
         fetchTransactions();
     }, []);
 
-    if (loading) return <div className="p-6">{t('common.loading')}</div>;
+    if (loading) return (
+        <div className="xl:col-span-1 rounded-2xl bg-white dark:bg-surface-dark border border-slate-100 dark:border-[#493f22] shadow-sm p-6 flex flex-col h-full">
+            <div className="flex items-center justify-between mb-6">
+                <div className="h-5 w-40 bg-slate-200 dark:bg-slate-700 rounded-lg animate-pulse"></div>
+                <div className="h-4 w-16 bg-slate-200 dark:bg-slate-700 rounded-lg animate-pulse"></div>
+            </div>
+            <div className="flex flex-col gap-4 flex-1">
+                {[...Array(4)].map((_, i) => (
+                    <div key={i} className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-700 animate-pulse"></div>
+                            <div className="flex flex-col gap-1.5">
+                                <div className="h-3.5 w-24 bg-slate-200 dark:bg-slate-700 rounded animate-pulse"></div>
+                                <div className="h-2.5 w-32 bg-slate-100 dark:bg-slate-800 rounded animate-pulse"></div>
+                            </div>
+                        </div>
+                        <div className="h-3.5 w-20 bg-slate-200 dark:bg-slate-700 rounded animate-pulse"></div>
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
 
     return (
         <div className="xl:col-span-1 rounded-2xl bg-white dark:bg-surface-dark border border-slate-100 dark:border-[#493f22] shadow-sm p-6 flex flex-col h-full">

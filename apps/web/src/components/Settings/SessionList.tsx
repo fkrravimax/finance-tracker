@@ -77,8 +77,19 @@ const SessionList: React.FC = () => {
 
     if (loading) {
         return (
-            <div className="flex justify-center p-8">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            <div className="flex flex-col gap-4">
+                {[...Array(3)].map((_, i) => (
+                    <div key={i} className="flex items-start gap-4 p-4 rounded-xl border border-slate-100 dark:border-[#493f22] bg-white dark:bg-[#2b2616]">
+                        <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-slate-200 dark:bg-slate-700 animate-pulse flex-shrink-0"></div>
+                        <div className="flex-1 flex flex-col gap-2">
+                            <div className="h-4 w-48 bg-slate-200 dark:bg-slate-700 rounded animate-pulse"></div>
+                            <div className="flex gap-3">
+                                <div className="h-3 w-24 bg-slate-100 dark:bg-slate-800 rounded animate-pulse"></div>
+                                <div className="h-3 w-32 bg-slate-100 dark:bg-slate-800 rounded animate-pulse"></div>
+                            </div>
+                        </div>
+                    </div>
+                ))}
             </div>
         );
     }

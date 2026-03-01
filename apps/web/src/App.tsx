@@ -1,23 +1,32 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, lazy, Suspense } from 'react'
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import DashboardLayout from './components/DashboardLayout'
 import Dashboard from './components/Dashboard'
-import Reports from './components/Reports'
-import SavingsVault from './components/SavingsVault'
-import Transactions from './components/Transactions'
-import Settings from './components/Settings'
 import Login from './components/Login'
 import LandingPage from './components/LandingPage'
-import TradingDashboard from './components/TradingDashboard'
-import AdminDashboard from './components/AdminDashboard'
 import ErrorBoundary from './components/ErrorBoundary'
 import OAuthCallback from './components/OAuthCallback'
 import { authService } from './services/authService'
 import { authClient } from './lib/auth-client';
-import PrivacyPolicy from './components/PrivacyPolicy';
 import ProtectedRoute from './components/ProtectedRoute';
-import NotificationsPage from './components/NotificationsPage';
-import SplitBill from './components/SplitBill';
+
+// Lazy-loaded pages (code-split per route)
+const Reports = lazy(() => import('./components/Reports'));
+const SavingsVault = lazy(() => import('./components/SavingsVault'));
+const Transactions = lazy(() => import('./components/Transactions'));
+const Settings = lazy(() => import('./components/Settings'));
+const TradingDashboard = lazy(() => import('./components/TradingDashboard'));
+const AdminDashboard = lazy(() => import('./components/AdminDashboard'));
+const NotificationsPage = lazy(() => import('./components/NotificationsPage'));
+const SplitBill = lazy(() => import('./components/SplitBill'));
+const PrivacyPolicy = lazy(() => import('./components/PrivacyPolicy'));
+
+// Suspense fallback shared across all lazy routes
+const PageLoader = () => (
+    <div className="flex h-full items-center justify-center">
+        <span className="w-10 h-10 border-4 border-primary/30 border-t-primary rounded-full animate-spin"></span>
+    </div>
+);
 
 function App() {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -79,7 +88,7 @@ function App() {
 
     // Allow public access to Privacy Policy
     if (location.pathname === '/privacy') {
-        return <PrivacyPolicy />;
+        return <Suspense fallback={<PageLoader />}><PrivacyPolicy /></Suspense>;
     }
 
     // Handle OAuth callback (public route)
@@ -120,28 +129,30 @@ function App() {
     return (
         <ErrorBoundary>
             <DashboardLayout onLogout={handleLogout}>
-                <Routes>
-                    <Route path="/" element={<Navigate to="/dashboard" replace />} />
-                    <Route path="/login" element={<Navigate to="/dashboard" replace />} />
-                    <Route path="/dashboard" element={<Dashboard />} />
-                    <Route path="/transactions" element={<Transactions />} />
-                    <Route path="/reports" element={<Reports />} />
-                    <Route path="/savings" element={<SavingsVault />} />
-                    <Route path="/trading" element={<TradingDashboard />} />
-                    <Route path="/split-bill" element={<SplitBill />} />
-                    <Route path="/settings" element={<Settings />} />
-                    <Route path="/notifications" element={<NotificationsPage />} />
-                    <Route element={<ProtectedRoute allowedRoles={['ADMIN']} />}>
-                        <Route path="/admin" element={<AdminDashboard />} />
-                    </Route>
-                    <Route path="*" element={
-                        <div className="flex flex-col items-center justify-center h-full text-slate-500 dark:text-[#cbbc90]">
-                            <span className="material-symbols-outlined text-6xl mb-4">construction</span>
-                            <h2 className="text-2xl font-bold mb-2">Coming Soon</h2>
-                            <p>This page is currently under construction.</p>
-                        </div>
-                    } />
-                </Routes>
+                <Suspense fallback={<PageLoader />}>
+                    <Routes>
+                        <Route path="/" element={<Navigate to="/dashboard" replace />} />
+                        <Route path="/login" element={<Navigate to="/dashboard" replace />} />
+                        <Route path="/dashboard" element={<Dashboard />} />
+                        <Route path="/transactions" element={<Transactions />} />
+                        <Route path="/reports" element={<Reports />} />
+                        <Route path="/savings" element={<SavingsVault />} />
+                        <Route path="/trading" element={<TradingDashboard />} />
+                        <Route path="/split-bill" element={<SplitBill />} />
+                        <Route path="/settings" element={<Settings />} />
+                        <Route path="/notifications" element={<NotificationsPage />} />
+                        <Route element={<ProtectedRoute allowedRoles={['ADMIN']} />}>
+                            <Route path="/admin" element={<AdminDashboard />} />
+                        </Route>
+                        <Route path="*" element={
+                            <div className="flex flex-col items-center justify-center h-full text-slate-500 dark:text-[#cbbc90]">
+                                <span className="material-symbols-outlined text-6xl mb-4">construction</span>
+                                <h2 className="text-2xl font-bold mb-2">Coming Soon</h2>
+                                <p>This page is currently under construction.</p>
+                            </div>
+                        } />
+                    </Routes>
+                </Suspense>
             </DashboardLayout>
         </ErrorBoundary>
     )
