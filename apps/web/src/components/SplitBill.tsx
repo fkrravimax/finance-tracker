@@ -586,7 +586,7 @@ const SplitBill: React.FC = () => {
                             </span>
                             <span className="font-black tracking-tight text-slate-900 text-lg">Rupiku.</span>
                         </div>
-                        <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">Generated via Rupiku - Split Bill</span>
+                        <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest mt-0.5 whitespace-nowrap">Generated via Rupiku - Split Bill</span>
                     </div>
                 </div>
 
@@ -605,8 +605,8 @@ const SplitBill: React.FC = () => {
             <div className="bg-white dark:bg-[#2b2616] rounded-3xl border border-slate-200 dark:border-[#f4c025]/20 p-8 md:p-12 max-w-lg text-center shadow-xl">
                 {/* Icon */}
                 <div className={`w-20 h-20 mx-auto mb-6 rounded-full flex items-center justify-center shadow-lg ${hasPendingRequest
-                        ? 'bg-gradient-to-br from-blue-400 to-blue-600 shadow-blue-500/30'
-                        : 'bg-gradient-to-br from-amber-400 to-amber-600 shadow-amber-500/30'
+                    ? 'bg-gradient-to-br from-blue-400 to-blue-600 shadow-blue-500/30'
+                    : 'bg-gradient-to-br from-amber-400 to-amber-600 shadow-amber-500/30'
                     }`}>
                     {hasPendingRequest ? <Clock className="w-10 h-10 text-white" /> : <Lock className="w-10 h-10 text-white" />}
                 </div>
@@ -618,8 +618,8 @@ const SplitBill: React.FC = () => {
 
                 {/* Badge */}
                 <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6 ${hasPendingRequest
-                        ? 'bg-blue-100 dark:bg-blue-500/20'
-                        : 'bg-amber-100 dark:bg-amber-500/20'
+                    ? 'bg-blue-100 dark:bg-blue-500/20'
+                    : 'bg-amber-100 dark:bg-amber-500/20'
                     }`}>
                     {hasPendingRequest ? (
                         <>
