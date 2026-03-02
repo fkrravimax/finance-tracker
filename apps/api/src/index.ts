@@ -22,6 +22,20 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
+// ── Security Headers (CSP, anti-clickjack, etc.) ─────────────────────────────
+app.use((_req, res, next) => {
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('X-Frame-Options', 'DENY');
+    res.setHeader('X-XSS-Protection', '0'); // Modern approach: disable legacy filter
+    res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+    res.setHeader('Content-Security-Policy', "default-src 'self'; frame-ancestors 'none'");
+    next();
+});
+
+// ── CSRF Origin Validation ───────────────────────────────────────────────────
+import { csrfMiddleware } from './middleware/csrf.middleware.js';
+app.use(csrfMiddleware);
+
 // ── Rate Limiting ────────────────────────────────────────────────────────────
 // Global rate limit: 100 requests per 15 minutes per IP
 const globalLimiter = rateLimit({

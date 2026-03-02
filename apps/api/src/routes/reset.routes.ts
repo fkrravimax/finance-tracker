@@ -5,6 +5,7 @@ import { db } from '../db/index.js';
 import { accounts } from '../db/schema.js';
 import { eq, and } from 'drizzle-orm';
 import { verifyPassword } from "better-auth/crypto";
+import { auditService } from '../services/audit.service.js';
 
 const router = Router();
 
@@ -46,6 +47,16 @@ router.post('/', authMiddleware, async (req: Request, res: Response) => {
         // Google-only users: no password check needed — session auth + UI confirmation is sufficient
 
         const result = await resetService.resetUserData(userId);
+
+        // Audit log
+        auditService.log({
+            userId,
+            action: 'DATA_RESET',
+            targetId: userId,
+            targetType: 'user',
+            ipAddress: req.ip,
+        });
+
         res.json(result);
     } catch (error) {
         console.error("Reset error", error);

@@ -4,6 +4,7 @@ import { users, upgradeRequests, sessions, accounts, wallets, transactions, savi
 import { eq, desc } from 'drizzle-orm';
 import { adminMiddleware } from '../middleware/admin.middleware.js';
 import { pushService, type PushPayload } from '../services/push.service.js';
+import { auditService } from '../services/audit.service.js';
 import { randomUUID } from 'crypto';
 
 const router = Router();
@@ -164,6 +165,17 @@ router.patch('/upgrade-requests/:id', async (req: Request, res: Response) => {
                 ? 'User has been upgraded to ' + upgradeRequest.requestedPlan
                 : 'Upgrade request has been rejected'
         });
+
+        // Audit log
+        const adminUser = (req as any).user;
+        auditService.log({
+            userId: adminUser.id,
+            action: 'USER_UPGRADE',
+            targetId: upgradeRequest.userId,
+            targetType: 'upgrade_request',
+            metadata: { requestId: id, action, plan: upgradeRequest.requestedPlan },
+            ipAddress: req.ip,
+        });
     } catch (error) {
         console.error("Error processing upgrade request:", error);
         res.status(500).json({ error: "Failed to process upgrade request" });
@@ -240,6 +252,16 @@ router.post('/notifications/broadcast', async (req: Request, res: Response) => {
             count: userIds.length,
             details: { success: successCount, failed: failCount }
         });
+
+        // Audit log
+        const adminUser = (req as any).user;
+        auditService.log({
+            userId: adminUser.id,
+            action: 'BROADCAST_SENT',
+            targetType: 'broadcast',
+            metadata: { title: payload.title, recipientCount: userIds.length, successCount, failCount },
+            ipAddress: req.ip,
+        });
     } catch (error) {
         console.error("Error sending broadcast:", error);
         res.status(500).json({ error: "Failed to send broadcast" });
@@ -287,6 +309,16 @@ router.delete('/users/:id', async (req: Request, res: Response) => {
         });
 
         console.log(`Admin ${adminUser.email} deleted user ${targetUser.email} (${id})`);
+
+        // Audit log
+        auditService.log({
+            userId: adminUser.id,
+            action: 'USER_DELETE',
+            targetId: id as string,
+            targetType: 'user',
+            metadata: { deletedEmail: targetUser.email, deletedName: targetUser.name },
+            ipAddress: req.ip,
+        });
 
         res.json({
             success: true,

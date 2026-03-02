@@ -235,4 +235,23 @@ export const watchlists = pgTable("watchlist", {
     lastPrice: text("last_price"), // Encrypted snapshot for comparison
     lastCheckedAt: timestamp("last_checked_at"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
-});
+}, (table) => ({
+    userIdIdx: index("watchlist_user_id_idx").on(table.userId),
+}));
+
+// --- Audit Logs Table ---
+
+export const auditLogs = pgTable("audit_log", {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: text("user_id").notNull(), // Who performed the action (no FK — user may be deleted)
+    action: text("action").notNull(), // e.g., 'USER_DELETE', 'DATA_RESET', 'BROADCAST_SENT'
+    targetId: text("target_id"), // ID of the affected resource (user, request, etc.)
+    targetType: text("target_type"), // e.g., 'user', 'upgrade_request'
+    metadata: text("metadata"), // JSON stringified extra data
+    ipAddress: text("ip_address"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+}, (table) => ({
+    userIdIdx: index("audit_log_user_id_idx").on(table.userId),
+    actionIdx: index("audit_log_action_idx").on(table.action),
+    createdAtIdx: index("audit_log_created_at_idx").on(table.createdAt),
+}));
