@@ -521,20 +521,15 @@ class SplitBillService {
      * Much more accurate than Tesseract.js for complex receipts.
      */
     async parseReceiptWithGemini(file: File): Promise<ParsedReceipt> {
-        // Convert file to base64 data URL
-        const dataUrl = await new Promise<string>((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onload = () => resolve(reader.result as string);
-            reader.onerror = () => reject(new Error("Failed to read image file"));
-            reader.readAsDataURL(file);
-        });
+        // Compress image to stay within Vercel's 4.5MB body limit
+        const compressedDataUrl = await this.compressImageForUpload(file);
 
         // Dynamic import to avoid circular dependency
         const { default: api } = await import('./api');
 
         const response = await api.post('/ai/parse-receipt', {
-            image: dataUrl,
-            mimeType: file.type || 'image/jpeg',
+            image: compressedDataUrl,
+            mimeType: 'image/jpeg',
         });
 
         const data = response.data;
@@ -557,6 +552,48 @@ class SplitBillService {
             grandTotal: Number(data.grandTotal) || 0,
             taxInclusive: Boolean(data.taxInclusive),
         };
+    }
+
+    /**
+     * Compresses an image file for API upload.
+     * Resizes to max 1600px width, converts to JPEG at 0.85 quality.
+     * Keeps text readable while staying well under Vercel's 4.5MB body limit.
+     */
+    private async compressImageForUpload(file: File): Promise<string> {
+        return new Promise((resolve, reject) => {
+            const img = new Image();
+            const url = URL.createObjectURL(file);
+
+            img.onload = () => {
+                URL.revokeObjectURL(url);
+
+                const MAX_WIDTH = 1600;
+                let { width, height } = img;
+
+                if (width > MAX_WIDTH) {
+                    height = Math.round((height * MAX_WIDTH) / width);
+                    width = MAX_WIDTH;
+                }
+
+                const canvas = document.createElement('canvas');
+                canvas.width = width;
+                canvas.height = height;
+
+                const ctx = canvas.getContext('2d')!;
+                ctx.drawImage(img, 0, 0, width, height);
+
+                // JPEG at 85% quality — good balance of size vs text clarity
+                const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+                resolve(dataUrl);
+            };
+
+            img.onerror = () => {
+                URL.revokeObjectURL(url);
+                reject(new Error('Failed to load image for compression'));
+            };
+
+            img.src = url;
+        });
     }
 
     /**
