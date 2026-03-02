@@ -41,7 +41,7 @@ const receiptSchema: Schema = {
 };
 
 const visionModel = genAI.getGenerativeModel({
-    model: "gemini-2.0-flash",
+    model: "gemini-2.5-flash",
     generationConfig: {
         responseMimeType: "application/json",
         responseSchema: receiptSchema,
