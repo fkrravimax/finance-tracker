@@ -516,6 +516,50 @@ class SplitBillService {
     }
 
     /**
+     * Parses a receipt image using Gemini AI Vision API (server-side).
+     * Returns structured ParsedReceipt directly — no regex parsing needed.
+     * Much more accurate than Tesseract.js for complex receipts.
+     */
+    async parseReceiptWithGemini(file: File): Promise<ParsedReceipt> {
+        // Convert file to base64 data URL
+        const dataUrl = await new Promise<string>((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result as string);
+            reader.onerror = () => reject(new Error("Failed to read image file"));
+            reader.readAsDataURL(file);
+        });
+
+        // Dynamic import to avoid circular dependency
+        const { default: api } = await import('./api');
+
+        const response = await api.post('/ai/parse-receipt', {
+            image: dataUrl,
+            mimeType: file.type || 'image/jpeg',
+        });
+
+        const data = response.data;
+
+        // Convert to ParsedReceipt format (add IDs to items)
+        const items: ReceiptItem[] = (data.items || []).map((item: any) => ({
+            id: crypto.randomUUID(),
+            name: String(item.name || 'Unknown Item'),
+            qty: Math.max(1, Math.round(Number(item.qty) || 1)),
+            unitPrice: Number(item.unitPrice) || 0,
+            total: Number(item.total) || 0,
+        }));
+
+        return {
+            items,
+            subtotal: Number(data.subtotal) || 0,
+            tax: Number(data.tax) || 0,
+            serviceCharge: Number(data.serviceCharge) || 0,
+            discount: Math.abs(Number(data.discount) || 0),
+            grandTotal: Number(data.grandTotal) || 0,
+            taxInclusive: Boolean(data.taxInclusive),
+        };
+    }
+
+    /**
      * Parses raw OCR text into a structured receipt.
      *
      * Strategy:

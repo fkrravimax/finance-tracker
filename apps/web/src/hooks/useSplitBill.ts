@@ -24,25 +24,44 @@ export function useSplitBill() {
     // items[itemId] -> array of participantIds
     const [itemAssignments, setItemAssignments] = useState<Record<string, string[]>>({});
 
-    // Step 1: Process Image
+    // Step 1: Process Image (Gemini AI primary, Tesseract.js fallback)
     const processImage = async (file: File) => {
         setIsProcessingIndicator(true);
         setError(null);
         setReceiptImageRaw(file);
 
         try {
-            // 1. Preprocess
+            // Try Gemini AI first (server-side, more accurate)
+            setProcessingProgress(20);
+            console.log('[SplitBill] Trying Gemini AI...');
+
+            try {
+                const parsed = await splitBillService.parseReceiptWithGemini(file);
+                console.log('[SplitBill] Gemini AI success:', parsed);
+
+                // Create a preview image for the review step
+                const previewUrl = URL.createObjectURL(file);
+                setReceiptImageEnhanced(previewUrl);
+
+                setReceiptData(parsed);
+                setProcessingProgress(100);
+                setCurrentStep('review');
+                return;
+            } catch (geminiErr: any) {
+                console.warn('[SplitBill] Gemini AI failed, falling back to Tesseract:', geminiErr.message);
+            }
+
+            // Fallback: Tesseract.js (client-side OCR)
+            console.log('[SplitBill] Using Tesseract.js fallback...');
             setProcessingProgress(10);
             const enhancedDataUrl = await splitBillService.preprocessImage(file);
             setReceiptImageEnhanced(enhancedDataUrl);
 
-            // 2. OCR
             setProcessingProgress(20);
             const text = await splitBillService.runOCR(enhancedDataUrl, (p) => {
-                setProcessingProgress(20 + Math.floor(p * 0.7)); // Scale 0-100 to 20-90
+                setProcessingProgress(20 + Math.floor(p * 0.7));
             });
 
-            // 3. Parse
             setProcessingProgress(95);
             const parsed = splitBillService.parseReceiptText(text);
             setReceiptData(parsed);

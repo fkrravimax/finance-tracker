@@ -56,7 +56,7 @@ app.use('/api/auth/sign-up', authLimiter);
 app.all("/api/auth/*splat", toNodeHandler(auth));
 
 // Body parser for all other routes
-app.use(express.json());
+app.use(express.json({ limit: '10mb' }));
 
 import transactionRoutes from './routes/transaction.routes.js';
 import { authMiddleware } from './middleware/auth.middleware.js';
