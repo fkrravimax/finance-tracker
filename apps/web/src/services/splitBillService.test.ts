@@ -946,7 +946,7 @@ describe('calculateSplit — Pro-rata tax distribution', () => {
         ...overrides,
     });
 
-    const makeAssignments = (participantItems: { itemId: string; share: number }[]) => ([
+    const makeAssignments = (participantItems: { itemId: string; share: number; qtyAssigned: number }[]) => ([
         {
             participantId: 'p1',
             participantName: 'Rafi',
@@ -968,8 +968,8 @@ describe('calculateSplit — Pro-rata tax distribution', () => {
             ]
         });
         const assignments = makeAssignments([
-            { itemId: 'item-1', share: 0.5 },
-            { itemId: 'item-2', share: 0.5 },
+            { itemId: 'item-1', share: 0.5, qtyAssigned: 1 },
+            { itemId: 'item-2', share: 0.5, qtyAssigned: 1 },
         ]);
 
         const result = splitBillService.calculateSplit(receipt, assignments);
@@ -988,8 +988,8 @@ describe('calculateSplit — Pro-rata tax distribution', () => {
             ]
         });
         const assignments = makeAssignments([
-            { itemId: 'item-1', share: 0.5 },
-            { itemId: 'item-2', share: 0.5 },
+            { itemId: 'item-1', share: 0.5, qtyAssigned: 1 },
+            { itemId: 'item-2', share: 0.5, qtyAssigned: 1 },
         ]);
 
         const result = splitBillService.calculateSplit(receipt, assignments);
@@ -1011,8 +1011,8 @@ describe('calculateSplit — Pro-rata tax distribution', () => {
             ],
         });
         const assignments = makeAssignments([
-            { itemId: 'item-1', share: 0.5 },
-            { itemId: 'item-2', share: 0.5 },
+            { itemId: 'item-1', share: 0.5, qtyAssigned: 1 },
+            { itemId: 'item-2', share: 0.5, qtyAssigned: 1 },
         ]);
 
         const result = splitBillService.calculateSplit(receipt, assignments);
@@ -1033,7 +1033,7 @@ describe('calculateSplit — Pro-rata tax distribution', () => {
         });
         // Only assign item-1, leave item-2 unassigned
         const assignments = [
-            { participantId: 'p1', participantName: 'Rafi', items: [{ itemId: 'item-1', share: 1 }] },
+            { participantId: 'p1', participantName: 'Rafi', items: [{ itemId: 'item-1', share: 1, qtyAssigned: 2 }] },
         ];
 
         const result = splitBillService.calculateSplit(receipt, assignments);
