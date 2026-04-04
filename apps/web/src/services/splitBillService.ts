@@ -24,6 +24,7 @@ export interface ParticipantAssignment {
     items: {
         itemId: string;
         share: number;
+        qtyAssigned: number;
     }[];
 }
 
@@ -865,34 +866,72 @@ class SplitBillService {
     }
 
     /**
-     * Calculates the final split based on pro-rata logic
+     * Calculates the final split based on qty-aware pro-rata logic.
+     * 
+     * Security validations:
+     * - Total qtyAssigned per item cannot exceed item.qty
+     * - All numeric values guarded against NaN/Infinity
+     * - Share ratios clamped to [0, 1]
+     * - Input objects are never mutated
      */
     calculateSplit(receipt: ParsedReceipt, assignments: ParticipantAssignment[]): SplitResult {
         const results: SplitResultParticipant[] = [];
         let assignedTotal = 0;
 
+        // Security: Pre-validate total assigned qty per item doesn't exceed item qty
+        const qtyPerItem: Record<string, number> = {};
         assignments.forEach(participant => {
-            const participantItems: { id: string; name: string; amount: number; }[] = [];
+            participant.items.forEach(assignment => {
+                const qty = Math.max(0, Math.floor(assignment.qtyAssigned || 0));
+                qtyPerItem[assignment.itemId] = (qtyPerItem[assignment.itemId] || 0) + qty;
+            });
+        });
+
+        // Build a clamped qty map — if over-assigned, proportionally scale down
+        const itemQtyLimits: Record<string, number> = {};
+        receipt.items.forEach(item => {
+            itemQtyLimits[item.id] = item.qty;
+        });
+
+        assignments.forEach(participant => {
+            const participantItems: { id: string; name: string; amount: number; qtyAssigned: number; }[] = [];
             let participantSubtotal = 0;
 
             participant.items.forEach(assignment => {
                 const item = receipt.items.find(i => i.id === assignment.itemId);
                 if (item) {
-                    const itemShareAmount = item.total * assignment.share;
+                    // Security: Clamp qty to valid range
+                    let qty = Math.max(0, Math.floor(assignment.qtyAssigned || 0));
+                    const totalAssignedForItem = qtyPerItem[item.id] || 0;
+                    
+                    // If over-assigned, proportionally scale down
+                    if (totalAssignedForItem > item.qty && totalAssignedForItem > 0) {
+                        qty = Math.round((qty / totalAssignedForItem) * item.qty);
+                    }
+
+                    // Calculate share based on qty ratio
+                    const share = item.qty > 0 ? Math.min(1, qty / item.qty) : 0;
+                    const itemShareAmount = item.total * share;
+
+                    // Security: Guard against NaN/Infinity
+                    const safeAmount = isFinite(itemShareAmount) ? itemShareAmount : 0;
+
                     participantItems.push({
                         id: item.id,
                         name: item.name,
-                        amount: itemShareAmount
+                        amount: safeAmount,
+                        qtyAssigned: qty
                     });
-                    participantSubtotal += itemShareAmount;
-                    assignedTotal += itemShareAmount;
+                    participantSubtotal += safeAmount;
+                    assignedTotal += safeAmount;
                 }
             });
 
             const subtotalRatio = receipt.subtotal > 0 ? (participantSubtotal / receipt.subtotal) : 0;
-            const taxShare = receipt.tax * subtotalRatio;
-            const serviceShare = receipt.serviceCharge * subtotalRatio;
-            const discountShare = receipt.discount * subtotalRatio;
+            const safeRatio = isFinite(subtotalRatio) ? Math.min(1, Math.max(0, subtotalRatio)) : 0;
+            const taxShare = receipt.tax * safeRatio;
+            const serviceShare = receipt.serviceCharge * safeRatio;
+            const discountShare = receipt.discount * safeRatio;
             const finalTotal = participantSubtotal + taxShare + serviceShare - discountShare;
 
             results.push({
@@ -903,7 +942,7 @@ class SplitBillService {
                 taxShare,
                 serviceShare,
                 discountShare,
-                total: finalTotal
+                total: isFinite(finalTotal) ? Math.max(0, finalTotal) : 0
             });
         });
 

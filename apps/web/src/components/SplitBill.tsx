@@ -378,13 +378,18 @@ const SplitBill: React.FC = () => {
                 {/* Assignment List */}
                 <div className="w-full pr-0 md:pr-2 space-y-3 pb-8">
                     {splitState.receiptData.items.map(item => {
-                        const assignedIds = splitState.itemAssignments[item.id] || [];
-                        const isFullyAssigned = assignedIds.length > 0;
-                        const individualCost = isFullyAssigned ? item.total / assignedIds.length : item.total;
+                        const isMultiQty = item.qty > 1;
+                        const totalAssigned = splitState.getTotalAssignedQty(item.id);
+                        const remainingQty = splitState.getRemainingQty(item.id);
+
+                        const isFullyAssigned = totalAssigned >= item.qty;
+                        const hasAnyAssignment = totalAssigned > 0;
 
                         return (
-                            <div key={item.id} className={`p-4 rounded-2xl border transition-colors ${isFullyAssigned
-                                ? 'bg-slate-50 dark:bg-slate-900/50 border-slate-200 dark:border-white/10'
+                            <div key={item.id} className={`p-4 rounded-2xl border transition-colors ${hasAnyAssignment
+                                ? isFullyAssigned
+                                    ? 'bg-slate-50 dark:bg-slate-900/50 border-green-200 dark:border-green-900/30'
+                                    : 'bg-slate-50 dark:bg-slate-900/50 border-amber-200 dark:border-amber-900/30'
                                 : 'bg-white dark:bg-slate-800 border-red-200 dark:border-red-900/30 shadow-sm'
                                 }`}>
                                 <div className="flex justify-between items-start mb-3">
@@ -394,30 +399,115 @@ const SplitBill: React.FC = () => {
                                     </div>
                                     <div className="text-right">
                                         <div className="font-bold text-slate-800 dark:text-white font-mono">{formatRp(item.total)}</div>
-                                        {isFullyAssigned && assignedIds.length > 1 && (
-                                            <div className="text-xs font-bold text-primary font-mono">{formatRp(individualCost)} / person</div>
+                                        {isFullyAssigned && (
+                                            <div className="text-xs font-bold text-green-500 flex items-center gap-1 justify-end">
+                                                <span className="material-symbols-outlined text-[14px]">check_circle</span>
+                                                Fully Assigned
+                                            </div>
                                         )}
-                                        {!isFullyAssigned && (
+                                        {hasAnyAssignment && !isFullyAssigned && (
+                                            <div className="text-xs font-bold text-amber-500 flex items-center gap-1 justify-end">
+                                                <span className="material-symbols-outlined text-[14px]">warning</span>
+                                                {remainingQty} qty unassigned
+                                            </div>
+                                        )}
+                                        {!hasAnyAssignment && (
                                             <div className="text-xs font-bold text-red-500">Unassigned</div>
                                         )}
                                     </div>
                                 </div>
 
-                                {/* Toggle Chips */}
+                                {/* Qty Progress Bar (only for multi-qty items) */}
+                                {isMultiQty && hasAnyAssignment && (
+                                    <div className="mb-3">
+                                        <div className="w-full bg-slate-200 dark:bg-slate-700 h-1.5 rounded-full overflow-hidden">
+                                            <div
+                                                className={`h-full rounded-full transition-all duration-300 ${isFullyAssigned ? 'bg-green-500' : 'bg-amber-400'}`}
+                                                style={{ width: `${Math.min(100, (totalAssigned / item.qty) * 100)}%` }}
+                                            />
+                                        </div>
+                                        <div className="text-[10px] text-slate-400 mt-1 font-medium">
+                                            {totalAssigned} / {item.qty} qty assigned
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Assignment Controls */}
                                 <div className="flex flex-wrap gap-2 mt-2">
                                     {splitState.participants.map(p => {
-                                        const isSelected = assignedIds.includes(p.id);
+                                        const assignedQty = splitState.getAssignedQty(item.id, p.id);
+                                        const isSelected = assignedQty > 0;
+
+                                        if (!isMultiQty) {
+                                            // ── Simple toggle chip for qty=1 items ──
+                                            return (
+                                                <button
+                                                    key={p.id}
+                                                    onClick={() => splitState.toggleItemAssignment(item.id, p.id)}
+                                                    className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all border ${isSelected
+                                                        ? 'bg-primary text-white border-primary shadow-md shadow-primary/20 scale-105'
+                                                        : 'bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-600 hover:border-primary/50'
+                                                        }`}
+                                                >
+                                                    {p.name}
+                                                </button>
+                                            );
+                                        }
+
+                                        // ── Qty stepper for multi-qty items ──
+                                        const canIncrement = remainingQty > 0;
+                                        const perPersonCost = assignedQty > 0 ? (item.unitPrice * assignedQty) : 0;
+
                                         return (
-                                            <button
+                                            <div
                                                 key={p.id}
-                                                onClick={() => splitState.toggleItemAssignment(item.id, p.id)}
-                                                className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all border ${isSelected
-                                                    ? 'bg-primary text-white border-primary shadow-md shadow-primary/20 scale-105'
-                                                    : 'bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-600 hover:border-primary/50'
-                                                    }`}
+                                                className={`flex items-center gap-1.5 rounded-xl border transition-all px-2 py-1.5 ${
+                                                    isSelected
+                                                        ? 'bg-primary/5 dark:bg-primary/10 border-primary/30 shadow-sm'
+                                                        : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-600'
+                                                }`}
                                             >
-                                                {p.name}
-                                            </button>
+                                                {/* Participant name — tap to toggle */}
+                                                <button
+                                                    onClick={() => splitState.toggleItemAssignment(item.id, p.id)}
+                                                    className={`text-xs font-bold px-1.5 py-0.5 rounded-md transition-colors ${
+                                                        isSelected ? 'text-primary' : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'
+                                                    }`}
+                                                >
+                                                    {p.name}
+                                                </button>
+
+                                                {isSelected && (
+                                                    <>
+                                                        {/* Decrement button */}
+                                                        <button
+                                                            onClick={() => splitState.decrementItemAssignment(item.id, p.id)}
+                                                            className="w-6 h-6 rounded-lg bg-slate-200 dark:bg-slate-700 hover:bg-red-100 dark:hover:bg-red-900/30 flex items-center justify-center text-slate-600 dark:text-slate-300 hover:text-red-500 transition-colors"
+                                                        >
+                                                            <span className="material-symbols-outlined text-[14px]">remove</span>
+                                                        </button>
+
+                                                        {/* Qty display */}
+                                                        <span className="text-sm font-black text-primary min-w-[20px] text-center tabular-nums">
+                                                            {assignedQty}
+                                                        </span>
+
+                                                        {/* Increment button */}
+                                                        <button
+                                                            onClick={() => splitState.incrementItemAssignment(item.id, p.id)}
+                                                            disabled={!canIncrement}
+                                                            className="w-6 h-6 rounded-lg bg-slate-200 dark:bg-slate-700 hover:bg-green-100 dark:hover:bg-green-900/30 flex items-center justify-center text-slate-600 dark:text-slate-300 hover:text-green-500 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                                                        >
+                                                            <span className="material-symbols-outlined text-[14px]">add</span>
+                                                        </button>
+
+                                                        {/* Per-person cost */}
+                                                        <span className="text-[10px] font-bold text-primary/60 ml-0.5 whitespace-nowrap">
+                                                            {formatRp(perPersonCost)}
+                                                        </span>
+                                                    </>
+                                                )}
+                                            </div>
                                         );
                                     })}
                                 </div>
@@ -468,8 +558,9 @@ const SplitBill: React.FC = () => {
             results.participants.forEach(p => {
                 if (p.total > 0) {
                     text += `*👤 ${p.name}: ${formatRp(p.total)}*\n`;
-                    p.items.forEach(item => {
-                        text += `  - ${item.name}: ${formatRp(item.amount)}\n`;
+                    p.items.forEach((item: any) => {
+                        const qtyInfo = item.qtyAssigned && item.qtyAssigned > 0 ? ` (${item.qtyAssigned}x)` : '';
+                        text += `  - ${item.name}${qtyInfo}: ${formatRp(item.amount)}\n`;
                     });
                     if (p.taxShare > 0 || p.serviceShare > 0 || p.discountShare > 0) {
                         text += `  _(Incl. Tax/Svc/Disc: ${formatRp(p.taxShare + p.serviceShare - p.discountShare)})_\n`;
@@ -554,9 +645,14 @@ const SplitBill: React.FC = () => {
                                     </div>
                                 </div>
                                 <div className="space-y-2 mt-4 text-sm">
-                                    {p.items.map(item => (
+                                    {p.items.map((item: any) => (
                                         <div key={item.id} className="flex justify-between text-slate-600">
-                                            <span>{item.name}</span>
+                                            <span>
+                                                {item.name}
+                                                {item.qtyAssigned && item.qtyAssigned > 0 && (
+                                                    <span className="text-slate-400 ml-1">×{item.qtyAssigned}</span>
+                                                )}
+                                            </span>
                                             <span className="font-mono">{formatRp(item.amount)}</span>
                                         </div>
                                     ))}

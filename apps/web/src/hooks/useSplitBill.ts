@@ -21,8 +21,8 @@ export function useSplitBill() {
 
     const [participants, setParticipants] = useState<{ id: string, name: string }[]>([]);
 
-    // items[itemId] -> array of participantIds
-    const [itemAssignments, setItemAssignments] = useState<Record<string, string[]>>({});
+    // Qty-aware assignments: items[itemId] -> { participantId: qtyAssigned }
+    const [itemAssignments, setItemAssignments] = useState<Record<string, Record<string, number>>>({});
 
     // Step 1: Process Image (Gemini AI primary, Tesseract.js fallback)
     const processImage = async (file: File) => {
@@ -124,6 +124,12 @@ export function useSplitBill() {
                 grandTotal: subtotal + prev.tax + prev.serviceCharge - prev.discount
             };
         });
+        // Clean up assignments for removed item
+        setItemAssignments(prev => {
+            const next = { ...prev };
+            delete next[id];
+            return next;
+        });
     };
 
     const updateReceiptTotals = (field: keyof ParsedReceipt, value: any) => {
@@ -144,39 +150,149 @@ export function useSplitBill() {
 
     const removeParticipant = (id: string) => {
         setParticipants(prev => prev.filter(p => p.id !== id));
-        // Clean up assignments
+        // Clean up qty assignments for removed participant
         setItemAssignments(prev => {
-            const next = { ...prev };
-            Object.keys(next).forEach(itemId => {
-                next[itemId] = next[itemId].filter(pId => pId !== id);
+            const next: Record<string, Record<string, number>> = {};
+            Object.entries(prev).forEach(([itemId, assignments]) => {
+                const cleaned = { ...assignments };
+                delete cleaned[id];
+                // Only keep the entry if there are remaining assignments
+                if (Object.keys(cleaned).length > 0) {
+                    next[itemId] = cleaned;
+                }
             });
             return next;
         });
     };
 
-    const toggleItemAssignment = (itemId: string, participantId: string) => {
+    // ── Qty-Aware Assignment Helpers ─────────────────────────────────────
+
+    /** Get how many qty of this item are assigned to a specific participant */
+    const getAssignedQty = useCallback((itemId: string, participantId: string): number => {
+        return itemAssignments[itemId]?.[participantId] || 0;
+    }, [itemAssignments]);
+
+    /** Get total qty assigned across all participants for this item */
+    const getTotalAssignedQty = useCallback((itemId: string): number => {
+        const assignments = itemAssignments[itemId];
+        if (!assignments) return 0;
+        return Object.values(assignments).reduce((sum, qty) => sum + qty, 0);
+    }, [itemAssignments]);
+
+    /** Get remaining unassigned qty for this item */
+    const getRemainingQty = useCallback((itemId: string): number => {
+        const item = receiptData.items.find(i => i.id === itemId);
+        if (!item) return 0;
+        return Math.max(0, item.qty - getTotalAssignedQty(itemId));
+    }, [receiptData.items, getTotalAssignedQty]);
+
+    /** Get all participant IDs that have any qty assigned to this item */
+    const getAssignedParticipantIds = useCallback((itemId: string): string[] => {
+        const assignments = itemAssignments[itemId];
+        if (!assignments) return [];
+        return Object.entries(assignments)
+            .filter(([, qty]) => qty > 0)
+            .map(([pid]) => pid);
+    }, [itemAssignments]);
+
+    /** Set a specific qty for a participant on an item (with validation) */
+    const updateItemQtyAssignment = useCallback((itemId: string, participantId: string, qty: number) => {
+        // Security: Enforce integer, non-negative
+        const safeQty = Math.max(0, Math.floor(qty));
+
         setItemAssignments(prev => {
-            const currentAssignments = prev[itemId] || [];
-            if (currentAssignments.includes(participantId)) {
-                return { ...prev, [itemId]: currentAssignments.filter(id => id !== participantId) };
-            } else {
-                return { ...prev, [itemId]: [...currentAssignments, participantId] };
+            const item = receiptData.items.find(i => i.id === itemId);
+            if (!item) return prev;
+
+            const currentAssignments = prev[itemId] || {};
+            // Security: Check total assigned won't exceed item qty
+            const otherAssignedQty = Object.entries(currentAssignments)
+                .filter(([pid]) => pid !== participantId)
+                .reduce((sum, [, q]) => sum + q, 0);
+
+            const clampedQty = Math.min(safeQty, item.qty - otherAssignedQty);
+            const finalQty = Math.max(0, clampedQty);
+
+            if (finalQty === 0) {
+                // Remove participant from this item
+                const { [participantId]: _, ...rest } = currentAssignments;
+                if (Object.keys(rest).length === 0) {
+                    const { [itemId]: __, ...restItems } = prev;
+                    return restItems;
+                }
+                return { ...prev, [itemId]: rest };
             }
+
+            return {
+                ...prev,
+                [itemId]: {
+                    ...currentAssignments,
+                    [participantId]: finalQty
+                }
+            };
         });
-    };
+    }, [receiptData.items]);
+
+    /** Increment qty for a participant on an item by 1 */
+    const incrementItemAssignment = useCallback((itemId: string, participantId: string) => {
+        const current = getAssignedQty(itemId, participantId);
+        const remaining = getRemainingQty(itemId);
+        if (remaining > 0) {
+            updateItemQtyAssignment(itemId, participantId, current + 1);
+        }
+    }, [getAssignedQty, getRemainingQty, updateItemQtyAssignment]);
+
+    /** Decrement qty for a participant on an item by 1 */
+    const decrementItemAssignment = useCallback((itemId: string, participantId: string) => {
+        const current = getAssignedQty(itemId, participantId);
+        if (current > 0) {
+            updateItemQtyAssignment(itemId, participantId, current - 1);
+        }
+    }, [getAssignedQty, updateItemQtyAssignment]);
+
+    /**
+     * Hybrid toggle:
+     * - qty=1 items: simple on/off toggle (same as before)
+     * - qty>1 items: adds 1 qty if not assigned, removes if already assigned
+     */
+    const toggleItemAssignment = useCallback((itemId: string, participantId: string) => {
+        const item = receiptData.items.find(i => i.id === itemId);
+        if (!item) return;
+
+        const currentQty = getAssignedQty(itemId, participantId);
+
+        if (item.qty === 1) {
+            // Simple toggle for single-qty items
+            updateItemQtyAssignment(itemId, participantId, currentQty > 0 ? 0 : 1);
+        } else {
+            // For multi-qty items: toggle adds 1 or removes entirely
+            if (currentQty > 0) {
+                updateItemQtyAssignment(itemId, participantId, 0);
+            } else {
+                // Add 1 qty if there's remaining capacity
+                const remaining = getRemainingQty(itemId);
+                if (remaining > 0) {
+                    updateItemQtyAssignment(itemId, participantId, 1);
+                }
+            }
+        }
+    }, [receiptData.items, getAssignedQty, getRemainingQty, updateItemQtyAssignment]);
 
     // Step 4: Yield final calculated results
     const calculateResults = useCallback((): SplitResult => {
-        // Map itemAssignments back to ParticipantAssignment array for the service
+        // Map itemAssignments to ParticipantAssignment array with qty-based shares
         const formattedAssignments: ParticipantAssignment[] = participants.map(p => {
-            const participantItems: { itemId: string; share: number; }[] = [];
+            const participantItems: { itemId: string; share: number; qtyAssigned: number; }[] = [];
 
-            Object.entries(itemAssignments).forEach(([itemId, assignedUserIds]) => {
-                if (assignedUserIds.includes(p.id)) {
-                    // Split equally among everyone assigned to this item
+            Object.entries(itemAssignments).forEach(([itemId, assignments]) => {
+                const qtyAssigned = assignments[p.id] || 0;
+                if (qtyAssigned > 0) {
+                    const item = receiptData.items.find(i => i.id === itemId);
+                    const totalQty = item?.qty || 1;
                     participantItems.push({
                         itemId,
-                        share: 1 / assignedUserIds.length
+                        share: totalQty > 0 ? qtyAssigned / totalQty : 0,
+                        qtyAssigned
                     });
                 }
             });
@@ -209,6 +325,9 @@ export function useSplitBill() {
         processImage,
         participants, addParticipant, removeParticipant,
         itemAssignments, toggleItemAssignment,
+        // New qty-aware functions
+        getAssignedQty, getTotalAssignedQty, getRemainingQty, getAssignedParticipantIds,
+        updateItemQtyAssignment, incrementItemAssignment, decrementItemAssignment,
         calculateResults,
         reset
     };
