@@ -14,10 +14,12 @@ import { authService } from '../services/authService';
 import SessionList from './Settings/SessionList';
 import PageTransition from './ui/PageTransition';
 import { StaggerContainer, StaggerItem, ScaleButton } from './ui/Motion';
+import { usePrivacyMask } from '../hooks/usePrivacyMask';
 
 const Settings: React.FC = () => {
     const { theme, setTheme, privacyMode, setPrivacyMode } = useAppearance();
     const { language, setLanguage, t } = useLanguage();
+    const { maskCurrency } = usePrivacyMask();
     const [budgetLimit, setBudgetLimit] = useState('');
     const [loading, setLoading] = useState(false);
     const [currentUser, setCurrentUser] = useState<any>(null);
@@ -631,7 +633,7 @@ const Settings: React.FC = () => {
                                 </div>
                                 <div>
                                     <h3 className="font-bold text-slate-900 dark:text-white line-clamp-1">{trans.name}</h3>
-                                    <p className="text-primary font-bold">{formatCurrency(trans.amount)}</p>
+                                    <p className="text-primary font-bold">{maskCurrency(formatCurrency(trans.amount))}</p>
                                 </div>
                                 <div className="mt-auto pt-3 border-t border-slate-200 dark:border-[#493f22] flex items-center gap-2 text-xs text-slate-500 dark:text-[#cbbc90]">
                                     <span className="material-symbols-outlined text-[16px]">event_repeat</span>

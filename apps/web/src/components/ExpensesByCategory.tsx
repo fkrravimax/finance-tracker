@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
+import { usePrivacyMask } from '../hooks/usePrivacyMask';
 import { transactionService } from '../services/transactionService';
 
 // Reusable component
 const ExpensesByCategory: React.FC = () => {
     const { t } = useLanguage();
+    const { maskCurrency } = usePrivacyMask();
     const [startDate, setStartDate] = useState(() => {
         const date = new Date();
         date.setDate(1); // 1st of current month
@@ -127,7 +129,7 @@ const ExpensesByCategory: React.FC = () => {
                                     <span className="font-bold text-slate-900 dark:text-white">{cat.category}</span>
                                     <div className="text-right">
                                         <span className="font-bold text-slate-900 dark:text-white">
-                                            {cat.amount.toLocaleString('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 })}
+                                            {maskCurrency(cat.amount.toLocaleString('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }))}
                                         </span>
                                         <span className="text-xs text-slate-500 dark:text-[#cbbc90] ml-2">({cat.percentage.toFixed(1)}%)</span>
                                     </div>
@@ -147,7 +149,7 @@ const ExpensesByCategory: React.FC = () => {
                         <div className="text-center">
                             <p className="text-slate-500 dark:text-[#cbbc90] mb-2">{t('reports.totalExpensesPeriod')}</p>
                             <h2 className="text-4xl font-black text-slate-900 dark:text-white">
-                                {categories.reduce((acc, c) => acc + c.amount, 0).toLocaleString('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 })}
+                                {maskCurrency(categories.reduce((acc, c) => acc + c.amount, 0).toLocaleString('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }))}
                             </h2>
                             <p className="text-xs text-slate-400 mt-2">
                                 {new Date(startDate).toLocaleDateString()} - {new Date(endDate).toLocaleDateString()}

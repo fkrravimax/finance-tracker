@@ -6,7 +6,7 @@ interface LandingCTAProps {
 }
 
 const LandingCTA: React.FC<LandingCTAProps> = ({ onSignUp }) => {
-    const { t } = useLanguage();
+    const { t, language } = useLanguage();
 
     return (
         <section className="w-full py-24 px-4 md:px-8 relative">
@@ -28,7 +28,7 @@ const LandingCTA: React.FC<LandingCTAProps> = ({ onSignUp }) => {
                         {t('landing.hero.getStarted')}
                     </button>
                     <button className="px-8 py-4 bg-white dark:bg-[#2b2616] border border-slate-200 dark:border-[#493f22] text-slate-900 dark:text-white font-bold text-lg rounded-2xl transition-all hover:bg-slate-50 dark:hover:bg-[#1a160b] w-full sm:w-auto">
-                        View Demo
+                        {language === 'id' ? 'Lihat Demo' : 'View Demo'}
                     </button>
                 </div>
             </div>

@@ -326,13 +326,13 @@
         "hero": {
             "title": "Kelola Keuangan",
             "titleHighlight": "dengan Ceria",
-            "subtitle": "Pelacak keuangan yang indah dan intuitif, membuat pengelolaan uang jadi sederhana dan menyenangkan.",
+            "subtitle": "Pelacak keuangan yang indah dan intuitif, membuat pencatatan pengeluaran jadi sederhana dan menyenangkan.",
             "getStarted": "Mulai Sekarang",
             "signIn": "Masuk"
         },
         "features": {
             "title": "Fitur Unggulan",
-            "subtitle": "Segala yang Anda butuhkan untuk mengelola kekayaan Anda di satu tempat.",
+            "subtitle": "Segala yang Anda butuhkan untuk mengelola pengeluaran Anda di satu tempat.",
             "dashboard": "Dashboard",
             "dashboardDesc": "Lihat ringkasan lengkap keuangan Anda",
             "transactions": "Transaksi",

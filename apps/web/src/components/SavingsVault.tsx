@@ -9,6 +9,7 @@ import { StaggerContainer, StaggerItem, ScaleButton } from './ui/Motion';
 import { motion } from 'framer-motion';
 
 import { useLanguage } from '../contexts/LanguageContext';
+import { usePrivacyMask } from '../hooks/usePrivacyMask';
 
 // Helper to get dynamic image based on name using Bing Images (More reliable for search terms)
 const getGoalImage = (name: string): string => {
@@ -21,6 +22,7 @@ const getGoalImage = (name: string): string => {
 
 const SavingsVault: React.FC = () => {
     const { t } = useLanguage();
+    const { maskCurrency } = usePrivacyMask();
     const [goals, setGoals] = useState<SavingsGoal[]>([]);
     const [loading, setLoading] = useState(true);
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -350,7 +352,7 @@ const SavingsVault: React.FC = () => {
                             <p className="text-slate-500 dark:text-[#cbbc90] font-medium">{t('savings.totalSaved')}</p>
                         </div>
                         <div>
-                            <p className="text-3xl font-bold text-slate-900 dark:text-white">{formatCurrency(totalSaved)}</p>
+                            <p className="text-3xl font-bold text-slate-900 dark:text-white">{maskCurrency(formatCurrency(totalSaved))}</p>
                             <div className="flex items-center gap-1 mt-1 text-sm font-medium text-green-500">
                                 <span className="material-symbols-outlined text-base">trending_up</span>
                                 <span>{t('savings.onTrack')}</span>
@@ -379,7 +381,7 @@ const SavingsVault: React.FC = () => {
                             <p className="text-slate-500 dark:text-[#cbbc90] font-medium">{t('savings.monthlyTarget')}</p>
                         </div>
                         <div>
-                            <p className="text-3xl font-bold text-slate-900 dark:text-white">{formatCurrency(monthlySavings)}</p>
+                            <p className="text-3xl font-bold text-slate-900 dark:text-white">{maskCurrency(formatCurrency(monthlySavings))}</p>
                             <p className="text-sm mt-1 text-slate-400 dark:text-[#cbbc90]">{t('savings.neededForTargets')}</p>
                         </div>
                     </div>
@@ -438,8 +440,8 @@ const SavingsVault: React.FC = () => {
 
                                     <div className="flex flex-col gap-2 mt-auto">
                                         <div className="flex justify-between items-end text-sm">
-                                            <span className="font-bold text-slate-900 dark:text-white">{formatCurrency(goal.currentAmount)}</span>
-                                            <span className="text-slate-500 dark:text-[#cbbc90]">of {formatCurrency(goal.targetAmount)}</span>
+                                            <span className="font-bold text-slate-900 dark:text-white">{maskCurrency(formatCurrency(goal.currentAmount))}</span>
+                                            <span className="text-slate-500 dark:text-[#cbbc90]">of {maskCurrency(formatCurrency(goal.targetAmount))}</span>
                                         </div>
                                         <div className="w-full h-3 bg-slate-100 dark:bg-[#231e10] rounded-full overflow-hidden">
                                             <motion.div

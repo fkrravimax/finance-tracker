@@ -3,6 +3,7 @@ import TransactionTableSkeleton from './skeletons/TransactionTableSkeleton';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useUI } from '../contexts/UIContext';
 import { useNotification } from '../contexts/NotificationContext';
+import { usePrivacyMask } from '../hooks/usePrivacyMask';
 import { transactionService } from '../services/transactionService';
 import ConfirmationModal from './ConfirmationModal';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -29,6 +30,7 @@ const MONTH_NAMES = [
 
 const Transactions: React.FC = () => {
     const { t } = useLanguage();
+    const { maskCurrency } = usePrivacyMask();
     const now = new Date();
     const [selectedMonth, setSelectedMonth] = useState(now.getMonth());
     const [selectedYear, setSelectedYear] = useState(now.getFullYear());
@@ -253,7 +255,7 @@ const Transactions: React.FC = () => {
                         <div>
                             <p className="text-sm text-slate-500 dark:text-[#cbbc90]">{t('transactions.income')}</p>
                             <p className="text-2xl font-bold text-slate-900 dark:text-white">
-                                {formatCurrency(transactions.filter(t => t.type === 'income').reduce((sum, t) => sum + Number(t.amount), 0))}
+                                {maskCurrency(formatCurrency(transactions.filter(t => t.type === 'income').reduce((sum, t) => sum + Number(t.amount), 0)))}
                             </p>
                         </div>
                     </div>
@@ -264,7 +266,7 @@ const Transactions: React.FC = () => {
                         <div>
                             <p className="text-sm text-slate-500 dark:text-[#cbbc90]">{t('transactions.expense')}</p>
                             <p className="text-2xl font-bold text-slate-900 dark:text-white">
-                                {formatCurrency(transactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + Number(t.amount), 0))}
+                                {maskCurrency(formatCurrency(transactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + Number(t.amount), 0)))}
                             </p>
                         </div>
                     </div>
@@ -340,7 +342,7 @@ const Transactions: React.FC = () => {
                                                 <td className="p-4 text-sm text-slate-600 dark:text-[#cbbc90]">{transaction.category}</td>
                                                 <td className="p-4 text-sm text-slate-500 dark:text-[#cbbc90]">{formatDate(transaction.date)}</td>
                                                 <td className={`p-4 font-bold ${transaction.type === 'income' ? 'text-green-600 dark:text-green-400' : 'text-slate-900 dark:text-white'}`}>
-                                                    {transaction.type === 'income' ? '+' : '-'}{formatCurrency(transaction.amount)}
+                                                    {transaction.type === 'income' ? '+' : '-'}{maskCurrency(formatCurrency(transaction.amount))}
                                                 </td>
                                                 <td className="p-4 pr-6 text-right">
                                                     <span className="inline-block px-2 py-1 text-xs font-bold rounded-md bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">

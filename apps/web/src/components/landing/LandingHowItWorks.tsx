@@ -3,7 +3,7 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import { motion } from 'framer-motion';
 
 const LandingHowItWorks: React.FC = () => {
-    const { t } = useLanguage();
+    const { t, language } = useLanguage();
 
     const steps = [
         { num: 1, icon: 'person_add', title: t('landing.howItWorks.step1Title'), desc: t('landing.howItWorks.step1Desc') },
@@ -21,7 +21,7 @@ const LandingHowItWorks: React.FC = () => {
                     {t('landing.howItWorks.title')}
                 </h2>
                 <p className="text-lg text-slate-600 dark:text-[#cbbc90] max-w-2xl">
-                    Get started in minutes and take control of your financial future.
+                    {language === 'en' ? 'Get started in minutes and take control of your financial future.' : 'Mulai dalam beberapa menit dan kendalikan masa depan finansial Anda.'}
                 </p>
             </div>
 

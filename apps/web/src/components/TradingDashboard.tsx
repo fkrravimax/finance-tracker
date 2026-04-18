@@ -8,6 +8,7 @@ import { authService } from '../services/authService';
 import { upgradeService } from '../services/upgradeService';
 import { useAppearance } from '../contexts/AppearanceContext';
 import { useLanguage } from '../contexts/LanguageContext';
+import { usePrivacyMask } from '../hooks/usePrivacyMask';
 import LogTradeModal from './LogTradeModal';
 import WithdrawTradeModal from './WithdrawTradeModal';
 import DepositTradeModal from './DepositTradeModal';
@@ -22,6 +23,7 @@ import { cryptoService } from '../services/cryptoService';
 const TradingDashboard = () => {
     const { currentTheme } = useAppearance();
     const { t } = useLanguage();
+    const { maskCurrency, isExtremeHide, MASK } = usePrivacyMask();
     const isDark = currentTheme === 'dark';
     const [stats, setStats] = useState<any>(null);
     const [trades, setTrades] = useState<any[]>([]);
@@ -322,7 +324,7 @@ const TradingDashboard = () => {
                                     </p>
                                     {loading ? <Skeleton className="h-8 w-32 bg-slate-200 dark:bg-[#f4c025]/10" /> : (
                                         <h2 className="text-2xl md:text-3xl font-bold text-slate-800 dark:text-white">
-                                            ${stats?.currentBalance?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                            ${maskCurrency(stats?.currentBalance?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }))}
                                         </h2>
                                     )}
                                 </div>
@@ -398,7 +400,7 @@ const TradingDashboard = () => {
                                                 <Skeleton className="w-24 h-6 bg-slate-200 dark:bg-[#f4c025]/10 mt-1" />
                                             ) : (
                                                 <p className={`text-xl font-bold ${stats?.totalPnl >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
-                                                    {stats?.totalPnl >= 0 ? '+' : ''}${stats?.totalPnl?.toLocaleString()}
+                                                    {stats?.totalPnl >= 0 ? '+' : ''}${maskCurrency(stats?.totalPnl?.toLocaleString())}
                                                 </p>
                                             )}
                                         </div>
@@ -443,6 +445,7 @@ const TradingDashboard = () => {
                                                         color: isDark ? 'white' : '#1e293b'
                                                     }}
                                                     itemStyle={{ color: isDark ? '#f4c025' : '#d97706' }}
+                                                    formatter={(value: number | string | undefined) => isExtremeHide ? MASK : `$${Number(value ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
                                                 />
                                                 <Area
                                                     type="monotone"
@@ -523,11 +526,11 @@ const TradingDashboard = () => {
                                                         <div className="grid grid-cols-3 gap-2 mb-3">
                                                             <div>
                                                                 <p className="text-[10px] text-slate-400 dark:text-[#cbbc90] uppercase">Entry</p>
-                                                                <p className="text-sm font-bold text-slate-700 dark:text-white">${pos.entryPrice.toLocaleString()}</p>
+                                                                <p className="text-sm font-bold text-slate-700 dark:text-white">${maskCurrency(pos.entryPrice.toLocaleString())}</p>
                                                             </div>
                                                             <div>
                                                                 <p className="text-[10px] text-slate-400 dark:text-[#cbbc90] uppercase">Margin</p>
-                                                                <p className="text-sm font-bold text-slate-700 dark:text-white">${pos.amount.toLocaleString()}</p>
+                                                                <p className="text-sm font-bold text-slate-700 dark:text-white">${maskCurrency(pos.amount.toLocaleString())}</p>
                                                             </div>
                                                             <div>
                                                                 <p className="text-[10px] text-slate-400 dark:text-[#cbbc90] uppercase">Leverage</p>
@@ -628,15 +631,15 @@ const TradingDashboard = () => {
                                                     <td className="p-4 text-slate-500 dark:text-[#cbbc90]">{trade.leverage}x</td>
                                                     <td className="p-4 text-right">
                                                         <div className="flex flex-col items-end">
-                                                            <span className="text-xs text-slate-500 dark:text-[#cbbc90]">Entry: ${parseFloat(trade.entryPrice).toLocaleString()}</span>
-                                                            <span className="text-slate-800 dark:text-white">${parseFloat(trade.closePrice || '0').toLocaleString()}</span>
+                                                            <span className="text-xs text-slate-500 dark:text-[#cbbc90]">Entry: ${maskCurrency(parseFloat(trade.entryPrice).toLocaleString())}</span>
+                                                            <span className="text-slate-800 dark:text-white">${maskCurrency(parseFloat(trade.closePrice || '0').toLocaleString())}</span>
                                                         </div>
                                                     </td>
                                                     <td className={`p-4 text-right font-bold ${parseFloat(trade.pnl) >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
-                                                        {parseFloat(trade.pnl) >= 0 ? '+' : ''}${parseFloat(trade.pnl).toLocaleString()}
+                                                        {parseFloat(trade.pnl) >= 0 ? '+' : ''}${maskCurrency(parseFloat(trade.pnl).toLocaleString())}
                                                         <div className="text-[10px] font-normal opacity-70">
-                                                            {/* ROI Calc guess */}
-                                                            ({((parseFloat(trade.pnl) / parseFloat(trade.amount)) * 100).toFixed(2)}%)
+                                                            {/* ROI Calc */}
+                                                            ({isExtremeHide ? MASK : `${((parseFloat(trade.pnl) / parseFloat(trade.amount)) * 100).toFixed(2)}%`})
                                                         </div>
                                                     </td>
                                                     <td className="p-4 text-right">

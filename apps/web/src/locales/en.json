@@ -326,13 +326,13 @@
         "hero": {
             "title": "Track Your Finances",
             "titleHighlight": "with Joy",
-            "subtitle": "A beautiful, intuitive finance tracker that makes managing money simple and delightful.",
+            "subtitle": "A beautiful, intuitive finance tracker that makes expense tracking simple and delightful.",
             "getStarted": "Get Started",
             "signIn": "Sign In"
         },
         "features": {
             "title": "Powerful Features",
-            "subtitle": "Everything you need to manage your wealth in one place.",
+            "subtitle": "Everything you need to manage your expenses in one place.",
             "dashboard": "Dashboard",
             "dashboardDesc": "Get a complete overview of your finances",
             "transactions": "Transactions",

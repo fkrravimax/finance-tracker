@@ -7,9 +7,11 @@ import PageTransition from './ui/PageTransition';
 import { StaggerContainer, StaggerItem } from './ui/Motion';
 
 import { useLanguage } from '../contexts/LanguageContext';
+import { usePrivacyMask } from '../hooks/usePrivacyMask';
 
 const Reports: React.FC = () => {
     const { t } = useLanguage();
+    const { maskCurrency } = usePrivacyMask();
     const [timeRange, setTimeRange] = useState('Monthly');
     const [reportData, setReportData] = useState<any>(null);
     const [loading, setLoading] = useState(true);
@@ -116,10 +118,10 @@ const Reports: React.FC = () => {
                                                     {formatPeriod(row.period)}
                                                 </td>
                                                 <td className="py-3 px-4 text-green-600 dark:text-green-400 font-medium">
-                                                    +{row.income.toLocaleString('id-ID', { style: 'currency', currency: 'IDR' })}
+                                                    +{maskCurrency(row.income.toLocaleString('id-ID', { style: 'currency', currency: 'IDR' }))}
                                                 </td>
                                                 <td className="py-3 px-4 text-red-600 dark:text-red-400 font-medium">
-                                                    -{row.expense.toLocaleString('id-ID', { style: 'currency', currency: 'IDR' })}
+                                                    -{maskCurrency(row.expense.toLocaleString('id-ID', { style: 'currency', currency: 'IDR' }))}
                                                 </td>
                                                 <td className="py-3 px-4 last:pr-2">
                                                     <span className={`px-2 py-1 rounded-md text-xs font-bold ${row.income > row.expense
@@ -155,9 +157,9 @@ const Reports: React.FC = () => {
                                             <div className="flex justify-between items-end">
                                                 <span className="text-sm font-bold text-slate-700 dark:text-[#cbbc90]">{t('reports.totalPeriodSpending').replace('{period}', t('common.monthly'))}</span>
                                                 <span className="text-xs font-medium text-slate-500 dark:text-[#8e8568]">
-                                                    {Number(item.actual).toLocaleString('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 })}
+                                                    {maskCurrency(Number(item.actual).toLocaleString('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }))}
                                                     <span className="text-slate-300 dark:text-[#493f22] mx-1">/</span>
-                                                    {item.limit > 0 ? Number(item.limit).toLocaleString('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }) : t('reports.noLimit')}
+                                                    {item.limit > 0 ? maskCurrency(Number(item.limit).toLocaleString('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 })) : t('reports.noLimit')}
                                                 </span>
                                             </div>
                                             <div className="relative w-full h-4 bg-slate-100 dark:bg-[#342d18] rounded-full overflow-hidden mt-1">
@@ -184,7 +186,7 @@ const Reports: React.FC = () => {
                                 <div>
                                     <p className="text-sm text-slate-500 dark:text-[#cbbc90] font-medium mb-1">{t('reports.totalSavings')} ({getLocalizedPeriodLabel(timeRange)})</p>
                                     <h3 className="text-3xl font-black text-slate-900 dark:text-white">
-                                        {reportData.history.reduce((acc: number, curr: any) => acc + (curr.income - curr.expense), 0).toLocaleString('id-ID', { style: 'currency', currency: 'IDR' })}
+                                        {maskCurrency(reportData.history.reduce((acc: number, curr: any) => acc + (curr.income - curr.expense), 0).toLocaleString('id-ID', { style: 'currency', currency: 'IDR' }))}
                                     </h3>
                                 </div>
                                 <div className="w-12 h-12 rounded-full bg-green-900/30 text-green-500 flex items-center justify-center">

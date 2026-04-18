@@ -16,7 +16,7 @@ const LandingHero: React.FC<LandingHeroProps> = ({ onSignUp }) => {
                 <StaggerItem>
                     <div className="inline-block px-3 py-1 bg-primary/10 dark:bg-primary/20 rounded-full mb-6 border border-primary/20">
                         <span className="text-xs font-bold text-primary uppercase tracking-wider">
-                            {language === 'en' ? 'The Ultimate Finance Tracker' : 'Aplikasi Keuangan Terbaik'}
+                            {language === 'en' ? 'The Best Solution for Expense Tracking' : 'Solusi Terbaik untuk Mencatat pengeluaran'}
                         </span>
                     </div>
                 </StaggerItem>
