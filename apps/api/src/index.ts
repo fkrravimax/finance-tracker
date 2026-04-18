@@ -141,7 +141,22 @@ app.get('/api/user/me', authMiddleware, (req, res) => {
     res.json({ user });
 });
 
-// Health Check
+// ── Root Endpoint & Health Status ──────────────────────────────────────────────
+app.get('/', (req, res) => {
+    res.status(200).json({
+        success: true,
+        service: "Rupiku Enterprise API Workspace",
+        status: "online",
+        environment: process.env.NODE_ENV || "development",
+        version: "1.0.0",
+        uptime: process.uptime(),
+        timestamp: new Date().toISOString(),
+        message: "System services are operating normally.",
+        security: "Private API endpoints. Unauthorized access and malicious activities are strictly monitored and logged."
+    });
+});
+
+// Basic Health Check
 app.get('/api/health', (req, res) => {
     res.json({ status: 'ok', timestamp: new Date() });
 });
