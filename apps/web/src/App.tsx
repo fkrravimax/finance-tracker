@@ -37,26 +37,34 @@ function App() {
     // Check for saved auth session
     useEffect(() => {
         const checkAuth = async () => {
-            // Check localStorage first — covers both email/password and Google OAuth sessions
-            if (authService.isAuthenticated()) {
-                setIsAuthenticated(true);
-                setIsAuthChecking(false);
-                return;
-            }
-
-            // Fallback: check Better Auth cookie session (email/password login via cookies)
+            // First, optimistically set authenticated if we have local data for fast initial sense of auth
+            // but we still fetch the latest session from the server to get fresh roles/plans.
+            const hasLocalAuth = authService.isAuthenticated();
+            
             try {
+                // Always check Better Auth cookie session to keep roles and user data fresh
                 const session = await authClient.getSession();
+                
                 if (session.data) {
-                    // Store user data in localStorage for consistency
                     const user = session.data.user;
                     if (user) {
+                        // Crucially, update local storage with fresh user data (roles, plans)
                         localStorage.setItem('user', JSON.stringify(user));
                     }
                     setIsAuthenticated(true);
+                } else if (!hasLocalAuth) {
+                    // Fallback for non-cookie sessions (like old JWT if they exist)
+                    setIsAuthenticated(false);
+                } else {
+                    // They had local auth but the server session is gone -> they are actually logged out
+                    setIsAuthenticated(false);
                 }
             } catch (error) {
                 console.error("Auth check failed", error);
+                if (hasLocalAuth) {
+                    // If offline or error, fallback to local storage
+                    setIsAuthenticated(true);
+                }
             } finally {
                 setIsAuthChecking(false);
             }
