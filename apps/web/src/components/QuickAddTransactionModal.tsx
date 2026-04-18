@@ -93,13 +93,14 @@ const QuickAddTransactionModal: React.FC<QuickAddTransactionModalProps> = ({ isO
     useEffect(() => {
         const timeoutId = setTimeout(() => {
             // Only auto-categorize if NOT editing and user is typing notes
-            if (!initialData && notes && notes.length > 2) {
+            // Disable auto-categorize for Income transactions
+            if (!initialData && notes && notes.length > 2 && transactionType === 'Expense') {
                 handleAutoCategorize();
             }
         }, 1500);
 
         return () => clearTimeout(timeoutId);
-    }, [notes, initialData]);
+    }, [notes, initialData, transactionType]);
 
     const handleSave = async () => {
         if (amount === '0') return;
@@ -329,8 +330,10 @@ const QuickAddTransactionModal: React.FC<QuickAddTransactionModalProps> = ({ isO
                             <div>
 
                                 <div className="flex justify-between items-center mb-2">
-                                    <label className="block text-slate-500 dark:text-[#cbbc90] text-sm font-medium">Notes / Merchant</label>
-                                    {isCategorizing && (
+                                    <label className="block text-slate-500 dark:text-[#cbbc90] text-sm font-medium">
+                                        {transactionType === 'Income' ? 'Source / Description' : 'Notes / Merchant'}
+                                    </label>
+                                    {isCategorizing && transactionType === 'Expense' && (
                                         <span className="text-xs flex items-center gap-1 text-primary animate-pulse">
                                             <span className="material-symbols-outlined text-xs animate-spin">refresh</span>
                                             Auto-Cat...
@@ -340,7 +343,7 @@ const QuickAddTransactionModal: React.FC<QuickAddTransactionModalProps> = ({ isO
 
                                 <input
                                     className="w-full rounded-lg border border-slate-200 dark:border-[#685a31] bg-slate-50 dark:bg-[#342d18] text-slate-900 dark:text-white p-4 text-base font-normal placeholder:text-slate-400 dark:placeholder:text-[#685a31] focus:outline-none focus:ring-2 focus:ring-primary/50 transition-shadow"
-                                    placeholder="e.g. Starbucks, Gojek, Tokopedia..."
+                                    placeholder={transactionType === 'Income' ? "e.g. Salary, Project, John Doe..." : "e.g. Starbucks, Gojek, Tokopedia..."}
                                     type="text"
                                     value={notes}
                                     onChange={(e) => setNotes(e.target.value)}
