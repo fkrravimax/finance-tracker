@@ -7,7 +7,7 @@ import LandingPage from './components/LandingPage'
 import ErrorBoundary from './components/ErrorBoundary'
 import OAuthCallback from './components/OAuthCallback'
 import { authService } from './services/authService'
-import { authClient } from './lib/auth-client';
+import api from './services/api';
 import ProtectedRoute from './components/ProtectedRoute';
 
 // Lazy-loaded pages (code-split per route)
@@ -37,37 +37,37 @@ function App() {
     // Check for saved auth session
     useEffect(() => {
         const checkAuth = async () => {
-            // First, optimistically set authenticated if we have local data for fast initial sense of auth
-            // but we still fetch the latest session from the server to get fresh roles/plans.
             const hasLocalAuth = authService.isAuthenticated();
-            
-            try {
-                // Always check Better Auth cookie session to keep roles and user data fresh
-                const session = await authClient.getSession();
-                
-                if (session.data) {
-                    const user = session.data.user;
-                    if (user) {
-                        // Crucially, update local storage with fresh user data (roles, plans)
-                        localStorage.setItem('user', JSON.stringify(user));
+
+            // Refresh user data from server via /api/user/me.
+            // This endpoint sits behind authMiddleware which handles BOTH:
+            //   1. Better Auth cookie sessions (email/password login)
+            //   2. Bearer token sessions (Google OAuth login)
+            // On success, we update localStorage with fresh role/plan data so
+            // the UI unlocks features instantly without re-login.
+            if (hasLocalAuth) {
+                try {
+                    const { data } = await api.get('/user/me');
+                    if (data?.user) {
+                        localStorage.setItem('user', JSON.stringify(data.user));
                     }
                     setIsAuthenticated(true);
-                } else if (!hasLocalAuth) {
-                    // Fallback for non-cookie sessions (like old JWT if they exist)
-                    setIsAuthenticated(false);
-                } else {
-                    // They had local auth but the server session is gone -> they are actually logged out
-                    setIsAuthenticated(false);
+                } catch (error: any) {
+                    if (error.response?.status === 401) {
+                        // Session truly expired/revoked by server — force logout
+                        localStorage.removeItem('token');
+                        localStorage.removeItem('user');
+                        setIsAuthenticated(false);
+                    } else {
+                        // Network error / server down — trust local data
+                        console.error("Session refresh failed (non-fatal):", error);
+                        setIsAuthenticated(true);
+                    }
                 }
-            } catch (error) {
-                console.error("Auth check failed", error);
-                if (hasLocalAuth) {
-                    // If offline or error, fallback to local storage
-                    setIsAuthenticated(true);
-                }
-            } finally {
-                setIsAuthChecking(false);
+            } else {
+                setIsAuthenticated(false);
             }
+            setIsAuthChecking(false);
         };
         checkAuth();
 

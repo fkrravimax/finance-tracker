@@ -130,6 +130,17 @@ app.use('/api/wallets', authMiddleware, walletRoutes);
 import notificationRoutes from './routes/notification.routes.js';
 app.use('/api/notifications', authMiddleware, notificationRoutes);
 
+// GET /api/user/me — Return fresh user profile (role, plan, etc.)
+// Works for BOTH cookie-based (Better Auth) and Bearer token (Google OAuth) sessions
+// because authMiddleware handles both auth strategies.
+app.get('/api/user/me', authMiddleware, (req, res) => {
+    const user = (req as any).user;
+    if (!user) {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+    res.json({ user });
+});
+
 // Health Check
 app.get('/api/health', (req, res) => {
     res.json({ status: 'ok', timestamp: new Date() });
