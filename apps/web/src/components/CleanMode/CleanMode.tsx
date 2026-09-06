@@ -228,7 +228,7 @@ export const CleanMode: React.FC = () => {
                         />
 
                         {/* TOP ACTION ROW (myBCA Logo + CS, Settings, Logout matching CONTOHTAMPILAN.PNG) */}
-                        <div className="mt-1 mb-2 flex items-center justify-between relative z-10 px-0">
+                        <div className="mt-1 mb-2 flex items-center justify-between relative z-10 -ml-2 -mr-1">
                             <div className="flex items-center cursor-pointer" onClick={() => showToast('myBCA by Bank Central Asia')}>
                                 <img
                                     src="/clean-mode/mybca_logo_hd.png"
@@ -280,7 +280,7 @@ export const CleanMode: React.FC = () => {
                         </div>
 
                         {/* GREETING STRIP */}
-                        <div className="mt-2 mb-2.5 relative z-10 px-0">
+                        <div className="mt-2.5 mb-2.5 relative z-10 pl-1.5 pr-0">
                             <p className="text-[11px] tracking-wide text-white">
                                 <span className="font-normal text-white/90">HELLO, </span>
                                 <span className="font-bold">{userName}</span>
@@ -290,12 +290,12 @@ export const CleanMode: React.FC = () => {
                         {/* PRIMARY ACCOUNT CARD (Entirely enclosed inside Dark Blue Header - Never Cut Off!) */}
                         <div className="relative z-20 rounded-[18px] shadow-lg shadow-black/15 overflow-hidden bg-white">
                             {/* Top Dual-Tone Gradient Strip (#77bcf1 -> #41a2c3 -> #2bb7b9) with Stacked Elements */}
-                            <div className="bg-gradient-to-r from-[#77bcf1] via-[#41a2c3] to-[#2bb7b9] px-4 pt-3 pb-3 flex flex-col gap-2.5 text-white">
+                            <div className="bg-gradient-to-r from-[#77bcf1] via-[#41a2c3] to-[#2bb7b9] px-4 pt-2.5 pb-2.5 flex flex-col gap-2 text-white">
                                 {/* Row 1: BCA ID pill button (Left-aligned) */}
                                 <div>
                                     <div
                                         onClick={() => showToast('BCA ID Aktif')}
-                                        className="inline-flex items-center gap-1.5 bg-white/20 hover:bg-white/30 backdrop-blur-md px-2 py-[2px] rounded-full text-[10.5px] font-medium tracking-wide border border-white/40 cursor-pointer active:scale-95 transition-all"
+                                        className="inline-flex items-center gap-1.5 bg-transparent hover:bg-white/10 px-2 py-[2px] rounded-full text-[10.5px] font-medium tracking-wide border border-white/60 cursor-pointer active:scale-95 transition-all"
                                     >
                                         <svg className="w-3 h-3 fill-none stroke-white stroke-[2]" viewBox="0 0 24 24">
                                             <rect x="3" y="3" width="7" height="7" rx="1.5" />
@@ -338,19 +338,19 @@ export const CleanMode: React.FC = () => {
                             </div>
 
                             {/* Bottom White Card Section */}
-                            <div className="px-4 pt-3.5 pb-3.5 bg-white">
+                            <div className="px-4 pt-2.5 pb-2.5 bg-white">
                                 <p
-                                    className="text-[12px] font-normal text-[#596066] tracking-tight"
-                                    style={{ fontFamily: '"Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif' }}
+                                    className="text-[12px] font-normal text-[#53575a] tracking-tight"
+                                    style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", "Open Sans", sans-serif' }}
                                 >
                                     Active Balance
                                 </p>
-                                <div className="flex items-center justify-between mt-3 mb-3.5">
+                                <div className="flex items-center justify-between mt-1.5 mb-2">
                                     <div className="flex items-baseline gap-2">
                                         <span
                                             className="text-[17.5px] font-extrabold text-[#4a4f56] tracking-tight"
                                             style={{
-                                                fontFamily: '"Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif',
+                                                fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", "Plus Jakarta Sans", sans-serif',
                                                 fontWeight: 800,
                                                 letterSpacing: '-0.02em',
                                                 color: '#4a4f56',
@@ -382,7 +382,7 @@ export const CleanMode: React.FC = () => {
                                 </div>
 
                                 {/* Hairline Divider */}
-                                <div className="border-t border-slate-100 mb-3" />
+                                <div className="border-t border-slate-100 mb-2" />
 
                                 {/* Account Transactions Link */}
                                 <button
@@ -392,11 +392,11 @@ export const CleanMode: React.FC = () => {
                                     <img
                                         src="/clean-mode/icon_account_trans_hd.png"
                                         alt="Transactions"
-                                        className="w-[22px] h-[19px] object-contain shrink-0"
+                                        className="w-[21px] h-[19px] object-contain shrink-0"
                                     />
                                     <span
                                         className="text-[12.5px] font-bold"
-                                        style={{ fontFamily: '"Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif' }}
+                                        style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif' }}
                                     >
                                         Account Transactions
                                     </span>
