@@ -79,7 +79,7 @@ export const CleanMode: React.FC = () => {
         // Sync mobile browser status bar / notch color to match BCA Navy
         const metaTheme = document.querySelector('meta[name="theme-color"]');
         const prevTheme = metaTheme?.getAttribute('content') || '#09090b';
-        if (metaTheme) metaTheme.setAttribute('content', '#0b4b80');
+        if (metaTheme) metaTheme.setAttribute('content', '#254c7f');
 
         return () => {
             if (metaTheme) metaTheme.setAttribute('content', prevTheme);
@@ -153,7 +153,7 @@ export const CleanMode: React.FC = () => {
                 >
 
                     {/* ── 1. DEEP NAVY BLUE HEADER & CARD SECTION (Exact matching CONTOHTAMPILAN.PNG) ── */}
-                    <div className="bg-[#0b4b80] text-white pt-[max(env(safe-area-inset-top,44px),44px)] sm:pt-4 pb-7 px-5 relative overflow-hidden rounded-b-[28px] sm:rounded-b-[32px]">
+                    <div className="bg-[#254c7f] text-white pt-[max(env(safe-area-inset-top,44px),44px)] sm:pt-4 pb-3 px-5 relative overflow-hidden">
                         {/* Authentic myBCA organic wave background motif */}
                         <img
                             src="/clean-mode/header_bg_motif.png"
@@ -327,22 +327,20 @@ export const CleanMode: React.FC = () => {
                         </div>
                     </div>
 
-                    {/* ── 2. SEPARATOR AD BANNER (Overlapping the rounded curve between navy header & light body) ── */}
-                    <div className="relative -mt-6 mx-5 z-30">
-                        <div
-                            onClick={() => showToast('Program Undian myBCA Berhadiah')}
-                            className="cursor-pointer active:scale-[0.99] transition-transform drop-shadow-[0_4px_12px_rgba(0,0,0,0.12)]"
-                        >
-                            <img
-                                src="/clean-mode/banner_prizes_clean.png"
-                                alt="Over 600.000 Prizes Ready to Be Won!"
-                                className="w-full object-contain"
-                            />
-                        </div>
+                    {/* ── 2. SEPARATOR AD BANNER (Exact full-width seamless transition matching CONTOHTAMPILAN.PNG) ── */}
+                    <div
+                        onClick={() => showToast('Program Undian myBCA Berhadiah')}
+                        className="w-full cursor-pointer active:scale-[0.99] transition-transform select-none block relative z-30"
+                    >
+                        <img
+                            src="/clean-mode/ad_banner_top_full.png"
+                            alt="Over 600.000 Prizes Ready to Be Won!"
+                            className="w-full h-auto block select-none"
+                        />
                     </div>
 
                     {/* ── 3. LIGHT BLUE CONTENT SECTION (#f3f7fb) ── */}
-                    <div className="px-4 pt-3 space-y-3">
+                    <div className="px-4 pt-1 space-y-3">
 
                         {/* ── MAIN MENU (Authentic 5-Column Grid with Transparent PNG Icons) ── */}
                         <div className="pt-0.5 pb-1">
