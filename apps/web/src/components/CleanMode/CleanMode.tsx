@@ -332,8 +332,8 @@ export const CleanMode: React.FC = () => {
 
                         {/* PRIMARY ACCOUNT CARD (Entirely enclosed inside Dark Blue Header - Never Cut Off!) */}
                         <div className="relative z-20 rounded-[20px] shadow-lg shadow-black/15 overflow-hidden bg-white">
-                            {/* Top Dual-Tone Gradient Strip (Matching SS 3 Turquoise/Teal) */}
-                            <div className="bg-gradient-to-r from-[#2baabf] via-[#33b1b6] to-[#45b6a7] px-4 pt-2.5 pb-2.5 flex flex-col gap-2 text-white">
+                            {/* Top Dual-Tone Gradient Strip (Matching Authentic myBCA Sky Blue to Turquoise) */}
+                            <div className="bg-gradient-to-r from-[#75bbee] via-[#3da0c1] to-[#29b9b7] px-4 pt-2.5 pb-2.5 flex flex-col gap-2 text-white">
                                 {/* Row 1: BCA ID pill button (Left-aligned) */}
                                 <div>
                                     <div
