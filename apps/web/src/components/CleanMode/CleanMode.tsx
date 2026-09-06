@@ -27,7 +27,6 @@ export const CleanMode: React.FC = () => {
     // Pockets & Card Tab States (1:1 myBCA)
     const [pocketTab, setPocketTab] = useState<'rupiah' | 'forex'>('rupiah');
     const [cardTab, setCardTab] = useState<'debit' | 'credit'>('debit');
-    const [isScrolled, setIsScrolled] = useState<boolean>(false);
 
     // Financial Diary State (Exact 1:1 Matching myBCA)
     const [fdSlide, setFdSlide] = useState<number>(0);
@@ -131,7 +130,7 @@ export const CleanMode: React.FC = () => {
         // Sync mobile browser status bar / notch color to match BCA Navy
         const metaTheme = document.querySelector('meta[name="theme-color"]');
         const prevTheme = metaTheme?.getAttribute('content') || '#09090b';
-        if (metaTheme) metaTheme.setAttribute('content', '#254c7f');
+        if (metaTheme) metaTheme.setAttribute('content', '#0f4277');
 
         return () => {
             if (metaTheme) metaTheme.setAttribute('content', prevTheme);
@@ -222,26 +221,18 @@ export const CleanMode: React.FC = () => {
                 style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", "Plus Jakarta Sans", "Open Sans", sans-serif' }}
             >
 
-            {/* ── PERSISTENT TOP NAVIGATION HEADER (1:1 Native myBCA Header with Authentic Wave Motif & Scrolled Curve) ── */}
-            <div className="absolute top-0 left-0 right-0 z-40 select-none pointer-events-none">
-                {/* Scrolled curved background with authentic waves & corner swoops (fades in on scroll with soft drop shadow) */}
-                <div
-                    className={`absolute inset-0 transition-opacity duration-200 pointer-events-none ${
-                        isScrolled ? 'opacity-100' : 'opacity-0'
-                    }`}
-                    style={{
-                        filter: isScrolled ? 'drop-shadow(0 4px 6px rgba(0, 0, 0, 0.16))' : 'none',
-                    }}
-                >
-                    <img
-                        src="/clean-mode/scrolled_header_bg.png"
-                        alt=""
-                        className="w-full h-auto block select-none pointer-events-none"
-                    />
-                </div>
-
-                {/* Persistent Top Action Row (myBCA Logo + CS, Settings, Logout) - Always in exact native position! */}
-                <div className="pt-[max(env(safe-area-inset-top,44px),44px)] sm:pt-4 pb-2 px-5 flex items-center justify-between relative z-10 pointer-events-auto">
+            {/* ── PERSISTENT TOP NAVIGATION HEADER (1:1 Authentic myBCA Header with Seamless Continuous Motif) ── */}
+            <div
+                className="absolute top-0 left-0 right-0 z-40 select-none overflow-hidden"
+                style={{
+                    backgroundImage: `url('/clean-mode/mybca_seamless_header_bg.png')`,
+                    backgroundSize: '100% auto',
+                    backgroundPosition: 'top center',
+                    backgroundColor: '#0f4277',
+                }}
+            >
+                {/* Persistent Top Action Row (myBCA Logo + CS, Settings, Logout) - Always pinned in exact native position */}
+                <div className="pt-[max(env(safe-area-inset-top,44px),44px)] sm:pt-4 pb-2.5 px-5 flex items-center justify-between relative z-10 pointer-events-auto">
                     {/* myBCA Logo */}
                     <div
                         className="flex items-center cursor-pointer active:scale-95 transition-transform -ml-2"
@@ -300,19 +291,20 @@ export const CleanMode: React.FC = () => {
 
             {/* ── SCROLLABLE APP BODY (Containing Navy Header + Cards + Banners + Menu) ── */}
             <div
-                onScroll={(e) => setIsScrolled(e.currentTarget.scrollTop > 15)}
                 className="flex-1 overflow-y-auto cleanmode-no-scrollbar no-scrollbar pb-28 relative z-10"
                 style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
             >
 
-                    {/* ── 1. DEEP NAVY BLUE HEADER & CARD SECTION (Exact matching CONTOHTAMPILAN.PNG) ── */}
-                    <div className="bg-[#1b4c84] text-white pt-[calc(max(env(safe-area-inset-top,44px),44px)+42px)] sm:pt-[68px] pb-3 px-5 relative overflow-hidden">
-                        {/* Authentic myBCA organic wave background motif */}
-                        <img
-                            src="/clean-mode/header_bg_motif.png"
-                            alt=""
-                            className="absolute inset-0 w-full h-full object-cover pointer-events-none select-none z-0"
-                        />
+                    {/* ── 1. DEEP NAVY BLUE HEADER & CARD SECTION (Exact matching CONTOHTAMPILAN.PNG & Native Video) ── */}
+                    <div
+                        className="text-white pt-[calc(max(env(safe-area-inset-top,44px),44px)+50px)] sm:pt-[76px] pb-3 px-5 relative overflow-hidden"
+                        style={{
+                            backgroundImage: `url('/clean-mode/mybca_seamless_header_bg.png')`,
+                            backgroundSize: '100% auto',
+                            backgroundPosition: 'top center',
+                            backgroundColor: '#0f4277',
+                        }}
+                    >
 
                         {/* GREETING STRIP */}
                         <div className="mt-2.5 mb-2.5 relative z-10 pl-1.5 pr-0">
