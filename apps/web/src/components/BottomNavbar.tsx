@@ -52,6 +52,19 @@ const BottomNavbar: React.FC = () => {
                         className="fixed bottom-32 left-1/2 -translate-x-1/2 flex flex-col items-center gap-4 z-50 md:hidden"
                     >
 
+                        {/* Option 5: Clean Mode (myBCA) */}
+                        <NavLink
+                            to="/clean-mode"
+                            onClick={() => setIsMenuOpen(false)}
+                            className="flex items-center gap-4 bg-white dark:bg-[#2b2616] pl-4 pr-6 py-4 w-64 rounded-2xl shadow-xl border border-slate-100 dark:border-white/10 active:scale-95 transition-transform"
+                        >
+                            <div className="w-10 h-10 rounded-full bg-blue-500/20 text-[#005caa] flex items-center justify-center shrink-0">
+                                <span className="material-symbols-outlined">visibility_off</span>
+                            </div>
+                            <span className="font-bold text-slate-800 dark:text-white text-base flex-1">Clean Mode (myBCA)</span>
+                            <span className="text-[10px] font-black tracking-wider bg-blue-600 text-white px-2 py-0.5 rounded-full shadow-sm relative -mr-2">BCA</span>
+                        </NavLink>
+
                         {/* Option 4: Split Bill */}
                         <NavLink
                             to="/split-bill"

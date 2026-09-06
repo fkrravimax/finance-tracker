@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Open+Sans:wght@400;500;600;700&display=swap');
 @import "tailwindcss";
 
 @layer base {
@@ -117,6 +118,31 @@
 ::-webkit-scrollbar-thumb {
     background: #493f22;
     border-radius: 4px;
+}
+
+/* Hide scrollbar utility to eliminate browser native scrollbars completely */
+@utility no-scrollbar {
+    -ms-overflow-style: none !important;
+    scrollbar-width: none !important;
+    &::-webkit-scrollbar {
+        display: none !important;
+        width: 0 !important;
+        height: 0 !important;
+        background: transparent !important;
+    }
+}
+
+.no-scrollbar::-webkit-scrollbar,
+.no-scrollbar *::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+    background: transparent !important;
+}
+
+.no-scrollbar {
+    -ms-overflow-style: none !important;
+    scrollbar-width: none !important;
 }
 
 /* Light mode scrollbar override */

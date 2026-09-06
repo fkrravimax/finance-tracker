@@ -20,6 +20,7 @@ const AdminDashboard = lazy(() => import('./components/AdminDashboard'));
 const NotificationsPage = lazy(() => import('./components/NotificationsPage'));
 const SplitBill = lazy(() => import('./components/SplitBill'));
 const PrivacyPolicy = lazy(() => import('./components/PrivacyPolicy'));
+const CleanMode = lazy(() => import('./components/CleanMode/CleanMode'));
 
 // Suspense fallback shared across all lazy routes
 const PageLoader = () => (
@@ -97,6 +98,11 @@ function App() {
     // Allow public access to Privacy Policy
     if (location.pathname === '/privacy') {
         return <Suspense fallback={<PageLoader />}><PrivacyPolicy /></Suspense>;
+    }
+
+    // Allow standalone Clean Mode (1:1 myBCA camouflage mode)
+    if (location.pathname === '/clean-mode') {
+        return <Suspense fallback={<PageLoader />}><CleanMode /></Suspense>;
     }
 
     // Handle OAuth callback (public route)
