@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Check, ChevronRight, SlidersHorizontal, ArrowLeft, X } from 'lucide-react';
+import { Check, ChevronRight, SlidersHorizontal, ArrowLeft, X, Settings } from 'lucide-react';
 import { dashboardService } from '../../services/dashboardService';
 import { authService } from '../../services/authService';
 import BcaStatementModal from './BcaStatementModal';
@@ -23,6 +23,10 @@ export const CleanMode: React.FC = () => {
     const [customNameInput, setCustomNameInput] = useState<string>('');
     const [customAccountInput, setCustomAccountInput] = useState<string>('');
     const [customBalanceInput, setCustomBalanceInput] = useState<string>('');
+
+    // Pockets & Card Tab States (1:1 myBCA)
+    const [pocketTab, setPocketTab] = useState<'rupiah' | 'forex'>('rupiah');
+    const [cardTab, setCardTab] = useState<'debit' | 'credit'>('debit');
 
     // Financial Diary State (Exact 1:1 Matching myBCA)
     const [fdSlide, setFdSlide] = useState<number>(0);
@@ -576,13 +580,303 @@ export const CleanMode: React.FC = () => {
                         {/* PROMO BANNER 2 ("Pay 1 Get 2" Doodle Aliens matching CONTOHTAMPILAN.PNG) */}
                         <div
                             onClick={() => showToast('Promo Pay 1 Get 2 myBCA')}
-                            className="cursor-pointer active:scale-[0.99] transition-transform rounded-2xl overflow-hidden shadow-sm mt-2 mb-4"
+                            className="cursor-pointer active:scale-[0.99] transition-transform rounded-2xl overflow-hidden shadow-sm mt-2 mb-2"
                         >
                             <img
                                 src="/clean-mode/banner_aliens_exact.png"
                                 alt="Pay 1 Get 2"
                                 className="w-full object-contain rounded-2xl block"
                             />
+                        </div>
+
+                        {/* ── SEKSI 1: POCKETS (Exact 1:1 Matching myBCA) ── */}
+                        <div className="pt-0.5 pb-1">
+                            {/* Section Header */}
+                            <div className="flex items-center justify-between mb-2.5 px-1">
+                                <h2
+                                    className="text-[16px] font-bold text-[#0c3258] tracking-tight"
+                                    style={{
+                                        fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", "Plus Jakarta Sans", sans-serif',
+                                        color: '#0c3258',
+                                    }}
+                                >
+                                    Pockets
+                                </h2>
+                            </div>
+
+                            {/* Tabs (Rupiah Pocket / Forex Pocket) */}
+                            <div className="flex items-center gap-2 mb-2.5">
+                                <button
+                                    onClick={() => setPocketTab('rupiah')}
+                                    className={`px-3 py-1.5 rounded-[10px] text-[13px] transition-all cursor-pointer ${
+                                        pocketTab === 'rupiah'
+                                            ? 'border-[1.5px] border-[#005caa] bg-[#e4f2fe] text-[#334155] font-semibold shadow-xs'
+                                            : 'border-[1.5px] border-[#cfcfcf] bg-white text-[#6e7479] font-normal hover:bg-slate-50'
+                                    }`}
+                                    style={{
+                                        fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", "Plus Jakarta Sans", sans-serif',
+                                    }}
+                                >
+                                    Rupiah Pocket
+                                </button>
+                                <button
+                                    onClick={() => setPocketTab('forex')}
+                                    className={`px-3 py-1.5 rounded-[10px] text-[13px] transition-all cursor-pointer ${
+                                        pocketTab === 'forex'
+                                            ? 'border-[1.5px] border-[#005caa] bg-[#e4f2fe] text-[#334155] font-semibold shadow-xs'
+                                            : 'border-[1.5px] border-[#cfcfcf] bg-white text-[#6e7479] font-normal hover:bg-slate-50'
+                                    }`}
+                                    style={{
+                                        fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", "Plus Jakarta Sans", sans-serif',
+                                    }}
+                                >
+                                    Forex Pocket
+                                </button>
+                            </div>
+
+                            {/* Pocket Info Card */}
+                            <div className="bg-white rounded-[18px] border border-[#eef2f6] shadow-[0_2px_10px_rgba(0,0,0,0.03)] p-4 flex items-center gap-3.5">
+                                {pocketTab === 'rupiah' ? (
+                                    <>
+                                        <img
+                                            src="/clean-mode/pocket_illustration_hd.png"
+                                            alt="Pocket"
+                                            className="w-[48px] h-auto object-contain shrink-0"
+                                        />
+                                        <div className="flex-1 min-w-0">
+                                            <p
+                                                className="text-[12px] leading-[17px] text-[#4a5568] font-normal"
+                                                style={{
+                                                    fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", "Plus Jakarta Sans", sans-serif',
+                                                }}
+                                            >
+                                                Create a Rupiah Pocket to easily manage your finances according to your needs.
+                                            </p>
+                                            <button
+                                                onClick={() => showToast('Buat Pocket Baru di myBCA')}
+                                                className="text-[13px] font-bold text-[#005caa] hover:underline mt-2 inline-block text-left cursor-pointer active:scale-95 transition-transform"
+                                                style={{
+                                                    fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", "Plus Jakarta Sans", sans-serif',
+                                                }}
+                                            >
+                                                Create Now
+                                            </button>
+                                        </div>
+                                    </>
+                                ) : (
+                                    <>
+                                        <img
+                                            src="/clean-mode/pocket_illustration_hd.png"
+                                            alt="Pocket"
+                                            className="w-[48px] h-auto object-contain shrink-0"
+                                        />
+                                        <div className="flex-1 min-w-0">
+                                            <p
+                                                className="text-[12px] leading-[17px] text-[#4a5568] font-normal"
+                                                style={{
+                                                    fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", "Plus Jakarta Sans", sans-serif',
+                                                }}
+                                            >
+                                                Create a Forex Pocket for multi-currency transactions and competitive exchange rates.
+                                            </p>
+                                            <button
+                                                onClick={() => showToast('Buat Forex Pocket di myBCA')}
+                                                className="text-[13px] font-bold text-[#005caa] hover:underline mt-2 inline-block text-left cursor-pointer active:scale-95 transition-transform"
+                                                style={{
+                                                    fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", "Plus Jakarta Sans", sans-serif',
+                                                }}
+                                            >
+                                                Create Now
+                                            </button>
+                                        </div>
+                                    </>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* ── SEKSI 2: E-WALLET (Exact 1:1 Matching myBCA) ── */}
+                        <div className="pt-0.5 pb-1">
+                            {/* Section Header */}
+                            <div className="flex items-center justify-between mb-2.5 px-1">
+                                <h2
+                                    className="text-[16px] font-bold text-[#0c3258] tracking-tight"
+                                    style={{
+                                        fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", "Plus Jakarta Sans", sans-serif',
+                                        color: '#0c3258',
+                                    }}
+                                >
+                                    e-Wallet
+                                </h2>
+                            </div>
+
+                            {/* e-Wallet Grid Cards */}
+                            <div className="grid grid-cols-4 gap-2.5">
+                                <div
+                                    onClick={() => showToast('Sakuku BCA')}
+                                    className="cursor-pointer active:scale-95 transition-transform"
+                                >
+                                    <img
+                                        src="/clean-mode/ewallet_sakuku_hd.png"
+                                        alt="Sakuku"
+                                        className="w-full h-auto object-contain block drop-shadow-xs"
+                                    />
+                                </div>
+                                <div
+                                    onClick={() => showToast('DANA e-Wallet')}
+                                    className="cursor-pointer active:scale-95 transition-transform"
+                                >
+                                    <img
+                                        src="/clean-mode/ewallet_dana_hd.png"
+                                        alt="DANA"
+                                        className="w-full h-auto object-contain block drop-shadow-xs"
+                                    />
+                                </div>
+                                <div
+                                    onClick={() => showToast('GoPay e-Wallet')}
+                                    className="cursor-pointer active:scale-95 transition-transform"
+                                >
+                                    <img
+                                        src="/clean-mode/ewallet_gopay_hd.png"
+                                        alt="GoPay"
+                                        className="w-full h-auto object-contain block drop-shadow-xs"
+                                    />
+                                </div>
+                                <div
+                                    onClick={() => showToast('OVO e-Wallet')}
+                                    className="cursor-pointer active:scale-95 transition-transform"
+                                >
+                                    <img
+                                        src="/clean-mode/ewallet_ovo_hd.png"
+                                        alt="OVO"
+                                        className="w-full h-auto object-contain block drop-shadow-xs"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* ── SEKSI 3: CARD (Exact 1:1 Matching myBCA) ── */}
+                        <div className="pt-0.5 pb-1">
+                            {/* Section Header */}
+                            <div className="flex items-center justify-between mb-2.5 px-1">
+                                <h2
+                                    className="text-[16px] font-bold text-[#0c3258] tracking-tight"
+                                    style={{
+                                        fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", "Plus Jakarta Sans", sans-serif',
+                                        color: '#0c3258',
+                                    }}
+                                >
+                                    Card
+                                </h2>
+                            </div>
+
+                            {/* Tabs (Debit Card / Credit Card) */}
+                            <div className="flex items-center gap-2 mb-2.5">
+                                <button
+                                    onClick={() => setCardTab('debit')}
+                                    className={`px-3 py-1.5 rounded-[10px] text-[13px] transition-all cursor-pointer ${
+                                        cardTab === 'debit'
+                                            ? 'border-[1.5px] border-[#005caa] bg-[#e4f2fe] text-[#334155] font-semibold shadow-xs'
+                                            : 'border-[1.5px] border-[#cfcfcf] bg-white text-[#6e7479] font-normal hover:bg-slate-50'
+                                    }`}
+                                    style={{
+                                        fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", "Plus Jakarta Sans", sans-serif',
+                                    }}
+                                >
+                                    Debit Card
+                                </button>
+                                <button
+                                    onClick={() => setCardTab('credit')}
+                                    className={`px-3 py-1.5 rounded-[10px] text-[13px] transition-all cursor-pointer ${
+                                        cardTab === 'credit'
+                                            ? 'border-[1.5px] border-[#005caa] bg-[#e4f2fe] text-[#334155] font-semibold shadow-xs'
+                                            : 'border-[1.5px] border-[#cfcfcf] bg-white text-[#6e7479] font-normal hover:bg-slate-50'
+                                    }`}
+                                    style={{
+                                        fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", "Plus Jakarta Sans", sans-serif',
+                                    }}
+                                >
+                                    Credit Card
+                                </button>
+                            </div>
+
+                            {/* Card Item Container */}
+                            <div className="bg-white rounded-[18px] border border-[#eef2f6] shadow-[0_2px_10px_rgba(0,0,0,0.03)] px-3.5 py-3.5 flex items-center justify-between">
+                                {cardTab === 'debit' ? (
+                                    <>
+                                        <div className="flex items-center gap-3 min-w-0">
+                                            <img
+                                                src="/clean-mode/card_paspor_platinum_hd.png"
+                                                alt="Paspor BCA Platinum"
+                                                className="w-[54px] h-auto object-contain rounded-[4px] shadow-xs shrink-0"
+                                            />
+                                            <div className="min-w-0">
+                                                <p
+                                                    className="text-[12.5px] font-bold text-[#2d3748] tracking-wider whitespace-nowrap"
+                                                    style={{
+                                                        fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", "Plus Jakarta Sans", sans-serif',
+                                                    }}
+                                                >
+                                                    5260 - **** - **** - **60
+                                                </p>
+                                                <p
+                                                    className="text-[10px] font-semibold text-[#6b7280] tracking-wider mt-0.5 whitespace-nowrap"
+                                                    style={{
+                                                        fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", "Plus Jakarta Sans", sans-serif',
+                                                    }}
+                                                >
+                                                    PASPOR BCA PLATINUM
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <button
+                                            onClick={() => showToast('Pengaturan Kartu Debit')}
+                                            className="flex items-center gap-1.5 text-[#005caa] hover:text-[#004885] active:scale-95 transition-transform cursor-pointer shrink-0 ml-2"
+                                            style={{
+                                                fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", "Plus Jakarta Sans", sans-serif',
+                                            }}
+                                        >
+                                            <Settings className="w-3.5 h-3.5 stroke-[2.4]" />
+                                            <span className="text-[12px] font-bold">Manage</span>
+                                        </button>
+                                    </>
+                                ) : (
+                                    <>
+                                        <div className="flex items-center gap-3 min-w-0">
+                                            <div className="w-[54px] h-[34px] rounded-[4px] bg-gradient-to-tr from-[#1a365d] to-[#2b6cb0] flex items-center justify-center shadow-xs shrink-0">
+                                                <span className="text-[8.5px] font-bold text-white tracking-widest">BCA</span>
+                                            </div>
+                                            <div className="min-w-0">
+                                                <p
+                                                    className="text-[12.5px] font-bold text-[#2d3748] tracking-wider whitespace-nowrap"
+                                                    style={{
+                                                        fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", "Plus Jakarta Sans", sans-serif',
+                                                    }}
+                                                >
+                                                    BCA Everyday Card
+                                                </p>
+                                                <p
+                                                    className="text-[10px] font-semibold text-[#6b7280] tracking-wider mt-0.5 whitespace-nowrap"
+                                                    style={{
+                                                        fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", "Plus Jakarta Sans", sans-serif',
+                                                    }}
+                                                >
+                                                    CREDIT CARD
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <button
+                                            onClick={() => showToast('Pengaturan Kartu Kredit')}
+                                            className="flex items-center gap-1.5 text-[#005caa] hover:text-[#004885] active:scale-95 transition-transform cursor-pointer shrink-0 ml-2"
+                                            style={{
+                                                fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", "Plus Jakarta Sans", sans-serif',
+                                            }}
+                                        >
+                                            <Settings className="w-3.5 h-3.5 stroke-[2.4]" />
+                                            <span className="text-[12px] font-bold">Manage</span>
+                                        </button>
+                                    </>
+                                )}
+                            </div>
                         </div>
 
                         {/* ── 4. FINANCIAL DIARY SECTION (Exact 1:1 Matching myBCA) ── */}
