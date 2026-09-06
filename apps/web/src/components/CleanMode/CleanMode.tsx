@@ -30,23 +30,38 @@ export const CleanMode: React.FC = () => {
     const [selectedMonth, setSelectedMonth] = useState<string>('September 2026');
     const [isMonthPickerOpen, setIsMonthPickerOpen] = useState<boolean>(false);
 
+    // Dynamic FD Nominals with LocalStorage Persistence
+    const [fdSpendingAmount, setFdSpendingAmount] = useState<string>(() => {
+        return localStorage.getItem('clean_mode_fd_spending') || 'IDR 778,27 K';
+    });
+    const [fdEarningAmount, setFdEarningAmount] = useState<string>(() => {
+        return localStorage.getItem('clean_mode_fd_earning') || 'IDR 1 M';
+    });
+    const [fdCashflowAmount, setFdCashflowAmount] = useState<string>(() => {
+        return localStorage.getItem('clean_mode_fd_cashflow') || 'IDR 221,73 K';
+    });
+
+    const [customSpendingInput, setCustomSpendingInput] = useState<string>('');
+    const [customEarningInput, setCustomEarningInput] = useState<string>('');
+    const [customCashflowInput, setCustomCashflowInput] = useState<string>('');
+
     const fdSlides = [
         {
             title: 'Total Spending',
             label: 'Spending',
-            amount: 'IDR 778,27 K',
+            amount: fdSpendingAmount,
             ringImg: '/clean-mode/fd_ring_spending.png',
         },
         {
             title: 'Total Earning',
             label: 'Earning',
-            amount: 'IDR 1 M',
+            amount: fdEarningAmount,
             ringImg: '/clean-mode/fd_ring_earning.png',
         },
         {
             title: 'Total Cashflow',
             label: 'Cashflow',
-            amount: 'IDR 221,73 K',
+            amount: fdCashflowAmount,
             ringImg: '/clean-mode/fd_ring_cashflow.png',
         },
     ];
@@ -136,7 +151,16 @@ export const CleanMode: React.FC = () => {
         setCustomNameInput(userName);
         setCustomAccountInput(accountNumber);
         setCustomBalanceInput(String(balance));
+        setCustomSpendingInput(fdSpendingAmount);
+        setCustomEarningInput(fdEarningAmount);
+        setCustomCashflowInput(fdCashflowAmount);
         setIsSettingsOpen(true);
+    };
+
+    const cleanFdAmount = (val: string) => {
+        const trimmed = val.trim();
+        if (!trimmed) return '';
+        return trimmed.startsWith('IDR') ? trimmed : `IDR ${trimmed}`;
     };
 
     const handleSaveCustomSettings = () => {
@@ -144,6 +168,21 @@ export const CleanMode: React.FC = () => {
         if (customAccountInput.trim()) setAccountNumber(customAccountInput.trim());
         if (customBalanceInput.trim() && !isNaN(Number(customBalanceInput))) {
             setBalance(Number(customBalanceInput));
+        }
+        if (customSpendingInput.trim()) {
+            const val = cleanFdAmount(customSpendingInput);
+            setFdSpendingAmount(val);
+            localStorage.setItem('clean_mode_fd_spending', val);
+        }
+        if (customEarningInput.trim()) {
+            const val = cleanFdAmount(customEarningInput);
+            setFdEarningAmount(val);
+            localStorage.setItem('clean_mode_fd_earning', val);
+        }
+        if (customCashflowInput.trim()) {
+            const val = cleanFdAmount(customCashflowInput);
+            setFdCashflowAmount(val);
+            localStorage.setItem('clean_mode_fd_cashflow', val);
         }
         setIsSettingsOpen(false);
         showToast('Pengaturan tampilan berhasil diperbarui!');
@@ -533,9 +572,25 @@ export const CleanMode: React.FC = () => {
                         {/* ── 4. FINANCIAL DIARY SECTION (Exact 1:1 Matching myBCA) ── */}
                         <div className="pt-1 pb-1">
                             {/* Section Header */}
-                            <div className="flex items-center justify-between mb-3 px-1">
-                                <h2 className="text-[16.5px] font-extrabold text-[#0c3258] tracking-tight">Financial Diary</h2>
-                                <span className="text-[13px] font-semibold text-[#8e9aa8]">Cashflow</span>
+                            <div className="flex items-center justify-between mb-2.5 px-1">
+                                <h2
+                                    className="text-[16px] font-bold text-[#0c3258] tracking-tight"
+                                    style={{
+                                        fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", "Plus Jakarta Sans", sans-serif',
+                                        color: '#0c3258',
+                                    }}
+                                >
+                                    Financial Diary
+                                </h2>
+                                <span
+                                    className="text-[13px] font-medium"
+                                    style={{
+                                        fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", "Plus Jakarta Sans", sans-serif',
+                                        color: '#7e8d9f',
+                                    }}
+                                >
+                                    Cashflow
+                                </span>
                             </div>
 
                             {/* White Financial Diary Card */}
@@ -544,12 +599,16 @@ export const CleanMode: React.FC = () => {
                                 <div className="relative">
                                     <button
                                         onClick={() => setIsMonthPickerOpen(!isMonthPickerOpen)}
-                                        className="w-full flex items-center justify-between px-3.5 py-2 rounded-lg border border-[#d8e2ed] bg-white text-[#2c3e50] text-[13.5px] font-medium hover:border-[#005caa] transition-colors cursor-pointer"
+                                        className="w-full flex items-center justify-between px-3.5 py-2 rounded-[9px] border border-[#dce3ec] bg-white text-[13.5px] font-medium hover:border-[#005caa] transition-colors cursor-pointer"
+                                        style={{
+                                            fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", "Plus Jakarta Sans", sans-serif',
+                                            color: '#2c3e50',
+                                        }}
                                         aria-label="Pilih Periode"
                                     >
                                         <span>{selectedMonth}</span>
                                         <svg
-                                            className={`w-4 h-4 text-[#005caa] stroke-current stroke-[2.5] fill-none transition-transform duration-200 ${
+                                            className={`w-4 h-4 stroke-[#005caa] stroke-[2.5] fill-none transition-transform duration-200 ${
                                                 isMonthPickerOpen ? 'rotate-180' : ''
                                             }`}
                                             viewBox="0 0 24 24"
@@ -583,33 +642,49 @@ export const CleanMode: React.FC = () => {
                                 </div>
 
                                 {/* Donut Ring & Center Details */}
-                                <div className="relative w-[218px] h-[218px] mx-auto flex items-center justify-center my-3.5">
+                                <div className="relative w-[220px] h-[220px] mx-auto flex items-center justify-center my-3.5">
                                     <img
                                         src={fdSlides[fdSlide].ringImg}
                                         alt={fdSlides[fdSlide].title}
                                         className="w-full h-full object-contain pointer-events-none select-none"
                                     />
-                                    <div className="absolute inset-0 flex flex-col items-center justify-center text-center select-none pt-0.5">
-                                        <span className="text-[13px] text-[#5b6878] font-normal leading-tight">Total</span>
-                                        <span className="text-[14.5px] text-[#2c3e50] font-bold leading-tight mt-0.5">
+                                    <div
+                                        className="absolute inset-0 flex flex-col items-center justify-center text-center select-none"
+                                        style={{
+                                            fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", "Plus Jakarta Sans", sans-serif',
+                                        }}
+                                    >
+                                        <span
+                                            className="text-[14px] leading-tight font-normal"
+                                            style={{ color: '#495057' }}
+                                        >
+                                            Total
+                                        </span>
+                                        <span
+                                            className="text-[16px] leading-tight font-semibold mt-0.5"
+                                            style={{ color: '#495057' }}
+                                        >
                                             {fdSlides[fdSlide].label}
                                         </span>
-                                        <span className="text-[15.5px] text-[#0c3258] font-extrabold tracking-tight mt-1.5">
+                                        <span
+                                            className="text-[16.5px] leading-tight font-bold tracking-tight mt-1.5"
+                                            style={{ color: '#144e83' }}
+                                        >
                                             {fdMasked ? 'IDR ******' : fdSlides[fdSlide].amount}
                                         </span>
                                         <button
                                             onClick={() => setFdMasked(!fdMasked)}
-                                            className="mt-2 w-[40px] h-[28px] rounded-[7px] border border-[#d2d9e1] bg-[#f8fafd] hover:bg-[#eef4fb] active:scale-95 transition-all flex items-center justify-center shadow-xs cursor-pointer"
+                                            className="mt-2 w-[42px] h-[30px] rounded-[6px] border border-[#dce3ea] bg-[#f3f6f9] hover:bg-[#ebf0f5] active:scale-95 transition-all flex items-center justify-center cursor-pointer shadow-xs"
                                             title={fdMasked ? 'Tampilkan Nominal' : 'Sembunyikan Nominal'}
                                             aria-label="Toggle nominal visibility"
                                         >
                                             {fdMasked ? (
-                                                <svg className="w-4 h-4 stroke-[#7a869a] fill-none stroke-[2]" viewBox="0 0 24 24">
+                                                <svg className="w-[18px] h-[18px] stroke-[#7c8a9c] fill-none stroke-[1.8]" viewBox="0 0 24 24">
                                                     <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
                                                     <line x1="1" y1="1" x2="23" y2="23" />
                                                 </svg>
                                             ) : (
-                                                <svg className="w-4 h-4 stroke-[#7a869a] fill-none stroke-[2]" viewBox="0 0 24 24">
+                                                <svg className="w-[18px] h-[18px] stroke-[#7c8a9c] fill-none stroke-[1.8]" viewBox="0 0 24 24">
                                                     <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
                                                     <circle cx="12" cy="12" r="3" />
                                                 </svg>
@@ -626,8 +701,8 @@ export const CleanMode: React.FC = () => {
                                         disabled={fdSlide === 0}
                                         className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${
                                             fdSlide === 0
-                                                ? 'opacity-25 cursor-not-allowed bg-transparent text-[#b0bccb]'
-                                                : 'bg-[#ebf4fd] text-[#0060b2] hover:bg-[#deeeff] active:scale-90 cursor-pointer shadow-xs'
+                                                ? 'bg-transparent text-[#d5dde6] cursor-default'
+                                                : 'bg-[#ebf4fd] text-[#005caa] hover:bg-[#deeeff] active:scale-90 cursor-pointer shadow-xs'
                                         }`}
                                         aria-label="Previous slide"
                                     >
@@ -644,8 +719,8 @@ export const CleanMode: React.FC = () => {
                                                 onClick={() => setFdSlide(idx)}
                                                 className={`transition-all duration-300 rounded-full cursor-pointer ${
                                                     fdSlide === idx
-                                                        ? 'w-2 h-2 bg-[#0c3258]'
-                                                        : 'w-2 h-2 bg-[#d8e0ea] hover:bg-slate-400'
+                                                        ? 'w-[6.5px] h-[6.5px] bg-[#0c3258]'
+                                                        : 'w-[6.5px] h-[6.5px] bg-[#dbe2ea] hover:bg-slate-400'
                                                 }`}
                                                 aria-label={`Slide ${idx + 1}`}
                                             />
@@ -658,8 +733,8 @@ export const CleanMode: React.FC = () => {
                                         disabled={fdSlide === fdSlides.length - 1}
                                         className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${
                                             fdSlide === fdSlides.length - 1
-                                                ? 'opacity-25 cursor-not-allowed bg-transparent text-[#b0bccb]'
-                                                : 'bg-[#ebf4fd] text-[#0060b2] hover:bg-[#deeeff] active:scale-90 cursor-pointer shadow-xs'
+                                                ? 'bg-transparent text-[#d5dde6] cursor-default'
+                                                : 'bg-[#ebf4fd] text-[#005caa] hover:bg-[#deeeff] active:scale-90 cursor-pointer shadow-xs'
                                         }`}
                                         aria-label="Next slide"
                                     >
@@ -677,6 +752,9 @@ export const CleanMode: React.FC = () => {
                                             setIsStatementOpen(true);
                                         }}
                                         className="text-[14px] font-bold text-[#005caa] hover:text-[#004885] active:scale-98 transition-all hover:underline cursor-pointer"
+                                        style={{
+                                            fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", "Plus Jakarta Sans", sans-serif',
+                                        }}
                                     >
                                         View Cashflow Details
                                     </button>
@@ -870,7 +948,7 @@ export const CleanMode: React.FC = () => {
                                 initial={{ scale: 0.95, opacity: 0 }}
                                 animate={{ scale: 1, opacity: 1 }}
                                 exit={{ scale: 0.95, opacity: 0 }}
-                                className="w-full max-w-sm bg-white rounded-3xl p-6 shadow-2xl border border-slate-200"
+                                className="w-full max-w-sm max-h-[90vh] overflow-y-auto bg-white rounded-3xl p-5 sm:p-6 shadow-2xl border border-slate-200 cleanmode-no-scrollbar"
                             >
                                 <div className="flex items-center justify-between mb-4">
                                     <h3 className="font-bold text-base text-slate-900">Pengaturan Clean Mode</h3>
@@ -910,6 +988,49 @@ export const CleanMode: React.FC = () => {
                                         />
                                     </div>
 
+                                    {/* Financial Diary Customization */}
+                                    <div className="pt-2.5 border-t border-slate-100">
+                                        <div className="flex items-center gap-1.5 mb-2">
+                                            <span className="font-bold text-slate-800 text-[12.5px]">Financial Diary</span>
+                                            <span className="text-[10px] text-slate-400 font-medium">(Nominal Tampilan)</span>
+                                        </div>
+
+                                        <div className="space-y-2.5">
+                                            <div>
+                                                <label className="block text-slate-500 font-medium mb-1 text-[11px]">Total Spending</label>
+                                                <input
+                                                    type="text"
+                                                    value={customSpendingInput}
+                                                    placeholder="IDR 778,27 K"
+                                                    onChange={e => setCustomSpendingInput(e.target.value)}
+                                                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 font-bold focus:outline-none focus:ring-2 focus:ring-[#005caa]"
+                                                />
+                                            </div>
+
+                                            <div>
+                                                <label className="block text-slate-500 font-medium mb-1 text-[11px]">Total Earning</label>
+                                                <input
+                                                    type="text"
+                                                    value={customEarningInput}
+                                                    placeholder="IDR 1 M"
+                                                    onChange={e => setCustomEarningInput(e.target.value)}
+                                                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 font-bold focus:outline-none focus:ring-2 focus:ring-[#005caa]"
+                                                />
+                                            </div>
+
+                                            <div>
+                                                <label className="block text-slate-500 font-medium mb-1 text-[11px]">Total Cashflow</label>
+                                                <input
+                                                    type="text"
+                                                    value={customCashflowInput}
+                                                    placeholder="IDR 221,73 K"
+                                                    onChange={e => setCustomCashflowInput(e.target.value)}
+                                                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 font-bold focus:outline-none focus:ring-2 focus:ring-[#005caa]"
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+
                                     <div className="pt-2 flex flex-col gap-2">
                                         <button
                                             type="button"
@@ -917,15 +1038,18 @@ export const CleanMode: React.FC = () => {
                                                 setCustomNameInput('AHMAD FIKRI RAFI UDDIN');
                                                 setCustomAccountInput('801 - 040 - 1811');
                                                 setCustomBalanceInput('529265.71');
+                                                setCustomSpendingInput('IDR 778,27 K');
+                                                setCustomEarningInput('IDR 1 M');
+                                                setCustomCashflowInput('IDR 221,73 K');
                                             }}
-                                            className="w-full py-2 bg-blue-50 hover:bg-blue-100 text-[#005caa] rounded-xl font-semibold text-xs transition-colors border border-blue-200 text-center"
+                                            className="w-full py-2 bg-blue-50 hover:bg-blue-100 text-[#005caa] rounded-xl font-semibold text-xs transition-colors border border-blue-200 text-center cursor-pointer"
                                         >
-                                            Salin Nilai Contoh Acuan (529.265,71)
+                                            Salin Nilai Contoh Acuan (myBCA)
                                         </button>
 
                                         <button
                                             onClick={handleSaveCustomSettings}
-                                            className="w-full py-2.5 bg-[#005caa] text-white rounded-xl font-bold text-xs hover:bg-[#004b9c] transition-colors shadow-md shadow-blue-900/20"
+                                            className="w-full py-2.5 bg-[#005caa] text-white rounded-xl font-bold text-xs hover:bg-[#004b9c] transition-colors shadow-md shadow-blue-900/20 cursor-pointer"
                                         >
                                             Simpan Perubahan
                                         </button>
@@ -935,7 +1059,7 @@ export const CleanMode: React.FC = () => {
                                                 setIsSettingsOpen(false);
                                                 navigate('/dashboard');
                                             }}
-                                            className="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold text-xs transition-colors flex items-center justify-center gap-1.5"
+                                            className="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold text-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
                                         >
                                             <ArrowLeft className="w-3.5 h-3.5" />
                                             <span>Kembali ke Dashboard Rupiku</span>
