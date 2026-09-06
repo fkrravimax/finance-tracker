@@ -56,9 +56,6 @@ export const CleanMode: React.FC = () => {
         }
     };
 
-    // Live clock formatted as HH.MM (e.g. 09.23 / 09.45)
-    const [timeStr, setTimeStr] = useState<string>('09.45');
-
     useEffect(() => {
         // Fetch current user from Rupiku
         const user = authService.getCurrentUser();
@@ -79,16 +76,14 @@ export const CleanMode: React.FC = () => {
         };
         fetchBalance();
 
-        // Clock timer
-        const updateClock = () => {
-            const now = new Date();
-            const hrs = String(now.getHours()).padStart(2, '0');
-            const mins = String(now.getMinutes()).padStart(2, '0');
-            setTimeStr(`${hrs}.${mins}`);
+        // Sync mobile browser status bar / notch color to match BCA Navy
+        const metaTheme = document.querySelector('meta[name="theme-color"]');
+        const prevTheme = metaTheme?.getAttribute('content') || '#09090b';
+        if (metaTheme) metaTheme.setAttribute('content', '#0b4b80');
+
+        return () => {
+            if (metaTheme) metaTheme.setAttribute('content', prevTheme);
         };
-        updateClock();
-        const timer = setInterval(updateClock, 30000);
-        return () => clearInterval(timer);
     }, []);
 
     const showToast = (msg: string) => {
@@ -158,7 +153,7 @@ export const CleanMode: React.FC = () => {
                 >
 
                     {/* ── 1. DEEP NAVY BLUE HEADER & CARD SECTION (Exact matching CONTOHTAMPILAN.PNG) ── */}
-                    <div className="bg-[#0b4b80] text-white pt-2.5 pb-8 px-4 relative overflow-hidden rounded-b-[28px] sm:rounded-b-[32px]">
+                    <div className="bg-[#0b4b80] text-white pt-[max(env(safe-area-inset-top,44px),44px)] sm:pt-4 pb-7 px-5 relative overflow-hidden rounded-b-[28px] sm:rounded-b-[32px]">
                         {/* Authentic myBCA organic wave background motif */}
                         <img
                             src="/clean-mode/header_bg_motif.png"
@@ -166,20 +161,8 @@ export const CleanMode: React.FC = () => {
                             className="absolute inset-0 w-full h-full object-cover pointer-events-none select-none z-0"
                         />
 
-                        {/* STATUS BAR (iOS Exact Replica matching CONTOHTAMPILAN.PNG) */}
-                        <div className="relative z-30 pt-1 pb-1 pl-8 pr-6 flex items-center justify-between text-xs font-semibold">
-                            <span className="text-[15px] font-semibold tracking-tight text-white">{timeStr}</span>
-                            <div className="flex items-center">
-                                <img
-                                    src="/clean-mode/status_exact_user.png"
-                                    alt="Cellular, WiFi, Battery"
-                                    className="h-[13.5px] w-auto object-contain"
-                                />
-                            </div>
-                        </div>
-
                         {/* TOP ACTION ROW (myBCA Logo + CS, Settings, Logout matching CONTOHTAMPILAN.PNG) */}
-                        <div className="mt-4 mb-2 flex items-center justify-between relative z-10 px-0">
+                        <div className="mt-1 mb-2 flex items-center justify-between relative z-10 px-0">
                             <div className="flex items-center cursor-pointer" onClick={() => showToast('myBCA by Bank Central Asia')}>
                                 <img
                                     src="/clean-mode/mybca_logo_hd.png"
@@ -231,37 +214,37 @@ export const CleanMode: React.FC = () => {
                         </div>
 
                         {/* GREETING STRIP */}
-                        <div className="mt-2.5 mb-3.5 relative z-10 px-0">
-                            <p className="text-[11.5px] tracking-wide text-white">
+                        <div className="mt-2 mb-2.5 relative z-10 px-0">
+                            <p className="text-[11px] tracking-wide text-white">
                                 <span className="font-normal text-white/90">HELLO, </span>
                                 <span className="font-bold">{userName}</span>
                             </p>
                         </div>
 
                         {/* PRIMARY ACCOUNT CARD (Entirely enclosed inside Dark Blue Header - Never Cut Off!) */}
-                        <div className="relative z-20 rounded-[20px] shadow-xl shadow-black/20 overflow-hidden bg-white">
+                        <div className="relative z-20 rounded-[18px] shadow-lg shadow-black/15 overflow-hidden bg-white">
                             {/* Top Dual-Tone Gradient Strip (#77bcf1 -> #41a2c3 -> #2bb7b9) with Stacked Elements */}
-                            <div className="bg-gradient-to-r from-[#77bcf1] via-[#41a2c3] to-[#2bb7b9] px-4 pt-3 pb-3 flex flex-col gap-2 text-white">
+                            <div className="bg-gradient-to-r from-[#77bcf1] via-[#41a2c3] to-[#2bb7b9] px-4 pt-2.5 pb-2.5 flex flex-col gap-1.5 text-white">
                                 {/* Row 1: BCA ID pill button (Left-aligned) */}
                                 <div>
                                     <div
                                         onClick={() => showToast('BCA ID Aktif')}
-                                        className="inline-flex items-center gap-1.5 bg-white/20 hover:bg-white/30 backdrop-blur-md px-2.5 py-0.5 rounded-full text-[11.5px] font-medium tracking-wide border border-white/40 cursor-pointer active:scale-95 transition-all"
+                                        className="inline-flex items-center gap-1.5 bg-white/20 hover:bg-white/30 backdrop-blur-md px-2 py-[2px] rounded-full text-[10.5px] font-medium tracking-wide border border-white/40 cursor-pointer active:scale-95 transition-all"
                                     >
-                                        <svg className="w-3.5 h-3.5 fill-none stroke-white stroke-[2]" viewBox="0 0 24 24">
+                                        <svg className="w-3 h-3 fill-none stroke-white stroke-[2]" viewBox="0 0 24 24">
                                             <rect x="3" y="3" width="7" height="7" rx="1.5" />
                                             <rect x="14" y="3" width="7" height="7" rx="1.5" />
                                             <rect x="3" y="14" width="7" height="7" rx="1.5" />
                                             <rect x="14" y="14" width="7" height="7" rx="1.5" />
                                         </svg>
                                         <span>BCA ID</span>
-                                        <ChevronRight className="w-3.5 h-3.5 stroke-[2.5]" />
+                                        <ChevronRight className="w-3 h-3 stroke-[2.5]" />
                                     </div>
                                 </div>
 
-                                {/* Row 2: Account Number & Copy SVG Icon (Facing left, exact match to CONTOHTAMPILAN) */}
+                                {/* Row 2: Account Number & Copy SVG Icon */}
                                 <div className="flex items-center gap-2">
-                                    <span className="text-[13px] text-white/95">
+                                    <span className="text-[12px] text-white/95">
                                         Account: <span className="font-bold tracking-wider">{accountNumber}</span>
                                     </span>
                                     <button
@@ -270,12 +253,12 @@ export const CleanMode: React.FC = () => {
                                         title="Salin Nomor Rekening"
                                     >
                                         {copied ? (
-                                            <Check className="w-3.5 h-3.5 text-white stroke-[2.5]" />
+                                            <Check className="w-3 h-3 text-white stroke-[2.5]" />
                                         ) : (
                                             <img
                                                 src="/clean-mode/icon_copy_hd.png"
                                                 alt="Copy"
-                                                className="w-[15px] h-[15px] object-contain shrink-0"
+                                                className="w-[13.5px] h-[13.5px] object-contain shrink-0"
                                             />
                                         )}
                                     </button>
@@ -283,17 +266,17 @@ export const CleanMode: React.FC = () => {
                             </div>
 
                             {/* Bottom White Card Section */}
-                            <div className="px-4 pt-3.5 pb-3.5 bg-white">
+                            <div className="px-4 pt-2.5 pb-2.5 bg-white">
                                 <p
-                                    className="text-[13px] font-normal text-[#596066] tracking-tight"
+                                    className="text-[11.5px] font-normal text-[#596066] tracking-tight"
                                     style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", "Plus Jakarta Sans", sans-serif' }}
                                 >
                                     Active Balance
                                 </p>
-                                <div className="flex items-center justify-between mt-1 mb-2.5">
+                                <div className="flex items-center justify-between mt-0.5 mb-1.5">
                                     <div className="flex items-baseline gap-2">
                                         <span
-                                            className="text-[21px] font-extrabold text-[#2c3137] tracking-tight"
+                                            className="text-[17.5px] font-extrabold text-[#2c3137] tracking-tight"
                                             style={{
                                                 fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", "Plus Jakarta Sans", sans-serif',
                                                 fontWeight: 800,
@@ -311,7 +294,7 @@ export const CleanMode: React.FC = () => {
                                         title={isMasked ? 'Tampilkan Saldo' : 'Sembunyikan Saldo'}
                                     >
                                         {isMasked ? (
-                                            <svg className="w-[22px] h-[15px] text-[#005caa] stroke-current fill-none stroke-[2.5]" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round">
+                                            <svg className="w-[19px] h-[14px] text-[#005caa] stroke-current fill-none stroke-[2.5]" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round">
                                                 <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
                                                 <line x1="1" y1="1" x2="23" y2="23" />
                                             </svg>
@@ -319,33 +302,33 @@ export const CleanMode: React.FC = () => {
                                             <img
                                                 src="/clean-mode/icon_eye_hd.png"
                                                 alt="Eye"
-                                                className="w-[22px] h-auto object-contain"
+                                                className="w-[19px] h-auto object-contain"
                                             />
                                         )}
                                     </button>
                                 </div>
 
                                 {/* Hairline Divider */}
-                                <div className="border-t border-slate-100 my-2.5" />
+                                <div className="border-t border-slate-100 my-2" />
 
                                 {/* Account Transactions Link */}
                                 <button
                                     onClick={() => setIsStatementOpen(true)}
-                                    className="w-full flex items-center gap-2.5 text-[#005caa] hover:text-[#004885] active:translate-x-0.5 transition-all text-left"
+                                    className="w-full flex items-center gap-2 text-[#005caa] hover:text-[#004885] active:translate-x-0.5 transition-all text-left"
                                 >
                                     <img
                                         src="/clean-mode/icon_account_trans_hd.png"
                                         alt="Transactions"
-                                        className="w-[27px] h-[23px] object-contain shrink-0"
+                                        className="w-[22px] h-[19px] object-contain shrink-0"
                                     />
-                                    <span className="text-[13.5px] font-bold">Account Transactions</span>
+                                    <span className="text-[12.5px] font-bold">Account Transactions</span>
                                 </button>
                             </div>
                         </div>
                     </div>
 
                     {/* ── 2. SEPARATOR AD BANNER (Overlapping the rounded curve between navy header & light body) ── */}
-                    <div className="relative -mt-6 mx-4 z-30">
+                    <div className="relative -mt-6 mx-5 z-30">
                         <div
                             onClick={() => showToast('Program Undian myBCA Berhadiah')}
                             className="cursor-pointer active:scale-[0.99] transition-transform drop-shadow-[0_4px_12px_rgba(0,0,0,0.12)]"
@@ -464,7 +447,7 @@ export const CleanMode: React.FC = () => {
                             </div>
 
                             {/* Authentic Interactive Carousel Indicator (< [cyan pill] [grey pill] > matching CONTOHTAMPILAN.PNG) */}
-                            <div className="flex justify-center items-center gap-1.5 mt-3 mb-1 select-none">
+                            <div className="flex justify-center items-center gap-1.5 mt-2.5 mb-1 select-none">
                                 {/* Left Chevron Button */}
                                 <button
                                     onClick={handleScrollLeft}
@@ -479,17 +462,17 @@ export const CleanMode: React.FC = () => {
 
                                 {/* Dual-Part Pill Indicator Capsule */}
                                 <div
-                                    className="flex items-center h-[5.5px] rounded-full overflow-hidden cursor-pointer"
+                                    className="flex items-center h-[4.5px] rounded-full overflow-hidden cursor-pointer"
                                     onClick={() => (menuPage === 0 ? handleScrollRight() : handleScrollLeft())}
                                     title="Ganti Halaman Menu"
                                 >
                                     <div
-                                        className={`h-[5.5px] w-6 rounded-l-full transition-colors duration-300 ${
+                                        className={`h-[4.5px] w-4 rounded-l-full transition-colors duration-300 ${
                                             menuPage === 0 ? 'bg-[#00a2e8]' : 'bg-[#d6dbe1]'
                                         }`}
                                     />
                                     <div
-                                        className={`h-[5.5px] w-6 rounded-r-full transition-colors duration-300 ${
+                                        className={`h-[4.5px] w-4 rounded-r-full transition-colors duration-300 ${
                                             menuPage === 1 ? 'bg-[#00a2e8]' : 'bg-[#d6dbe1]'
                                         }`}
                                     />
@@ -524,16 +507,16 @@ export const CleanMode: React.FC = () => {
                 </div>
 
                 {/* ── 4. SIGNATURE FLOATING BOTTOM DOCK NAVBAR (Exact 1:1 Matching CONTOHTAMPILAN.PNG) ── */}
-                <div className="absolute bottom-0 left-0 right-0 z-40 bg-[#255aa4] text-white shadow-[0_-5px_25px_rgba(0,0,0,0.18)] pb-[env(safe-area-inset-bottom)] rounded-t-[24px] sm:rounded-b-[32px]">
+                <div className="absolute bottom-0 left-0 right-0 z-40 bg-[#005caa] text-white shadow-[0_-5px_25px_rgba(0,0,0,0.18)] pb-[env(safe-area-inset-bottom)] rounded-t-[24px] sm:rounded-b-[32px]">
                     <div className="flex items-center justify-between px-2 pt-1 pb-1.5 relative h-[68px]">
 
                         {/* Tab 1: Home */}
                         <button
                             onClick={() => setActiveTab('home')}
-                            className={`flex-1 flex flex-col items-center justify-center active:scale-95 transition-transform ${activeTab === 'home' ? 'opacity-100' : 'opacity-85 hover:opacity-100'}`}
+                            className={`flex-1 flex flex-col items-center justify-center bg-transparent active:scale-95 transition-transform ${activeTab === 'home' ? 'opacity-100' : 'opacity-85 hover:opacity-100'}`}
                             title="Home"
                         >
-                            <img src="/clean-mode/dock_tab_home.png" alt="Home" className="h-[46px] object-contain" />
+                            <img src="/clean-mode/dock_tab_home.png" alt="Home" className="h-[40px] w-auto object-contain" />
                         </button>
 
                         {/* Tab 2: Activity */}
@@ -542,28 +525,28 @@ export const CleanMode: React.FC = () => {
                                 setActiveTab('activity');
                                 setIsStatementOpen(true);
                             }}
-                            className={`flex-1 flex flex-col items-center justify-center active:scale-95 transition-transform ${activeTab === 'activity' ? 'opacity-100' : 'opacity-85 hover:opacity-100'}`}
+                            className={`flex-1 flex flex-col items-center justify-center bg-transparent active:scale-95 transition-transform ${activeTab === 'activity' ? 'opacity-100' : 'opacity-85 hover:opacity-100'}`}
                             title="Activity"
                         >
-                            <img src="/clean-mode/dock_tab_activity.png" alt="Activity" className="h-[46px] object-contain" />
+                            <img src="/clean-mode/dock_tab_activity.png" alt="Activity" className="h-[40px] w-auto object-contain" />
                         </button>
 
                         {/* Tab 3: Center Floating Elevated QRIS Action Button */}
-                        <div className="flex-1 flex flex-col items-center relative -top-5">
+                        <div className="flex-1 flex flex-col items-center relative -top-3.5">
                             <button
                                 onClick={() => navigate('/split-bill')}
-                                className="active:scale-95 transition-transform flex flex-col items-center group"
+                                className="active:scale-95 transition-transform flex flex-col items-center group bg-transparent"
                                 title="Scan QRIS"
                             >
                                 <img
                                     src="/clean-mode/nav_qris_pebble.png"
                                     alt="QRIS"
-                                    className="w-[56px] h-[56px] object-contain drop-shadow-[0_4px_10px_rgba(0,0,0,0.25)]"
+                                    className="w-[50px] h-auto object-contain drop-shadow-[0_4px_10px_rgba(0,0,0,0.25)]"
                                 />
                                 <img
                                     src="/clean-mode/nav_qris_text.png"
                                     alt="QRIS Logo"
-                                    className="h-[13px] w-auto object-contain mt-1"
+                                    className="h-[14px] w-auto object-contain mt-1 drop-shadow-sm"
                                 />
                             </button>
                         </div>
@@ -574,10 +557,10 @@ export const CleanMode: React.FC = () => {
                                 setActiveTab('foryou');
                                 showToast('Fitur Promo & Rewards myBCA');
                             }}
-                            className={`flex-1 flex flex-col items-center justify-center active:scale-95 transition-transform ${activeTab === 'foryou' ? 'opacity-100' : 'opacity-85 hover:opacity-100'}`}
+                            className={`flex-1 flex flex-col items-center justify-center bg-transparent active:scale-95 transition-transform ${activeTab === 'foryou' ? 'opacity-100' : 'opacity-85 hover:opacity-100'}`}
                             title="For You"
                         >
-                            <img src="/clean-mode/dock_tab_foryou.png" alt="For You" className="h-[46px] object-contain" />
+                            <img src="/clean-mode/dock_tab_foryou.png" alt="For You" className="h-[40px] w-auto object-contain" />
                         </button>
 
                         {/* Tab 5: My Account */}
@@ -586,10 +569,10 @@ export const CleanMode: React.FC = () => {
                                 setActiveTab('account');
                                 handleOpenSettings();
                             }}
-                            className={`flex-1 flex flex-col items-center justify-center active:scale-95 transition-transform ${activeTab === 'account' ? 'opacity-100' : 'opacity-85 hover:opacity-100'}`}
+                            className={`flex-1 flex flex-col items-center justify-center bg-transparent active:scale-95 transition-transform ${activeTab === 'account' ? 'opacity-100' : 'opacity-85 hover:opacity-100'}`}
                             title="My Account"
                         >
-                            <img src="/clean-mode/dock_tab_account.png" alt="My Account" className="h-[46px] object-contain" />
+                            <img src="/clean-mode/dock_tab_account.png" alt="My Account" className="h-[40px] w-auto object-contain" />
                         </button>
                     </div>
                 </div>
