@@ -9,11 +9,23 @@ import BcaStatementModal from './BcaStatementModal';
 export const CleanMode: React.FC = () => {
     const navigate = useNavigate();
 
-    // Core States
-    const [balance, setBalance] = useState<number>(529265.71);
-    const [isMasked, setIsMasked] = useState<boolean>(false);
-    const [userName, setUserName] = useState<string>('AHMAD FIKRI RAFI UDDIN');
-    const [accountNumber, setAccountNumber] = useState<string>('801 - 040 - 1811');
+    // Core States with LocalStorage Persistence (Preserves edited settings across app restarts)
+    const [balance, setBalance] = useState<number>(() => {
+        const saved = localStorage.getItem('clean_mode_balance');
+        if (saved !== null && !isNaN(Number(saved))) {
+            return Number(saved);
+        }
+        return 529265.71;
+    });
+    const [isMasked, setIsMasked] = useState<boolean>(() => {
+        return localStorage.getItem('clean_mode_balance_masked') === 'true';
+    });
+    const [userName, setUserName] = useState<string>(() => {
+        return localStorage.getItem('clean_mode_user_name') || 'AHMAD FIKRI RAFI UDDIN';
+    });
+    const [accountNumber, setAccountNumber] = useState<string>(() => {
+        return localStorage.getItem('clean_mode_account_number') || '801 - 040 - 1811';
+    });
     const [copied, setCopied] = useState<boolean>(false);
     const [toastMessage, setToastMessage] = useState<string | null>(null);
 
@@ -30,7 +42,9 @@ export const CleanMode: React.FC = () => {
 
     // Financial Diary State (Exact 1:1 Matching myBCA)
     const [fdSlide, setFdSlide] = useState<number>(0);
-    const [fdMasked, setFdMasked] = useState<boolean>(true);
+    const [fdMasked, setFdMasked] = useState<boolean>(() => {
+        return localStorage.getItem('clean_mode_fd_masked') !== 'false';
+    });
     const [selectedMonth, setSelectedMonth] = useState<string>('September 2026');
     const [isMonthPickerOpen, setIsMonthPickerOpen] = useState<boolean>(false);
 
@@ -110,12 +124,18 @@ export const CleanMode: React.FC = () => {
             return;
         }
 
-        if (user?.name) {
+        // Only set default userName from user.name if no custom clean_mode_user_name is saved in localStorage
+        const savedName = localStorage.getItem('clean_mode_user_name');
+        if (!savedName && user?.name) {
             setUserName(user.name.toUpperCase());
         }
 
-        // Fetch real balance from Rupiku
+        // Fetch real balance from Rupiku only if no custom clean_mode_balance is saved in localStorage
         const fetchBalance = async () => {
+            const savedBalance = localStorage.getItem('clean_mode_balance');
+            if (savedBalance !== null && !isNaN(Number(savedBalance))) {
+                return;
+            }
             try {
                 const stats = await dashboardService.getStats();
                 if (stats && typeof stats.totalBalance === 'number' && stats.totalBalance > 0) {
@@ -149,6 +169,22 @@ export const CleanMode: React.FC = () => {
         setTimeout(() => setCopied(false), 2000);
     };
 
+    const handleToggleMask = () => {
+        setIsMasked(prev => {
+            const next = !prev;
+            localStorage.setItem('clean_mode_balance_masked', String(next));
+            return next;
+        });
+    };
+
+    const handleToggleFdMask = () => {
+        setFdMasked(prev => {
+            const next = !prev;
+            localStorage.setItem('clean_mode_fd_masked', String(next));
+            return next;
+        });
+    };
+
     const formatBalance = (val: number) => {
         return new Intl.NumberFormat('en-US', {
             minimumFractionDigits: 2,
@@ -173,10 +209,23 @@ export const CleanMode: React.FC = () => {
     };
 
     const handleSaveCustomSettings = () => {
-        if (customNameInput.trim()) setUserName(customNameInput.trim().toUpperCase());
-        if (customAccountInput.trim()) setAccountNumber(customAccountInput.trim());
-        if (customBalanceInput.trim() && !isNaN(Number(customBalanceInput))) {
-            setBalance(Number(customBalanceInput));
+        if (customNameInput.trim()) {
+            const val = customNameInput.trim().toUpperCase();
+            setUserName(val);
+            localStorage.setItem('clean_mode_user_name', val);
+        }
+        if (customAccountInput.trim()) {
+            const val = customAccountInput.trim();
+            setAccountNumber(val);
+            localStorage.setItem('clean_mode_account_number', val);
+        }
+        if (customBalanceInput.trim()) {
+            const cleanNum = customBalanceInput.replace(/[^0-9.]/g, '');
+            const parsed = parseFloat(cleanNum);
+            if (!isNaN(parsed)) {
+                setBalance(parsed);
+                localStorage.setItem('clean_mode_balance', String(parsed));
+            }
         }
         if (customSpendingInput.trim()) {
             const val = cleanFdAmount(customSpendingInput);
@@ -194,7 +243,7 @@ export const CleanMode: React.FC = () => {
             localStorage.setItem('clean_mode_fd_cashflow', val);
         }
         setIsSettingsOpen(false);
-        showToast('Pengaturan tampilan berhasil diperbarui!');
+        showToast('Pengaturan tampilan berhasil disimpan secara permanen!');
     };
 
     return (
@@ -405,7 +454,7 @@ export const CleanMode: React.FC = () => {
 
                                     {/* Eye Toggle Icon: Authentic Thicker/Bolder Eye from CONTOHTAMPILAN.PNG */}
                                     <button
-                                        onClick={() => setIsMasked(!isMasked)}
+                                        onClick={handleToggleMask}
                                         className="p-1 rounded-full hover:bg-blue-50 active:scale-90 transition-all flex items-center justify-center"
                                         title={isMasked ? 'Tampilkan Saldo' : 'Sembunyikan Saldo'}
                                     >
@@ -1057,7 +1106,7 @@ export const CleanMode: React.FC = () => {
                                             {fdMasked ? 'IDR ******' : fdSlides[fdSlide].amount}
                                         </span>
                                         <button
-                                            onClick={() => setFdMasked(!fdMasked)}
+                                            onClick={handleToggleFdMask}
                                             className="mt-2.5 w-[42px] h-[30px] rounded-[6px] border border-[#dce3ea] bg-[#f3f6f9] hover:bg-[#ebf0f5] active:scale-95 transition-all flex items-center justify-center cursor-pointer shadow-xs"
                                             title={fdMasked ? 'Tampilkan Nominal' : 'Sembunyikan Nominal'}
                                             aria-label="Toggle nominal visibility"
@@ -1415,6 +1464,12 @@ export const CleanMode: React.FC = () => {
                                         </div>
                                     </div>
 
+                                    {/* Storage Persistence Indicator */}
+                                    <div className="p-2.5 bg-blue-50/70 border border-blue-100 rounded-xl flex items-center gap-2 text-[11px] text-blue-900 font-medium">
+                                        <div className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
+                                        <span>Data disimpan permanen di perangkat & tetap tersimpan saat aplikasi ditutup.</span>
+                                    </div>
+
                                     <div className="pt-2 flex flex-col gap-2">
                                         <button
                                             type="button"
@@ -1429,6 +1484,25 @@ export const CleanMode: React.FC = () => {
                                             className="w-full py-2 bg-blue-50 hover:bg-blue-100 text-[#005caa] rounded-xl font-semibold text-xs transition-colors border border-blue-200 text-center cursor-pointer"
                                         >
                                             Salin Nilai Contoh Acuan (myBCA)
+                                        </button>
+
+                                        <button
+                                            type="button"
+                                            onClick={async () => {
+                                                const user = authService.getCurrentUser();
+                                                if (user?.name) setCustomNameInput(user.name.toUpperCase());
+                                                try {
+                                                    const stats = await dashboardService.getStats();
+                                                    if (stats && typeof stats.totalBalance === 'number') {
+                                                        setCustomBalanceInput(String(stats.totalBalance));
+                                                    }
+                                                } catch (e) {
+                                                    console.warn(e);
+                                                }
+                                            }}
+                                            className="w-full py-2 bg-slate-50 hover:bg-slate-100 text-slate-700 rounded-xl font-semibold text-xs transition-colors border border-slate-200 text-center cursor-pointer"
+                                        >
+                                            Isi Otomatis Data Profil Rupiku Asli
                                         </button>
 
                                         <button
