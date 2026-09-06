@@ -530,21 +530,21 @@ export const CleanMode: React.FC = () => {
                         </button>
 
                         {/* Tab 3: Center Floating Elevated QRIS Action Button */}
-                        <div className="flex-1 flex flex-col items-center relative -top-3.5">
+                        <div className="flex-1 flex flex-col items-center relative -top-[18px]">
                             <button
                                 onClick={() => navigate('/split-bill')}
-                                className="active:scale-95 transition-transform flex flex-col items-center group bg-transparent"
+                                className="active:scale-95 transition-transform flex flex-col items-center group bg-transparent focus:outline-none"
                                 title="Scan QRIS"
                             >
                                 <img
                                     src="/clean-mode/nav_qris_pebble.png"
                                     alt="QRIS"
-                                    className="w-[50px] h-auto object-contain drop-shadow-[0_4px_10px_rgba(0,0,0,0.25)]"
+                                    className="w-[52px] h-auto object-contain drop-shadow-[0_4px_12px_rgba(0,0,0,0.28)]"
                                 />
                                 <img
                                     src="/clean-mode/nav_qris_text.png"
                                     alt="QRIS Logo"
-                                    className="h-[14px] w-auto object-contain mt-1 drop-shadow-sm"
+                                    className="h-[14.5px] w-auto object-contain mt-1 drop-shadow-sm"
                                 />
                             </button>
                         </div>
