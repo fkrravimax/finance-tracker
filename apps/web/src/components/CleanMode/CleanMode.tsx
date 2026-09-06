@@ -294,7 +294,7 @@ export const CleanMode: React.FC = () => {
                     className="absolute left-0 -bottom-[18px] w-[18px] h-[18px] pointer-events-none fill-[#134e84] z-10"
                     viewBox="0 0 18 18"
                 >
-                    <path d="M 0,0 L 0,18 A 18,18 0 0,0 18,0 Z" />
+                    <path d="M 0,0 L 0,18 A 18,18 0 0,1 18,0 Z" />
                 </svg>
                 {/* Right Corner Wedge (fillet R=18px) */}
                 <svg
