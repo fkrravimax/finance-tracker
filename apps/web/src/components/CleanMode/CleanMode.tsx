@@ -222,156 +222,97 @@ export const CleanMode: React.FC = () => {
                 style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", "Plus Jakarta Sans", "Open Sans", sans-serif' }}
             >
 
-            {/* ── STICKY SCROLLED HEADER (1:1 myBCA Native Scroll Behavior) ── */}
-            <AnimatePresence>
-                {isScrolled && (
-                    <motion.div
-                        initial={{ opacity: 0, y: -20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -20 }}
-                        transition={{ duration: 0.18, ease: 'easeOut' }}
-                        className="absolute top-0 left-0 right-0 z-40 bg-[#254c7f] text-white pt-[max(env(safe-area-inset-top,44px),44px)] sm:pt-4 pb-2.5 px-5 shadow-sm"
+            {/* ── PERSISTENT TOP NAVIGATION HEADER (1:1 Native myBCA Header with Authentic Wave Motif & Scrolled Curve) ── */}
+            <div className="absolute top-0 left-0 right-0 z-40 select-none pointer-events-none">
+                {/* Scrolled curved background with authentic waves & corner swoops (fades in on scroll with soft drop shadow) */}
+                <div
+                    className={`absolute inset-0 transition-opacity duration-200 pointer-events-none ${
+                        isScrolled ? 'opacity-100' : 'opacity-0'
+                    }`}
+                    style={{
+                        filter: isScrolled ? 'drop-shadow(0 4px 6px rgba(0, 0, 0, 0.16))' : 'none',
+                    }}
+                >
+                    <img
+                        src="/clean-mode/scrolled_header_bg.png"
+                        alt=""
+                        className="w-full h-auto block select-none pointer-events-none"
+                    />
+                </div>
+
+                {/* Persistent Top Action Row (myBCA Logo + CS, Settings, Logout) - Always in exact native position! */}
+                <div className="pt-[max(env(safe-area-inset-top,44px),44px)] sm:pt-4 pb-2 px-5 flex items-center justify-between relative z-10 pointer-events-auto">
+                    {/* myBCA Logo */}
+                    <div
+                        className="flex items-center cursor-pointer active:scale-95 transition-transform -ml-2"
+                        onClick={() => showToast('myBCA by Bank Central Asia')}
                     >
-                        {/* Authentic myBCA organic wave background motif */}
                         <img
-                            src="/clean-mode/header_bg_motif.png"
-                            alt=""
-                            className="absolute inset-0 w-full h-full object-cover pointer-events-none select-none z-0 opacity-80"
+                            src="/clean-mode/mybca_logo_hd.png"
+                            alt="myBCA"
+                            className="h-[25px] w-auto object-contain drop-shadow-sm"
                         />
+                    </div>
 
-                        {/* Curved Downward Bottom Edge (tidak lurus, agak melengkung kebawah) */}
-                        <div className="absolute top-[calc(100%-1px)] left-0 w-full h-[14px] overflow-visible pointer-events-none z-10">
-                            <svg
-                                viewBox="0 0 414 14"
-                                className="w-full h-[14px] pointer-events-none drop-shadow-[0_4px_6px_rgba(0,0,0,0.06)]"
-                                preserveAspectRatio="none"
-                            >
-                                <path d="M 0,0 L 414,0 C 310,14 104,14 0,0 Z" fill="#254c7f" />
-                            </svg>
-                        </div>
+                    {/* 3 Action Icons (CS, Settings, Logout) */}
+                    <div className="flex items-center gap-[22px] -mr-1">
+                        {/* Headset CS */}
+                        <button
+                            onClick={() => showToast('Halo BCA: 1500888')}
+                            className="hover:opacity-80 active:scale-95 transition-all p-0.5"
+                            title="Customer Service"
+                        >
+                            <img
+                                src="/clean-mode/header_headset_hd.png"
+                                alt="CS"
+                                className="w-[22px] h-[22px] object-contain drop-shadow-sm"
+                            />
+                        </button>
 
-                        {/* TOP ACTION ROW (myBCA Logo + CS, Settings, Logout) */}
-                        <div className="mt-1 mb-1 flex items-center justify-between relative z-20 -ml-2 -mr-1">
-                            <div className="flex items-center cursor-pointer" onClick={() => showToast('myBCA by Bank Central Asia')}>
-                                <img
-                                    src="/clean-mode/mybca_logo_hd.png"
-                                    alt="myBCA"
-                                    className="h-[25px] w-auto object-contain drop-shadow-sm"
-                                />
-                            </div>
+                        {/* Settings / Gear */}
+                        <button
+                            onClick={handleOpenSettings}
+                            className="hover:opacity-80 active:scale-95 transition-all p-0.5"
+                            title="Pengaturan Tampilan"
+                        >
+                            <img
+                                src="/clean-mode/header_gear_hd.png"
+                                alt="Settings"
+                                className="w-[22px] h-[22px] object-contain drop-shadow-sm"
+                            />
+                        </button>
 
-                            <div className="flex items-center gap-[22px]">
-                                {/* Headset CS */}
-                                <button
-                                    onClick={() => showToast('Halo BCA: 1500888')}
-                                    className="hover:opacity-80 active:scale-95 transition-all p-0.5"
-                                    title="Customer Service"
-                                >
-                                    <img
-                                        src="/clean-mode/header_headset_hd.png"
-                                        alt="CS"
-                                        className="w-[22px] h-[22px] object-contain drop-shadow-sm"
-                                    />
-                                </button>
-
-                                {/* Settings / Gear */}
-                                <button
-                                    onClick={handleOpenSettings}
-                                    className="hover:opacity-80 active:scale-95 transition-all p-0.5"
-                                    title="Pengaturan Tampilan"
-                                >
-                                    <img
-                                        src="/clean-mode/header_gear_hd.png"
-                                        alt="Settings"
-                                        className="w-[22px] h-[22px] object-contain drop-shadow-sm"
-                                    />
-                                </button>
-
-                                {/* Logout Door / Return to Rupiku */}
-                                <button
-                                    onClick={() => navigate('/dashboard')}
-                                    className="hover:opacity-80 active:scale-95 transition-all p-0.5"
-                                    title="Kembali ke Dashboard Utama Rupiku"
-                                >
-                                    <img
-                                        src="/clean-mode/header_logout_hd.png"
-                                        alt="Logout"
-                                        className="w-[22px] h-[22px] object-contain drop-shadow-sm"
-                                    />
-                                </button>
-                            </div>
-                        </div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
+                        {/* Logout Door / Return to Rupiku */}
+                        <button
+                            onClick={() => navigate('/dashboard')}
+                            className="hover:opacity-80 active:scale-95 transition-all p-0.5"
+                            title="Kembali ke Dashboard Utama Rupiku"
+                        >
+                            <img
+                                src="/clean-mode/header_logout_hd.png"
+                                alt="Logout"
+                                className="w-[22px] h-[22px] object-contain drop-shadow-sm"
+                            />
+                        </button>
+                    </div>
+                </div>
+            </div>
 
             {/* ── SCROLLABLE APP BODY (Containing Navy Header + Cards + Banners + Menu) ── */}
             <div
-                onScroll={(e) => setIsScrolled(e.currentTarget.scrollTop > 35)}
-                className="flex-1 overflow-y-auto cleanmode-no-scrollbar no-scrollbar pb-28"
+                onScroll={(e) => setIsScrolled(e.currentTarget.scrollTop > 15)}
+                className="flex-1 overflow-y-auto cleanmode-no-scrollbar no-scrollbar pb-28 relative z-10"
                 style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
             >
 
                     {/* ── 1. DEEP NAVY BLUE HEADER & CARD SECTION (Exact matching CONTOHTAMPILAN.PNG) ── */}
-                    <div className="bg-[#254c7f] text-white pt-[max(env(safe-area-inset-top,44px),44px)] sm:pt-4 pb-3 px-5 relative overflow-hidden">
+                    <div className="bg-[#1b4c84] text-white pt-[calc(max(env(safe-area-inset-top,44px),44px)+42px)] sm:pt-[68px] pb-3 px-5 relative overflow-hidden">
                         {/* Authentic myBCA organic wave background motif */}
                         <img
                             src="/clean-mode/header_bg_motif.png"
                             alt=""
                             className="absolute inset-0 w-full h-full object-cover pointer-events-none select-none z-0"
                         />
-
-                        {/* TOP ACTION ROW (myBCA Logo + CS, Settings, Logout matching CONTOHTAMPILAN.PNG) */}
-                        <div className="mt-1 mb-2 flex items-center justify-between relative z-10 -ml-2 -mr-1">
-                            <div className="flex items-center cursor-pointer" onClick={() => showToast('myBCA by Bank Central Asia')}>
-                                <img
-                                    src="/clean-mode/mybca_logo_hd.png"
-                                    alt="myBCA"
-                                    className="h-[25px] w-auto object-contain drop-shadow-sm"
-                                />
-                            </div>
-
-                            <div className="flex items-center gap-[22px]">
-                                {/* Headset CS */}
-                                <button
-                                    onClick={() => showToast('Halo BCA: 1500888')}
-                                    className="hover:opacity-80 active:scale-95 transition-all p-0.5"
-                                    title="Customer Service"
-                                >
-                                    <img
-                                        src="/clean-mode/header_headset_hd.png"
-                                        alt="CS"
-                                        className="w-[22px] h-[22px] object-contain drop-shadow-sm"
-                                    />
-                                </button>
-
-                                {/* Settings / Gear */}
-                                <button
-                                    onClick={handleOpenSettings}
-                                    className="hover:opacity-80 active:scale-95 transition-all p-0.5"
-                                    title="Pengaturan Tampilan"
-                                >
-                                    <img
-                                        src="/clean-mode/header_gear_hd.png"
-                                        alt="Settings"
-                                        className="w-[22px] h-[22px] object-contain drop-shadow-sm"
-                                    />
-                                </button>
-
-                                {/* Logout Door / Return to Rupiku */}
-                                <button
-                                    onClick={() => navigate('/dashboard')}
-                                    className="hover:opacity-80 active:scale-95 transition-all p-0.5"
-                                    title="Kembali ke Dashboard Utama Rupiku"
-                                >
-                                    <img
-                                        src="/clean-mode/header_logout_hd.png"
-                                        alt="Logout"
-                                        className="w-[22px] h-[22px] object-contain drop-shadow-sm"
-                                    />
-                                </button>
-                            </div>
-                        </div>
 
                         {/* GREETING STRIP */}
                         <div className="mt-2.5 mb-2.5 relative z-10 pl-1.5 pr-0">
