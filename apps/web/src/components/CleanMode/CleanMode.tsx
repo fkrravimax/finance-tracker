@@ -651,30 +651,53 @@ export const CleanMode: React.FC = () => {
                                     <div
                                         className="absolute inset-0 flex flex-col items-center justify-center text-center select-none"
                                         style={{
-                                            fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", "Plus Jakarta Sans", sans-serif',
+                                            fontFamily: '"Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif',
                                         }}
                                     >
                                         <span
-                                            className="text-[14px] leading-tight font-normal"
-                                            style={{ color: '#495057' }}
+                                            style={{
+                                                fontFamily: '"Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif',
+                                                fontSize: '15px',
+                                                fontWeight: 600,
+                                                color: '#495057',
+                                                lineHeight: '1.2',
+                                                letterSpacing: '-0.01em',
+                                                display: 'block',
+                                            }}
                                         >
                                             Total
                                         </span>
                                         <span
-                                            className="text-[16px] leading-tight font-semibold mt-0.5"
-                                            style={{ color: '#495057' }}
+                                            style={{
+                                                fontFamily: '"Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif',
+                                                fontSize: '15px',
+                                                fontWeight: 600,
+                                                color: '#495057',
+                                                lineHeight: '1.2',
+                                                letterSpacing: '-0.01em',
+                                                display: 'block',
+                                                marginTop: '2px',
+                                            }}
                                         >
                                             {fdSlides[fdSlide].label}
                                         </span>
                                         <span
-                                            className="text-[16.5px] leading-tight font-bold tracking-tight mt-1.5"
-                                            style={{ color: '#144e83' }}
+                                            style={{
+                                                fontFamily: '"Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif',
+                                                fontSize: '16.5px',
+                                                fontWeight: 700,
+                                                color: '#144e83',
+                                                lineHeight: '1.2',
+                                                letterSpacing: '-0.01em',
+                                                display: 'block',
+                                                marginTop: '6px',
+                                            }}
                                         >
                                             {fdMasked ? 'IDR ******' : fdSlides[fdSlide].amount}
                                         </span>
                                         <button
                                             onClick={() => setFdMasked(!fdMasked)}
-                                            className="mt-2 w-[42px] h-[30px] rounded-[6px] border border-[#dce3ea] bg-[#f3f6f9] hover:bg-[#ebf0f5] active:scale-95 transition-all flex items-center justify-center cursor-pointer shadow-xs"
+                                            className="mt-2.5 w-[42px] h-[30px] rounded-[6px] border border-[#dce3ea] bg-[#f3f6f9] hover:bg-[#ebf0f5] active:scale-95 transition-all flex items-center justify-center cursor-pointer shadow-xs"
                                             title={fdMasked ? 'Tampilkan Nominal' : 'Sembunyikan Nominal'}
                                             aria-label="Toggle nominal visibility"
                                         >
