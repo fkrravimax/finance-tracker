@@ -27,6 +27,7 @@ export const CleanMode: React.FC = () => {
     // Pockets & Card Tab States (1:1 myBCA)
     const [pocketTab, setPocketTab] = useState<'rupiah' | 'forex'>('rupiah');
     const [cardTab, setCardTab] = useState<'debit' | 'credit'>('debit');
+    const [isScrolled, setIsScrolled] = useState<boolean>(false);
 
     // Financial Diary State (Exact 1:1 Matching myBCA)
     const [fdSlide, setFdSlide] = useState<number>(0);
@@ -221,11 +222,95 @@ export const CleanMode: React.FC = () => {
                 style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", "Plus Jakarta Sans", "Open Sans", sans-serif' }}
             >
 
-                {/* ── SCROLLABLE APP BODY (Containing Navy Header + Cards + Banners + Menu) ── */}
-                <div
-                    className="flex-1 overflow-y-auto cleanmode-no-scrollbar no-scrollbar pb-28"
-                    style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-                >
+            {/* ── STICKY SCROLLED HEADER (1:1 myBCA Native Scroll Behavior) ── */}
+            <AnimatePresence>
+                {isScrolled && (
+                    <motion.div
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -20 }}
+                        transition={{ duration: 0.18, ease: 'easeOut' }}
+                        className="absolute top-0 left-0 right-0 z-40 bg-[#254c7f] text-white pt-[max(env(safe-area-inset-top,44px),44px)] sm:pt-4 pb-2.5 px-5 shadow-sm"
+                    >
+                        {/* Authentic myBCA organic wave background motif */}
+                        <img
+                            src="/clean-mode/header_bg_motif.png"
+                            alt=""
+                            className="absolute inset-0 w-full h-full object-cover pointer-events-none select-none z-0 opacity-80"
+                        />
+
+                        {/* Curved Downward Bottom Edge (tidak lurus, agak melengkung kebawah) */}
+                        <div className="absolute top-[calc(100%-1px)] left-0 w-full h-[14px] overflow-visible pointer-events-none z-10">
+                            <svg
+                                viewBox="0 0 414 14"
+                                className="w-full h-[14px] pointer-events-none drop-shadow-[0_4px_6px_rgba(0,0,0,0.06)]"
+                                preserveAspectRatio="none"
+                            >
+                                <path d="M 0,0 L 414,0 C 310,14 104,14 0,0 Z" fill="#254c7f" />
+                            </svg>
+                        </div>
+
+                        {/* TOP ACTION ROW (myBCA Logo + CS, Settings, Logout) */}
+                        <div className="mt-1 mb-1 flex items-center justify-between relative z-20 -ml-2 -mr-1">
+                            <div className="flex items-center cursor-pointer" onClick={() => showToast('myBCA by Bank Central Asia')}>
+                                <img
+                                    src="/clean-mode/mybca_logo_hd.png"
+                                    alt="myBCA"
+                                    className="h-[25px] w-auto object-contain drop-shadow-sm"
+                                />
+                            </div>
+
+                            <div className="flex items-center gap-[22px]">
+                                {/* Headset CS */}
+                                <button
+                                    onClick={() => showToast('Halo BCA: 1500888')}
+                                    className="hover:opacity-80 active:scale-95 transition-all p-0.5"
+                                    title="Customer Service"
+                                >
+                                    <img
+                                        src="/clean-mode/header_headset_hd.png"
+                                        alt="CS"
+                                        className="w-[22px] h-[22px] object-contain drop-shadow-sm"
+                                    />
+                                </button>
+
+                                {/* Settings / Gear */}
+                                <button
+                                    onClick={handleOpenSettings}
+                                    className="hover:opacity-80 active:scale-95 transition-all p-0.5"
+                                    title="Pengaturan Tampilan"
+                                >
+                                    <img
+                                        src="/clean-mode/header_gear_hd.png"
+                                        alt="Settings"
+                                        className="w-[22px] h-[22px] object-contain drop-shadow-sm"
+                                    />
+                                </button>
+
+                                {/* Logout Door / Return to Rupiku */}
+                                <button
+                                    onClick={() => navigate('/dashboard')}
+                                    className="hover:opacity-80 active:scale-95 transition-all p-0.5"
+                                    title="Kembali ke Dashboard Utama Rupiku"
+                                >
+                                    <img
+                                        src="/clean-mode/header_logout_hd.png"
+                                        alt="Logout"
+                                        className="w-[22px] h-[22px] object-contain drop-shadow-sm"
+                                    />
+                                </button>
+                            </div>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+            {/* ── SCROLLABLE APP BODY (Containing Navy Header + Cards + Banners + Menu) ── */}
+            <div
+                onScroll={(e) => setIsScrolled(e.currentTarget.scrollTop > 35)}
+                className="flex-1 overflow-y-auto cleanmode-no-scrollbar no-scrollbar pb-28"
+                style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+            >
 
                     {/* ── 1. DEEP NAVY BLUE HEADER & CARD SECTION (Exact matching CONTOHTAMPILAN.PNG) ── */}
                     <div className="bg-[#254c7f] text-white pt-[max(env(safe-area-inset-top,44px),44px)] sm:pt-4 pb-3 px-5 relative overflow-hidden">
@@ -433,7 +518,15 @@ export const CleanMode: React.FC = () => {
                         <div className="pt-0.5 pb-1">
                             {/* Main Menu Header */}
                             <div className="flex items-center justify-between mb-3 px-1">
-                                <h2 className="text-[17px] font-extrabold text-[#0c3258] tracking-tight">Main Menu</h2>
+                                <h2
+                                    className="text-[18px] font-bold text-[#0c3258] tracking-tight"
+                                    style={{
+                                        fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", "Plus Jakarta Sans", sans-serif',
+                                        color: '#0c3258',
+                                    }}
+                                >
+                                    Main Menu
+                                </h2>
                                 <button
                                     onClick={() => showToast('Menu kustomisasi myBCA')}
                                     className="flex items-center gap-1 text-xs font-bold text-[#0060b2] hover:text-blue-800"
@@ -580,7 +673,7 @@ export const CleanMode: React.FC = () => {
                         {/* PROMO BANNER 2 ("Pay 1 Get 2" Doodle Aliens matching CONTOHTAMPILAN.PNG) */}
                         <div
                             onClick={() => showToast('Promo Pay 1 Get 2 myBCA')}
-                            className="cursor-pointer active:scale-[0.99] transition-transform rounded-2xl overflow-hidden shadow-sm mt-2 mb-2"
+                            className="cursor-pointer active:scale-[0.99] transition-transform rounded-2xl overflow-hidden shadow-sm mt-2 mb-1"
                         >
                             <img
                                 src="/clean-mode/banner_aliens_exact.png"
@@ -589,12 +682,21 @@ export const CleanMode: React.FC = () => {
                             />
                         </div>
 
+                        {/* Carousel Indicator Dots below Banner 2 matching SS 1 */}
+                        <div className="flex items-center justify-center gap-1.5 pt-0.5 pb-1">
+                            <div className="w-[5px] h-[5px] rounded-full bg-[#cfd8dc]" />
+                            <div className="w-[5px] h-[5px] rounded-full bg-[#cfd8dc]" />
+                            <div className="w-[5.5px] h-[5.5px] rounded-full bg-[#00a2e8]" />
+                            <div className="w-[5px] h-[5px] rounded-full bg-[#cfd8dc]" />
+                            <div className="w-[5px] h-[5px] rounded-full bg-[#cfd8dc]" />
+                        </div>
+
                         {/* ── SEKSI 1: POCKETS (Exact 1:1 Matching myBCA) ── */}
                         <div className="pt-0.5 pb-1">
                             {/* Section Header */}
                             <div className="flex items-center justify-between mb-2.5 px-1">
                                 <h2
-                                    className="text-[16px] font-bold text-[#0c3258] tracking-tight"
+                                    className="text-[18px] font-bold text-[#0c3258] tracking-tight"
                                     style={{
                                         fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", "Plus Jakarta Sans", sans-serif',
                                         color: '#0c3258',
@@ -608,9 +710,9 @@ export const CleanMode: React.FC = () => {
                             <div className="flex items-center gap-2 mb-2.5">
                                 <button
                                     onClick={() => setPocketTab('rupiah')}
-                                    className={`px-3 py-1.5 rounded-[10px] text-[13px] transition-all cursor-pointer ${
+                                    className={`px-3.5 py-1.5 rounded-[11px] text-[14px] transition-all cursor-pointer ${
                                         pocketTab === 'rupiah'
-                                            ? 'border-[1.5px] border-[#005caa] bg-[#e4f2fe] text-[#334155] font-semibold shadow-xs'
+                                            ? 'border-[1.5px] border-[#005caa] bg-[#e4f2fe] text-[#2d3748] font-medium shadow-xs'
                                             : 'border-[1.5px] border-[#cfcfcf] bg-white text-[#6e7479] font-normal hover:bg-slate-50'
                                     }`}
                                     style={{
@@ -621,9 +723,9 @@ export const CleanMode: React.FC = () => {
                                 </button>
                                 <button
                                     onClick={() => setPocketTab('forex')}
-                                    className={`px-3 py-1.5 rounded-[10px] text-[13px] transition-all cursor-pointer ${
+                                    className={`px-3.5 py-1.5 rounded-[11px] text-[14px] transition-all cursor-pointer ${
                                         pocketTab === 'forex'
-                                            ? 'border-[1.5px] border-[#005caa] bg-[#e4f2fe] text-[#334155] font-semibold shadow-xs'
+                                            ? 'border-[1.5px] border-[#005caa] bg-[#e4f2fe] text-[#2d3748] font-medium shadow-xs'
                                             : 'border-[1.5px] border-[#cfcfcf] bg-white text-[#6e7479] font-normal hover:bg-slate-50'
                                     }`}
                                     style={{
@@ -635,17 +737,17 @@ export const CleanMode: React.FC = () => {
                             </div>
 
                             {/* Pocket Info Card */}
-                            <div className="bg-white rounded-[18px] border border-[#eef2f6] shadow-[0_2px_10px_rgba(0,0,0,0.03)] p-4 flex items-center gap-3.5">
+                            <div className="bg-white rounded-[20px] border border-[#eef2f6] shadow-[0_2px_10px_rgba(0,0,0,0.03)] p-4 flex items-center gap-3.5">
                                 {pocketTab === 'rupiah' ? (
                                     <>
                                         <img
                                             src="/clean-mode/pocket_illustration_hd.png"
                                             alt="Pocket"
-                                            className="w-[48px] h-auto object-contain shrink-0"
+                                            className="w-[54px] sm:w-[58px] h-auto object-contain shrink-0"
                                         />
                                         <div className="flex-1 min-w-0">
                                             <p
-                                                className="text-[12px] leading-[17px] text-[#4a5568] font-normal"
+                                                className="text-[13.5px] leading-[19px] text-[#4a5568] font-normal"
                                                 style={{
                                                     fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", "Plus Jakarta Sans", sans-serif',
                                                 }}
@@ -654,7 +756,7 @@ export const CleanMode: React.FC = () => {
                                             </p>
                                             <button
                                                 onClick={() => showToast('Buat Pocket Baru di myBCA')}
-                                                className="text-[13px] font-bold text-[#005caa] hover:underline mt-2 inline-block text-left cursor-pointer active:scale-95 transition-transform"
+                                                className="text-[15px] font-bold text-[#005caa] hover:underline mt-2.5 inline-block text-left cursor-pointer active:scale-95 transition-transform"
                                                 style={{
                                                     fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", "Plus Jakarta Sans", sans-serif',
                                                 }}
@@ -668,11 +770,11 @@ export const CleanMode: React.FC = () => {
                                         <img
                                             src="/clean-mode/pocket_illustration_hd.png"
                                             alt="Pocket"
-                                            className="w-[48px] h-auto object-contain shrink-0"
+                                            className="w-[54px] sm:w-[58px] h-auto object-contain shrink-0"
                                         />
                                         <div className="flex-1 min-w-0">
                                             <p
-                                                className="text-[12px] leading-[17px] text-[#4a5568] font-normal"
+                                                className="text-[13.5px] leading-[19px] text-[#4a5568] font-normal"
                                                 style={{
                                                     fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", "Plus Jakarta Sans", sans-serif',
                                                 }}
@@ -681,7 +783,7 @@ export const CleanMode: React.FC = () => {
                                             </p>
                                             <button
                                                 onClick={() => showToast('Buat Forex Pocket di myBCA')}
-                                                className="text-[13px] font-bold text-[#005caa] hover:underline mt-2 inline-block text-left cursor-pointer active:scale-95 transition-transform"
+                                                className="text-[15px] font-bold text-[#005caa] hover:underline mt-2.5 inline-block text-left cursor-pointer active:scale-95 transition-transform"
                                                 style={{
                                                     fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", "Plus Jakarta Sans", sans-serif',
                                                 }}
@@ -699,7 +801,7 @@ export const CleanMode: React.FC = () => {
                             {/* Section Header */}
                             <div className="flex items-center justify-between mb-2.5 px-1">
                                 <h2
-                                    className="text-[16px] font-bold text-[#0c3258] tracking-tight"
+                                    className="text-[18px] font-bold text-[#0c3258] tracking-tight"
                                     style={{
                                         fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", "Plus Jakarta Sans", sans-serif',
                                         color: '#0c3258',
@@ -709,8 +811,8 @@ export const CleanMode: React.FC = () => {
                                 </h2>
                             </div>
 
-                            {/* e-Wallet Grid Cards */}
-                            <div className="grid grid-cols-4 gap-2.5">
+                            {/* e-Wallet Grid Cards (Tight gap matching SS 1) */}
+                            <div className="grid grid-cols-4 gap-2">
                                 <div
                                     onClick={() => showToast('Sakuku BCA')}
                                     className="cursor-pointer active:scale-95 transition-transform"
@@ -759,7 +861,7 @@ export const CleanMode: React.FC = () => {
                             {/* Section Header */}
                             <div className="flex items-center justify-between mb-2.5 px-1">
                                 <h2
-                                    className="text-[16px] font-bold text-[#0c3258] tracking-tight"
+                                    className="text-[18px] font-bold text-[#0c3258] tracking-tight"
                                     style={{
                                         fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", "Plus Jakarta Sans", sans-serif',
                                         color: '#0c3258',
@@ -773,9 +875,9 @@ export const CleanMode: React.FC = () => {
                             <div className="flex items-center gap-2 mb-2.5">
                                 <button
                                     onClick={() => setCardTab('debit')}
-                                    className={`px-3 py-1.5 rounded-[10px] text-[13px] transition-all cursor-pointer ${
+                                    className={`px-3.5 py-1.5 rounded-[11px] text-[14px] transition-all cursor-pointer ${
                                         cardTab === 'debit'
-                                            ? 'border-[1.5px] border-[#005caa] bg-[#e4f2fe] text-[#334155] font-semibold shadow-xs'
+                                            ? 'border-[1.5px] border-[#005caa] bg-[#e4f2fe] text-[#2d3748] font-medium shadow-xs'
                                             : 'border-[1.5px] border-[#cfcfcf] bg-white text-[#6e7479] font-normal hover:bg-slate-50'
                                     }`}
                                     style={{
@@ -786,9 +888,9 @@ export const CleanMode: React.FC = () => {
                                 </button>
                                 <button
                                     onClick={() => setCardTab('credit')}
-                                    className={`px-3 py-1.5 rounded-[10px] text-[13px] transition-all cursor-pointer ${
+                                    className={`px-3.5 py-1.5 rounded-[11px] text-[14px] transition-all cursor-pointer ${
                                         cardTab === 'credit'
-                                            ? 'border-[1.5px] border-[#005caa] bg-[#e4f2fe] text-[#334155] font-semibold shadow-xs'
+                                            ? 'border-[1.5px] border-[#005caa] bg-[#e4f2fe] text-[#2d3748] font-medium shadow-xs'
                                             : 'border-[1.5px] border-[#cfcfcf] bg-white text-[#6e7479] font-normal hover:bg-slate-50'
                                     }`}
                                     style={{
@@ -800,18 +902,18 @@ export const CleanMode: React.FC = () => {
                             </div>
 
                             {/* Card Item Container */}
-                            <div className="bg-white rounded-[18px] border border-[#eef2f6] shadow-[0_2px_10px_rgba(0,0,0,0.03)] px-3.5 py-3.5 flex items-center justify-between">
+                            <div className="bg-white rounded-[20px] border border-[#eef2f6] shadow-[0_2px_10px_rgba(0,0,0,0.03)] px-3.5 py-3.5 flex items-center justify-between">
                                 {cardTab === 'debit' ? (
                                     <>
                                         <div className="flex items-center gap-3 min-w-0">
                                             <img
                                                 src="/clean-mode/card_paspor_platinum_hd.png"
                                                 alt="Paspor BCA Platinum"
-                                                className="w-[54px] h-auto object-contain rounded-[4px] shadow-xs shrink-0"
+                                                className="w-[58px] sm:w-[62px] h-auto object-contain rounded-[4px] shadow-xs shrink-0"
                                             />
                                             <div className="min-w-0">
                                                 <p
-                                                    className="text-[12.5px] font-bold text-[#2d3748] tracking-wider whitespace-nowrap"
+                                                    className="text-[15px] font-bold text-[#2d3748] tracking-wider whitespace-nowrap"
                                                     style={{
                                                         fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", "Plus Jakarta Sans", sans-serif',
                                                     }}
@@ -819,7 +921,7 @@ export const CleanMode: React.FC = () => {
                                                     5260 - **** - **** - **60
                                                 </p>
                                                 <p
-                                                    className="text-[10px] font-semibold text-[#6b7280] tracking-wider mt-0.5 whitespace-nowrap"
+                                                    className="text-[12.5px] font-medium text-[#596066] tracking-wide mt-0.5 whitespace-nowrap"
                                                     style={{
                                                         fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", "Plus Jakarta Sans", sans-serif',
                                                     }}
@@ -835,19 +937,19 @@ export const CleanMode: React.FC = () => {
                                                 fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", "Plus Jakarta Sans", sans-serif',
                                             }}
                                         >
-                                            <Settings className="w-3.5 h-3.5 stroke-[2.4]" />
-                                            <span className="text-[12px] font-bold">Manage</span>
+                                            <Settings className="w-4 h-4 stroke-[2.4]" />
+                                            <span className="text-[14.5px] font-bold">Manage</span>
                                         </button>
                                     </>
                                 ) : (
                                     <>
                                         <div className="flex items-center gap-3 min-w-0">
-                                            <div className="w-[54px] h-[34px] rounded-[4px] bg-gradient-to-tr from-[#1a365d] to-[#2b6cb0] flex items-center justify-center shadow-xs shrink-0">
-                                                <span className="text-[8.5px] font-bold text-white tracking-widest">BCA</span>
+                                            <div className="w-[58px] sm:w-[62px] h-[36px] rounded-[4px] bg-gradient-to-tr from-[#1a365d] to-[#2b6cb0] flex items-center justify-center shadow-xs shrink-0">
+                                                <span className="text-[9px] font-bold text-white tracking-widest">BCA</span>
                                             </div>
                                             <div className="min-w-0">
                                                 <p
-                                                    className="text-[12.5px] font-bold text-[#2d3748] tracking-wider whitespace-nowrap"
+                                                    className="text-[15px] font-bold text-[#2d3748] tracking-wider whitespace-nowrap"
                                                     style={{
                                                         fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", "Plus Jakarta Sans", sans-serif',
                                                     }}
@@ -855,7 +957,7 @@ export const CleanMode: React.FC = () => {
                                                     BCA Everyday Card
                                                 </p>
                                                 <p
-                                                    className="text-[10px] font-semibold text-[#6b7280] tracking-wider mt-0.5 whitespace-nowrap"
+                                                    className="text-[12.5px] font-medium text-[#596066] tracking-wide mt-0.5 whitespace-nowrap"
                                                     style={{
                                                         fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", "Plus Jakarta Sans", sans-serif',
                                                     }}
@@ -871,8 +973,8 @@ export const CleanMode: React.FC = () => {
                                                 fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", "Plus Jakarta Sans", sans-serif',
                                             }}
                                         >
-                                            <Settings className="w-3.5 h-3.5 stroke-[2.4]" />
-                                            <span className="text-[12px] font-bold">Manage</span>
+                                            <Settings className="w-4 h-4 stroke-[2.4]" />
+                                            <span className="text-[14.5px] font-bold">Manage</span>
                                         </button>
                                     </>
                                 )}
@@ -884,7 +986,7 @@ export const CleanMode: React.FC = () => {
                             {/* Section Header */}
                             <div className="flex items-center justify-between mb-2.5 px-1">
                                 <h2
-                                    className="text-[16px] font-bold text-[#0c3258] tracking-tight"
+                                    className="text-[18px] font-bold text-[#0c3258] tracking-tight"
                                     style={{
                                         fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", "Plus Jakarta Sans", sans-serif',
                                         color: '#0c3258',
@@ -893,10 +995,10 @@ export const CleanMode: React.FC = () => {
                                     Financial Diary
                                 </h2>
                                 <span
-                                    className="text-[13px] font-medium"
+                                    className="text-[15px] font-medium"
                                     style={{
                                         fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", "Plus Jakarta Sans", sans-serif',
-                                        color: '#7e8d9f',
+                                        color: '#718096',
                                     }}
                                 >
                                     Cashflow
