@@ -276,11 +276,12 @@ export const CleanMode: React.FC = () => {
                                 <div className="flex items-center justify-between mt-0.5 mb-1.5">
                                     <div className="flex items-baseline gap-2">
                                         <span
-                                            className="text-[17.5px] font-extrabold text-[#2c3137] tracking-tight"
+                                            className="text-[17.5px] font-extrabold text-[#4a4f56] tracking-tight"
                                             style={{
                                                 fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", "Plus Jakarta Sans", sans-serif',
                                                 fontWeight: 800,
                                                 letterSpacing: '-0.02em',
+                                                color: '#4a4f56',
                                             }}
                                         >
                                             {isMasked ? 'IDR ••••••••' : `IDR ${formatBalance(balance)}`}
