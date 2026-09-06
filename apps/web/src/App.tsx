@@ -100,11 +100,6 @@ function App() {
         return <Suspense fallback={<PageLoader />}><PrivacyPolicy /></Suspense>;
     }
 
-    // Allow standalone Clean Mode (1:1 myBCA camouflage mode)
-    if (location.pathname === '/clean-mode') {
-        return <Suspense fallback={<PageLoader />}><CleanMode /></Suspense>;
-    }
-
     // Handle OAuth callback (public route)
     if (location.pathname === '/auth/callback') {
         return <OAuthCallback onLogin={handleLogin} />;
@@ -116,6 +111,15 @@ function App() {
                 <span className="w-10 h-10 border-4 border-primary/30 border-t-primary rounded-full animate-spin"></span>
             </div>
         );
+    }
+
+    // Allow standalone Clean Mode (1:1 myBCA camouflage mode) - ADMIN ONLY
+    if (location.pathname === '/clean-mode') {
+        const currentUser = authService.getCurrentUser();
+        if (!isAuthenticated || !currentUser || currentUser.role !== 'ADMIN') {
+            return <Navigate to="/dashboard" replace />;
+        }
+        return <Suspense fallback={<PageLoader />}><CleanMode /></Suspense>;
     }
 
     // Show Landing Page first if not authenticated and not in auth mode

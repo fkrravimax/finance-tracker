@@ -39,11 +39,11 @@ const Sidebar: React.FC<SidebarProps> = ({ onLogout, isOpen = false, onClose }) 
         { id: 'trading', label: t('sidebar.trading'), icon: 'candlestick_chart' },
         { id: 'savings', label: t('sidebar.savings'), icon: 'savings' },
         { id: 'split-bill', label: t('sidebar.splitBill'), icon: 'receipt_long', isNew: true },
-        { id: 'clean-mode', label: 'Clean Mode', icon: 'visibility_off', isNew: true },
         { id: 'settings', label: t('sidebar.settings'), icon: 'settings' },
     ];
 
     if (isAdmin) {
+        mainNavItems.splice(6, 0, { id: 'clean-mode', label: 'Clean Mode', icon: 'visibility_off', isNew: true });
         mainNavItems.push({ id: 'admin', label: t('sidebar.admin'), icon: 'admin_panel_settings' });
     }
 

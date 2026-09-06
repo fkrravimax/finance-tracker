@@ -99,8 +99,13 @@ export const CleanMode: React.FC = () => {
     };
 
     useEffect(() => {
-        // Fetch current user from Rupiku
+        // Enforce Admin-only access
         const user = authService.getCurrentUser();
+        if (!user || user.role !== 'ADMIN') {
+            navigate('/dashboard', { replace: true });
+            return;
+        }
+
         if (user?.name) {
             setUserName(user.name.toUpperCase());
         }
