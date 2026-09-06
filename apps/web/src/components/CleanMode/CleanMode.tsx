@@ -24,6 +24,33 @@ export const CleanMode: React.FC = () => {
     const [customAccountInput, setCustomAccountInput] = useState<string>('');
     const [customBalanceInput, setCustomBalanceInput] = useState<string>('');
 
+    // Financial Diary State (Exact 1:1 Matching myBCA)
+    const [fdSlide, setFdSlide] = useState<number>(0);
+    const [fdMasked, setFdMasked] = useState<boolean>(true);
+    const [selectedMonth, setSelectedMonth] = useState<string>('September 2026');
+    const [isMonthPickerOpen, setIsMonthPickerOpen] = useState<boolean>(false);
+
+    const fdSlides = [
+        {
+            title: 'Total Spending',
+            label: 'Spending',
+            amount: 'IDR 778,27 K',
+            ringImg: '/clean-mode/fd_ring_spending.png',
+        },
+        {
+            title: 'Total Earning',
+            label: 'Earning',
+            amount: 'IDR 1 M',
+            ringImg: '/clean-mode/fd_ring_earning.png',
+        },
+        {
+            title: 'Total Cashflow',
+            label: 'Cashflow',
+            amount: 'IDR 221,73 K',
+            ringImg: '/clean-mode/fd_ring_cashflow.png',
+        },
+    ];
+
     // Carousel state
     const [activeTab, setActiveTab] = useState<'home' | 'activity' | 'foryou' | 'account'>('home');
 
@@ -148,7 +175,7 @@ export const CleanMode: React.FC = () => {
 
                 {/* ── SCROLLABLE APP BODY (Containing Navy Header + Cards + Banners + Menu) ── */}
                 <div
-                    className="flex-1 overflow-y-auto cleanmode-no-scrollbar no-scrollbar pb-24"
+                    className="flex-1 overflow-y-auto cleanmode-no-scrollbar no-scrollbar pb-28"
                     style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
                 >
 
@@ -501,6 +528,251 @@ export const CleanMode: React.FC = () => {
                                 alt="Pay 1 Get 2"
                                 className="w-full object-contain rounded-2xl block"
                             />
+                        </div>
+
+                        {/* ── 4. FINANCIAL DIARY SECTION (Exact 1:1 Matching myBCA) ── */}
+                        <div className="pt-1 pb-1">
+                            {/* Section Header */}
+                            <div className="flex items-center justify-between mb-3 px-1">
+                                <h2 className="text-[16.5px] font-extrabold text-[#0c3258] tracking-tight">Financial Diary</h2>
+                                <span className="text-[13px] font-semibold text-[#8e9aa8]">Cashflow</span>
+                            </div>
+
+                            {/* White Financial Diary Card */}
+                            <div className="bg-white rounded-[22px] border border-[#eef2f6] shadow-[0_2px_12px_rgba(0,0,0,0.04)] p-4 relative">
+                                {/* Month Selector Capsule */}
+                                <div className="relative">
+                                    <button
+                                        onClick={() => setIsMonthPickerOpen(!isMonthPickerOpen)}
+                                        className="w-full flex items-center justify-between px-3.5 py-2 rounded-lg border border-[#d8e2ed] bg-white text-[#2c3e50] text-[13.5px] font-medium hover:border-[#005caa] transition-colors cursor-pointer"
+                                        aria-label="Pilih Periode"
+                                    >
+                                        <span>{selectedMonth}</span>
+                                        <svg
+                                            className={`w-4 h-4 text-[#005caa] stroke-current stroke-[2.5] fill-none transition-transform duration-200 ${
+                                                isMonthPickerOpen ? 'rotate-180' : ''
+                                            }`}
+                                            viewBox="0 0 24 24"
+                                        >
+                                            <polyline points="6 9 12 15 18 9" />
+                                        </svg>
+                                    </button>
+
+                                    {/* Month Dropdown List */}
+                                    {isMonthPickerOpen && (
+                                        <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-[#d8e2ed] rounded-lg shadow-lg z-30 py-1 overflow-hidden">
+                                            {['September 2026', 'Agustus 2026', 'Juli 2026', 'Juni 2026'].map((m) => (
+                                                <button
+                                                    key={m}
+                                                    onClick={() => {
+                                                        setSelectedMonth(m);
+                                                        setIsMonthPickerOpen(false);
+                                                        showToast(`Periode diubah ke ${m}`);
+                                                    }}
+                                                    className={`w-full text-left px-3.5 py-2 text-[13px] hover:bg-[#f0f6fc] transition-colors ${
+                                                        selectedMonth === m
+                                                            ? 'text-[#005caa] font-bold bg-[#f0f6fc]'
+                                                            : 'text-[#2c3e50]'
+                                                    }`}
+                                                >
+                                                    {m}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Donut Ring & Center Details */}
+                                <div className="relative w-[218px] h-[218px] mx-auto flex items-center justify-center my-3.5">
+                                    <img
+                                        src={fdSlides[fdSlide].ringImg}
+                                        alt={fdSlides[fdSlide].title}
+                                        className="w-full h-full object-contain pointer-events-none select-none"
+                                    />
+                                    <div className="absolute inset-0 flex flex-col items-center justify-center text-center select-none pt-0.5">
+                                        <span className="text-[13px] text-[#5b6878] font-normal leading-tight">Total</span>
+                                        <span className="text-[14.5px] text-[#2c3e50] font-bold leading-tight mt-0.5">
+                                            {fdSlides[fdSlide].label}
+                                        </span>
+                                        <span className="text-[15.5px] text-[#0c3258] font-extrabold tracking-tight mt-1.5">
+                                            {fdMasked ? 'IDR ******' : fdSlides[fdSlide].amount}
+                                        </span>
+                                        <button
+                                            onClick={() => setFdMasked(!fdMasked)}
+                                            className="mt-2 w-[40px] h-[28px] rounded-[7px] border border-[#d2d9e1] bg-[#f8fafd] hover:bg-[#eef4fb] active:scale-95 transition-all flex items-center justify-center shadow-xs cursor-pointer"
+                                            title={fdMasked ? 'Tampilkan Nominal' : 'Sembunyikan Nominal'}
+                                            aria-label="Toggle nominal visibility"
+                                        >
+                                            {fdMasked ? (
+                                                <svg className="w-4 h-4 stroke-[#7a869a] fill-none stroke-[2]" viewBox="0 0 24 24">
+                                                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
+                                                    <line x1="1" y1="1" x2="23" y2="23" />
+                                                </svg>
+                                            ) : (
+                                                <svg className="w-4 h-4 stroke-[#7a869a] fill-none stroke-[2]" viewBox="0 0 24 24">
+                                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                                                    <circle cx="12" cy="12" r="3" />
+                                                </svg>
+                                            )}
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {/* Carousel Navigation Controls */}
+                                <div className="flex items-center justify-between px-6 mt-1 mb-2">
+                                    {/* Previous Button */}
+                                    <button
+                                        onClick={() => setFdSlide(Math.max(0, fdSlide - 1))}
+                                        disabled={fdSlide === 0}
+                                        className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${
+                                            fdSlide === 0
+                                                ? 'opacity-25 cursor-not-allowed bg-transparent text-[#b0bccb]'
+                                                : 'bg-[#ebf4fd] text-[#0060b2] hover:bg-[#deeeff] active:scale-90 cursor-pointer shadow-xs'
+                                        }`}
+                                        aria-label="Previous slide"
+                                    >
+                                        <svg className="w-4 h-4 fill-none stroke-current stroke-[2.5]" viewBox="0 0 24 24">
+                                            <polyline points="15 18 9 12 15 6" />
+                                        </svg>
+                                    </button>
+
+                                    {/* 3 Pagination Dots */}
+                                    <div className="flex items-center gap-2">
+                                        {fdSlides.map((_, idx) => (
+                                            <button
+                                                key={idx}
+                                                onClick={() => setFdSlide(idx)}
+                                                className={`transition-all duration-300 rounded-full cursor-pointer ${
+                                                    fdSlide === idx
+                                                        ? 'w-2 h-2 bg-[#0c3258]'
+                                                        : 'w-2 h-2 bg-[#d8e0ea] hover:bg-slate-400'
+                                                }`}
+                                                aria-label={`Slide ${idx + 1}`}
+                                            />
+                                        ))}
+                                    </div>
+
+                                    {/* Next Button */}
+                                    <button
+                                        onClick={() => setFdSlide(Math.min(fdSlides.length - 1, fdSlide + 1))}
+                                        disabled={fdSlide === fdSlides.length - 1}
+                                        className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${
+                                            fdSlide === fdSlides.length - 1
+                                                ? 'opacity-25 cursor-not-allowed bg-transparent text-[#b0bccb]'
+                                                : 'bg-[#ebf4fd] text-[#0060b2] hover:bg-[#deeeff] active:scale-90 cursor-pointer shadow-xs'
+                                        }`}
+                                        aria-label="Next slide"
+                                    >
+                                        <svg className="w-4 h-4 fill-none stroke-current stroke-[2.5]" viewBox="0 0 24 24">
+                                            <polyline points="9 18 15 12 9 6" />
+                                        </svg>
+                                    </button>
+                                </div>
+
+                                {/* View Cashflow Details Link */}
+                                <div className="pt-3 pb-1 text-center">
+                                    <button
+                                        onClick={() => {
+                                            setActiveTab('activity');
+                                            setIsStatementOpen(true);
+                                        }}
+                                        className="text-[14px] font-bold text-[#005caa] hover:text-[#004885] active:scale-98 transition-all hover:underline cursor-pointer"
+                                    >
+                                        View Cashflow Details
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* ── 5. CURRENCY EXCHANGE RATES SECTION (Exact 1:1 Matching myBCA) ── */}
+                        <div className="pt-1 pb-6">
+                            {/* Header */}
+                            <div
+                                onClick={() => showToast('Informasi Kurs BCA Terbaru')}
+                                className="flex items-center justify-between mb-3 px-1 cursor-pointer group"
+                            >
+                                <h2 className="text-[16.5px] font-extrabold text-[#0c3258] tracking-tight">Currency Exchange Rates</h2>
+                                <svg className="w-4 h-4 text-[#0c3258] stroke-current stroke-[2.5] fill-none group-hover:translate-x-0.5 transition-transform" viewBox="0 0 24 24">
+                                    <polyline points="9 18 15 12 9 6" />
+                                </svg>
+                            </div>
+
+                            {/* Rates Table Card */}
+                            <div className="bg-white rounded-[22px] border border-[#eef2f6] shadow-[0_2px_12px_rgba(0,0,0,0.04)] p-4">
+                                {/* Table Header */}
+                                <div className="flex items-center justify-between text-[12.5px] font-bold text-[#0c3258] pb-3 border-b border-slate-100 px-1">
+                                    <span className="w-1/3">Currency</span>
+                                    <span className="w-1/3 text-center">Bank Buy</span>
+                                    <span className="w-1/3 text-right">Bank Sell</span>
+                                </div>
+
+                                {/* Currency Rows */}
+                                <div className="divide-y divide-slate-50 pt-1">
+                                    {/* USD Row */}
+                                    <div className="flex items-center justify-between py-2.5 px-1">
+                                        <div className="w-1/3 flex items-center gap-2">
+                                            <svg className="w-5 h-5 rounded-full shrink-0 shadow-xs overflow-hidden" viewBox="0 0 64 64">
+                                                <rect width="64" height="64" fill="#b22234" />
+                                                <rect y="5" width="64" height="5" fill="#ffffff" />
+                                                <rect y="15" width="64" height="5" fill="#ffffff" />
+                                                <rect y="25" width="64" height="5" fill="#ffffff" />
+                                                <rect y="35" width="64" height="5" fill="#ffffff" />
+                                                <rect y="45" width="64" height="5" fill="#ffffff" />
+                                                <rect y="55" width="64" height="5" fill="#ffffff" />
+                                                <rect width="32" height="35" fill="#3c3b6e" />
+                                                <circle cx="8" cy="7" r="1.8" fill="#ffffff" />
+                                                <circle cx="16" cy="7" r="1.8" fill="#ffffff" />
+                                                <circle cx="24" cy="7" r="1.8" fill="#ffffff" />
+                                                <circle cx="12" cy="14" r="1.8" fill="#ffffff" />
+                                                <circle cx="20" cy="14" r="1.8" fill="#ffffff" />
+                                                <circle cx="8" cy="21" r="1.8" fill="#ffffff" />
+                                                <circle cx="16" cy="21" r="1.8" fill="#ffffff" />
+                                                <circle cx="24" cy="21" r="1.8" fill="#ffffff" />
+                                                <circle cx="12" cy="28" r="1.8" fill="#ffffff" />
+                                                <circle cx="20" cy="28" r="1.8" fill="#ffffff" />
+                                            </svg>
+                                            <span className="text-[13.5px] font-bold text-[#0c3258]">USD</span>
+                                        </div>
+                                        <span className="w-1/3 text-center text-[13.5px] font-medium text-[#4a4f56]">17,540.00</span>
+                                        <span className="w-1/3 text-right text-[13.5px] font-medium text-[#4a4f56]">17,690.00</span>
+                                    </div>
+
+                                    {/* SGD Row */}
+                                    <div className="flex items-center justify-between py-2.5 px-1">
+                                        <div className="w-1/3 flex items-center gap-2">
+                                            <svg className="w-5 h-5 rounded-full shrink-0 shadow-xs overflow-hidden" viewBox="0 0 64 64">
+                                                <rect width="64" height="32" fill="#ed2939" />
+                                                <rect y="32" width="64" height="32" fill="#ffffff" />
+                                                <circle cx="16" cy="16" r="8" fill="#ffffff" />
+                                                <circle cx="19" cy="16" r="7" fill="#ed2939" />
+                                            </svg>
+                                            <span className="text-[13.5px] font-bold text-[#0c3258]">SGD</span>
+                                        </div>
+                                        <span className="w-1/3 text-center text-[13.5px] font-medium text-[#4a4f56]">13,420.00</span>
+                                        <span className="w-1/3 text-right text-[13.5px] font-medium text-[#4a4f56]">13,580.00</span>
+                                    </div>
+
+                                    {/* EUR Row */}
+                                    <div className="flex items-center justify-between py-2.5 px-1">
+                                        <div className="w-1/3 flex items-center gap-2">
+                                            <svg className="w-5 h-5 rounded-full shrink-0 shadow-xs overflow-hidden" viewBox="0 0 64 64">
+                                                <rect width="64" height="64" fill="#003399" />
+                                                <circle cx="32" cy="14" r="2.2" fill="#ffcc00" />
+                                                <circle cx="32" cy="50" r="2.2" fill="#ffcc00" />
+                                                <circle cx="14" cy="32" r="2.2" fill="#ffcc00" />
+                                                <circle cx="50" cy="32" r="2.2" fill="#ffcc00" />
+                                                <circle cx="19" cy="19" r="2.2" fill="#ffcc00" />
+                                                <circle cx="45" cy="19" r="2.2" fill="#ffcc00" />
+                                                <circle cx="19" cy="45" r="2.2" fill="#ffcc00" />
+                                                <circle cx="45" cy="45" r="2.2" fill="#ffcc00" />
+                                            </svg>
+                                            <span className="text-[13.5px] font-bold text-[#0c3258]">EUR</span>
+                                        </div>
+                                        <span className="w-1/3 text-center text-[13.5px] font-medium text-[#4a4f56]">19,110.00</span>
+                                        <span className="w-1/3 text-right text-[13.5px] font-medium text-[#4a4f56]">19,340.00</span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
