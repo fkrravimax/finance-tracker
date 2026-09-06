@@ -221,11 +221,11 @@ export const CleanMode: React.FC = () => {
                 style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", "Plus Jakarta Sans", "Open Sans", sans-serif' }}
             >
 
-            {/* ── PERSISTENT TOP NAVIGATION HEADER (1:1 Authentic myBCA Header with Seamless Continuous Motif) ── */}
+            {/* ── PERSISTENT TOP NAVIGATION HEADER (1:1 Authentic myBCA Header with Seamless Continuous Motif & Curved Bottom Corners) ── */}
             <div
-                className="absolute top-0 left-0 right-0 z-40 select-none overflow-hidden"
+                className="absolute top-0 left-0 right-0 z-40 select-none"
                 style={{
-                    backgroundImage: `url('/clean-mode/mybca_seamless_header_bg.png')`,
+                    backgroundImage: `url('/clean-mode/mybca_master_clean_bg.png')`,
                     backgroundSize: '100% auto',
                     backgroundPosition: 'top center',
                     backgroundColor: '#0f4277',
@@ -287,6 +287,22 @@ export const CleanMode: React.FC = () => {
                         </button>
                     </div>
                 </div>
+
+                {/* ── Authentic Curved Corner Wedges (Exact matching SS 2 Downward Corner Fillet R=18px) ── */}
+                {/* Left Corner Wedge (fillet R=18px) */}
+                <svg
+                    className="absolute left-0 -bottom-[18px] w-[18px] h-[18px] pointer-events-none fill-[#134e84] z-10"
+                    viewBox="0 0 18 18"
+                >
+                    <path d="M 0,0 L 0,18 A 18,18 0 0,0 18,0 Z" />
+                </svg>
+                {/* Right Corner Wedge (fillet R=18px) */}
+                <svg
+                    className="absolute right-0 -bottom-[18px] w-[18px] h-[18px] pointer-events-none fill-[#134e84] z-10"
+                    viewBox="0 0 18 18"
+                >
+                    <path d="M 18,0 L 18,18 A 18,18 0 0,0 0,0 Z" />
+                </svg>
             </div>
 
             {/* ── SCROLLABLE APP BODY (Containing Navy Header + Cards + Banners + Menu) ── */}
@@ -295,11 +311,11 @@ export const CleanMode: React.FC = () => {
                 style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
             >
 
-                    {/* ── 1. DEEP NAVY BLUE HEADER & CARD SECTION (Exact matching CONTOHTAMPILAN.PNG & Native Video) ── */}
+                    {/* ── 1. DEEP NAVY BLUE HEADER & CARD SECTION (Exact matching SS 3 & Native Video) ── */}
                     <div
-                        className="text-white pt-[calc(max(env(safe-area-inset-top,44px),44px)+50px)] sm:pt-[76px] pb-3 px-5 relative overflow-hidden"
+                        className="text-white pt-[calc(max(env(safe-area-inset-top,44px),44px)+50px)] sm:pt-[76px] pb-3 px-4 relative overflow-hidden"
                         style={{
-                            backgroundImage: `url('/clean-mode/mybca_seamless_header_bg.png')`,
+                            backgroundImage: `url('/clean-mode/mybca_master_clean_bg.png')`,
                             backgroundSize: '100% auto',
                             backgroundPosition: 'top center',
                             backgroundColor: '#0f4277',
@@ -315,9 +331,9 @@ export const CleanMode: React.FC = () => {
                         </div>
 
                         {/* PRIMARY ACCOUNT CARD (Entirely enclosed inside Dark Blue Header - Never Cut Off!) */}
-                        <div className="relative z-20 rounded-[18px] shadow-lg shadow-black/15 overflow-hidden bg-white">
-                            {/* Top Dual-Tone Gradient Strip (#77bcf1 -> #41a2c3 -> #2bb7b9) with Stacked Elements */}
-                            <div className="bg-gradient-to-r from-[#77bcf1] via-[#41a2c3] to-[#2bb7b9] px-4 pt-2.5 pb-2.5 flex flex-col gap-2 text-white">
+                        <div className="relative z-20 rounded-[20px] shadow-lg shadow-black/15 overflow-hidden bg-white">
+                            {/* Top Dual-Tone Gradient Strip (Matching SS 3 Turquoise/Teal) */}
+                            <div className="bg-gradient-to-r from-[#2baabf] via-[#33b1b6] to-[#45b6a7] px-4 pt-2.5 pb-2.5 flex flex-col gap-2 text-white">
                                 {/* Row 1: BCA ID pill button (Left-aligned) */}
                                 <div>
                                     <div
@@ -627,9 +643,9 @@ export const CleanMode: React.FC = () => {
                         {/* ── SEKSI 1: POCKETS (Exact 1:1 Matching myBCA) ── */}
                         <div className="pt-0.5 pb-1">
                             {/* Section Header */}
-                            <div className="flex items-center justify-between mb-2.5 px-1">
+                            <div className="flex items-center justify-between mb-2 px-1">
                                 <h2
-                                    className="text-[18px] font-bold text-[#0c3258] tracking-tight"
+                                    className="text-[15px] font-bold text-[#0c3258] tracking-tight"
                                     style={{
                                         fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", "Plus Jakarta Sans", sans-serif',
                                         color: '#0c3258',
@@ -640,10 +656,10 @@ export const CleanMode: React.FC = () => {
                             </div>
 
                             {/* Tabs (Rupiah Pocket / Forex Pocket) */}
-                            <div className="flex items-center gap-2 mb-2.5">
+                            <div className="flex items-center gap-2 mb-2">
                                 <button
                                     onClick={() => setPocketTab('rupiah')}
-                                    className={`px-3.5 py-1.5 rounded-[11px] text-[14px] transition-all cursor-pointer ${
+                                    className={`px-3 py-1 rounded-[8px] text-[11.5px] h-[28px] transition-all cursor-pointer flex items-center justify-center ${
                                         pocketTab === 'rupiah'
                                             ? 'border-[1.5px] border-[#005caa] bg-[#e4f2fe] text-[#2d3748] font-medium shadow-xs'
                                             : 'border-[1.5px] border-[#cfcfcf] bg-white text-[#6e7479] font-normal hover:bg-slate-50'
@@ -656,7 +672,7 @@ export const CleanMode: React.FC = () => {
                                 </button>
                                 <button
                                     onClick={() => setPocketTab('forex')}
-                                    className={`px-3.5 py-1.5 rounded-[11px] text-[14px] transition-all cursor-pointer ${
+                                    className={`px-3 py-1 rounded-[8px] text-[11.5px] h-[28px] transition-all cursor-pointer flex items-center justify-center ${
                                         pocketTab === 'forex'
                                             ? 'border-[1.5px] border-[#005caa] bg-[#e4f2fe] text-[#2d3748] font-medium shadow-xs'
                                             : 'border-[1.5px] border-[#cfcfcf] bg-white text-[#6e7479] font-normal hover:bg-slate-50'
@@ -670,17 +686,17 @@ export const CleanMode: React.FC = () => {
                             </div>
 
                             {/* Pocket Info Card */}
-                            <div className="bg-white rounded-[20px] border border-[#eef2f6] shadow-[0_2px_10px_rgba(0,0,0,0.03)] p-4 flex items-center gap-3.5">
+                            <div className="bg-white rounded-[18px] border border-[#eef2f6] shadow-[0_2px_10px_rgba(0,0,0,0.03)] p-3.5 flex items-center gap-3">
                                 {pocketTab === 'rupiah' ? (
                                     <>
                                         <img
-                                            src="/clean-mode/pocket_illustration_hd.png"
+                                            src="/clean-mode/pocket_illustration_exact.png"
                                             alt="Pocket"
-                                            className="w-[54px] sm:w-[58px] h-auto object-contain shrink-0"
+                                            className="w-[38px] h-auto object-contain shrink-0"
                                         />
                                         <div className="flex-1 min-w-0">
                                             <p
-                                                className="text-[13.5px] leading-[19px] text-[#4a5568] font-normal"
+                                                className="text-[11px] leading-[15px] text-[#53575a] font-normal"
                                                 style={{
                                                     fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", "Plus Jakarta Sans", sans-serif',
                                                 }}
@@ -689,7 +705,7 @@ export const CleanMode: React.FC = () => {
                                             </p>
                                             <button
                                                 onClick={() => showToast('Buat Pocket Baru di myBCA')}
-                                                className="text-[15px] font-bold text-[#005caa] hover:underline mt-2.5 inline-block text-left cursor-pointer active:scale-95 transition-transform"
+                                                className="text-[12px] font-bold text-[#005caa] hover:underline mt-1.5 inline-block text-left cursor-pointer active:scale-95 transition-transform"
                                                 style={{
                                                     fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", "Plus Jakarta Sans", sans-serif',
                                                 }}
@@ -701,13 +717,13 @@ export const CleanMode: React.FC = () => {
                                 ) : (
                                     <>
                                         <img
-                                            src="/clean-mode/pocket_illustration_hd.png"
+                                            src="/clean-mode/pocket_illustration_exact.png"
                                             alt="Pocket"
-                                            className="w-[54px] sm:w-[58px] h-auto object-contain shrink-0"
+                                            className="w-[38px] h-auto object-contain shrink-0"
                                         />
                                         <div className="flex-1 min-w-0">
                                             <p
-                                                className="text-[13.5px] leading-[19px] text-[#4a5568] font-normal"
+                                                className="text-[11px] leading-[15px] text-[#53575a] font-normal"
                                                 style={{
                                                     fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", "Plus Jakarta Sans", sans-serif',
                                                 }}
@@ -716,7 +732,7 @@ export const CleanMode: React.FC = () => {
                                             </p>
                                             <button
                                                 onClick={() => showToast('Buat Forex Pocket di myBCA')}
-                                                className="text-[15px] font-bold text-[#005caa] hover:underline mt-2.5 inline-block text-left cursor-pointer active:scale-95 transition-transform"
+                                                className="text-[12px] font-bold text-[#005caa] hover:underline mt-1.5 inline-block text-left cursor-pointer active:scale-95 transition-transform"
                                                 style={{
                                                     fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", "Plus Jakarta Sans", sans-serif',
                                                 }}
@@ -732,9 +748,9 @@ export const CleanMode: React.FC = () => {
                         {/* ── SEKSI 2: E-WALLET (Exact 1:1 Matching myBCA) ── */}
                         <div className="pt-0.5 pb-1">
                             {/* Section Header */}
-                            <div className="flex items-center justify-between mb-2.5 px-1">
+                            <div className="flex items-center justify-between mb-2 px-1">
                                 <h2
-                                    className="text-[18px] font-bold text-[#0c3258] tracking-tight"
+                                    className="text-[15px] font-bold text-[#0c3258] tracking-tight"
                                     style={{
                                         fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", "Plus Jakarta Sans", sans-serif',
                                         color: '#0c3258',
@@ -744,46 +760,46 @@ export const CleanMode: React.FC = () => {
                                 </h2>
                             </div>
 
-                            {/* e-Wallet Grid Cards (Tight gap matching SS 1) */}
+                            {/* e-Wallet Grid Cards (Exact 1:1 matching SS 2) */}
                             <div className="grid grid-cols-4 gap-2">
                                 <div
                                     onClick={() => showToast('Sakuku BCA')}
-                                    className="cursor-pointer active:scale-95 transition-transform"
+                                    className="cursor-pointer active:scale-95 transition-transform rounded-[16px] overflow-hidden shadow-xs"
                                 >
                                     <img
-                                        src="/clean-mode/ewallet_sakuku_hd.png"
+                                        src="/clean-mode/ewallet_card_sakuku_hd.png"
                                         alt="Sakuku"
-                                        className="w-full h-auto object-contain block drop-shadow-xs"
+                                        className="w-full h-auto object-contain block"
                                     />
                                 </div>
                                 <div
                                     onClick={() => showToast('DANA e-Wallet')}
-                                    className="cursor-pointer active:scale-95 transition-transform"
+                                    className="cursor-pointer active:scale-95 transition-transform rounded-[16px] overflow-hidden shadow-xs"
                                 >
                                     <img
-                                        src="/clean-mode/ewallet_dana_hd.png"
+                                        src="/clean-mode/ewallet_card_dana_hd.png"
                                         alt="DANA"
-                                        className="w-full h-auto object-contain block drop-shadow-xs"
+                                        className="w-full h-auto object-contain block"
                                     />
                                 </div>
                                 <div
                                     onClick={() => showToast('GoPay e-Wallet')}
-                                    className="cursor-pointer active:scale-95 transition-transform"
+                                    className="cursor-pointer active:scale-95 transition-transform rounded-[16px] overflow-hidden shadow-xs"
                                 >
                                     <img
-                                        src="/clean-mode/ewallet_gopay_hd.png"
+                                        src="/clean-mode/ewallet_card_gopay_hd.png"
                                         alt="GoPay"
-                                        className="w-full h-auto object-contain block drop-shadow-xs"
+                                        className="w-full h-auto object-contain block"
                                     />
                                 </div>
                                 <div
                                     onClick={() => showToast('OVO e-Wallet')}
-                                    className="cursor-pointer active:scale-95 transition-transform"
+                                    className="cursor-pointer active:scale-95 transition-transform rounded-[16px] overflow-hidden shadow-xs"
                                 >
                                     <img
-                                        src="/clean-mode/ewallet_ovo_hd.png"
+                                        src="/clean-mode/ewallet_card_ovo_hd.png"
                                         alt="OVO"
-                                        className="w-full h-auto object-contain block drop-shadow-xs"
+                                        className="w-full h-auto object-contain block"
                                     />
                                 </div>
                             </div>
@@ -792,9 +808,9 @@ export const CleanMode: React.FC = () => {
                         {/* ── SEKSI 3: CARD (Exact 1:1 Matching myBCA) ── */}
                         <div className="pt-0.5 pb-1">
                             {/* Section Header */}
-                            <div className="flex items-center justify-between mb-2.5 px-1">
+                            <div className="flex items-center justify-between mb-2 px-1">
                                 <h2
-                                    className="text-[18px] font-bold text-[#0c3258] tracking-tight"
+                                    className="text-[15px] font-bold text-[#0c3258] tracking-tight"
                                     style={{
                                         fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", "Plus Jakarta Sans", sans-serif',
                                         color: '#0c3258',
@@ -805,10 +821,10 @@ export const CleanMode: React.FC = () => {
                             </div>
 
                             {/* Tabs (Debit Card / Credit Card) */}
-                            <div className="flex items-center gap-2 mb-2.5">
+                            <div className="flex items-center gap-2 mb-2">
                                 <button
                                     onClick={() => setCardTab('debit')}
-                                    className={`px-3.5 py-1.5 rounded-[11px] text-[14px] transition-all cursor-pointer ${
+                                    className={`px-3 py-1 rounded-[8px] text-[11.5px] h-[28px] transition-all cursor-pointer flex items-center justify-center ${
                                         cardTab === 'debit'
                                             ? 'border-[1.5px] border-[#005caa] bg-[#e4f2fe] text-[#2d3748] font-medium shadow-xs'
                                             : 'border-[1.5px] border-[#cfcfcf] bg-white text-[#6e7479] font-normal hover:bg-slate-50'
@@ -821,7 +837,7 @@ export const CleanMode: React.FC = () => {
                                 </button>
                                 <button
                                     onClick={() => setCardTab('credit')}
-                                    className={`px-3.5 py-1.5 rounded-[11px] text-[14px] transition-all cursor-pointer ${
+                                    className={`px-3 py-1 rounded-[8px] text-[11.5px] h-[28px] transition-all cursor-pointer flex items-center justify-center ${
                                         cardTab === 'credit'
                                             ? 'border-[1.5px] border-[#005caa] bg-[#e4f2fe] text-[#2d3748] font-medium shadow-xs'
                                             : 'border-[1.5px] border-[#cfcfcf] bg-white text-[#6e7479] font-normal hover:bg-slate-50'
@@ -835,18 +851,18 @@ export const CleanMode: React.FC = () => {
                             </div>
 
                             {/* Card Item Container */}
-                            <div className="bg-white rounded-[20px] border border-[#eef2f6] shadow-[0_2px_10px_rgba(0,0,0,0.03)] px-3.5 py-3.5 flex items-center justify-between">
+                            <div className="bg-white rounded-[18px] border border-[#eef2f6] shadow-[0_2px_10px_rgba(0,0,0,0.03)] px-3.5 py-3 flex items-center justify-between">
                                 {cardTab === 'debit' ? (
                                     <>
                                         <div className="flex items-center gap-3 min-w-0">
                                             <img
-                                                src="/clean-mode/card_paspor_platinum_hd.png"
+                                                src="/clean-mode/card_paspor_platinum_thumb_exact.png"
                                                 alt="Paspor BCA Platinum"
-                                                className="w-[58px] sm:w-[62px] h-auto object-contain rounded-[4px] shadow-xs shrink-0"
+                                                className="w-[42px] h-[27px] object-contain rounded-[3px] shadow-xs shrink-0"
                                             />
                                             <div className="min-w-0">
                                                 <p
-                                                    className="text-[15px] font-bold text-[#2d3748] tracking-wider whitespace-nowrap"
+                                                    className="text-[12.5px] font-semibold text-[#1e293b] tracking-normal whitespace-nowrap"
                                                     style={{
                                                         fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", "Plus Jakarta Sans", sans-serif',
                                                     }}
@@ -854,7 +870,7 @@ export const CleanMode: React.FC = () => {
                                                     5260 - **** - **** - **60
                                                 </p>
                                                 <p
-                                                    className="text-[12.5px] font-medium text-[#596066] tracking-wide mt-0.5 whitespace-nowrap"
+                                                    className="text-[10px] font-medium text-[#64748b] tracking-wide mt-0.5 whitespace-nowrap"
                                                     style={{
                                                         fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", "Plus Jakarta Sans", sans-serif',
                                                     }}
@@ -865,24 +881,24 @@ export const CleanMode: React.FC = () => {
                                         </div>
                                         <button
                                             onClick={() => showToast('Pengaturan Kartu Debit')}
-                                            className="flex items-center gap-1.5 text-[#005caa] hover:text-[#004885] active:scale-95 transition-transform cursor-pointer shrink-0 ml-2"
+                                            className="flex items-center gap-1 text-[#005caa] hover:text-[#004885] active:scale-95 transition-transform cursor-pointer shrink-0 ml-2"
                                             style={{
                                                 fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", "Plus Jakarta Sans", sans-serif',
                                             }}
                                         >
-                                            <Settings className="w-4 h-4 stroke-[2.4]" />
-                                            <span className="text-[14.5px] font-bold">Manage</span>
+                                            <Settings className="w-3.5 h-3.5 stroke-[2.4]" />
+                                            <span className="text-[12px] font-bold">Manage</span>
                                         </button>
                                     </>
                                 ) : (
                                     <>
                                         <div className="flex items-center gap-3 min-w-0">
-                                            <div className="w-[58px] sm:w-[62px] h-[36px] rounded-[4px] bg-gradient-to-tr from-[#1a365d] to-[#2b6cb0] flex items-center justify-center shadow-xs shrink-0">
-                                                <span className="text-[9px] font-bold text-white tracking-widest">BCA</span>
+                                            <div className="w-[42px] h-[27px] rounded-[3px] bg-gradient-to-tr from-[#1a365d] to-[#2b6cb0] flex items-center justify-center shadow-xs shrink-0">
+                                                <span className="text-[8px] font-bold text-white tracking-widest">BCA</span>
                                             </div>
                                             <div className="min-w-0">
                                                 <p
-                                                    className="text-[15px] font-bold text-[#2d3748] tracking-wider whitespace-nowrap"
+                                                    className="text-[12.5px] font-semibold text-[#1e293b] tracking-normal whitespace-nowrap"
                                                     style={{
                                                         fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", "Plus Jakarta Sans", sans-serif',
                                                     }}
@@ -890,24 +906,24 @@ export const CleanMode: React.FC = () => {
                                                     BCA Everyday Card
                                                 </p>
                                                 <p
-                                                    className="text-[12.5px] font-medium text-[#596066] tracking-wide mt-0.5 whitespace-nowrap"
+                                                    className="text-[10px] font-medium text-[#64748b] tracking-wide mt-0.5 whitespace-nowrap"
                                                     style={{
                                                         fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", "Plus Jakarta Sans", sans-serif',
                                                     }}
                                                 >
-                                                    CREDIT CARD
+                                                    5412 - **** - **** - **88
                                                 </p>
                                             </div>
                                         </div>
                                         <button
                                             onClick={() => showToast('Pengaturan Kartu Kredit')}
-                                            className="flex items-center gap-1.5 text-[#005caa] hover:text-[#004885] active:scale-95 transition-transform cursor-pointer shrink-0 ml-2"
+                                            className="flex items-center gap-1 text-[#005caa] hover:text-[#004885] active:scale-95 transition-transform cursor-pointer shrink-0 ml-2"
                                             style={{
                                                 fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", "Plus Jakarta Sans", sans-serif',
                                             }}
                                         >
-                                            <Settings className="w-4 h-4 stroke-[2.4]" />
-                                            <span className="text-[14.5px] font-bold">Manage</span>
+                                            <Settings className="w-3.5 h-3.5 stroke-[2.4]" />
+                                            <span className="text-[12px] font-bold">Manage</span>
                                         </button>
                                     </>
                                 )}
