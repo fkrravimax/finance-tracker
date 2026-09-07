@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Settings, Check, X, Eye, EyeOff, Sparkles, RefreshCw, Layers } from 'lucide-react';
@@ -29,7 +29,7 @@ const DEFAULT_TRANSACTIONS: DateGroup[] = [
                 id: 'm1',
                 icon: '/clean-mode-mandiri/mandiri_tx_qr.png',
                 title: 'QR Bayar',
-                description: 'Pembayaran QR ke IDM QRIS LIVIN 624827123587',
+                description: 'Pembayaran QR\nke IDM QRIS LIVIN\n624827123587',
                 amount: 75300,
                 cents: '00',
                 type: 'expense',
@@ -38,7 +38,7 @@ const DEFAULT_TRANSACTIONS: DateGroup[] = [
                 id: 'm2',
                 icon: '/clean-mode-mandiri/mandiri_tx_transfer.png',
                 title: 'Transfer Rupiah',
-                description: 'Transfer BI Fast Ke BANK BNI SUHENDRA WAHYU 1817362467',
+                description: 'Transfer BI Fast\nKe BANK BNI\nSUHENDRA WAHYU 1817362467',
                 amount: 285000,
                 cents: '00',
                 type: 'expense',
@@ -70,7 +70,7 @@ const DEFAULT_TRANSACTIONS: DateGroup[] = [
                 id: 'm5',
                 icon: '/clean-mode-mandiri/mandiri_tx_transfer.png',
                 title: 'Transfer Rupiah',
-                description: 'Transfer BI Fast Ke BCA RANO 7245614730',
+                description: 'Transfer BI Fast\nKe BCA\nRANO 7245614730',
                 amount: 1700000,
                 cents: '00',
                 type: 'expense',
@@ -79,7 +79,7 @@ const DEFAULT_TRANSACTIONS: DateGroup[] = [
                 id: 'm6',
                 icon: '/clean-mode-mandiri/mandiri_tx_transfer.png',
                 title: 'Transfer Rupiah',
-                description: 'Transfer BI Fast Ke BANK MANDIRI TYAS ALIFA ARDAYANTI 1370018899231',
+                description: 'Transfer BI Fast\nKe BANK MANDIRI\nTYAS ALIFA ARDAYANTI 1370018899231',
                 amount: 450000,
                 cents: '00',
                 type: 'expense',
@@ -102,7 +102,7 @@ const DEFAULT_TRANSACTIONS: DateGroup[] = [
                 id: 'm8',
                 icon: '/clean-mode-mandiri/mandiri_tx_transfer.png',
                 title: 'Transfer Rupiah',
-                description: 'Transfer BI Fast Ke BANK BNI PAGUYUBAN PEGAWAI KP 1902837461',
+                description: 'Transfer BI Fast\nKe BANK BNI\nPAGUYUBAN PEGAWAI KP 1902837461',
                 amount: 200000,
                 cents: '00',
                 type: 'expense',
@@ -161,7 +161,7 @@ export const CleanModeMandiri: React.FC = () => {
         return localStorage.getItem('mandiri_clean_mode_selected_month') || 'September';
     });
 
-    // Copied feedback & toast
+    // Feedback states
     const [copied, setCopied] = useState<boolean>(false);
     const [toastMessage, setToastMessage] = useState<string | null>(null);
 
@@ -176,21 +176,15 @@ export const CleanModeMandiri: React.FC = () => {
     const [inputMonth, setInputMonth] = useState<string>('');
     const [fetchingReal, setFetchingReal] = useState<boolean>(false);
 
-    // Sheet expansion state: 'collapsed' (mid screen ~48%) or 'expanded' (top ~80px)
+    // Sheet expansion state: 'collapsed' (mid screen ~50%) or 'expanded' (top ~80px)
     const [isSheetExpanded, setIsSheetExpanded] = useState<boolean>(false);
 
-    // Dynamic clock
-    const [currentTime, setCurrentTime] = useState<string>('10.29');
+    // Month scroll ref to align September on the right (showing 2.5-3 months like real Livin')
+    const monthScrollRef = useRef<HTMLDivElement>(null);
     useEffect(() => {
-        const updateTime = () => {
-            const now = new Date();
-            const h = String(now.getHours()).padStart(2, '0');
-            const m = String(now.getMinutes()).padStart(2, '0');
-            setCurrentTime(`${h}.${m}`);
-        };
-        updateTime();
-        const interval = setInterval(updateTime, 30000);
-        return () => clearInterval(interval);
+        if (monthScrollRef.current) {
+            monthScrollRef.current.scrollLeft = monthScrollRef.current.scrollWidth;
+        }
     }, []);
 
     // Format helper for Mandiri balance: Integer part separated by dots, cents as string
@@ -213,10 +207,10 @@ export const CleanModeMandiri: React.FC = () => {
         setTimeout(() => {
             setCopied(false);
             setToastMessage(null);
-        }, 2200);
+        }, 2000);
     };
 
-    // Open Settings Modal and populate inputs
+    // Open Settings Modal
     const handleOpenSettings = () => {
         setInputName(accountName);
         setInputAccount(accountNumber);
@@ -274,13 +268,12 @@ export const CleanModeMandiri: React.FC = () => {
 
     return (
         <div className="min-h-screen w-full bg-[#1b4b72] flex justify-center items-start select-none font-sans overflow-hidden">
-            {/* Main Phone Viewport Container */}
-            <div className="w-full max-w-[430px] min-h-screen h-screen relative bg-gradient-to-b from-[#2b8bdc] via-[#3594e2] to-[#1c6eb5] overflow-hidden flex flex-col shadow-2xl">
+            {/* Main Phone Viewport Container (Dynamic 100dvh to match phone screen exactly) */}
+            <div className="w-full max-w-[430px] h-[100dvh] relative bg-gradient-to-b from-[#2b8bdc] via-[#3594e2] to-[#1c6eb5] overflow-hidden flex flex-col shadow-2xl">
                 
                 {/* Background Subtle Organic Wave Curves */}
                 <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
-                    {/* Upper curved wave highlight */}
-                    <svg className="absolute w-full h-[520px] top-0 left-0 opacity-25" viewBox="0 0 430 520" fill="none" preserveAspectRatio="none">
+                    <svg className="absolute w-full h-[500px] top-0 left-0 opacity-25" viewBox="0 0 430 500" fill="none" preserveAspectRatio="none">
                         <path d="M-50 180 C 120 160, 240 280, 480 200 L 480 0 L -50 0 Z" fill="url(#waveGrad1)" />
                         <path d="M-50 260 C 140 220, 280 370, 480 280 L 480 0 L -50 0 Z" fill="url(#waveGrad2)" />
                         <defs>
@@ -296,199 +289,183 @@ export const CleanModeMandiri: React.FC = () => {
                     </svg>
                 </div>
 
-                {/* Status Bar */}
-                <div className="relative z-10 w-full pt-3 px-7 flex justify-between items-center text-white text-[14px] font-semibold tracking-tight">
-                    <span className="font-semibold tracking-normal">{currentTime}</span>
-                    <div className="flex items-center gap-1.5">
-                        {/* 4G / Signal indicator */}
-                        <div className="flex items-end gap-[2px] h-3 mr-1">
-                            <span className="w-[3px] h-1.5 bg-white rounded-full"></span>
-                            <span className="w-[3px] h-2 bg-white rounded-full"></span>
-                            <span className="w-[3px] h-2.5 bg-white rounded-full"></span>
-                            <span className="w-[3px] h-3 bg-white rounded-full"></span>
-                        </div>
-                        <span className="text-[12px] font-bold">4G</span>
-                        {/* Battery with 12% & lightning bolt */}
-                        <div className="ml-1 flex items-center bg-[#ea3838] px-1.5 py-[1px] rounded-full text-[10px] font-bold text-white shadow-sm">
-                            <span>12</span>
-                            <span className="text-[9px] ml-0.5">⚡</span>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Top Navigation Bar */}
-                <div className="relative z-10 w-full px-5 pt-3 pb-2 flex items-center justify-between">
-                    {/* Back Button */}
-                    <button
-                        onClick={() => navigate('/dashboard')}
-                        className="w-9 h-9 flex items-center justify-center text-white hover:bg-white/10 active:scale-95 rounded-full transition-all"
-                        aria-label="Kembali"
-                    >
-                        <ArrowLeft className="w-6 h-6 stroke-[2.2]" />
-                    </button>
-
-                    {/* Centered Miniature Mandiri Debit Platinum Batik Card */}
-                    <div className="flex flex-col items-center">
-                        <img
-                            src="/clean-mode-mandiri/mandiri_card_batik.png"
-                            alt="Kartu Mandiri Debit Platinum"
-                            className="w-[66px] h-[41px] object-cover rounded-[5px] shadow-lg border border-white/20"
-                        />
-                    </div>
-
-                    {/* Settings Button */}
-                    <button
-                        onClick={handleOpenSettings}
-                        className="w-9 h-9 flex items-center justify-center text-white hover:bg-white/10 active:scale-95 rounded-full transition-all"
-                        aria-label="Pengaturan Clean Mode Mandiri"
-                    >
-                        <Settings className="w-6 h-6 stroke-[2.2]" />
-                    </button>
-                </div>
-
-                {/* Hero Section: Account & Balance */}
-                <div className="relative z-10 flex flex-col items-center text-center px-4 pt-1 pb-3">
-                    {/* Account Name */}
-                    <h1 className="text-white text-[19px] font-bold tracking-tight">
-                        {accountName}
-                    </h1>
-
-                    {/* Account Number with Copy Icon */}
-                    <button
-                        onClick={handleCopyAccountNumber}
-                        className="mt-0.5 flex items-center gap-1.5 text-white/95 text-[15px] hover:text-white transition-opacity active:opacity-75"
-                        title="Salin nomor rekening"
-                    >
-                        <span className="tracking-wide font-normal">{accountNumber}</span>
-                        {/* Duplicate document copy icon matching Livin' */}
-                        {copied ? (
-                            <Check className="w-4 h-4 text-emerald-300" />
-                        ) : (
-                            <svg className="w-4 h-4 text-white fill-none stroke-current stroke-[2]" viewBox="0 0 24 24">
-                                <rect x="8" y="8" width="12" height="12" rx="2" ry="2" />
-                                <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
-                            </svg>
-                        )}
-                    </button>
-
-                    {/* Main Balance with Superscript Cents */}
-                    <div className="mt-3 flex items-center justify-center">
-                        {isMasked ? (
-                            <span className="text-white text-[32px] font-bold tracking-widest">
-                                Rp ••••••••••
-                            </span>
-                        ) : (
-                            <div className="text-white text-[32px] font-bold tracking-tight flex items-baseline">
-                                <span>Rp {formattedInt}</span>
-                                <sup className="text-[17px] font-bold align-super ml-0.5 tracking-normal">
-                                    {cents}
-                                </sup>
-                            </div>
-                        )}
+                {/* Hero Section Container (Occupies exactly top 50% of the screen) */}
+                <div className="relative z-10 w-full h-[50%] flex flex-col justify-between pt-[max(env(safe-area-inset-top),38px)] pb-3 px-5">
+                    
+                    {/* Top Bar: Back Arrow, Miniature Card, Settings Gear */}
+                    <div className="w-full flex items-center justify-between">
+                        {/* Back Arrow */}
                         <button
-                            onClick={() => {
-                                const next = !isMasked;
-                                setIsMasked(next);
-                                localStorage.setItem('mandiri_clean_mode_balance_masked', String(next));
-                            }}
-                            className="ml-2 text-white/80 hover:text-white transition-colors"
+                            onClick={() => navigate('/dashboard')}
+                            className="w-8 h-8 flex items-center justify-center text-white hover:bg-white/10 active:scale-95 rounded-full transition-all"
+                            aria-label="Kembali"
                         >
-                            {isMasked ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5 opacity-0 hover:opacity-100" />}
+                            <ArrowLeft className="w-[22px] h-[22px] stroke-[2.2]" />
                         </button>
+
+                        {/* Centered Miniature Mandiri Debit Platinum Batik Card */}
+                        <div className="flex flex-col items-center">
+                            <img
+                                src="/clean-mode-mandiri/mandiri_card_batik.png"
+                                alt="Kartu Mandiri Debit Platinum"
+                                className="w-[74px] h-[46px] object-cover rounded-[5px] shadow-md border border-white/20"
+                            />
+                        </div>
+
+                        {/* Settings Button */}
+                        <button
+                            onClick={handleOpenSettings}
+                            className="w-8 h-8 flex items-center justify-center text-white hover:bg-white/10 active:scale-95 rounded-full transition-all"
+                            aria-label="Pengaturan Clean Mode Mandiri"
+                        >
+                            <Settings className="w-[22px] h-[22px] stroke-[2.2]" />
+                        </button>
+                    </div>
+
+                    {/* Account Name & Number */}
+                    <div className="flex flex-col items-center text-center -mt-1">
+                        <h1 className="text-white text-[16px] font-bold tracking-tight">
+                            {accountName}
+                        </h1>
+
+                        <button
+                            onClick={handleCopyAccountNumber}
+                            className="mt-1 flex items-center gap-1.5 text-white/95 text-[13.5px] hover:text-white transition-opacity active:opacity-75"
+                            title="Salin nomor rekening"
+                        >
+                            <span className="tracking-wider font-normal">{accountNumber}</span>
+                            {copied ? (
+                                <Check className="w-3.5 h-3.5 text-emerald-300" />
+                            ) : (
+                                <svg className="w-3.5 h-3.5 text-white fill-none stroke-current stroke-[2]" viewBox="0 0 24 24">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                                </svg>
+                            )}
+                        </button>
+
+                        {/* Main Balance with Superscript Cents */}
+                        <div className="mt-2.5 flex items-center justify-center">
+                            {isMasked ? (
+                                <span className="text-white text-[24px] font-bold tracking-widest">
+                                    Rp ••••••••••
+                                </span>
+                            ) : (
+                                <div className="text-white text-[24px] font-bold tracking-tight flex items-baseline">
+                                    <span>Rp {formattedInt}</span>
+                                    <sup className="text-[14px] font-bold align-super ml-0.5 tracking-normal">
+                                        {cents}
+                                    </sup>
+                                </div>
+                            )}
+                            <button
+                                onClick={() => {
+                                    const next = !isMasked;
+                                    setIsMasked(next);
+                                    localStorage.setItem('mandiri_clean_mode_balance_masked', String(next));
+                                }}
+                                className="ml-2 text-white/80 hover:text-white transition-colors"
+                            >
+                                {isMasked ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4 opacity-0 hover:opacity-100" />}
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* 4 Quick Action Buttons */}
+                    <div className="w-full grid grid-cols-4 gap-2 pt-1 pb-1">
+                        {/* Action 1: Transfer Rupiah */}
+                        <div className="flex flex-col items-center">
+                            <button className="w-[60px] h-[60px] rounded-full bg-white shadow-[0_4px_14px_rgba(0,0,0,0.08)] flex items-center justify-center active:scale-95 transition-transform hover:shadow-lg">
+                                <img
+                                    src="/clean-mode-mandiri/mandiri_action_transfer.png"
+                                    alt="Transfer Rupiah"
+                                    className="w-[34px] h-[34px] object-contain"
+                                />
+                            </button>
+                            <span className="mt-1.5 text-white text-[11.5px] font-medium leading-[13px] text-center whitespace-pre-line">
+                                {'Transfer\nRupiah'}
+                            </span>
+                        </div>
+
+                        {/* Action 2: Bayar/VA */}
+                        <div className="flex flex-col items-center">
+                            <button className="w-[60px] h-[60px] rounded-full bg-white shadow-[0_4px_14px_rgba(0,0,0,0.08)] flex items-center justify-center active:scale-95 transition-transform hover:shadow-lg">
+                                <img
+                                    src="/clean-mode-mandiri/mandiri_action_bayar.png"
+                                    alt="Bayar/VA"
+                                    className="w-[34px] h-[34px] object-contain"
+                                />
+                            </button>
+                            <span className="mt-1.5 text-white text-[11.5px] font-medium leading-[13px] text-center">
+                                Bayar/VA
+                            </span>
+                        </div>
+
+                        {/* Action 3: Top-up */}
+                        <div className="flex flex-col items-center">
+                            <button className="w-[60px] h-[60px] rounded-full bg-white shadow-[0_4px_14px_rgba(0,0,0,0.08)] flex items-center justify-center active:scale-95 transition-transform hover:shadow-lg">
+                                <img
+                                    src="/clean-mode-mandiri/mandiri_action_topup.png"
+                                    alt="Top-up"
+                                    className="w-[34px] h-[34px] object-contain"
+                                />
+                            </button>
+                            <span className="mt-1.5 text-white text-[11.5px] font-medium leading-[13px] text-center">
+                                Top-up
+                            </span>
+                        </div>
+
+                        {/* Action 4: Kartu Fisik/Virtual */}
+                        <div className="flex flex-col items-center">
+                            <button className="w-[60px] h-[60px] rounded-full bg-white shadow-[0_4px_14px_rgba(0,0,0,0.08)] flex items-center justify-center active:scale-95 transition-transform hover:shadow-lg">
+                                <img
+                                    src="/clean-mode-mandiri/mandiri_action_card.png"
+                                    alt="Kartu Fisik/Virtual"
+                                    className="w-[34px] h-[34px] object-contain"
+                                />
+                            </button>
+                            <span className="mt-1.5 text-white text-[11.5px] font-medium leading-[13px] text-center whitespace-pre-line">
+                                {'Kartu Fisik/\nVirtual'}
+                            </span>
+                        </div>
                     </div>
                 </div>
 
-                {/* 4 Quick Action Buttons */}
-                <div className="relative z-10 w-full px-5 pt-1 pb-6 grid grid-cols-4 gap-2">
-                    {/* Action 1: Transfer Rupiah */}
-                    <div className="flex flex-col items-center">
-                        <button className="w-[62px] h-[62px] rounded-full bg-white shadow-md flex items-center justify-center active:scale-95 transition-transform hover:shadow-lg">
-                            <img
-                                src="/clean-mode-mandiri/mandiri_action_transfer.png"
-                                alt="Transfer Rupiah"
-                                className="w-[38px] h-[38px] object-contain"
-                            />
-                        </button>
-                        <span className="mt-2 text-white text-[12px] font-medium leading-[14px] text-center whitespace-pre-line">
-                            {'Transfer\nRupiah'}
-                        </span>
-                    </div>
-
-                    {/* Action 2: Bayar/VA */}
-                    <div className="flex flex-col items-center">
-                        <button className="w-[62px] h-[62px] rounded-full bg-white shadow-md flex items-center justify-center active:scale-95 transition-transform hover:shadow-lg">
-                            <img
-                                src="/clean-mode-mandiri/mandiri_action_bayar.png"
-                                alt="Bayar/VA"
-                                className="w-[38px] h-[38px] object-contain"
-                            />
-                        </button>
-                        <span className="mt-2 text-white text-[12px] font-medium leading-[14px] text-center">
-                            Bayar/VA
-                        </span>
-                    </div>
-
-                    {/* Action 3: Top-up */}
-                    <div className="flex flex-col items-center">
-                        <button className="w-[62px] h-[62px] rounded-full bg-white shadow-md flex items-center justify-center active:scale-95 transition-transform hover:shadow-lg">
-                            <img
-                                src="/clean-mode-mandiri/mandiri_action_topup.png"
-                                alt="Top-up"
-                                className="w-[38px] h-[38px] object-contain"
-                            />
-                        </button>
-                        <span className="mt-2 text-white text-[12px] font-medium leading-[14px] text-center">
-                            Top-up
-                        </span>
-                    </div>
-
-                    {/* Action 4: Kartu Fisik/Virtual */}
-                    <div className="flex flex-col items-center">
-                        <button className="w-[62px] h-[62px] rounded-full bg-white shadow-md flex items-center justify-center active:scale-95 transition-transform hover:shadow-lg">
-                            <img
-                                src="/clean-mode-mandiri/mandiri_action_card.png"
-                                alt="Kartu Fisik/Virtual"
-                                className="w-[38px] h-[38px] object-contain"
-                            />
-                        </button>
-                        <span className="mt-2 text-white text-[12px] font-medium leading-[14px] text-center whitespace-pre-line">
-                            {'Kartu Fisik/\nVirtual'}
-                        </span>
-                    </div>
-                </div>
-
-                {/* Bottom Sheet "Transaksi" */}
+                {/* Bottom Sheet "Transaksi" (Occupies bottom 50% initially, expandable upward) */}
                 <motion.div
                     initial={{ y: 0 }}
-                    animate={{ y: isSheetExpanded ? -180 : 0 }}
+                    animate={{ y: isSheetExpanded ? -240 : 0 }}
                     transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-                    className="relative z-20 flex-1 bg-white rounded-t-[28px] shadow-[0_-8px_30px_rgba(0,0,0,0.12)] flex flex-col overflow-hidden -mt-2"
+                    className="relative z-20 h-[50%] bg-white rounded-t-[28px] shadow-[0_-8px_30px_rgba(0,0,0,0.12)] flex flex-col overflow-hidden"
                 >
                     {/* Drag Handle Bar */}
                     <div
                         onClick={() => setIsSheetExpanded(!isSheetExpanded)}
-                        className="w-full pt-3 pb-2 cursor-pointer flex justify-center items-center"
+                        className="w-full pt-2.5 pb-2 cursor-pointer flex justify-center items-center shrink-0"
                     >
-                        <div className="w-10 h-1 rounded-full bg-[#525b68]" />
+                        <div className="w-12 h-[3.5px] rounded-full bg-[#525b68]" />
                     </div>
 
                     {/* Sheet Header: Transaksi & e-Statement */}
-                    <div className="px-5 pt-1 pb-3 flex items-center justify-between">
-                        <h2 className="text-[20px] font-bold text-[#1e293b] tracking-tight">
+                    <div className="px-5 pt-0.5 pb-2.5 flex items-center justify-between shrink-0">
+                        <h2 className="text-[17.5px] font-bold text-[#1e293b] tracking-tight">
                             Transaksi
                         </h2>
                         <button
                             onClick={() => setIsStatementOpen(true)}
-                            className="text-[15px] font-semibold text-[#0077d8] hover:text-[#005ea6] transition-colors"
+                            className="text-[13.5px] font-semibold text-[#0077d8] hover:text-[#005ea6] transition-colors"
                         >
                             e-Statement
                         </button>
                     </div>
 
                     {/* Month Carousel & Utility Tools */}
-                    <div className="px-5 pb-2.5 flex items-center justify-between border-b border-gray-100">
-                        {/* Horizontal Months */}
-                        <div className="flex items-center gap-6 overflow-x-auto no-scrollbar py-1">
+                    <div className="px-5 pb-2 flex items-center justify-between border-b border-gray-100 shrink-0">
+                        {/* Horizontal Months (Right-aligned so September is active and 2.5 months are visible) */}
+                        <div
+                            ref={monthScrollRef}
+                            className="flex items-center space-x-7 overflow-x-auto no-scrollbar py-1"
+                        >
                             {months.map(m => {
                                 const isActive = selectedMonth.toLowerCase() === m.toLowerCase();
                                 return (
@@ -498,7 +475,7 @@ export const CleanModeMandiri: React.FC = () => {
                                             setSelectedMonth(m);
                                             localStorage.setItem('mandiri_clean_mode_selected_month', m);
                                         }}
-                                        className={`relative text-[15px] transition-colors whitespace-nowrap ${
+                                        className={`relative text-[14.5px] transition-colors whitespace-nowrap ${
                                             isActive
                                                 ? 'font-bold text-[#1e293b]'
                                                 : 'font-medium text-[#8c94a0] hover:text-[#525b68]'
@@ -514,57 +491,57 @@ export const CleanModeMandiri: React.FC = () => {
                         </div>
 
                         {/* Right Tools: Assistant & Search */}
-                        <div className="flex items-center pl-3 border-l border-gray-200">
+                        <div className="flex items-center pl-3 border-l border-gray-200 shrink-0">
                             <button
                                 onClick={() => setToastMessage('Fitur Livin Assistant siap digunakan')}
-                                className="p-1 hover:opacity-80 active:scale-95 transition-all"
+                                className="p-0.5 hover:opacity-80 active:scale-95 transition-all"
                                 title="Livin Assistant"
                             >
                                 <img
                                     src="/clean-mode-mandiri/mandiri_icon_assistant.png"
                                     alt="Livin Assistant"
-                                    className="w-[26px] h-[26px] object-contain"
+                                    className="w-[24px] h-[24px] object-contain"
                                 />
                             </button>
                             <button
                                 onClick={() => setToastMessage('Pencarian mutasi')}
-                                className="p-1 ml-3 hover:opacity-80 active:scale-95 transition-all"
+                                className="p-0.5 ml-3 hover:opacity-80 active:scale-95 transition-all"
                                 title="Cari Transaksi"
                             >
                                 <img
                                     src="/clean-mode-mandiri/mandiri_icon_search.png"
                                     alt="Search"
-                                    className="w-[18px] h-[18px] object-contain"
+                                    className="w-[17px] h-[17px] object-contain"
                                 />
                             </button>
                         </div>
                     </div>
 
-                    {/* Transactions Feed List */}
-                    <div className="flex-1 overflow-y-auto px-5 divide-y divide-gray-100 pb-20">
+                    {/* Transactions Feed List (Spaced so exactly 2 transactions fit on screen) */}
+                    <div className="flex-1 overflow-y-auto px-5 divide-y divide-gray-100 pb-16">
                         {DEFAULT_TRANSACTIONS.map(group => (
                             <div key={group.date} className="py-2.5">
                                 {/* Date Header */}
-                                <div className="text-[13px] font-medium text-[#8c94a0] pb-2 pt-1">
+                                <div className="text-[12.5px] font-normal text-[#8c94a0] pb-2 pt-1">
                                     {group.date}
                                 </div>
 
                                 {/* Items under this date */}
                                 <div className="space-y-4">
                                     {group.items.map(item => (
-                                        <div key={item.id} className="flex items-start justify-between gap-3 pt-1">
+                                        <div key={item.id} className="flex items-start justify-between gap-3 pt-1.5 pb-1">
                                             {/* Icon + Details */}
-                                            <div className="flex items-start gap-3 flex-1 min-w-0">
+                                            <div className="flex items-start gap-3.5 flex-1 min-w-0">
                                                 <img
                                                     src={item.icon}
                                                     alt={item.title}
                                                     className="w-7 h-7 object-contain shrink-0 mt-0.5"
                                                 />
                                                 <div className="flex-1 min-w-0">
-                                                    <h3 className="text-[15px] font-bold text-[#1e293b] leading-snug">
+                                                    <h3 className="text-[15px] font-bold text-[#1e293b] leading-tight">
                                                         {item.title}
                                                     </h3>
-                                                    <p className="text-[12px] text-[#64748b] leading-tight mt-0.5 break-words">
+                                                    <p className="text-[12px] text-[#718096] leading-[1.35] mt-1 whitespace-pre-line break-words">
                                                         {item.description}
                                                     </p>
                                                 </div>
@@ -572,7 +549,7 @@ export const CleanModeMandiri: React.FC = () => {
 
                                             {/* Nominal with Superscript Cents */}
                                             <div
-                                                className={`text-[15px] font-bold shrink-0 text-right whitespace-nowrap ${
+                                                className={`text-[15.5px] font-bold shrink-0 text-right whitespace-nowrap ${
                                                     item.type === 'income' ? 'text-[#16a34a]' : 'text-[#1e293b]'
                                                 }`}
                                             >
