@@ -27,7 +27,7 @@ const DEFAULT_TRANSACTIONS: DateGroup[] = [
         items: [
             {
                 id: 'm1',
-                icon: '/clean-mode-mandiri/mandiri_tx_qr.png',
+                icon: '/clean-mode-mandiri/mandiri_mutasi_qr.png',
                 title: 'QR Bayar',
                 description: 'Pembayaran QR\nke IDM QRIS LIVIN\n624827123587',
                 amount: 75300,
@@ -36,7 +36,7 @@ const DEFAULT_TRANSACTIONS: DateGroup[] = [
             },
             {
                 id: 'm2',
-                icon: '/clean-mode-mandiri/mandiri_tx_transfer.png',
+                icon: '/clean-mode-mandiri/mandiri_mutasi_transfer.png',
                 title: 'Transfer Rupiah',
                 description: 'Transfer BI Fast\nKe BANK BNI\nSUHENDRA WAHYU 1817362467',
                 amount: 285000,
@@ -45,7 +45,7 @@ const DEFAULT_TRANSACTIONS: DateGroup[] = [
             },
             {
                 id: 'm3',
-                icon: '/clean-mode-mandiri/mandiri_tx_biaya.png',
+                icon: '/clean-mode-mandiri/mandiri_mutasi_biaya.png',
                 title: 'Biaya',
                 description: 'Biaya transfer BI Fast',
                 amount: 2500,
@@ -59,7 +59,7 @@ const DEFAULT_TRANSACTIONS: DateGroup[] = [
         items: [
             {
                 id: 'm4',
-                icon: '/clean-mode-mandiri/mandiri_tx_biaya.png',
+                icon: '/clean-mode-mandiri/mandiri_mutasi_biaya.png',
                 title: 'Biaya',
                 description: 'Biaya transfer BI Fast',
                 amount: 2500,
@@ -68,7 +68,7 @@ const DEFAULT_TRANSACTIONS: DateGroup[] = [
             },
             {
                 id: 'm5',
-                icon: '/clean-mode-mandiri/mandiri_tx_transfer.png',
+                icon: '/clean-mode-mandiri/mandiri_mutasi_transfer.png',
                 title: 'Transfer Rupiah',
                 description: 'Transfer BI Fast\nKe BCA\nRANO 7245614730',
                 amount: 1700000,
@@ -77,7 +77,7 @@ const DEFAULT_TRANSACTIONS: DateGroup[] = [
             },
             {
                 id: 'm6',
-                icon: '/clean-mode-mandiri/mandiri_tx_transfer.png',
+                icon: '/clean-mode-mandiri/mandiri_mutasi_transfer.png',
                 title: 'Transfer Rupiah',
                 description: 'Transfer BI Fast\nKe BANK MANDIRI\nTYAS ALIFA ARDAYANTI 1370018899231',
                 amount: 450000,
@@ -462,33 +462,33 @@ export const CleanModeMandiri: React.FC = () => {
                     transition={{ type: 'spring', damping: 30, stiffness: 300 }}
                     className="relative z-20 h-[50%] bg-white rounded-t-[28px] shadow-[0_-8px_30px_rgba(0,0,0,0.12)] flex flex-col overflow-hidden"
                 >
-                    {/* Drag Handle Bar */}
+                    {/* Drag Handle Bar (Calibrated 44px x 4.5px dark pill) */}
                     <div
                         onClick={() => setIsSheetExpanded(!isSheetExpanded)}
-                        className="w-full pt-2.5 pb-2 cursor-pointer flex justify-center items-center shrink-0"
+                        className="w-full pt-[13px] pb-[10px] cursor-pointer flex justify-center items-center shrink-0"
                     >
-                        <div className="w-11 h-[3.5px] rounded-full bg-[#cbd5e1]" />
+                        <div className="w-[44px] h-[4.5px] rounded-full bg-[#5f5959]" />
                     </div>
 
                     {/* Sheet Header: Transaksi & e-Statement */}
-                    <div className="px-5 pt-0.5 pb-2.5 flex items-center justify-between shrink-0">
-                        <h2 className="text-[17.5px] font-bold text-[#1e293b] tracking-tight">
+                    <div className="px-5 pt-0.5 pb-3 flex items-center justify-between shrink-0">
+                        <h2 className="text-[17px] font-semibold text-[#1e1e1e] tracking-[-0.01em]">
                             Transaksi
                         </h2>
                         <button
                             onClick={() => setIsStatementOpen(true)}
-                            className="text-[13.5px] font-semibold text-[#0077d8] hover:text-[#005ea6] transition-colors"
+                            className="text-[14px] font-normal text-[#007dfe] hover:opacity-80 transition-opacity"
                         >
                             e-Statement
                         </button>
                     </div>
 
-                    {/* Month Carousel & Utility Tools */}
-                    <div className="px-5 pb-2 flex items-center justify-between border-b border-gray-100 shrink-0">
-                        {/* Horizontal Months (Right-aligned with space-x-12 so only 2.5-3 months are visible) */}
+                    {/* Month Carousel & Utility Tools Bar */}
+                    <div className="h-[46px] border-b border-[#ededed] flex items-center justify-between shrink-0 pl-5 pr-4">
+                        {/* Horizontal Months (Right-aligned so active month 'September' sits next to utilities) */}
                         <div
                             ref={monthScrollRef}
-                            className="flex items-center space-x-12 overflow-x-auto no-scrollbar py-1"
+                            className="h-full flex items-center space-x-7 overflow-x-auto no-scrollbar"
                         >
                             {months.map(m => {
                                 const isActive = selectedMonth.toLowerCase() === m.toLowerCase();
@@ -499,73 +499,82 @@ export const CleanModeMandiri: React.FC = () => {
                                             setSelectedMonth(m);
                                             localStorage.setItem('mandiri_clean_mode_selected_month', m);
                                         }}
-                                        className={`relative text-[14.5px] transition-colors whitespace-nowrap ${
+                                        className={`relative h-full flex items-center px-1 text-[15px] whitespace-nowrap transition-colors ${
                                             isActive
-                                                ? 'font-bold text-[#1e293b]'
-                                                : 'font-medium text-[#8c94a0] hover:text-[#525b68]'
+                                                ? 'font-semibold text-[#111111]'
+                                                : 'font-normal text-[#757575] hover:text-[#333333]'
                                         }`}
                                     >
                                         <span>{m}</span>
                                         {isActive && (
-                                            <div className="absolute -bottom-2 left-0 right-0 h-[3px] bg-[#0077d8] rounded-full" />
+                                            <div className="absolute bottom-0 left-0 right-0 h-[3.5px] bg-[#007dfe] rounded-t-full" />
                                         )}
                                     </button>
                                 );
                             })}
                         </div>
 
-                        {/* Right Tools: Assistant & Search */}
-                        <div className="flex items-center pl-3 border-l border-gray-200 shrink-0">
+                        {/* Right Utilities: Vertical Divider + CS Avatar + Vertical Divider + Search */}
+                        <div className="h-full flex items-center shrink-0">
+                            {/* Divider 1 */}
+                            <div className="h-[24px] w-[1px] bg-[#ededed] mx-2 shrink-0" />
+
+                            {/* CS Assistant Avatar */}
                             <button
                                 onClick={() => setToastMessage('Fitur Livin Assistant siap digunakan')}
-                                className="p-0.5 hover:opacity-80 active:scale-95 transition-all"
+                                className="w-9 h-full flex items-center justify-center hover:opacity-80 active:scale-95 transition-all"
                                 title="Livin Assistant"
                             >
                                 <img
-                                    src="/clean-mode-mandiri/mandiri_icon_assistant.png"
+                                    src="/clean-mode-mandiri/mandiri_avatar_cs.png"
                                     alt="Livin Assistant"
-                                    className="w-[24px] h-[24px] object-contain"
+                                    className="w-[25px] h-[25px] object-contain"
                                 />
                             </button>
+
+                            {/* Divider 2 */}
+                            <div className="h-[24px] w-[1px] bg-[#ededed] mx-2 shrink-0" />
+
+                            {/* Search Button */}
                             <button
                                 onClick={() => setToastMessage('Pencarian mutasi')}
-                                className="p-0.5 ml-3 hover:opacity-80 active:scale-95 transition-all"
+                                className="w-8 h-full flex items-center justify-center hover:opacity-80 active:scale-95 transition-all"
                                 title="Cari Transaksi"
                             >
                                 <img
                                     src="/clean-mode-mandiri/mandiri_icon_search.png"
                                     alt="Search"
-                                    className="w-[17px] h-[17px] object-contain"
+                                    className="w-[18px] h-[18px] object-contain"
                                 />
                             </button>
                         </div>
                     </div>
 
-                    {/* Transactions Feed List (Generous spacing: exactly 2 transactions fit on screen) */}
-                    <div className="flex-1 overflow-y-auto divide-y divide-gray-100 pb-16">
+                    {/* Transactions Feed List (Calibrated row height so exactly 2 transactions fit in the initial fold) */}
+                    <div className="flex-1 overflow-y-auto no-scrollbar pb-16">
                         {DEFAULT_TRANSACTIONS.map(group => (
-                            <div key={group.date} className="pt-2">
-                                {/* Date Header */}
-                                <div className="text-[12.5px] font-normal text-[#8c94a0] pb-2 pt-1 px-5">
+                            <div key={group.date}>
+                                {/* Date Section Header */}
+                                <div className="text-[13px] font-medium text-[#7c7c80] pt-[16px] pb-[8px] px-5 tracking-tight">
                                     {group.date}
                                 </div>
 
                                 {/* Items under this date */}
-                                <div className="divide-y divide-gray-100">
+                                <div className="divide-y divide-[#f4f4f4]">
                                     {group.items.map(item => (
-                                        <div key={item.id} className="flex items-start justify-between gap-3 px-5 py-[18px]">
+                                        <div key={item.id} className="flex items-start justify-between gap-3 px-5 py-[19px]">
                                             {/* Icon + Details */}
                                             <div className="flex items-start gap-3.5 flex-1 min-w-0">
                                                 <img
                                                     src={item.icon}
                                                     alt={item.title}
-                                                    className="w-7 h-7 object-contain shrink-0 mt-0.5"
+                                                    className="w-[30px] h-[30px] object-contain shrink-0 mt-0.5"
                                                 />
                                                 <div className="flex-1 min-w-0">
-                                                    <h3 className="text-[15px] font-bold text-[#1e293b] leading-tight">
+                                                    <h3 className="text-[15.5px] font-bold text-[#111111] leading-snug">
                                                         {item.title}
                                                     </h3>
-                                                    <p className="text-[12px] text-[#718096] leading-[1.38] mt-1 whitespace-pre-line break-words">
+                                                    <p className="text-[12px] font-normal text-[#5c5c60] leading-[17px] mt-1 whitespace-pre-line break-words">
                                                         {item.description}
                                                     </p>
                                                 </div>
@@ -573,15 +582,15 @@ export const CleanModeMandiri: React.FC = () => {
 
                                             {/* Nominal with Superscript Cents */}
                                             <div
-                                                className={`text-[15.5px] font-bold shrink-0 text-right whitespace-nowrap ${
-                                                    item.type === 'income' ? 'text-[#16a34a]' : 'text-[#1e293b]'
+                                                className={`text-[16.5px] font-bold shrink-0 text-right whitespace-nowrap tracking-tight ${
+                                                    item.type === 'income' ? 'text-[#16a34a]' : 'text-[#111111]'
                                                 }`}
                                             >
                                                 <span>
                                                     {item.type === 'income' ? '+ IDR ' : '- IDR '}
                                                     {item.amount.toLocaleString('id-ID')}
                                                 </span>
-                                                <sup className="text-[10px] font-bold align-super ml-0.5">
+                                                <sup className="text-[10px] font-bold align-top relative -top-1.5 ml-[1px]">
                                                     {item.cents}
                                                 </sup>
                                             </div>
