@@ -60,55 +60,33 @@ export const CleanModeMandiri: React.FC = () => {
     // Sheet expansion state: 'collapsed' (mid screen ~50%) or 'expanded' (top ~64px)
     const [isSheetExpanded, setIsSheetExpanded] = useState<boolean>(false);
 
-    // Refs for gesture detection
-    const sheetContainerRef = useRef<HTMLDivElement>(null);
-    const listScrollRef = useRef<HTMLDivElement>(null);
-    const touchStartY = useRef<number>(0);
+    // Touch/wheel ref specifically for the Drag Handle Area (SS 1)
+    const handleTouchStartY = useRef<number>(0);
 
-    // Wheel event (Mouse/Trackpad on Desktop)
-    const handleWheel = (e: React.WheelEvent) => {
-        // When collapsed: any downward wheel (scroll down) expands sheet
+    const handleHandleTouchStart = (e: React.TouchEvent) => {
+        handleTouchStartY.current = e.touches[0].clientY;
+    };
+
+    const handleHandleTouchMove = (e: React.TouchEvent) => {
+        const currentY = e.touches[0].clientY;
+        const deltaY = currentY - handleTouchStartY.current;
+
+        // Swiping UP on handle area expands sheet
+        if (!isSheetExpanded && deltaY < -20) {
+            setIsSheetExpanded(true);
+        }
+        // Swiping DOWN on handle area collapses sheet
+        else if (isSheetExpanded && deltaY > 20) {
+            setIsSheetExpanded(false);
+        }
+    };
+
+    const handleHandleWheel = (e: React.WheelEvent) => {
+        // Wheel scrolling on handle bar area expands or collapses sheet
         if (!isSheetExpanded && e.deltaY > 5) {
             setIsSheetExpanded(true);
-        }
-        // When expanded: if user is at top of transaction list and scrolls upward
-        else if (isSheetExpanded && e.deltaY < -10) {
-            if (listScrollRef.current && listScrollRef.current.scrollTop <= 0) {
-                setIsSheetExpanded(false);
-            }
-        }
-    };
-
-    // Touch Gestures (Mobile/Touchscreen)
-    const handleTouchStart = (e: React.TouchEvent) => {
-        touchStartY.current = e.touches[0].clientY;
-    };
-
-    const handleTouchMove = (e: React.TouchEvent) => {
-        const currentY = e.touches[0].clientY;
-        const deltaY = currentY - touchStartY.current;
-
-        // If collapsed: swiping UP (deltaY < -15) immediately expands the sheet
-        if (!isSheetExpanded && deltaY < -15) {
-            setIsSheetExpanded(true);
-        }
-    };
-
-    const handleTouchEnd = (e: React.TouchEvent) => {
-        const deltaY = e.changedTouches[0].clientY - touchStartY.current;
-
-        // If expanded: pulling DOWN (deltaY > 40) when at top of transactions collapses the sheet
-        if (isSheetExpanded && deltaY > 40) {
-            if (listScrollRef.current && listScrollRef.current.scrollTop <= 5) {
-                setIsSheetExpanded(false);
-            }
-        }
-    };
-
-    const handleListScroll = () => {
-        // If scrolled while collapsed, immediately expand
-        if (!isSheetExpanded && listScrollRef.current && listScrollRef.current.scrollTop > 5) {
-            setIsSheetExpanded(true);
+        } else if (isSheetExpanded && e.deltaY < -5) {
+            setIsSheetExpanded(false);
         }
     };
 
@@ -472,23 +450,21 @@ export const CleanModeMandiri: React.FC = () => {
                     </div>
                 </div>
 
-                {/* Bottom Sheet "Transaksi" (Occupies bottom 50% initially, smoothly glides up to top: 64px on scroll / swipe up) */}
+                {/* Bottom Sheet "Transaksi" (Occupies bottom 50% initially, smoothly glides up to top: 64px on handle bar scroll/swipe) */}
                 <div
-                    ref={sheetContainerRef}
-                    onWheel={handleWheel}
-                    onTouchStart={handleTouchStart}
-                    onTouchMove={handleTouchMove}
-                    onTouchEnd={handleTouchEnd}
                     className="absolute inset-x-0 bottom-0 z-20 bg-white rounded-t-[28px] shadow-[0_-8px_30px_rgba(0,0,0,0.12)] flex flex-col overflow-hidden transition-[top] duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]"
                     style={{
                         top: isSheetExpanded ? 'max(calc(env(safe-area-inset-top) + 12px), 64px)' : '50%',
                     }}
                 >
-                    {/* Drag Handle Bar (Calibrated 44px x 4.5px dark pill) */}
+                    {/* Drag Handle Bar Area (SS 1: Expanding/collapsing is exclusively triggered here) */}
                     <div
+                        onWheel={handleHandleWheel}
+                        onTouchStart={handleHandleTouchStart}
+                        onTouchMove={handleHandleTouchMove}
                         onClick={() => setIsSheetExpanded(prev => !prev)}
                         className="w-full pt-[18px] pb-[13px] cursor-pointer flex justify-center items-center shrink-0 active:opacity-70 transition-opacity"
-                        title={isSheetExpanded ? 'Tutup Transaksi' : 'Buka Transaksi'}
+                        title={isSheetExpanded ? 'Tutup ke Tampilan Normal' : 'Tarik ke Atas untuk Perluas'}
                     >
                         <div className="w-[44px] h-[4.5px] rounded-full bg-[#5f5959]" />
                     </div>
@@ -573,12 +549,8 @@ export const CleanModeMandiri: React.FC = () => {
                         </div>
                     </div>
 
-                    {/* Transactions Feed List (Calibrated row height; smooth scrolling when expanded) */}
-                    <div
-                        ref={listScrollRef}
-                        onScroll={handleListScroll}
-                        className={`flex-1 ${isSheetExpanded ? 'overflow-y-auto' : 'overflow-y-hidden'} no-scrollbar pb-16`}
-                    >
+                    {/* Transactions Feed List (SS 2: Always scrolls normally inside the card WITHOUT expanding the card) */}
+                    <div className="flex-1 overflow-y-auto no-scrollbar pb-16">
                         {groupedMutations.map(group => (
                             <div key={group.date}>
                                 {/* Date Section Header (Synchronized automatically with selectedMonth) */}
