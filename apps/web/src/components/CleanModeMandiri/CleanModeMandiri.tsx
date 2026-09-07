@@ -208,138 +208,15 @@ export const CleanModeMandiri: React.FC = () => {
             style={{ fontFamily: "'LivinFont', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', sans-serif" }}
         >
             {/* Main Phone Viewport Container (Dynamic 100dvh to match phone screen exactly) */}
-            <div className="w-full max-w-[430px] h-[100dvh] relative bg-gradient-to-b from-[#50a6e6] via-[#439fe3] to-[#3695df] overflow-hidden flex flex-col shadow-2xl">
+            <div className="w-full max-w-[430px] h-[100dvh] relative bg-[#439fe3] overflow-hidden flex flex-col shadow-2xl">
                 
-                {/* Background Subtle Organic Wave Curves (Livin' Dynamic Light Waves) */}
+                {/* Background Image: Authentic Native Livin' Mandiri Fluid Wave Motif */}
                 <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
-                    <svg className="absolute w-full h-[520px] top-0 left-0" viewBox="0 0 430 520" fill="none" preserveAspectRatio="none">
-                        <defs>
-                            {/* Filter for soft luminous glow on wave crest edges */}
-                            <filter id="mandiriWaveGlow" x="-20%" y="-20%" width="140%" height="140%">
-                                <feGaussianBlur stdDeviation="2.5" result="blur" />
-                                <feMerge>
-                                    <feMergeNode in="blur" />
-                                    <feMergeNode in="SourceGraphic" />
-                                </feMerge>
-                            </filter>
-                            <filter id="mandiriSoftGlow" x="-30%" y="-30%" width="160%" height="160%">
-                                <feGaussianBlur stdDeviation="6" />
-                            </filter>
-
-                            {/* Top Right Ambient Light */}
-                            <radialGradient id="topRightGlow" cx="95%" cy="5%" r="75%">
-                                <stop offset="0%" stopColor="#ffffff" stopOpacity="0.22" />
-                                <stop offset="50%" stopColor="#ffffff" stopOpacity="0.08" />
-                                <stop offset="100%" stopColor="#ffffff" stopOpacity="0.0" />
-                            </radialGradient>
-
-                            {/* Top Left Ambient Light */}
-                            <radialGradient id="topLeftGlow" cx="5%" cy="5%" r="65%">
-                                <stop offset="0%" stopColor="#ffffff" stopOpacity="0.16" />
-                                <stop offset="60%" stopColor="#ffffff" stopOpacity="0.05" />
-                                <stop offset="100%" stopColor="#ffffff" stopOpacity="0.0" />
-                            </radialGradient>
-
-                            {/* Main Ribbon 1 Body Gradient */}
-                            <linearGradient id="ribbon1Grad" x1="0%" y1="20%" x2="100%" y2="80%">
-                                <stop offset="0%" stopColor="#ffffff" stopOpacity="0.30" />
-                                <stop offset="25%" stopColor="#ffffff" stopOpacity="0.20" />
-                                <stop offset="55%" stopColor="#ffffff" stopOpacity="0.10" />
-                                <stop offset="100%" stopColor="#ffffff" stopOpacity="0.02" />
-                            </linearGradient>
-
-                            {/* Main Ribbon 1 Crest Glowing Line Gradient */}
-                            <linearGradient id="crest1Line" x1="0%" y1="0%" x2="100%" y2="0%">
-                                <stop offset="0%" stopColor="#ffffff" stopOpacity="0.2" />
-                                <stop offset="15%" stopColor="#ffffff" stopOpacity="0.85" />
-                                <stop offset="45%" stopColor="#ffffff" stopOpacity="0.75" />
-                                <stop offset="80%" stopColor="#ffffff" stopOpacity="0.35" />
-                                <stop offset="100%" stopColor="#ffffff" stopOpacity="0.1" />
-                            </linearGradient>
-
-                            {/* Lower Wave 2 Body Gradient */}
-                            <linearGradient id="ribbon2Grad" x1="20%" y1="0%" x2="80%" y2="100%">
-                                <stop offset="0%" stopColor="#ffffff" stopOpacity="0.22" />
-                                <stop offset="50%" stopColor="#ffffff" stopOpacity="0.08" />
-                                <stop offset="100%" stopColor="#ffffff" stopOpacity="0.0" />
-                            </linearGradient>
-
-                            {/* Lower Wave 2 Crest Line Gradient */}
-                            <linearGradient id="crest2Line" x1="0%" y1="0%" x2="100%" y2="0%">
-                                <stop offset="0%" stopColor="#ffffff" stopOpacity="0.1" />
-                                <stop offset="25%" stopColor="#ffffff" stopOpacity="0.75" />
-                                <stop offset="55%" stopColor="#ffffff" stopOpacity="0.85" />
-                                <stop offset="85%" stopColor="#ffffff" stopOpacity="0.4" />
-                                <stop offset="100%" stopColor="#ffffff" stopOpacity="0.1" />
-                            </linearGradient>
-                        </defs>
-
-                        {/* 1. Ambient Background Light Arches */}
-                        <path d="M 180 -10 C 260 80, 360 140, 450 160 L 450 -10 Z" fill="url(#topRightGlow)" />
-                        <path d="M -10 170 C 60 110, 130 50, 170 -10 L -10 -10 Z" fill="url(#topLeftGlow)" />
-
-                        {/* 2. Main Signature 3D Ribbon (Wave 1) */}
-                        {/* Ambient glow halo behind main ribbon crest */}
-                        <path
-                            d="M -15 145 C 50 175, 85 212, 120 216 C 165 220, 230 205, 300 195 C 360 185, 410 178, 445 174"
-                            stroke="#ffffff"
-                            strokeWidth="12"
-                            strokeOpacity="0.18"
-                            filter="url(#mandiriSoftGlow)"
-                            fill="none"
-                        />
-                        {/* Main Ribbon Filled Body */}
-                        <path
-                            d="M -20 145 C 50 175, 85 212, 120 216 C 165 220, 230 205, 300 195 C 360 185, 410 178, 450 174 L 450 240 C 390 245, 320 255, 250 268 C 170 282, 100 286, 60 275 C 20 262, -5 240, -20 225 Z"
-                            fill="url(#ribbon1Grad)"
-                        />
-                        {/* Main Ribbon Sharp Glowing Crest Line */}
-                        <path
-                            d="M -20 145 C 50 175, 85 212, 120 216 C 165 220, 230 205, 300 195 C 360 185, 410 178, 450 174"
-                            stroke="url(#crest1Line)"
-                            strokeWidth="3"
-                            filter="url(#mandiriWaveGlow)"
-                            fill="none"
-                        />
-                        <path
-                            d="M -20 145 C 50 175, 85 212, 120 216 C 165 220, 230 205, 300 195 C 360 185, 410 178, 450 174"
-                            stroke="#ffffff"
-                            strokeWidth="1"
-                            strokeOpacity="0.75"
-                            fill="none"
-                        />
-
-                        {/* 3. Lower Wave Cradle under Action Buttons (Wave 2) */}
-                        {/* Ambient glow halo under buttons */}
-                        <path
-                            d="M -15 330 C 45 365, 95 405, 160 412 C 205 415, 235 394, 280 392 C 340 390, 395 398, 445 378"
-                            stroke="#ffffff"
-                            strokeWidth="10"
-                            strokeOpacity="0.16"
-                            filter="url(#mandiriSoftGlow)"
-                            fill="none"
-                        />
-                        {/* Lower Wave Filled Body */}
-                        <path
-                            d="M -20 330 C 45 365, 95 405, 160 412 C 205 415, 235 394, 280 392 C 340 390, 395 398, 450 378 L 450 530 L -20 530 Z"
-                            fill="url(#ribbon2Grad)"
-                        />
-                        {/* Lower Wave Glowing Crest Line */}
-                        <path
-                            d="M -20 330 C 45 365, 95 405, 160 412 C 205 415, 235 394, 280 392 C 340 390, 395 398, 450 378"
-                            stroke="url(#crest2Line)"
-                            strokeWidth="2.5"
-                            filter="url(#mandiriWaveGlow)"
-                            fill="none"
-                        />
-                        <path
-                            d="M -20 330 C 45 365, 95 405, 160 412 C 205 415, 235 394, 280 392 C 340 390, 395 398, 450 378"
-                            stroke="#ffffff"
-                            strokeWidth="1"
-                            strokeOpacity="0.8"
-                            fill="none"
-                        />
-                    </svg>
+                    <img
+                        src="/clean-mode-mandiri/bg-mandiri.png"
+                        alt="Mandiri Background Motif"
+                        className="w-full h-[52%] object-cover object-top select-none pointer-events-none"
+                    />
                 </div>
 
                 {/* Hero Section Container (Occupies exactly top 50% of the screen) */}
