@@ -308,7 +308,7 @@ export const CleanModeMandiri: React.FC = () => {
                             <img
                                 src="/clean-mode-mandiri/mandiri_card_batik.png"
                                 alt="Kartu Mandiri Debit Platinum"
-                                className="w-[82px] h-[52px] object-cover rounded-[6px] shadow-[0_4px_12px_rgba(0,0,0,0.18)] border border-white/20"
+                                className="w-[82px] h-[52px] object-cover rounded-[5px]"
                             />
                         </div>
 
@@ -324,36 +324,37 @@ export const CleanModeMandiri: React.FC = () => {
 
                     {/* Account Name & Number with tight natural spacing */}
                     <div className="flex flex-col items-center text-center mt-[15px]">
-                        <h1 className="text-white text-[17px] font-bold tracking-tight">
+                        <h1 className="text-white text-[19.5px] font-bold tracking-tight">
                             {accountName}
                         </h1>
 
                         <button
                             onClick={handleCopyAccountNumber}
-                            className="mt-[7px] flex items-center gap-1.5 text-white/95 text-[13.5px] hover:text-white transition-opacity active:opacity-75"
+                            className="mt-[6px] flex items-center gap-1.5 text-white text-[15.5px] hover:text-white/90 transition-opacity active:opacity-75"
                             title="Salin nomor rekening"
                         >
-                            <span className="tracking-[0.05em] font-normal">{accountNumber}</span>
+                            <span className="tracking-[0.03em] font-normal">{accountNumber}</span>
                             {copied ? (
-                                <Check className="w-3.5 h-3.5 text-emerald-300" />
+                                <Check className="w-[18px] h-[18px] text-emerald-300 ml-1 inline-block" />
                             ) : (
-                                <svg className="w-3.5 h-3.5 text-white fill-none stroke-current stroke-[2.2]" viewBox="0 0 24 24">
-                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
-                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
-                                </svg>
+                                <img
+                                    src="/clean-mode-mandiri/mandiri_icon_copy.png"
+                                    alt="Salin nomor rekening"
+                                    className="w-[18px] h-[20px] object-contain ml-1 inline-block"
+                                />
                             )}
                         </button>
 
                         {/* Main Balance with Superscript Cents */}
-                        <div className="mt-[28px] flex items-center justify-center">
+                        <div className="mt-[15px] flex items-center justify-center">
                             {isMasked ? (
-                                <span className="text-white text-[26px] font-bold tracking-widest">
+                                <span className="text-white text-[27px] font-bold tracking-widest">
                                     Rp ••••••••••
                                 </span>
                             ) : (
-                                <div className="text-white text-[26px] font-bold tracking-tight flex items-baseline">
+                                <div className="text-white text-[27px] font-bold tracking-tight flex items-baseline">
                                     <span>Rp {formattedInt}</span>
-                                    <sup className="text-[14.5px] font-bold align-super ml-0.5 tracking-normal">
+                                    <sup className="text-[15px] font-bold align-super ml-0.5 tracking-normal">
                                         {cents}
                                     </sup>
                                 </div>
@@ -372,14 +373,14 @@ export const CleanModeMandiri: React.FC = () => {
                     </div>
 
                     {/* 4 Quick Action Buttons */}
-                    <div className="w-full grid grid-cols-4 gap-2 mt-[32px]">
+                    <div className="w-full grid grid-cols-4 gap-2 mt-[28px]">
                         {/* Action 1: Transfer Rupiah */}
                         <div className="flex flex-col items-center">
-                            <button className="w-[66px] h-[66px] rounded-full bg-white shadow-[0_4px_14px_rgba(0,0,0,0.09)] flex items-center justify-center active:scale-95 transition-transform hover:shadow-lg">
+                            <button className="w-[58px] h-[58px] rounded-full bg-white shadow-[0_3px_10px_rgba(0,0,0,0.08)] flex items-center justify-center active:scale-95 transition-transform hover:shadow-md">
                                 <img
                                     src="/clean-mode-mandiri/mandiri_action_transfer.png"
                                     alt="Transfer Rupiah"
-                                    className="w-[35px] h-[35px] object-contain"
+                                    className="w-[31px] h-[31px] object-contain"
                                 />
                             </button>
                             <div className="mt-2 h-[30px] flex flex-col items-center justify-start">
@@ -391,11 +392,11 @@ export const CleanModeMandiri: React.FC = () => {
 
                         {/* Action 2: Bayar/VA */}
                         <div className="flex flex-col items-center">
-                            <button className="w-[66px] h-[66px] rounded-full bg-white shadow-[0_4px_14px_rgba(0,0,0,0.09)] flex items-center justify-center active:scale-95 transition-transform hover:shadow-lg">
+                            <button className="w-[58px] h-[58px] rounded-full bg-white shadow-[0_3px_10px_rgba(0,0,0,0.08)] flex items-center justify-center active:scale-95 transition-transform hover:shadow-md">
                                 <img
                                     src="/clean-mode-mandiri/mandiri_action_bayar.png"
                                     alt="Bayar/VA"
-                                    className="w-[35px] h-[35px] object-contain"
+                                    className="w-[31px] h-[31px] object-contain"
                                 />
                             </button>
                             <div className="mt-2 h-[30px] flex flex-col items-center justify-start">
@@ -407,11 +408,11 @@ export const CleanModeMandiri: React.FC = () => {
 
                         {/* Action 3: Top-up */}
                         <div className="flex flex-col items-center">
-                            <button className="w-[66px] h-[66px] rounded-full bg-white shadow-[0_4px_14px_rgba(0,0,0,0.09)] flex items-center justify-center active:scale-95 transition-transform hover:shadow-lg">
+                            <button className="w-[58px] h-[58px] rounded-full bg-white shadow-[0_3px_10px_rgba(0,0,0,0.08)] flex items-center justify-center active:scale-95 transition-transform hover:shadow-md">
                                 <img
                                     src="/clean-mode-mandiri/mandiri_action_topup.png"
                                     alt="Top-up"
-                                    className="w-[35px] h-[35px] object-contain"
+                                    className="w-[31px] h-[31px] object-contain"
                                 />
                             </button>
                             <div className="mt-2 h-[30px] flex flex-col items-center justify-start">
@@ -423,11 +424,11 @@ export const CleanModeMandiri: React.FC = () => {
 
                         {/* Action 4: Kartu Fisik/Virtual */}
                         <div className="flex flex-col items-center">
-                            <button className="w-[66px] h-[66px] rounded-full bg-white shadow-[0_4px_14px_rgba(0,0,0,0.09)] flex items-center justify-center active:scale-95 transition-transform hover:shadow-lg">
+                            <button className="w-[58px] h-[58px] rounded-full bg-white shadow-[0_3px_10px_rgba(0,0,0,0.08)] flex items-center justify-center active:scale-95 transition-transform hover:shadow-md">
                                 <img
                                     src="/clean-mode-mandiri/mandiri_action_card.png"
                                     alt="Kartu Fisik/Virtual"
-                                    className="w-[35px] h-[35px] object-contain"
+                                    className="w-[31px] h-[31px] object-contain"
                                 />
                             </button>
                             <div className="mt-2 h-[30px] flex flex-col items-center justify-start">
