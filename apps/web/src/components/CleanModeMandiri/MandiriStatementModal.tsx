@@ -4,7 +4,7 @@ import { X, Plus, Trash2, Check, RotateCcw, FileText } from 'lucide-react';
 
 export interface MandiriMutationItem {
     id: string;
-    typeId: 'qr' | 'transfer';
+    typeId: 'qr' | 'transfer' | 'biaya';
     title: string;
     day: string;
     description: string;
@@ -31,6 +31,46 @@ export const DEFAULT_MANDIRI_MUTATIONS: MandiriMutationItem[] = [
         day: '05',
         description: 'Transfer BI Fast\nKe BANK BNI\nSUHENDRA WAHYU 1817362467',
         amount: 285000,
+        cents: '00',
+        type: 'expense',
+    },
+    {
+        id: 'm3',
+        typeId: 'biaya',
+        title: 'Biaya',
+        day: '05',
+        description: 'Biaya transfer BI Fast',
+        amount: 2500,
+        cents: '00',
+        type: 'expense',
+    },
+    {
+        id: 'm4',
+        typeId: 'transfer',
+        title: 'Transfer Rupiah',
+        day: '05',
+        description: 'Transfer BI Fast\nKe BANK BNI\nNANDA EFRI LIANI 1653953464',
+        amount: 111875,
+        cents: '00',
+        type: 'expense',
+    },
+    {
+        id: 'm5',
+        typeId: 'biaya',
+        title: 'Biaya',
+        day: '05',
+        description: 'Biaya transfer BI Fast',
+        amount: 2500,
+        cents: '00',
+        type: 'expense',
+    },
+    {
+        id: 'm6',
+        typeId: 'transfer',
+        title: 'Transfer Rupiah',
+        day: '05',
+        description: 'Transfer BI Fast\nKe BCA',
+        amount: 1700000,
         cents: '00',
         type: 'expense',
     },
@@ -73,15 +113,15 @@ export const MandiriStatementModal: React.FC<MandiriStatementModalProps> = ({
         });
     };
 
-    const handleTypeChange = (index: number, typeId: 'qr' | 'transfer') => {
+    const handleTypeChange = (index: number, typeId: 'qr' | 'transfer' | 'biaya') => {
         setDraftList(prev => {
             const next = [...prev];
             const curr = next[index];
-            const isDefaultTitle = curr.title === 'QR Bayar' || curr.title === 'Transfer Rupiah' || !curr.title;
+            const isDefaultTitle = curr.title === 'QR Bayar' || curr.title === 'Transfer Rupiah' || curr.title === 'Biaya' || !curr.title;
             next[index] = {
                 ...curr,
                 typeId,
-                title: isDefaultTitle ? (typeId === 'qr' ? 'QR Bayar' : 'Transfer Rupiah') : curr.title,
+                title: isDefaultTitle ? (typeId === 'qr' ? 'QR Bayar' : typeId === 'biaya' ? 'Biaya' : 'Transfer Rupiah') : curr.title,
             };
             return next;
         });
@@ -190,12 +230,12 @@ export const MandiriStatementModal: React.FC<MandiriStatementModalProps> = ({
                                     <label className="block text-[11px] font-semibold text-gray-600 mb-1.5">
                                         Jenis Mutasi & Ikon
                                     </label>
-                                    <div className="grid grid-cols-2 gap-2">
+                                    <div className="grid grid-cols-3 gap-2">
                                         {/* Option QR Bayar */}
                                         <button
                                             type="button"
                                             onClick={() => handleTypeChange(idx, 'qr')}
-                                            className={`flex items-center gap-2.5 p-2.5 rounded-xl border transition-all text-left ${
+                                            className={`flex items-center gap-2 p-2 rounded-xl border transition-all text-left ${
                                                 item.typeId === 'qr'
                                                     ? 'border-[#007dfe] bg-blue-50/60 ring-2 ring-[#007dfe]/20 font-semibold text-[#007dfe]'
                                                     : 'border-gray-200 hover:border-gray-300 text-gray-700'
@@ -204,11 +244,11 @@ export const MandiriStatementModal: React.FC<MandiriStatementModalProps> = ({
                                             <img
                                                 src="/clean-mode-mandiri/mandiri_mutasi_qr.png"
                                                 alt="QR Bayar"
-                                                className="w-7 h-7 object-contain shrink-0"
+                                                className="w-6 h-6 object-contain shrink-0"
                                             />
                                             <div className="min-w-0">
-                                                <div className="text-xs font-semibold leading-tight">QR Bayar</div>
-                                                <div className="text-[10px] text-gray-500">Ikon Kotak QR</div>
+                                                <div className="text-[11px] font-semibold leading-tight truncate">QR Bayar</div>
+                                                <div className="text-[9px] text-gray-500 truncate">QRIS Livin</div>
                                             </div>
                                         </button>
 
@@ -216,7 +256,7 @@ export const MandiriStatementModal: React.FC<MandiriStatementModalProps> = ({
                                         <button
                                             type="button"
                                             onClick={() => handleTypeChange(idx, 'transfer')}
-                                            className={`flex items-center gap-2.5 p-2.5 rounded-xl border transition-all text-left ${
+                                            className={`flex items-center gap-2 p-2 rounded-xl border transition-all text-left ${
                                                 item.typeId === 'transfer'
                                                     ? 'border-[#007dfe] bg-blue-50/60 ring-2 ring-[#007dfe]/20 font-semibold text-[#007dfe]'
                                                     : 'border-gray-200 hover:border-gray-300 text-gray-700'
@@ -225,11 +265,32 @@ export const MandiriStatementModal: React.FC<MandiriStatementModalProps> = ({
                                             <img
                                                 src="/clean-mode-mandiri/mandiri_mutasi_transfer.png"
                                                 alt="Transfer Rupiah"
-                                                className="w-7 h-7 object-contain shrink-0"
+                                                className="w-6 h-6 object-contain shrink-0"
                                             />
                                             <div className="min-w-0">
-                                                <div className="text-xs font-semibold leading-tight">Transfer Rupiah</div>
-                                                <div className="text-[10px] text-gray-500">Ikon Bulat Panah</div>
+                                                <div className="text-[11px] font-semibold leading-tight truncate">Transfer</div>
+                                                <div className="text-[9px] text-gray-500 truncate">BI Fast</div>
+                                            </div>
+                                        </button>
+
+                                        {/* Option Biaya */}
+                                        <button
+                                            type="button"
+                                            onClick={() => handleTypeChange(idx, 'biaya')}
+                                            className={`flex items-center gap-2 p-2 rounded-xl border transition-all text-left ${
+                                                item.typeId === 'biaya'
+                                                    ? 'border-[#007dfe] bg-blue-50/60 ring-2 ring-[#007dfe]/20 font-semibold text-[#007dfe]'
+                                                    : 'border-gray-200 hover:border-gray-300 text-gray-700'
+                                            }`}
+                                        >
+                                            <img
+                                                src="/clean-mode-mandiri/mandiri_mutasi_biaya.png"
+                                                alt="Biaya"
+                                                className="w-6 h-6 object-contain shrink-0"
+                                            />
+                                            <div className="min-w-0">
+                                                <div className="text-[11px] font-semibold leading-tight truncate">Biaya</div>
+                                                <div className="text-[9px] text-gray-500 truncate">Biaya Admin</div>
                                             </div>
                                         </button>
                                     </div>
