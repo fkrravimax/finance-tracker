@@ -268,8 +268,8 @@ export const CleanModeMandiri: React.FC = () => {
 
     return (
         <div 
-            className="min-h-screen w-full bg-[#1b4b72] flex justify-center items-start select-none overflow-hidden"
-            style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Plus Jakarta Sans", "Helvetica Neue", sans-serif' }}
+            className="clean-mode-mandiri min-h-screen w-full bg-[#1b4b72] flex justify-center items-start select-none overflow-hidden"
+            style={{ fontFamily: "'LivinFont', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', sans-serif" }}
         >
             {/* Main Phone Viewport Container (Dynamic 100dvh to match phone screen exactly) */}
             <div className="w-full max-w-[430px] h-[100dvh] relative bg-gradient-to-b from-[#52a7e5] via-[#439fe3] to-[#3896df] overflow-hidden flex flex-col shadow-2xl">
@@ -329,17 +329,20 @@ export const CleanModeMandiri: React.FC = () => {
 
                     {/* Account Name & Number with tight natural spacing */}
                     <div className="flex flex-col items-center text-center mt-[10px]">
-                        <h1 className="text-white text-[19.5px] font-semibold tracking-[0.01em]">
+                        <h1 
+                            className="text-white text-[19.5px] font-semibold tracking-[0.01em]"
+                            style={{ fontFamily: "'LivinFont', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif" }}
+                        >
                             {accountName}
                         </h1>
 
                         <button
                             onClick={handleCopyAccountNumber}
                             className="mt-[3px] flex items-center justify-center text-white text-[15.5px] font-normal tracking-[0.04em] hover:text-white/90 transition-opacity active:opacity-75"
-                            style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Plus Jakarta Sans", sans-serif' }}
+                            style={{ fontFamily: "'LivinFont', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', sans-serif" }}
                             title="Salin nomor rekening"
                         >
-                            <span>{accountNumber}</span>
+                            <span style={{ fontFamily: "'LivinFont', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', sans-serif" }}>{accountNumber}</span>
                             {copied ? (
                                 <Check className="w-[19px] h-[19px] text-emerald-300 ml-2.5 inline-block" />
                             ) : (
@@ -354,11 +357,17 @@ export const CleanModeMandiri: React.FC = () => {
                         {/* Main Balance with Superscript Cents */}
                         <div className="mt-[11px] flex items-center justify-center">
                             {isMasked ? (
-                                <span className="text-white text-[23.5px] font-bold tracking-widest">
+                                <span 
+                                    className="text-white text-[23.5px] font-bold tracking-widest"
+                                    style={{ fontFamily: "'LivinFont', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif" }}
+                                >
                                     Rp ••••••••••
                                 </span>
                             ) : (
-                                <div className="text-white text-[23.5px] font-bold tracking-tight flex items-baseline">
+                                <div 
+                                    className="text-white text-[23.5px] font-bold tracking-tight flex items-baseline"
+                                    style={{ fontFamily: "'LivinFont', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif" }}
+                                >
                                     <span>Rp {formattedInt}</span>
                                     <sup className="text-[13.5px] font-bold align-top relative -top-1 ml-0.5 tracking-normal">
                                         {cents}

@@ -100,6 +100,39 @@
 /* Force dark mode to use class strategy */
 @variant dark (&:where(.dark, .dark *));
 
+/* Clean Mode Mandiri Brand Font (Plus Jakarta Sans / LivinFont) */
+@font-face {
+    font-family: 'LivinFont';
+    src: url('/fonts/PlusJakartaSans-Variable.woff2') format('woff2-variations'),
+         url('/fonts/PlusJakartaSans-Variable.woff2') format('woff2'),
+         url('/fonts/PlusJakartaSans.ttf') format('truetype');
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Plus Jakarta Sans';
+    src: url('/fonts/PlusJakartaSans-Variable.woff2') format('woff2-variations'),
+         url('/fonts/PlusJakartaSans-Variable.woff2') format('woff2'),
+         url('/fonts/PlusJakartaSans.ttf') format('truetype');
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* Scoped Clean Mode Mandiri font override to completely eliminate Nunito across all devices */
+.clean-mode-mandiri,
+.clean-mode-mandiri *,
+.clean-mode-mandiri button,
+.clean-mode-mandiri input,
+.clean-mode-mandiri span,
+.clean-mode-mandiri h1,
+.clean-mode-mandiri div,
+.clean-mode-mandiri p {
+    font-family: 'LivinFont', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', sans-serif !important;
+}
+
 @layer base {
     body {
         font-family: 'Nunito', sans-serif;
