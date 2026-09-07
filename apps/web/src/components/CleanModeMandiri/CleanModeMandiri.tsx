@@ -1,129 +1,10 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Settings, Check, X, Eye, EyeOff, Sparkles, RefreshCw, Layers } from 'lucide-react';
 import { authService } from '../../services/authService';
 import { dashboardService } from '../../services/dashboardService';
-import MandiriStatementModal from './MandiriStatementModal';
-
-interface TransactionItem {
-    id: string;
-    icon: string;
-    title: string;
-    description: string;
-    amount: number;
-    cents: string;
-    type: 'expense' | 'income';
-}
-
-interface DateGroup {
-    date: string;
-    items: TransactionItem[];
-}
-
-const DEFAULT_TRANSACTIONS: DateGroup[] = [
-    {
-        date: '05 Sep 2026',
-        items: [
-            {
-                id: 'm1',
-                icon: '/clean-mode-mandiri/mandiri_mutasi_qr.png',
-                title: 'QR Bayar',
-                description: 'Pembayaran QR\nke IDM QRIS LIVIN\n624827123587',
-                amount: 75300,
-                cents: '00',
-                type: 'expense',
-            },
-            {
-                id: 'm2',
-                icon: '/clean-mode-mandiri/mandiri_mutasi_transfer.png',
-                title: 'Transfer Rupiah',
-                description: 'Transfer BI Fast\nKe BANK BNI\nSUHENDRA WAHYU 1817362467',
-                amount: 285000,
-                cents: '00',
-                type: 'expense',
-            },
-            {
-                id: 'm3',
-                icon: '/clean-mode-mandiri/mandiri_mutasi_biaya.png',
-                title: 'Biaya',
-                description: 'Biaya transfer BI Fast',
-                amount: 2500,
-                cents: '00',
-                type: 'expense',
-            },
-        ],
-    },
-    {
-        date: '04 Sep 2026',
-        items: [
-            {
-                id: 'm4',
-                icon: '/clean-mode-mandiri/mandiri_mutasi_biaya.png',
-                title: 'Biaya',
-                description: 'Biaya transfer BI Fast',
-                amount: 2500,
-                cents: '00',
-                type: 'expense',
-            },
-            {
-                id: 'm5',
-                icon: '/clean-mode-mandiri/mandiri_mutasi_transfer.png',
-                title: 'Transfer Rupiah',
-                description: 'Transfer BI Fast\nKe BCA\nRANO 7245614730',
-                amount: 1700000,
-                cents: '00',
-                type: 'expense',
-            },
-            {
-                id: 'm6',
-                icon: '/clean-mode-mandiri/mandiri_mutasi_transfer.png',
-                title: 'Transfer Rupiah',
-                description: 'Transfer BI Fast\nKe BANK MANDIRI\nTYAS ALIFA ARDAYANTI 1370018899231',
-                amount: 450000,
-                cents: '00',
-                type: 'expense',
-            },
-        ],
-    },
-    {
-        date: '02 Sep 2026',
-        items: [
-            {
-                id: 'm7',
-                icon: '/clean-mode-mandiri/mandiri_tx_qr.png',
-                title: 'QR Bayar',
-                description: 'Pembayaran QR ke KOPI KENANGAN SENOPATI',
-                amount: 38000,
-                cents: '00',
-                type: 'expense',
-            },
-            {
-                id: 'm8',
-                icon: '/clean-mode-mandiri/mandiri_tx_transfer.png',
-                title: 'Transfer Rupiah',
-                description: 'Transfer BI Fast\nKe BANK BNI\nPAGUYUBAN PEGAWAI KP 1902837461',
-                amount: 200000,
-                cents: '00',
-                type: 'expense',
-            },
-        ],
-    },
-    {
-        date: '01 Sep 2026',
-        items: [
-            {
-                id: 'm9',
-                icon: '/clean-mode-mandiri/mandiri_tx_transfer.png',
-                title: 'Transfer Rupiah',
-                description: 'PAYROLL SALARY CREDIT PT MANDIRI CORP',
-                amount: 35000000,
-                cents: '00',
-                type: 'income',
-            },
-        ],
-    },
-];
+import MandiriStatementModal, { type MandiriMutationItem, DEFAULT_MANDIRI_MUTATIONS } from './MandiriStatementModal';
 
 export const CleanModeMandiri: React.FC = () => {
     const navigate = useNavigate();
@@ -200,6 +81,61 @@ export const CleanModeMandiri: React.FC = () => {
 
     const { formattedInt, cents } = formatBalanceParts(balance);
 
+    // Custom mutations state (stored in localStorage)
+    const [mutations, setMutations] = useState<MandiriMutationItem[]>(() => {
+        try {
+            const saved = localStorage.getItem('mandiri_clean_mode_custom_mutations');
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                if (Array.isArray(parsed) && parsed.length > 0) {
+                    return parsed;
+                }
+            }
+        } catch (e) {
+            console.error('Failed to load custom mutations:', e);
+        }
+        return DEFAULT_MANDIRI_MUTATIONS;
+    });
+
+    const handleSaveMutations = (newMutations: MandiriMutationItem[]) => {
+        setMutations(newMutations);
+        try {
+            localStorage.setItem('mandiri_clean_mode_custom_mutations', JSON.stringify(newMutations));
+        } catch (e) {
+            console.error('Failed to save custom mutations:', e);
+        }
+        setToastMessage('Mutasi berhasil diperbarui');
+    };
+
+    // Dynamically map month abbreviation based on active selectedMonth
+    const getMonthAbbr = (m: string) => {
+        const lower = m.toLowerCase();
+        if (lower.startsWith('sep')) return 'Sep';
+        if (lower.startsWith('agu')) return 'Agu';
+        if (lower.startsWith('jul')) return 'Jul';
+        if (lower.startsWith('jun')) return 'Jun';
+        if (lower.startsWith('mei')) return 'Mei';
+        return m.slice(0, 3);
+    };
+
+    const currentMonthAbbr = getMonthAbbr(selectedMonth);
+
+    // Group items dynamically by day + currentMonthAbbr + 2026
+    const groupedMutations = useMemo(() => {
+        const groups: { date: string; items: MandiriMutationItem[] }[] = [];
+        mutations.forEach(item => {
+            const dayStr = (item.day || '05').padStart(2, '0');
+            const dateHeader = `${dayStr} ${currentMonthAbbr} 2026`;
+            let grp = groups.find(g => g.date === dateHeader);
+            if (!grp) {
+                grp = { date: dateHeader, items: [] };
+                groups.push(grp);
+            }
+            grp.items.push(item);
+        });
+        return groups;
+    }, [mutations, currentMonthAbbr]);
+
     const handleCopyAccountNumber = () => {
         navigator.clipboard.writeText(accountNumber.replace(/\D/g, ''));
         setCopied(true);
@@ -272,25 +208,137 @@ export const CleanModeMandiri: React.FC = () => {
             style={{ fontFamily: "'LivinFont', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', sans-serif" }}
         >
             {/* Main Phone Viewport Container (Dynamic 100dvh to match phone screen exactly) */}
-            <div className="w-full max-w-[430px] h-[100dvh] relative bg-gradient-to-b from-[#52a7e5] via-[#439fe3] to-[#3896df] overflow-hidden flex flex-col shadow-2xl">
+            <div className="w-full max-w-[430px] h-[100dvh] relative bg-gradient-to-b from-[#50a6e6] via-[#439fe3] to-[#3695df] overflow-hidden flex flex-col shadow-2xl">
                 
                 {/* Background Subtle Organic Wave Curves (Livin' Dynamic Light Waves) */}
                 <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
                     <svg className="absolute w-full h-[520px] top-0 left-0" viewBox="0 0 430 520" fill="none" preserveAspectRatio="none">
-                        <path d="M-30 200 C 90 190, 160 300, 270 280 C 350 260, 420 220, 470 240 L 470 0 L -30 0 Z" fill="url(#waveGrad1)" />
-                        <path d="M-30 270 C 100 250, 200 370, 320 330 C 390 300, 430 270, 470 280 L 470 0 L -30 0 Z" fill="url(#waveGrad2)" />
                         <defs>
-                            <linearGradient id="waveGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" stopColor="#ffffff" stopOpacity="0.28" />
-                                <stop offset="50%" stopColor="#ffffff" stopOpacity="0.12" />
-                                <stop offset="100%" stopColor="#ffffff" stopOpacity="0.04" />
+                            {/* Filter for soft luminous glow on wave crest edges */}
+                            <filter id="mandiriWaveGlow" x="-20%" y="-20%" width="140%" height="140%">
+                                <feGaussianBlur stdDeviation="2.5" result="blur" />
+                                <feMerge>
+                                    <feMergeNode in="blur" />
+                                    <feMergeNode in="SourceGraphic" />
+                                </feMerge>
+                            </filter>
+                            <filter id="mandiriSoftGlow" x="-30%" y="-30%" width="160%" height="160%">
+                                <feGaussianBlur stdDeviation="6" />
+                            </filter>
+
+                            {/* Top Right Ambient Light */}
+                            <radialGradient id="topRightGlow" cx="95%" cy="5%" r="75%">
+                                <stop offset="0%" stopColor="#ffffff" stopOpacity="0.22" />
+                                <stop offset="50%" stopColor="#ffffff" stopOpacity="0.08" />
+                                <stop offset="100%" stopColor="#ffffff" stopOpacity="0.0" />
+                            </radialGradient>
+
+                            {/* Top Left Ambient Light */}
+                            <radialGradient id="topLeftGlow" cx="5%" cy="5%" r="65%">
+                                <stop offset="0%" stopColor="#ffffff" stopOpacity="0.16" />
+                                <stop offset="60%" stopColor="#ffffff" stopOpacity="0.05" />
+                                <stop offset="100%" stopColor="#ffffff" stopOpacity="0.0" />
+                            </radialGradient>
+
+                            {/* Main Ribbon 1 Body Gradient */}
+                            <linearGradient id="ribbon1Grad" x1="0%" y1="20%" x2="100%" y2="80%">
+                                <stop offset="0%" stopColor="#ffffff" stopOpacity="0.30" />
+                                <stop offset="25%" stopColor="#ffffff" stopOpacity="0.20" />
+                                <stop offset="55%" stopColor="#ffffff" stopOpacity="0.10" />
+                                <stop offset="100%" stopColor="#ffffff" stopOpacity="0.02" />
                             </linearGradient>
-                            <linearGradient id="waveGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" stopColor="#ffffff" stopOpacity="0.18" />
+
+                            {/* Main Ribbon 1 Crest Glowing Line Gradient */}
+                            <linearGradient id="crest1Line" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" stopColor="#ffffff" stopOpacity="0.2" />
+                                <stop offset="15%" stopColor="#ffffff" stopOpacity="0.85" />
+                                <stop offset="45%" stopColor="#ffffff" stopOpacity="0.75" />
+                                <stop offset="80%" stopColor="#ffffff" stopOpacity="0.35" />
+                                <stop offset="100%" stopColor="#ffffff" stopOpacity="0.1" />
+                            </linearGradient>
+
+                            {/* Lower Wave 2 Body Gradient */}
+                            <linearGradient id="ribbon2Grad" x1="20%" y1="0%" x2="80%" y2="100%">
+                                <stop offset="0%" stopColor="#ffffff" stopOpacity="0.22" />
                                 <stop offset="50%" stopColor="#ffffff" stopOpacity="0.08" />
                                 <stop offset="100%" stopColor="#ffffff" stopOpacity="0.0" />
                             </linearGradient>
+
+                            {/* Lower Wave 2 Crest Line Gradient */}
+                            <linearGradient id="crest2Line" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" stopColor="#ffffff" stopOpacity="0.1" />
+                                <stop offset="25%" stopColor="#ffffff" stopOpacity="0.75" />
+                                <stop offset="55%" stopColor="#ffffff" stopOpacity="0.85" />
+                                <stop offset="85%" stopColor="#ffffff" stopOpacity="0.4" />
+                                <stop offset="100%" stopColor="#ffffff" stopOpacity="0.1" />
+                            </linearGradient>
                         </defs>
+
+                        {/* 1. Ambient Background Light Arches */}
+                        <path d="M 180 -10 C 260 80, 360 140, 450 160 L 450 -10 Z" fill="url(#topRightGlow)" />
+                        <path d="M -10 170 C 60 110, 130 50, 170 -10 L -10 -10 Z" fill="url(#topLeftGlow)" />
+
+                        {/* 2. Main Signature 3D Ribbon (Wave 1) */}
+                        {/* Ambient glow halo behind main ribbon crest */}
+                        <path
+                            d="M -15 145 C 50 175, 85 212, 120 216 C 165 220, 230 205, 300 195 C 360 185, 410 178, 445 174"
+                            stroke="#ffffff"
+                            strokeWidth="12"
+                            strokeOpacity="0.18"
+                            filter="url(#mandiriSoftGlow)"
+                            fill="none"
+                        />
+                        {/* Main Ribbon Filled Body */}
+                        <path
+                            d="M -20 145 C 50 175, 85 212, 120 216 C 165 220, 230 205, 300 195 C 360 185, 410 178, 450 174 L 450 240 C 390 245, 320 255, 250 268 C 170 282, 100 286, 60 275 C 20 262, -5 240, -20 225 Z"
+                            fill="url(#ribbon1Grad)"
+                        />
+                        {/* Main Ribbon Sharp Glowing Crest Line */}
+                        <path
+                            d="M -20 145 C 50 175, 85 212, 120 216 C 165 220, 230 205, 300 195 C 360 185, 410 178, 450 174"
+                            stroke="url(#crest1Line)"
+                            strokeWidth="3"
+                            filter="url(#mandiriWaveGlow)"
+                            fill="none"
+                        />
+                        <path
+                            d="M -20 145 C 50 175, 85 212, 120 216 C 165 220, 230 205, 300 195 C 360 185, 410 178, 450 174"
+                            stroke="#ffffff"
+                            strokeWidth="1"
+                            strokeOpacity="0.75"
+                            fill="none"
+                        />
+
+                        {/* 3. Lower Wave Cradle under Action Buttons (Wave 2) */}
+                        {/* Ambient glow halo under buttons */}
+                        <path
+                            d="M -15 330 C 45 365, 95 405, 160 412 C 205 415, 235 394, 280 392 C 340 390, 395 398, 445 378"
+                            stroke="#ffffff"
+                            strokeWidth="10"
+                            strokeOpacity="0.16"
+                            filter="url(#mandiriSoftGlow)"
+                            fill="none"
+                        />
+                        {/* Lower Wave Filled Body */}
+                        <path
+                            d="M -20 330 C 45 365, 95 405, 160 412 C 205 415, 235 394, 280 392 C 340 390, 395 398, 450 378 L 450 530 L -20 530 Z"
+                            fill="url(#ribbon2Grad)"
+                        />
+                        {/* Lower Wave Glowing Crest Line */}
+                        <path
+                            d="M -20 330 C 45 365, 95 405, 160 412 C 205 415, 235 394, 280 392 C 340 390, 395 398, 450 378"
+                            stroke="url(#crest2Line)"
+                            strokeWidth="2.5"
+                            filter="url(#mandiriWaveGlow)"
+                            fill="none"
+                        />
+                        <path
+                            d="M -20 330 C 45 365, 95 405, 160 412 C 205 415, 235 394, 280 392 C 340 390, 395 398, 450 378"
+                            stroke="#ffffff"
+                            strokeWidth="1"
+                            strokeOpacity="0.8"
+                            fill="none"
+                        />
                     </svg>
                 </div>
 
@@ -388,18 +436,21 @@ export const CleanModeMandiri: React.FC = () => {
                     </div>
 
                     {/* 4 Quick Action Buttons */}
-                    <div className="w-full grid grid-cols-4 gap-2 mt-[24px]">
+                    <div className="w-full grid grid-cols-4 gap-2 mt-[34px]">
                         {/* Action 1: Transfer Rupiah */}
                         <div className="flex flex-col items-center">
-                            <button className="w-[64px] h-[64px] rounded-full bg-white shadow-[0_4px_12px_rgba(0,0,0,0.08)] flex items-center justify-center active:scale-95 transition-transform hover:shadow-md">
+                            <button className="w-[66px] h-[66px] rounded-full bg-white shadow-[0_4px_12px_rgba(0,0,0,0.08)] flex items-center justify-center active:scale-95 transition-transform hover:shadow-md">
                                 <img
                                     src="/clean-mode-mandiri/mandiri_action_transfer.png"
                                     alt="Transfer Rupiah"
-                                    className="w-[33px] h-[33px] object-contain"
+                                    className="w-[34px] h-[34px] object-contain"
                                 />
                             </button>
-                            <div className="mt-2 h-[30px] flex flex-col items-center justify-start">
-                                <span className="text-white text-[12.5px] font-normal leading-[14px] text-center whitespace-pre-line">
+                            <div className="mt-2.5 h-[34px] flex flex-col items-center justify-start">
+                                <span 
+                                    className="text-white text-[13.5px] font-normal leading-[16.5px] text-center whitespace-pre-line"
+                                    style={{ fontFamily: "'LivinFont', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', sans-serif" }}
+                                >
                                     {'Transfer\nRupiah'}
                                 </span>
                             </div>
@@ -407,15 +458,18 @@ export const CleanModeMandiri: React.FC = () => {
 
                         {/* Action 2: Bayar/VA */}
                         <div className="flex flex-col items-center">
-                            <button className="w-[64px] h-[64px] rounded-full bg-white shadow-[0_4px_12px_rgba(0,0,0,0.08)] flex items-center justify-center active:scale-95 transition-transform hover:shadow-md">
+                            <button className="w-[66px] h-[66px] rounded-full bg-white shadow-[0_4px_12px_rgba(0,0,0,0.08)] flex items-center justify-center active:scale-95 transition-transform hover:shadow-md">
                                 <img
                                     src="/clean-mode-mandiri/mandiri_action_bayar.png"
                                     alt="Bayar/VA"
-                                    className="w-[33px] h-[33px] object-contain"
+                                    className="w-[34px] h-[34px] object-contain"
                                 />
                             </button>
-                            <div className="mt-2 h-[30px] flex flex-col items-center justify-start">
-                                <span className="text-white text-[12.5px] font-normal leading-[14px] text-center">
+                            <div className="mt-2.5 h-[34px] flex flex-col items-center justify-start">
+                                <span 
+                                    className="text-white text-[13.5px] font-normal leading-[16.5px] text-center"
+                                    style={{ fontFamily: "'LivinFont', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', sans-serif" }}
+                                >
                                     Bayar/VA
                                 </span>
                             </div>
@@ -423,15 +477,18 @@ export const CleanModeMandiri: React.FC = () => {
 
                         {/* Action 3: Top-up */}
                         <div className="flex flex-col items-center">
-                            <button className="w-[64px] h-[64px] rounded-full bg-white shadow-[0_4px_12px_rgba(0,0,0,0.08)] flex items-center justify-center active:scale-95 transition-transform hover:shadow-md">
+                            <button className="w-[66px] h-[66px] rounded-full bg-white shadow-[0_4px_12px_rgba(0,0,0,0.08)] flex items-center justify-center active:scale-95 transition-transform hover:shadow-md">
                                 <img
                                     src="/clean-mode-mandiri/mandiri_action_topup.png"
                                     alt="Top-up"
-                                    className="w-[33px] h-[33px] object-contain"
+                                    className="w-[34px] h-[34px] object-contain"
                                 />
                             </button>
-                            <div className="mt-2 h-[30px] flex flex-col items-center justify-start">
-                                <span className="text-white text-[12.5px] font-normal leading-[14px] text-center">
+                            <div className="mt-2.5 h-[34px] flex flex-col items-center justify-start">
+                                <span 
+                                    className="text-white text-[13.5px] font-normal leading-[16.5px] text-center"
+                                    style={{ fontFamily: "'LivinFont', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', sans-serif" }}
+                                >
                                     Top-up
                                 </span>
                             </div>
@@ -439,15 +496,18 @@ export const CleanModeMandiri: React.FC = () => {
 
                         {/* Action 4: Kartu Fisik/Virtual */}
                         <div className="flex flex-col items-center">
-                            <button className="w-[64px] h-[64px] rounded-full bg-white shadow-[0_4px_12px_rgba(0,0,0,0.08)] flex items-center justify-center active:scale-95 transition-transform hover:shadow-md">
+                            <button className="w-[66px] h-[66px] rounded-full bg-white shadow-[0_4px_12px_rgba(0,0,0,0.08)] flex items-center justify-center active:scale-95 transition-transform hover:shadow-md">
                                 <img
                                     src="/clean-mode-mandiri/mandiri_action_card.png"
                                     alt="Kartu Fisik/Virtual"
-                                    className="w-[33px] h-[33px] object-contain"
+                                    className="w-[34px] h-[34px] object-contain"
                                 />
                             </button>
-                            <div className="mt-2 h-[30px] flex flex-col items-center justify-start">
-                                <span className="text-white text-[12.5px] font-normal leading-[14px] text-center whitespace-pre-line">
+                            <div className="mt-2.5 h-[34px] flex flex-col items-center justify-start">
+                                <span 
+                                    className="text-white text-[13.5px] font-normal leading-[16.5px] text-center whitespace-pre-line"
+                                    style={{ fontFamily: "'LivinFont', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', sans-serif" }}
+                                >
                                     {'Kartu Fisik/\nVirtual'}
                                 </span>
                             </div>
@@ -465,14 +525,14 @@ export const CleanModeMandiri: React.FC = () => {
                     {/* Drag Handle Bar (Calibrated 44px x 4.5px dark pill) */}
                     <div
                         onClick={() => setIsSheetExpanded(!isSheetExpanded)}
-                        className="w-full pt-[16px] pb-[12px] cursor-pointer flex justify-center items-center shrink-0"
+                        className="w-full pt-[18px] pb-[13px] cursor-pointer flex justify-center items-center shrink-0"
                     >
                         <div className="w-[44px] h-[4.5px] rounded-full bg-[#5f5959]" />
                     </div>
 
                     {/* Sheet Header: Transaksi & e-Statement */}
-                    <div className="px-5 pt-1 pb-3.5 flex items-center justify-between shrink-0">
-                        <h2 className="text-[17px] font-semibold text-[#1e1e1e] tracking-[-0.01em]">
+                    <div className="px-5 pt-1.5 pb-4 flex items-center justify-between shrink-0">
+                        <h2 className="text-[17.5px] font-semibold text-[#1e1e1e] tracking-tight">
                             Transaksi
                         </h2>
                         <button
@@ -484,11 +544,11 @@ export const CleanModeMandiri: React.FC = () => {
                     </div>
 
                     {/* Month Carousel & Utility Tools Bar */}
-                    <div className="h-[48px] border-b border-[#ededed] flex items-center justify-between shrink-0 pl-5 pr-4">
-                        {/* Horizontal Months (Right-aligned with wide gap-38px so only 'Agustus', 'September' and cut-off 'Juli' are visible) */}
+                    <div className="h-[50px] border-b border-[#ededed] flex items-center justify-between shrink-0 pl-0 pr-2.5">
+                        {/* Horizontal Months (Right-aligned with calibrated gap-56px so Juli loses its 'J' and shows 'uli') */}
                         <div
                             ref={monthScrollRef}
-                            className="h-full flex items-center space-x-[38px] overflow-x-auto no-scrollbar"
+                            className="flex-1 h-full flex items-center space-x-[56px] overflow-x-auto no-scrollbar pl-0"
                         >
                             {months.map(m => {
                                 const isActive = selectedMonth.toLowerCase() === m.toLowerCase();
@@ -501,8 +561,8 @@ export const CleanModeMandiri: React.FC = () => {
                                         }}
                                         className={`relative h-full flex items-center px-1 text-[15px] whitespace-nowrap transition-colors shrink-0 ${
                                             isActive
-                                                ? 'font-semibold text-[#111111]'
-                                                : 'font-normal text-[#757575] hover:text-[#333333]'
+                                                ? 'font-medium text-[#111111]'
+                                                : 'font-normal text-[#666666] hover:text-[#333333]'
                                         }`}
                                     >
                                         <span>{m}</span>
@@ -517,33 +577,33 @@ export const CleanModeMandiri: React.FC = () => {
                         {/* Right Utilities: Vertical Divider + CS Avatar + Vertical Divider + Search */}
                         <div className="h-full flex items-center shrink-0">
                             {/* Divider 1 */}
-                            <div className="h-[24px] w-[1px] bg-[#ededed] mx-2 shrink-0" />
+                            <div className="h-[28px] w-[1px] bg-[#ededed] shrink-0 mr-1" />
 
                             {/* CS Assistant Avatar */}
                             <button
                                 onClick={() => setToastMessage('Fitur Livin Assistant siap digunakan')}
-                                className="w-9 h-full flex items-center justify-center hover:opacity-80 active:scale-95 transition-all"
+                                className="w-[58px] h-full flex items-center justify-center hover:opacity-80 active:scale-95 transition-all shrink-0"
                                 title="Livin Assistant"
                             >
                                 <img
                                     src="/clean-mode-mandiri/mandiri_avatar_cs.png"
                                     alt="Livin Assistant"
-                                    className="w-[25px] h-[25px] object-contain"
+                                    className="w-[26px] h-[26px] object-contain"
                                 />
                             </button>
 
                             {/* Divider 2 */}
-                            <div className="h-[24px] w-[1px] bg-[#ededed] mx-2 shrink-0" />
+                            <div className="h-[28px] w-[1px] bg-[#ededed] shrink-0" />
 
                             {/* Search Button */}
                             <button
                                 onClick={() => setToastMessage('Pencarian mutasi')}
-                                className="w-8 h-full flex items-center justify-center hover:opacity-80 active:scale-95 transition-all"
+                                className="w-[52px] h-full flex items-center justify-center hover:opacity-80 active:scale-95 transition-all shrink-0 pr-1"
                                 title="Cari Transaksi"
                             >
                                 <img
                                     src="/clean-mode-mandiri/mandiri_icon_search.png"
-                                    alt="Search"
+                                    alt="Cari Transaksi"
                                     className="w-[18px] h-[18px] object-contain"
                                 />
                             </button>
@@ -552,50 +612,57 @@ export const CleanModeMandiri: React.FC = () => {
 
                     {/* Transactions Feed List (Calibrated row height so exactly 2 transactions fit above the initial fold) */}
                     <div className="flex-1 overflow-y-auto no-scrollbar pb-16">
-                        {DEFAULT_TRANSACTIONS.map(group => (
+                        {groupedMutations.map(group => (
                             <div key={group.date}>
-                                {/* Date Section Header */}
-                                <div className="text-[13px] font-medium text-[#7c7c80] pt-[22px] pb-[10px] px-5 tracking-tight">
+                                {/* Date Section Header (Synchronized automatically with selectedMonth) */}
+                                <div className="text-[13px] font-medium text-[#7c7c80] pt-[32px] pb-[12px] px-5 tracking-tight">
                                     {group.date}
                                 </div>
 
                                 {/* Items under this date */}
-                                <div className="divide-y divide-[#f4f4f4]">
-                                    {group.items.map(item => (
-                                        <div key={item.id} className="flex items-start justify-between gap-3 px-5 py-[23px]">
-                                            {/* Icon + Details */}
-                                            <div className="flex items-start gap-3.5 flex-1 min-w-0">
-                                                <img
-                                                    src={item.icon}
-                                                    alt={item.title}
-                                                    className="w-[30px] h-[30px] object-contain shrink-0 mt-0.5"
-                                                />
-                                                <div className="flex-1 min-w-0">
-                                                    <h3 className="text-[15.5px] font-bold text-[#111111] leading-snug">
-                                                        {item.title}
-                                                    </h3>
-                                                    <p className="text-[12px] font-normal text-[#5c5c60] leading-[18px] mt-1.5 whitespace-pre-line break-words">
-                                                        {item.description}
-                                                    </p>
+                                <div className="divide-y divide-[#eeeeee]">
+                                    {group.items.map(item => {
+                                        const iconSrc =
+                                            item.typeId === 'qr'
+                                                ? '/clean-mode-mandiri/mandiri_mutasi_qr.png'
+                                                : '/clean-mode-mandiri/mandiri_mutasi_transfer.png';
+
+                                        return (
+                                            <div key={item.id} className="flex items-start justify-between gap-3 px-5 py-[26px]">
+                                                {/* Icon + Details */}
+                                                <div className="flex items-start gap-3.5 flex-1 min-w-0">
+                                                    <img
+                                                        src={iconSrc}
+                                                        alt={item.title}
+                                                        className="w-[32px] h-[32px] object-contain shrink-0 mt-0.5"
+                                                    />
+                                                    <div className="flex-1 min-w-0">
+                                                        <h3 className="text-[16px] font-semibold text-[#1c1c1e] leading-snug tracking-[-0.01em]">
+                                                            {item.title}
+                                                        </h3>
+                                                        <p className="text-[12px] font-normal text-[#6c6c70] leading-[18px] mt-1.5 whitespace-pre-line break-words">
+                                                            {item.description}
+                                                        </p>
+                                                    </div>
+                                                </div>
+
+                                                {/* Nominal with Superscript Cents */}
+                                                <div
+                                                    className={`text-[16px] font-bold shrink-0 text-right whitespace-nowrap tracking-tight ${
+                                                        item.type === 'income' ? 'text-[#16a34a]' : 'text-[#1c1c1e]'
+                                                    }`}
+                                                >
+                                                    <span>
+                                                        {item.type === 'income' ? '+ IDR ' : '- IDR '}
+                                                        {item.amount.toLocaleString('id-ID')}
+                                                    </span>
+                                                    <sup className="text-[10px] font-bold align-top relative -top-1.5 ml-0.5">
+                                                        {item.cents || '00'}
+                                                    </sup>
                                                 </div>
                                             </div>
-
-                                            {/* Nominal with Superscript Cents */}
-                                            <div
-                                                className={`text-[16.5px] font-bold shrink-0 text-right whitespace-nowrap tracking-tight ${
-                                                    item.type === 'income' ? 'text-[#16a34a]' : 'text-[#111111]'
-                                                }`}
-                                            >
-                                                <span>
-                                                    {item.type === 'income' ? '+ IDR ' : '- IDR '}
-                                                    {item.amount.toLocaleString('id-ID')}
-                                                </span>
-                                                <sup className="text-[10px] font-bold align-top relative -top-1.5 ml-[1px]">
-                                                    {item.cents}
-                                                </sup>
-                                            </div>
-                                        </div>
-                                    ))}
+                                        );
+                                    })}
                                 </div>
                             </div>
                         ))}
@@ -617,14 +684,13 @@ export const CleanModeMandiri: React.FC = () => {
                     )}
                 </AnimatePresence>
 
-                {/* Statement Modal */}
+                {/* Statement / Mutation Customizer Modal */}
                 <MandiriStatementModal
                     isOpen={isStatementOpen}
                     onClose={() => setIsStatementOpen(false)}
-                    accountNumber={accountNumber}
-                    accountName={accountName}
-                    currentBalance={balance}
-                    selectedMonth={`${selectedMonth} 2026`}
+                    mutations={mutations}
+                    onSave={handleSaveMutations}
+                    selectedMonth={selectedMonth}
                 />
 
                 {/* Settings Modal */}
