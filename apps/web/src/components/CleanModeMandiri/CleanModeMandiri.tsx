@@ -208,7 +208,7 @@ export const CleanModeMandiri: React.FC = () => {
             style={{ fontFamily: "'LivinFont', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', sans-serif" }}
         >
             {/* Main Phone Viewport Container (Dynamic 100dvh to match phone screen exactly) */}
-            <div className="w-full max-w-[430px] h-[100dvh] relative bg-[#439fe3] overflow-hidden flex flex-col shadow-2xl">
+            <div className="w-full max-w-[430px] h-[100dvh] relative bg-[#4ba4e3] overflow-hidden flex flex-col shadow-2xl">
                 
                 {/* Background Image: Authentic Native Livin' Mandiri Fluid Wave Motif */}
                 <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
@@ -248,7 +248,11 @@ export const CleanModeMandiri: React.FC = () => {
                             className="absolute right-1 top-1 w-8 h-8 flex items-center justify-center text-white hover:bg-white/10 active:scale-95 rounded-full transition-all"
                             aria-label="Pengaturan Clean Mode Mandiri"
                         >
-                            <Settings className="w-[22px] h-[22px] stroke-[2.2]" />
+                            <img
+                                src="/clean-mode-mandiri/mandiri_icon_settings.png"
+                                alt="Pengaturan"
+                                className="w-[22px] h-[22px] object-contain select-none pointer-events-none"
+                            />
                         </button>
                     </div>
 
