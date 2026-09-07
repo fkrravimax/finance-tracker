@@ -269,20 +269,20 @@ export const CleanModeMandiri: React.FC = () => {
     return (
         <div className="min-h-screen w-full bg-[#1b4b72] flex justify-center items-start select-none font-sans overflow-hidden">
             {/* Main Phone Viewport Container (Dynamic 100dvh to match phone screen exactly) */}
-            <div className="w-full max-w-[430px] h-[100dvh] relative bg-gradient-to-b from-[#2b8bdc] via-[#3594e2] to-[#1c6eb5] overflow-hidden flex flex-col shadow-2xl">
+            <div className="w-full max-w-[430px] h-[100dvh] relative bg-gradient-to-b from-[#52a7e5] via-[#439fe3] to-[#3896df] overflow-hidden flex flex-col shadow-2xl">
                 
                 {/* Background Subtle Organic Wave Curves */}
                 <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
-                    <svg className="absolute w-full h-[500px] top-0 left-0 opacity-25" viewBox="0 0 430 500" fill="none" preserveAspectRatio="none">
-                        <path d="M-50 180 C 120 160, 240 280, 480 200 L 480 0 L -50 0 Z" fill="url(#waveGrad1)" />
-                        <path d="M-50 260 C 140 220, 280 370, 480 280 L 480 0 L -50 0 Z" fill="url(#waveGrad2)" />
+                    <svg className="absolute w-full h-[500px] top-0 left-0 opacity-20" viewBox="0 0 430 500" fill="none" preserveAspectRatio="none">
+                        <path d="M-40 210 C 110 180, 230 310, 470 230 L 470 0 L -40 0 Z" fill="url(#waveGrad1)" />
+                        <path d="M-40 290 C 130 240, 270 400, 470 300 L 470 0 L -40 0 Z" fill="url(#waveGrad2)" />
                         <defs>
                             <linearGradient id="waveGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
                                 <stop offset="0%" stopColor="#ffffff" stopOpacity="0.4" />
                                 <stop offset="100%" stopColor="#ffffff" stopOpacity="0.05" />
                             </linearGradient>
                             <linearGradient id="waveGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" stopColor="#ffffff" stopOpacity="0.25" />
+                                <stop offset="0%" stopColor="#ffffff" stopOpacity="0.3" />
                                 <stop offset="100%" stopColor="#ffffff" stopOpacity="0.0" />
                             </linearGradient>
                         </defs>
@@ -290,7 +290,7 @@ export const CleanModeMandiri: React.FC = () => {
                 </div>
 
                 {/* Hero Section Container (Occupies exactly top 50% of the screen) */}
-                <div className="relative z-10 w-full h-[50%] flex flex-col items-center pt-[max(env(safe-area-inset-top),52px)] px-5">
+                <div className="relative z-10 w-full h-[50%] flex flex-col items-center pt-[max(calc(env(safe-area-inset-top)+32px),82px)] px-5">
                     
                     {/* Top Bar: Back Arrow, Miniature Card, Settings Gear */}
                     <div className="w-full flex items-center justify-between">
@@ -300,7 +300,7 @@ export const CleanModeMandiri: React.FC = () => {
                             className="w-8 h-8 flex items-center justify-center text-white hover:bg-white/10 active:scale-95 rounded-full transition-all"
                             aria-label="Kembali"
                         >
-                            <ArrowLeft className="w-[22px] h-[22px] stroke-[2.2]" />
+                            <ArrowLeft className="w-[22px] h-[22px] stroke-[2.4]" />
                         </button>
 
                         {/* Centered Miniature Mandiri Debit Platinum Batik Card */}
@@ -308,7 +308,7 @@ export const CleanModeMandiri: React.FC = () => {
                             <img
                                 src="/clean-mode-mandiri/mandiri_card_batik.png"
                                 alt="Kartu Mandiri Debit Platinum"
-                                className="w-[74px] h-[46px] object-cover rounded-[5px] shadow-md border border-white/20"
+                                className="w-[82px] h-[52px] object-cover rounded-[6px] shadow-[0_4px_12px_rgba(0,0,0,0.18)] border border-white/20"
                             />
                         </div>
 
@@ -318,26 +318,26 @@ export const CleanModeMandiri: React.FC = () => {
                             className="w-8 h-8 flex items-center justify-center text-white hover:bg-white/10 active:scale-95 rounded-full transition-all"
                             aria-label="Pengaturan Clean Mode Mandiri"
                         >
-                            <Settings className="w-[22px] h-[22px] stroke-[2.2]" />
+                            <Settings className="w-[22px] h-[22px] stroke-[2]" />
                         </button>
                     </div>
 
                     {/* Account Name & Number with tight natural spacing */}
-                    <div className="flex flex-col items-center text-center mt-3.5">
-                        <h1 className="text-white text-[16px] font-bold tracking-tight">
+                    <div className="flex flex-col items-center text-center mt-[15px]">
+                        <h1 className="text-white text-[17px] font-bold tracking-tight">
                             {accountName}
                         </h1>
 
                         <button
                             onClick={handleCopyAccountNumber}
-                            className="mt-1 flex items-center gap-1.5 text-white/95 text-[13.5px] hover:text-white transition-opacity active:opacity-75"
+                            className="mt-[7px] flex items-center gap-1.5 text-white/95 text-[13.5px] hover:text-white transition-opacity active:opacity-75"
                             title="Salin nomor rekening"
                         >
-                            <span className="tracking-wider font-normal">{accountNumber}</span>
+                            <span className="tracking-[0.05em] font-normal">{accountNumber}</span>
                             {copied ? (
                                 <Check className="w-3.5 h-3.5 text-emerald-300" />
                             ) : (
-                                <svg className="w-3.5 h-3.5 text-white fill-none stroke-current stroke-[2]" viewBox="0 0 24 24">
+                                <svg className="w-3.5 h-3.5 text-white fill-none stroke-current stroke-[2.2]" viewBox="0 0 24 24">
                                     <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
                                     <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
                                 </svg>
@@ -345,15 +345,15 @@ export const CleanModeMandiri: React.FC = () => {
                         </button>
 
                         {/* Main Balance with Superscript Cents */}
-                        <div className="mt-3 flex items-center justify-center">
+                        <div className="mt-[28px] flex items-center justify-center">
                             {isMasked ? (
-                                <span className="text-white text-[24px] font-bold tracking-widest">
+                                <span className="text-white text-[26px] font-bold tracking-widest">
                                     Rp ••••••••••
                                 </span>
                             ) : (
-                                <div className="text-white text-[24px] font-bold tracking-tight flex items-baseline">
+                                <div className="text-white text-[26px] font-bold tracking-tight flex items-baseline">
                                     <span>Rp {formattedInt}</span>
-                                    <sup className="text-[14px] font-bold align-super ml-0.5 tracking-normal">
+                                    <sup className="text-[14.5px] font-bold align-super ml-0.5 tracking-normal">
                                         {cents}
                                     </sup>
                                 </div>
@@ -372,18 +372,18 @@ export const CleanModeMandiri: React.FC = () => {
                     </div>
 
                     {/* 4 Quick Action Buttons */}
-                    <div className="w-full grid grid-cols-4 gap-2 mt-4 pb-2">
+                    <div className="w-full grid grid-cols-4 gap-2 mt-[32px]">
                         {/* Action 1: Transfer Rupiah */}
                         <div className="flex flex-col items-center">
-                            <button className="w-[62px] h-[62px] rounded-full bg-white shadow-[0_4px_14px_rgba(0,0,0,0.08)] flex items-center justify-center active:scale-95 transition-transform hover:shadow-lg">
+                            <button className="w-[66px] h-[66px] rounded-full bg-white shadow-[0_4px_14px_rgba(0,0,0,0.09)] flex items-center justify-center active:scale-95 transition-transform hover:shadow-lg">
                                 <img
                                     src="/clean-mode-mandiri/mandiri_action_transfer.png"
                                     alt="Transfer Rupiah"
-                                    className="w-[34px] h-[34px] object-contain"
+                                    className="w-[35px] h-[35px] object-contain"
                                 />
                             </button>
-                            <div className="mt-2 h-[28px] flex flex-col items-center justify-start">
-                                <span className="text-white text-[11.5px] font-medium leading-[13px] text-center whitespace-pre-line">
+                            <div className="mt-2 h-[30px] flex flex-col items-center justify-start">
+                                <span className="text-white text-[11.5px] font-medium leading-[14px] text-center whitespace-pre-line">
                                     {'Transfer\nRupiah'}
                                 </span>
                             </div>
@@ -391,15 +391,15 @@ export const CleanModeMandiri: React.FC = () => {
 
                         {/* Action 2: Bayar/VA */}
                         <div className="flex flex-col items-center">
-                            <button className="w-[62px] h-[62px] rounded-full bg-white shadow-[0_4px_14px_rgba(0,0,0,0.08)] flex items-center justify-center active:scale-95 transition-transform hover:shadow-lg">
+                            <button className="w-[66px] h-[66px] rounded-full bg-white shadow-[0_4px_14px_rgba(0,0,0,0.09)] flex items-center justify-center active:scale-95 transition-transform hover:shadow-lg">
                                 <img
                                     src="/clean-mode-mandiri/mandiri_action_bayar.png"
                                     alt="Bayar/VA"
-                                    className="w-[34px] h-[34px] object-contain"
+                                    className="w-[35px] h-[35px] object-contain"
                                 />
                             </button>
-                            <div className="mt-2 h-[28px] flex flex-col items-center justify-start">
-                                <span className="text-white text-[11.5px] font-medium leading-[13px] text-center">
+                            <div className="mt-2 h-[30px] flex flex-col items-center justify-start">
+                                <span className="text-white text-[11.5px] font-medium leading-[14px] text-center">
                                     Bayar/VA
                                 </span>
                             </div>
@@ -407,15 +407,15 @@ export const CleanModeMandiri: React.FC = () => {
 
                         {/* Action 3: Top-up */}
                         <div className="flex flex-col items-center">
-                            <button className="w-[62px] h-[62px] rounded-full bg-white shadow-[0_4px_14px_rgba(0,0,0,0.08)] flex items-center justify-center active:scale-95 transition-transform hover:shadow-lg">
+                            <button className="w-[66px] h-[66px] rounded-full bg-white shadow-[0_4px_14px_rgba(0,0,0,0.09)] flex items-center justify-center active:scale-95 transition-transform hover:shadow-lg">
                                 <img
                                     src="/clean-mode-mandiri/mandiri_action_topup.png"
                                     alt="Top-up"
-                                    className="w-[34px] h-[34px] object-contain"
+                                    className="w-[35px] h-[35px] object-contain"
                                 />
                             </button>
-                            <div className="mt-2 h-[28px] flex flex-col items-center justify-start">
-                                <span className="text-white text-[11.5px] font-medium leading-[13px] text-center">
+                            <div className="mt-2 h-[30px] flex flex-col items-center justify-start">
+                                <span className="text-white text-[11.5px] font-medium leading-[14px] text-center">
                                     Top-up
                                 </span>
                             </div>
@@ -423,15 +423,15 @@ export const CleanModeMandiri: React.FC = () => {
 
                         {/* Action 4: Kartu Fisik/Virtual */}
                         <div className="flex flex-col items-center">
-                            <button className="w-[62px] h-[62px] rounded-full bg-white shadow-[0_4px_14px_rgba(0,0,0,0.08)] flex items-center justify-center active:scale-95 transition-transform hover:shadow-lg">
+                            <button className="w-[66px] h-[66px] rounded-full bg-white shadow-[0_4px_14px_rgba(0,0,0,0.09)] flex items-center justify-center active:scale-95 transition-transform hover:shadow-lg">
                                 <img
                                     src="/clean-mode-mandiri/mandiri_action_card.png"
                                     alt="Kartu Fisik/Virtual"
-                                    className="w-[34px] h-[34px] object-contain"
+                                    className="w-[35px] h-[35px] object-contain"
                                 />
                             </button>
-                            <div className="mt-2 h-[28px] flex flex-col items-center justify-start">
-                                <span className="text-white text-[11.5px] font-medium leading-[13px] text-center whitespace-pre-line">
+                            <div className="mt-2 h-[30px] flex flex-col items-center justify-start">
+                                <span className="text-white text-[11.5px] font-medium leading-[14px] text-center whitespace-pre-line">
                                     {'Kartu Fisik/\nVirtual'}
                                 </span>
                             </div>
@@ -451,7 +451,7 @@ export const CleanModeMandiri: React.FC = () => {
                         onClick={() => setIsSheetExpanded(!isSheetExpanded)}
                         className="w-full pt-2.5 pb-2 cursor-pointer flex justify-center items-center shrink-0"
                     >
-                        <div className="w-12 h-[3.5px] rounded-full bg-[#525b68]" />
+                        <div className="w-11 h-[3.5px] rounded-full bg-[#cbd5e1]" />
                     </div>
 
                     {/* Sheet Header: Transaksi & e-Statement */}
@@ -469,10 +469,10 @@ export const CleanModeMandiri: React.FC = () => {
 
                     {/* Month Carousel & Utility Tools */}
                     <div className="px-5 pb-2 flex items-center justify-between border-b border-gray-100 shrink-0">
-                        {/* Horizontal Months (Right-aligned with space-x-10 so only 2.5-3 months are visible) */}
+                        {/* Horizontal Months (Right-aligned with space-x-12 so only 2.5-3 months are visible) */}
                         <div
                             ref={monthScrollRef}
-                            className="flex items-center space-x-10 overflow-x-auto no-scrollbar py-1"
+                            className="flex items-center space-x-12 overflow-x-auto no-scrollbar py-1"
                         >
                             {months.map(m => {
                                 const isActive = selectedMonth.toLowerCase() === m.toLowerCase();
@@ -537,7 +537,7 @@ export const CleanModeMandiri: React.FC = () => {
                                 {/* Items under this date */}
                                 <div className="divide-y divide-gray-100">
                                     {group.items.map(item => (
-                                        <div key={item.id} className="flex items-start justify-between gap-3 px-5 py-4">
+                                        <div key={item.id} className="flex items-start justify-between gap-3 px-5 py-[18px]">
                                             {/* Icon + Details */}
                                             <div className="flex items-start gap-3.5 flex-1 min-w-0">
                                                 <img
