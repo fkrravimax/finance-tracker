@@ -21,6 +21,7 @@ const NotificationsPage = lazy(() => import('./components/NotificationsPage'));
 const SplitBill = lazy(() => import('./components/SplitBill'));
 const PrivacyPolicy = lazy(() => import('./components/PrivacyPolicy'));
 const CleanMode = lazy(() => import('./components/CleanMode/CleanMode'));
+const CleanModeMandiri = lazy(() => import('./components/CleanModeMandiri/CleanModeMandiri'));
 
 // Suspense fallback shared across all lazy routes
 const PageLoader = () => (
@@ -120,6 +121,15 @@ function App() {
             return <Navigate to="/dashboard" replace />;
         }
         return <Suspense fallback={<PageLoader />}><CleanMode /></Suspense>;
+    }
+
+    // Allow standalone Clean Mode Mandiri (1:1 Livin' by Mandiri camouflage mode) - ADMIN ONLY
+    if (location.pathname === '/clean-mode-mandiri') {
+        const currentUser = authService.getCurrentUser();
+        if (!isAuthenticated || !currentUser || currentUser.role !== 'ADMIN') {
+            return <Navigate to="/dashboard" replace />;
+        }
+        return <Suspense fallback={<PageLoader />}><CleanModeMandiri /></Suspense>;
     }
 
     // Show Landing Page first if not authenticated and not in auth mode
