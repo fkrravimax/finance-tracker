@@ -267,7 +267,10 @@ export const CleanModeMandiri: React.FC = () => {
     const months = ['Mei', 'Juni', 'Juli', 'Agustus', 'September'];
 
     return (
-        <div className="min-h-screen w-full bg-[#1b4b72] flex justify-center items-start select-none font-sans overflow-hidden">
+        <div 
+            className="min-h-screen w-full bg-[#1b4b72] flex justify-center items-start select-none overflow-hidden"
+            style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Plus Jakarta Sans", "Helvetica Neue", sans-serif' }}
+        >
             {/* Main Phone Viewport Container (Dynamic 100dvh to match phone screen exactly) */}
             <div className="w-full max-w-[430px] h-[100dvh] relative bg-gradient-to-b from-[#52a7e5] via-[#439fe3] to-[#3896df] overflow-hidden flex flex-col shadow-2xl">
                 
@@ -333,6 +336,7 @@ export const CleanModeMandiri: React.FC = () => {
                         <button
                             onClick={handleCopyAccountNumber}
                             className="mt-[3px] flex items-center justify-center text-white text-[15.5px] font-normal tracking-[0.04em] hover:text-white/90 transition-opacity active:opacity-75"
+                            style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Plus Jakarta Sans", sans-serif' }}
                             title="Salin nomor rekening"
                         >
                             <span>{accountNumber}</span>
@@ -350,13 +354,13 @@ export const CleanModeMandiri: React.FC = () => {
                         {/* Main Balance with Superscript Cents */}
                         <div className="mt-[11px] flex items-center justify-center">
                             {isMasked ? (
-                                <span className="text-white text-[27px] font-bold tracking-widest">
+                                <span className="text-white text-[23.5px] font-bold tracking-widest">
                                     Rp ••••••••••
                                 </span>
                             ) : (
-                                <div className="text-white text-[27px] font-bold tracking-tight flex items-baseline">
+                                <div className="text-white text-[23.5px] font-bold tracking-tight flex items-baseline">
                                     <span>Rp {formattedInt}</span>
-                                    <sup className="text-[14.5px] font-bold align-top relative -top-1 ml-0.5 tracking-normal">
+                                    <sup className="text-[13.5px] font-bold align-top relative -top-1 ml-0.5 tracking-normal">
                                         {cents}
                                     </sup>
                                 </div>
