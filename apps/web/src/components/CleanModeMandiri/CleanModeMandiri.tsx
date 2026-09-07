@@ -465,13 +465,13 @@ export const CleanModeMandiri: React.FC = () => {
                     {/* Drag Handle Bar (Calibrated 44px x 4.5px dark pill) */}
                     <div
                         onClick={() => setIsSheetExpanded(!isSheetExpanded)}
-                        className="w-full pt-[13px] pb-[10px] cursor-pointer flex justify-center items-center shrink-0"
+                        className="w-full pt-[16px] pb-[12px] cursor-pointer flex justify-center items-center shrink-0"
                     >
                         <div className="w-[44px] h-[4.5px] rounded-full bg-[#5f5959]" />
                     </div>
 
                     {/* Sheet Header: Transaksi & e-Statement */}
-                    <div className="px-5 pt-0.5 pb-3 flex items-center justify-between shrink-0">
+                    <div className="px-5 pt-1 pb-3.5 flex items-center justify-between shrink-0">
                         <h2 className="text-[17px] font-semibold text-[#1e1e1e] tracking-[-0.01em]">
                             Transaksi
                         </h2>
@@ -484,11 +484,11 @@ export const CleanModeMandiri: React.FC = () => {
                     </div>
 
                     {/* Month Carousel & Utility Tools Bar */}
-                    <div className="h-[46px] border-b border-[#ededed] flex items-center justify-between shrink-0 pl-5 pr-4">
-                        {/* Horizontal Months (Right-aligned so active month 'September' sits next to utilities) */}
+                    <div className="h-[48px] border-b border-[#ededed] flex items-center justify-between shrink-0 pl-5 pr-4">
+                        {/* Horizontal Months (Right-aligned with wide gap-38px so only 'Agustus', 'September' and cut-off 'Juli' are visible) */}
                         <div
                             ref={monthScrollRef}
-                            className="h-full flex items-center space-x-7 overflow-x-auto no-scrollbar"
+                            className="h-full flex items-center space-x-[38px] overflow-x-auto no-scrollbar"
                         >
                             {months.map(m => {
                                 const isActive = selectedMonth.toLowerCase() === m.toLowerCase();
@@ -499,7 +499,7 @@ export const CleanModeMandiri: React.FC = () => {
                                             setSelectedMonth(m);
                                             localStorage.setItem('mandiri_clean_mode_selected_month', m);
                                         }}
-                                        className={`relative h-full flex items-center px-1 text-[15px] whitespace-nowrap transition-colors ${
+                                        className={`relative h-full flex items-center px-1 text-[15px] whitespace-nowrap transition-colors shrink-0 ${
                                             isActive
                                                 ? 'font-semibold text-[#111111]'
                                                 : 'font-normal text-[#757575] hover:text-[#333333]'
@@ -550,19 +550,19 @@ export const CleanModeMandiri: React.FC = () => {
                         </div>
                     </div>
 
-                    {/* Transactions Feed List (Calibrated row height so exactly 2 transactions fit in the initial fold) */}
+                    {/* Transactions Feed List (Calibrated row height so exactly 2 transactions fit above the initial fold) */}
                     <div className="flex-1 overflow-y-auto no-scrollbar pb-16">
                         {DEFAULT_TRANSACTIONS.map(group => (
                             <div key={group.date}>
                                 {/* Date Section Header */}
-                                <div className="text-[13px] font-medium text-[#7c7c80] pt-[16px] pb-[8px] px-5 tracking-tight">
+                                <div className="text-[13px] font-medium text-[#7c7c80] pt-[22px] pb-[10px] px-5 tracking-tight">
                                     {group.date}
                                 </div>
 
                                 {/* Items under this date */}
                                 <div className="divide-y divide-[#f4f4f4]">
                                     {group.items.map(item => (
-                                        <div key={item.id} className="flex items-start justify-between gap-3 px-5 py-[19px]">
+                                        <div key={item.id} className="flex items-start justify-between gap-3 px-5 py-[23px]">
                                             {/* Icon + Details */}
                                             <div className="flex items-start gap-3.5 flex-1 min-w-0">
                                                 <img
@@ -574,7 +574,7 @@ export const CleanModeMandiri: React.FC = () => {
                                                     <h3 className="text-[15.5px] font-bold text-[#111111] leading-snug">
                                                         {item.title}
                                                     </h3>
-                                                    <p className="text-[12px] font-normal text-[#5c5c60] leading-[17px] mt-1 whitespace-pre-line break-words">
+                                                    <p className="text-[12px] font-normal text-[#5c5c60] leading-[18px] mt-1.5 whitespace-pre-line break-words">
                                                         {item.description}
                                                     </p>
                                                 </div>
