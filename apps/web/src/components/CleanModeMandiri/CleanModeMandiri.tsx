@@ -290,7 +290,7 @@ export const CleanModeMandiri: React.FC = () => {
                 </div>
 
                 {/* Hero Section Container (Occupies exactly top 50% of the screen) */}
-                <div className="relative z-10 w-full h-[50%] flex flex-col justify-between pt-[max(env(safe-area-inset-top),38px)] pb-3 px-5">
+                <div className="relative z-10 w-full h-[50%] flex flex-col items-center pt-[max(env(safe-area-inset-top),52px)] px-5">
                     
                     {/* Top Bar: Back Arrow, Miniature Card, Settings Gear */}
                     <div className="w-full flex items-center justify-between">
@@ -322,8 +322,8 @@ export const CleanModeMandiri: React.FC = () => {
                         </button>
                     </div>
 
-                    {/* Account Name & Number */}
-                    <div className="flex flex-col items-center text-center -mt-1">
+                    {/* Account Name & Number with tight natural spacing */}
+                    <div className="flex flex-col items-center text-center mt-3.5">
                         <h1 className="text-white text-[16px] font-bold tracking-tight">
                             {accountName}
                         </h1>
@@ -345,7 +345,7 @@ export const CleanModeMandiri: React.FC = () => {
                         </button>
 
                         {/* Main Balance with Superscript Cents */}
-                        <div className="mt-2.5 flex items-center justify-center">
+                        <div className="mt-3 flex items-center justify-center">
                             {isMasked ? (
                                 <span className="text-white text-[24px] font-bold tracking-widest">
                                     Rp ••••••••••
@@ -372,61 +372,69 @@ export const CleanModeMandiri: React.FC = () => {
                     </div>
 
                     {/* 4 Quick Action Buttons */}
-                    <div className="w-full grid grid-cols-4 gap-2 pt-1 pb-1">
+                    <div className="w-full grid grid-cols-4 gap-2 mt-4 pb-2">
                         {/* Action 1: Transfer Rupiah */}
                         <div className="flex flex-col items-center">
-                            <button className="w-[60px] h-[60px] rounded-full bg-white shadow-[0_4px_14px_rgba(0,0,0,0.08)] flex items-center justify-center active:scale-95 transition-transform hover:shadow-lg">
+                            <button className="w-[62px] h-[62px] rounded-full bg-white shadow-[0_4px_14px_rgba(0,0,0,0.08)] flex items-center justify-center active:scale-95 transition-transform hover:shadow-lg">
                                 <img
                                     src="/clean-mode-mandiri/mandiri_action_transfer.png"
                                     alt="Transfer Rupiah"
                                     className="w-[34px] h-[34px] object-contain"
                                 />
                             </button>
-                            <span className="mt-1.5 text-white text-[11.5px] font-medium leading-[13px] text-center whitespace-pre-line">
-                                {'Transfer\nRupiah'}
-                            </span>
+                            <div className="mt-2 h-[28px] flex flex-col items-center justify-start">
+                                <span className="text-white text-[11.5px] font-medium leading-[13px] text-center whitespace-pre-line">
+                                    {'Transfer\nRupiah'}
+                                </span>
+                            </div>
                         </div>
 
                         {/* Action 2: Bayar/VA */}
                         <div className="flex flex-col items-center">
-                            <button className="w-[60px] h-[60px] rounded-full bg-white shadow-[0_4px_14px_rgba(0,0,0,0.08)] flex items-center justify-center active:scale-95 transition-transform hover:shadow-lg">
+                            <button className="w-[62px] h-[62px] rounded-full bg-white shadow-[0_4px_14px_rgba(0,0,0,0.08)] flex items-center justify-center active:scale-95 transition-transform hover:shadow-lg">
                                 <img
                                     src="/clean-mode-mandiri/mandiri_action_bayar.png"
                                     alt="Bayar/VA"
                                     className="w-[34px] h-[34px] object-contain"
                                 />
                             </button>
-                            <span className="mt-1.5 text-white text-[11.5px] font-medium leading-[13px] text-center">
-                                Bayar/VA
-                            </span>
+                            <div className="mt-2 h-[28px] flex flex-col items-center justify-start">
+                                <span className="text-white text-[11.5px] font-medium leading-[13px] text-center">
+                                    Bayar/VA
+                                </span>
+                            </div>
                         </div>
 
                         {/* Action 3: Top-up */}
                         <div className="flex flex-col items-center">
-                            <button className="w-[60px] h-[60px] rounded-full bg-white shadow-[0_4px_14px_rgba(0,0,0,0.08)] flex items-center justify-center active:scale-95 transition-transform hover:shadow-lg">
+                            <button className="w-[62px] h-[62px] rounded-full bg-white shadow-[0_4px_14px_rgba(0,0,0,0.08)] flex items-center justify-center active:scale-95 transition-transform hover:shadow-lg">
                                 <img
                                     src="/clean-mode-mandiri/mandiri_action_topup.png"
                                     alt="Top-up"
                                     className="w-[34px] h-[34px] object-contain"
                                 />
                             </button>
-                            <span className="mt-1.5 text-white text-[11.5px] font-medium leading-[13px] text-center">
-                                Top-up
-                            </span>
+                            <div className="mt-2 h-[28px] flex flex-col items-center justify-start">
+                                <span className="text-white text-[11.5px] font-medium leading-[13px] text-center">
+                                    Top-up
+                                </span>
+                            </div>
                         </div>
 
                         {/* Action 4: Kartu Fisik/Virtual */}
                         <div className="flex flex-col items-center">
-                            <button className="w-[60px] h-[60px] rounded-full bg-white shadow-[0_4px_14px_rgba(0,0,0,0.08)] flex items-center justify-center active:scale-95 transition-transform hover:shadow-lg">
+                            <button className="w-[62px] h-[62px] rounded-full bg-white shadow-[0_4px_14px_rgba(0,0,0,0.08)] flex items-center justify-center active:scale-95 transition-transform hover:shadow-lg">
                                 <img
                                     src="/clean-mode-mandiri/mandiri_action_card.png"
                                     alt="Kartu Fisik/Virtual"
                                     className="w-[34px] h-[34px] object-contain"
                                 />
                             </button>
-                            <span className="mt-1.5 text-white text-[11.5px] font-medium leading-[13px] text-center whitespace-pre-line">
-                                {'Kartu Fisik/\nVirtual'}
-                            </span>
+                            <div className="mt-2 h-[28px] flex flex-col items-center justify-start">
+                                <span className="text-white text-[11.5px] font-medium leading-[13px] text-center whitespace-pre-line">
+                                    {'Kartu Fisik/\nVirtual'}
+                                </span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -461,10 +469,10 @@ export const CleanModeMandiri: React.FC = () => {
 
                     {/* Month Carousel & Utility Tools */}
                     <div className="px-5 pb-2 flex items-center justify-between border-b border-gray-100 shrink-0">
-                        {/* Horizontal Months (Right-aligned so September is active and 2.5 months are visible) */}
+                        {/* Horizontal Months (Right-aligned with space-x-10 so only 2.5-3 months are visible) */}
                         <div
                             ref={monthScrollRef}
-                            className="flex items-center space-x-7 overflow-x-auto no-scrollbar py-1"
+                            className="flex items-center space-x-10 overflow-x-auto no-scrollbar py-1"
                         >
                             {months.map(m => {
                                 const isActive = selectedMonth.toLowerCase() === m.toLowerCase();
@@ -517,19 +525,19 @@ export const CleanModeMandiri: React.FC = () => {
                         </div>
                     </div>
 
-                    {/* Transactions Feed List (Spaced so exactly 2 transactions fit on screen) */}
-                    <div className="flex-1 overflow-y-auto px-5 divide-y divide-gray-100 pb-16">
+                    {/* Transactions Feed List (Generous spacing: exactly 2 transactions fit on screen) */}
+                    <div className="flex-1 overflow-y-auto divide-y divide-gray-100 pb-16">
                         {DEFAULT_TRANSACTIONS.map(group => (
-                            <div key={group.date} className="py-2.5">
+                            <div key={group.date} className="pt-2">
                                 {/* Date Header */}
-                                <div className="text-[12.5px] font-normal text-[#8c94a0] pb-2 pt-1">
+                                <div className="text-[12.5px] font-normal text-[#8c94a0] pb-2 pt-1 px-5">
                                     {group.date}
                                 </div>
 
                                 {/* Items under this date */}
-                                <div className="space-y-4">
+                                <div className="divide-y divide-gray-100">
                                     {group.items.map(item => (
-                                        <div key={item.id} className="flex items-start justify-between gap-3 pt-1.5 pb-1">
+                                        <div key={item.id} className="flex items-start justify-between gap-3 px-5 py-4">
                                             {/* Icon + Details */}
                                             <div className="flex items-start gap-3.5 flex-1 min-w-0">
                                                 <img
@@ -541,7 +549,7 @@ export const CleanModeMandiri: React.FC = () => {
                                                     <h3 className="text-[15px] font-bold text-[#1e293b] leading-tight">
                                                         {item.title}
                                                     </h3>
-                                                    <p className="text-[12px] text-[#718096] leading-[1.35] mt-1 whitespace-pre-line break-words">
+                                                    <p className="text-[12px] text-[#718096] leading-[1.38] mt-1 whitespace-pre-line break-words">
                                                         {item.description}
                                                     </p>
                                                 </div>
