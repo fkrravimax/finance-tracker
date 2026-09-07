@@ -257,7 +257,7 @@ export const CleanModeMandiri: React.FC = () => {
                     </div>
 
                     {/* Account Name & Number with tight natural spacing */}
-                    <div className="flex flex-col items-center text-center mt-[10px]">
+                    <div className="w-full flex flex-col items-center text-center mt-[10px]">
                         <h1 
                             className="text-white text-[19.5px] font-semibold tracking-[0.01em]"
                             style={{ fontFamily: "'LivinFont', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif" }}
@@ -265,54 +265,70 @@ export const CleanModeMandiri: React.FC = () => {
                             {accountName}
                         </h1>
 
+                        {/* Account Number with Native Livin' Copy Icon */}
                         <button
                             onClick={handleCopyAccountNumber}
                             className="mt-[3px] flex items-center justify-center text-white text-[15.5px] font-normal tracking-[0.04em] hover:text-white/90 transition-opacity active:opacity-75"
                             style={{ fontFamily: "'LivinFont', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', sans-serif" }}
                             title="Salin nomor rekening"
                         >
-                            <span style={{ fontFamily: "'LivinFont', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', sans-serif" }}>{accountNumber}</span>
+                            <span style={{ fontFamily: "'LivinFont', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', sans-serif" }}>
+                                {accountNumber}
+                            </span>
                             {copied ? (
-                                <Check className="w-[19px] h-[19px] text-emerald-300 ml-2.5 inline-block" />
+                                <Check className="w-[18px] h-[18px] text-emerald-300 ml-2" />
                             ) : (
                                 <img
                                     src="/clean-mode-mandiri/mandiri_icon_copy.png"
                                     alt="Salin nomor rekening"
-                                    className="w-[19px] h-[21px] object-contain ml-2.5 inline-block"
+                                    className="w-[18px] h-[20px] object-contain ml-2 select-none pointer-events-none"
                                 />
                             )}
                         </button>
 
-                        {/* Main Balance with Superscript Cents */}
-                        <div className="mt-[11px] flex items-center justify-center">
-                            {isMasked ? (
-                                <span 
-                                    className="text-white text-[23.5px] font-bold tracking-widest"
-                                    style={{ fontFamily: "'LivinFont', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif" }}
+                        {/* Main Balance: Centered perfectly on screen, eye toggle anchored to the right outside document flow */}
+                        <div className="mt-[11px] relative flex items-center justify-center">
+                            <div className="relative inline-flex items-baseline">
+                                {isMasked ? (
+                                    <span 
+                                        className="text-white text-[23.5px] font-bold tracking-widest cursor-pointer select-none"
+                                        onClick={() => {
+                                            const next = !isMasked;
+                                            setIsMasked(next);
+                                            localStorage.setItem('mandiri_clean_mode_balance_masked', String(next));
+                                        }}
+                                        style={{ fontFamily: "'LivinFont', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif" }}
+                                    >
+                                        Rp ••••••••••
+                                    </span>
+                                ) : (
+                                    <div 
+                                        className="text-white text-[23.5px] font-bold tracking-tight flex items-baseline cursor-pointer select-none"
+                                        onClick={() => {
+                                            const next = !isMasked;
+                                            setIsMasked(next);
+                                            localStorage.setItem('mandiri_clean_mode_balance_masked', String(next));
+                                        }}
+                                        style={{ fontFamily: "'LivinFont', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif" }}
+                                    >
+                                        <span>Rp {formattedInt}</span>
+                                        <sup className="text-[13.5px] font-bold align-top relative -top-1 ml-0.5 tracking-normal">
+                                            {cents}
+                                        </sup>
+                                    </div>
+                                )}
+                                <button
+                                    onClick={() => {
+                                        const next = !isMasked;
+                                        setIsMasked(next);
+                                        localStorage.setItem('mandiri_clean_mode_balance_masked', String(next));
+                                    }}
+                                    className="absolute left-full ml-2 text-white/80 hover:text-white transition-opacity active:scale-95 flex items-center top-1/2 -translate-y-1/2"
+                                    title={isMasked ? "Tampilkan saldo" : "Sembunyikan saldo"}
                                 >
-                                    Rp ••••••••••
-                                </span>
-                            ) : (
-                                <div 
-                                    className="text-white text-[23.5px] font-bold tracking-tight flex items-baseline"
-                                    style={{ fontFamily: "'LivinFont', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif" }}
-                                >
-                                    <span>Rp {formattedInt}</span>
-                                    <sup className="text-[13.5px] font-bold align-top relative -top-1 ml-0.5 tracking-normal">
-                                        {cents}
-                                    </sup>
-                                </div>
-                            )}
-                            <button
-                                onClick={() => {
-                                    const next = !isMasked;
-                                    setIsMasked(next);
-                                    localStorage.setItem('mandiri_clean_mode_balance_masked', String(next));
-                                }}
-                                className="ml-2 text-white/80 hover:text-white transition-colors"
-                            >
-                                {isMasked ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4 opacity-0 hover:opacity-100" />}
-                            </button>
+                                    {isMasked ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4 opacity-0 hover:opacity-100 transition-opacity" />}
+                                </button>
+                            </div>
                         </div>
                     </div>
 
@@ -413,12 +429,12 @@ export const CleanModeMandiri: React.FC = () => {
 
                     {/* Sheet Header: Transaksi & e-Statement */}
                     <div className="px-5 pt-1.5 pb-4 flex items-center justify-between shrink-0">
-                        <h2 className="text-[17.5px] font-semibold text-[#1e1e1e] tracking-tight">
+                        <h2 className="text-[15px] font-medium text-[#2c2c2e] tracking-tight">
                             Transaksi
                         </h2>
                         <button
                             onClick={() => setIsStatementOpen(true)}
-                            className="text-[14px] font-normal text-[#007dfe] hover:opacity-80 transition-opacity"
+                            className="text-[13px] font-normal text-[#007dfe] hover:opacity-80 transition-opacity"
                         >
                             e-Statement
                         </button>
@@ -426,10 +442,10 @@ export const CleanModeMandiri: React.FC = () => {
 
                     {/* Month Carousel & Utility Tools Bar */}
                     <div className="h-[50px] border-b border-[#ededed] flex items-center justify-between shrink-0 pl-0 pr-2.5">
-                        {/* Horizontal Months (Right-aligned with calibrated gap-56px so Juli loses its 'J' and shows 'uli') */}
+                        {/* Horizontal Months (Right-aligned with calibrated gap so Juli is partially cut off at left edge) */}
                         <div
                             ref={monthScrollRef}
-                            className="flex-1 h-full flex items-center space-x-[56px] overflow-x-auto no-scrollbar pl-0"
+                            className="flex-1 h-full flex items-center space-x-[48px] overflow-x-auto no-scrollbar pl-0"
                         >
                             {months.map(m => {
                                 const isActive = selectedMonth.toLowerCase() === m.toLowerCase();
@@ -440,15 +456,15 @@ export const CleanModeMandiri: React.FC = () => {
                                             setSelectedMonth(m);
                                             localStorage.setItem('mandiri_clean_mode_selected_month', m);
                                         }}
-                                        className={`relative h-full flex items-center px-1 text-[15px] whitespace-nowrap transition-colors shrink-0 ${
+                                        className={`relative h-full flex items-center px-1 text-[14px] tracking-[-0.01em] whitespace-nowrap transition-colors shrink-0 ${
                                             isActive
-                                                ? 'font-medium text-[#111111]'
-                                                : 'font-normal text-[#666666] hover:text-[#333333]'
+                                                ? 'font-normal text-[#1e1e1e]'
+                                                : 'font-normal text-[#8e8e93] hover:text-[#555555]'
                                         }`}
                                     >
                                         <span>{m}</span>
                                         {isActive && (
-                                            <div className="absolute bottom-0 left-0 right-0 h-[3.5px] bg-[#007dfe] rounded-t-full" />
+                                            <div className="absolute bottom-0 left-0 right-0 h-[3px] bg-[#007dfe] rounded-t-full" />
                                         )}
                                     </button>
                                 );
@@ -518,7 +534,7 @@ export const CleanModeMandiri: React.FC = () => {
                                                         className="w-[32px] h-[32px] object-contain shrink-0 mt-0.5"
                                                     />
                                                     <div className="flex-1 min-w-0">
-                                                        <h3 className="text-[16px] font-semibold text-[#1c1c1e] leading-snug tracking-[-0.01em]">
+                                                        <h3 className="text-[16px] font-medium text-[#1c1c1e] leading-snug tracking-[-0.01em]">
                                                             {item.title}
                                                         </h3>
                                                         <p className="text-[12px] font-normal text-[#6c6c70] leading-[18px] mt-1.5 whitespace-pre-line break-words">
@@ -529,7 +545,7 @@ export const CleanModeMandiri: React.FC = () => {
 
                                                 {/* Nominal with Superscript Cents */}
                                                 <div
-                                                    className={`text-[16px] font-bold shrink-0 text-right whitespace-nowrap tracking-tight ${
+                                                    className={`text-[18.5px] font-semibold shrink-0 text-right whitespace-nowrap tracking-tight ${
                                                         item.type === 'income' ? 'text-[#16a34a]' : 'text-[#1c1c1e]'
                                                     }`}
                                                 >
@@ -537,7 +553,7 @@ export const CleanModeMandiri: React.FC = () => {
                                                         {item.type === 'income' ? '+ IDR ' : '- IDR '}
                                                         {item.amount.toLocaleString('id-ID')}
                                                     </span>
-                                                    <sup className="text-[10px] font-bold align-top relative -top-1.5 ml-0.5">
+                                                    <sup className="text-[11.5px] font-semibold align-top relative -top-0.5 ml-0.5 tracking-normal">
                                                         {item.cents || '00'}
                                                     </sup>
                                                 </div>
