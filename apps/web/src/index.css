@@ -121,16 +121,26 @@
     font-display: swap;
 }
 
-/* Scoped Clean Mode Mandiri font override to completely eliminate Nunito across all devices */
-.clean-mode-mandiri,
-.clean-mode-mandiri *,
+/* Scoped Clean Mode Mandiri typography:
+   Prioritize Apple's native San Francisco font stack (SF Pro) matching the authentic iOS Livin' Mandiri app,
+   falling back cleanly to LivinFont / Plus Jakarta Sans on non-Apple devices.
+   No !important on universal/tag selectors to prevent blocking child component styling or size overrides.
+*/
+.clean-mode-mandiri {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', 'LivinFont', 'Plus Jakarta Sans', sans-serif;
+}
+
 .clean-mode-mandiri button,
 .clean-mode-mandiri input,
-.clean-mode-mandiri span,
-.clean-mode-mandiri h1,
-.clean-mode-mandiri div,
-.clean-mode-mandiri p {
-    font-family: 'LivinFont', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', sans-serif !important;
+.clean-mode-mandiri select,
+.clean-mode-mandiri textarea {
+    font-family: inherit;
+}
+
+/* Dedicated authentic nominal balance font styling */
+.mandiri-balance-text {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Arial, sans-serif;
+    letter-spacing: -0.01em;
 }
 
 @layer base {

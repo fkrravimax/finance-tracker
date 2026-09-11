@@ -243,7 +243,6 @@ export const CleanModeMandiri: React.FC = () => {
     return (
         <div 
             className="clean-mode-mandiri min-h-screen w-full bg-[#1b4b72] flex justify-center items-start select-none overflow-hidden"
-            style={{ fontFamily: "'LivinFont', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', sans-serif" }}
         >
             {/* Main Phone Viewport Container (Dynamic 100dvh to match phone screen exactly) */}
             <div className="w-full max-w-[430px] h-[100dvh] relative bg-[#4ba4e3] overflow-hidden flex flex-col shadow-2xl">
@@ -296,10 +295,7 @@ export const CleanModeMandiri: React.FC = () => {
 
                     {/* Account Name & Number with tight natural spacing */}
                     <div className="w-full flex flex-col items-center text-center mt-[10px]">
-                        <h1 
-                            className="text-white text-[19.5px] font-semibold tracking-[0.01em]"
-                            style={{ fontFamily: "'LivinFont', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif" }}
-                        >
+                        <h1 className="text-white text-[19.5px] font-semibold tracking-[0.01em]">
                             {accountName}
                         </h1>
 
@@ -307,10 +303,9 @@ export const CleanModeMandiri: React.FC = () => {
                         <button
                             onClick={handleCopyAccountNumber}
                             className="mt-[3px] flex items-center justify-center text-white text-[15.5px] font-normal tracking-[0.04em] hover:text-white/90 transition-opacity active:opacity-75"
-                            style={{ fontFamily: "'LivinFont', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', sans-serif" }}
                             title="Salin nomor rekening"
                         >
-                            <span style={{ fontFamily: "'LivinFont', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', sans-serif" }}>
+                            <span>
                                 {accountNumber}
                             </span>
                             {copied ? (
@@ -329,30 +324,28 @@ export const CleanModeMandiri: React.FC = () => {
                             <div className="relative inline-flex items-baseline">
                                 {isMasked ? (
                                     <span 
-                                        className="text-white text-[23.5px] font-bold tracking-widest cursor-pointer select-none"
+                                        className="mandiri-balance-text text-white text-[22px] font-bold tracking-widest cursor-pointer select-none"
                                         onClick={() => {
                                             const next = !isMasked;
                                             setIsMasked(next);
                                             localStorage.setItem('mandiri_clean_mode_balance_masked', String(next));
                                         }}
-                                        style={{ fontFamily: "'LivinFont', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif" }}
                                     >
                                         Rp ••••••••••
                                     </span>
                                 ) : (
                                     <div 
-                                        className="text-white text-[23.5px] font-bold tracking-tight flex items-baseline cursor-pointer select-none"
+                                        className="mandiri-balance-text text-white text-[22px] font-bold tracking-[-0.01em] flex items-baseline cursor-pointer select-none"
                                         onClick={() => {
                                             const next = !isMasked;
                                             setIsMasked(next);
                                             localStorage.setItem('mandiri_clean_mode_balance_masked', String(next));
                                         }}
-                                        style={{ fontFamily: "'LivinFont', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif" }}
                                     >
                                         <span>Rp {formattedInt}</span>
-                                        <sup className="text-[13.5px] font-bold align-top relative -top-1 ml-0.5 tracking-normal">
+                                        <span className="text-[13.5px] font-bold self-start relative -top-[7px] ml-[3px] tracking-normal">
                                             {cents}
-                                        </sup>
+                                        </span>
                                     </div>
                                 )}
                                 <button
@@ -382,10 +375,7 @@ export const CleanModeMandiri: React.FC = () => {
                                 />
                             </button>
                             <div className="mt-2.5 h-[34px] flex flex-col items-center justify-start">
-                                <span 
-                                    className="text-white text-[13.5px] font-normal leading-[16.5px] text-center whitespace-pre-line"
-                                    style={{ fontFamily: "'LivinFont', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', sans-serif" }}
-                                >
+                                <span className="text-white text-[13.5px] font-normal leading-[16.5px] text-center whitespace-pre-line">
                                     {'Transfer\nRupiah'}
                                 </span>
                             </div>
@@ -401,10 +391,7 @@ export const CleanModeMandiri: React.FC = () => {
                                 />
                             </button>
                             <div className="mt-2.5 h-[34px] flex flex-col items-center justify-start">
-                                <span 
-                                    className="text-white text-[13.5px] font-normal leading-[16.5px] text-center"
-                                    style={{ fontFamily: "'LivinFont', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', sans-serif" }}
-                                >
+                                <span className="text-white text-[13.5px] font-normal leading-[16.5px] text-center">
                                     Bayar/VA
                                 </span>
                             </div>
@@ -420,10 +407,7 @@ export const CleanModeMandiri: React.FC = () => {
                                 />
                             </button>
                             <div className="mt-2.5 h-[34px] flex flex-col items-center justify-start">
-                                <span 
-                                    className="text-white text-[13.5px] font-normal leading-[16.5px] text-center"
-                                    style={{ fontFamily: "'LivinFont', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', sans-serif" }}
-                                >
+                                <span className="text-white text-[13.5px] font-normal leading-[16.5px] text-center">
                                     Top-up
                                 </span>
                             </div>
@@ -439,10 +423,7 @@ export const CleanModeMandiri: React.FC = () => {
                                 />
                             </button>
                             <div className="mt-2.5 h-[34px] flex flex-col items-center justify-start">
-                                <span 
-                                    className="text-white text-[13.5px] font-normal leading-[16.5px] text-center whitespace-pre-line"
-                                    style={{ fontFamily: "'LivinFont', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', sans-serif" }}
-                                >
+                                <span className="text-white text-[13.5px] font-normal leading-[16.5px] text-center whitespace-pre-line">
                                     {'Kartu Fisik/\nVirtual'}
                                 </span>
                             </div>
