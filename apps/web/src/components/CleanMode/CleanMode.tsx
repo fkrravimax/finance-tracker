@@ -355,7 +355,7 @@ const SpendingDonutChart: React.FC<SpendingDonutChartProps> = ({
             <div
                 className="absolute inset-0 flex flex-col items-center justify-center text-center select-none cursor-pointer"
                 style={{
-                    fontFamily: '"Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif',
+                    fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", sans-serif',
                 }}
                 onClick={() => {
                     if (selectedCategoryId !== null) {
@@ -368,12 +368,12 @@ const SpendingDonutChart: React.FC<SpendingDonutChartProps> = ({
                     <>
                         <span
                             style={{
-                                fontFamily: '"Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif',
-                                fontSize: '16px',
+                                fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", sans-serif',
+                                fontSize: '16.5px',
                                 fontWeight: 800,
                                 color: '#00a2e8',
                                 lineHeight: '1.2',
-                                letterSpacing: '-0.01em',
+                                letterSpacing: '0',
                                 display: 'block',
                             }}
                         >
@@ -381,12 +381,12 @@ const SpendingDonutChart: React.FC<SpendingDonutChartProps> = ({
                         </span>
                         <span
                             style={{
-                                fontFamily: '"Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif',
-                                fontSize: '14.5px',
+                                fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", sans-serif',
+                                fontSize: '15px',
                                 fontWeight: 600,
                                 color: '#2c3e50',
                                 lineHeight: '1.2',
-                                letterSpacing: '-0.01em',
+                                letterSpacing: '0',
                                 display: 'block',
                                 marginTop: '2px',
                                 maxWidth: '110px',
@@ -399,14 +399,14 @@ const SpendingDonutChart: React.FC<SpendingDonutChartProps> = ({
                         </span>
                         <span
                             style={{
-                                fontFamily: '"Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif',
-                                fontSize: '16px',
+                                fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", sans-serif',
+                                fontSize: '17px',
                                 fontWeight: 700,
-                                color: '#144e83',
+                                color: '#134e83',
                                 lineHeight: '1.2',
-                                letterSpacing: '-0.01em',
+                                letterSpacing: '0.01em',
                                 display: 'block',
-                                marginTop: '4px',
+                                marginTop: '6px',
                             }}
                         >
                             {isMasked ? 'IDR ******' : formatFdAmount(selectedCategory.amount)}
@@ -416,12 +416,12 @@ const SpendingDonutChart: React.FC<SpendingDonutChartProps> = ({
                     <>
                         <span
                             style={{
-                                fontFamily: '"Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif',
+                                fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", sans-serif',
                                 fontSize: '15px',
                                 fontWeight: 600,
                                 color: '#495057',
                                 lineHeight: '1.2',
-                                letterSpacing: '-0.01em',
+                                letterSpacing: '0',
                                 display: 'block',
                             }}
                         >
@@ -429,12 +429,12 @@ const SpendingDonutChart: React.FC<SpendingDonutChartProps> = ({
                         </span>
                         <span
                             style={{
-                                fontFamily: '"Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif',
+                                fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", sans-serif',
                                 fontSize: '15px',
                                 fontWeight: 600,
                                 color: '#495057',
                                 lineHeight: '1.2',
-                                letterSpacing: '-0.01em',
+                                letterSpacing: '0',
                                 display: 'block',
                                 marginTop: '2px',
                             }}
@@ -443,12 +443,12 @@ const SpendingDonutChart: React.FC<SpendingDonutChartProps> = ({
                         </span>
                         <span
                             style={{
-                                fontFamily: '"Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif',
-                                fontSize: '16.5px',
+                                fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", sans-serif',
+                                fontSize: '17px',
                                 fontWeight: 700,
-                                color: '#144e83',
+                                color: '#134e83',
                                 lineHeight: '1.2',
-                                letterSpacing: '-0.01em',
+                                letterSpacing: '0.01em',
                                 display: 'block',
                                 marginTop: '6px',
                             }}
@@ -464,7 +464,7 @@ const SpendingDonutChart: React.FC<SpendingDonutChartProps> = ({
                         e.stopPropagation();
                         onToggleMask();
                     }}
-                    className="mt-2.5 w-[42px] h-[30px] rounded-[6px] border border-[#dce3ea] bg-white hover:bg-[#f3f6f9] active:scale-95 transition-all flex items-center justify-center cursor-pointer shadow-xs"
+                    className="mt-3.5 w-[46px] h-[34px] rounded-[8px] border border-[#dce3ea] bg-white hover:bg-[#f3f6f9] active:scale-95 transition-all flex items-center justify-center cursor-pointer shadow-xs"
                     title={isMasked ? 'Tampilkan Nominal' : 'Sembunyikan Nominal'}
                     aria-label="Toggle nominal visibility"
                 >
@@ -1586,17 +1586,17 @@ export const CleanMode: React.FC = () => {
                                         <div
                                             className="absolute inset-0 flex flex-col items-center justify-center text-center select-none"
                                             style={{
-                                                fontFamily: '"Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif',
+                                                fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", sans-serif',
                                             }}
                                         >
                                             <span
                                                 style={{
-                                                    fontFamily: '"Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif',
+                                                    fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", sans-serif',
                                                     fontSize: '15px',
                                                     fontWeight: 600,
                                                     color: '#495057',
                                                     lineHeight: '1.2',
-                                                    letterSpacing: '-0.01em',
+                                                    letterSpacing: '0',
                                                     display: 'block',
                                                 }}
                                             >
@@ -1604,12 +1604,12 @@ export const CleanMode: React.FC = () => {
                                             </span>
                                             <span
                                                 style={{
-                                                    fontFamily: '"Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif',
+                                                    fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", sans-serif',
                                                     fontSize: '15px',
                                                     fontWeight: 600,
                                                     color: '#495057',
                                                     lineHeight: '1.2',
-                                                    letterSpacing: '-0.01em',
+                                                    letterSpacing: '0',
                                                     display: 'block',
                                                     marginTop: '2px',
                                                 }}
@@ -1618,12 +1618,12 @@ export const CleanMode: React.FC = () => {
                                             </span>
                                             <span
                                                 style={{
-                                                    fontFamily: '"Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif',
-                                                    fontSize: '16.5px',
+                                                    fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", sans-serif',
+                                                    fontSize: '17px',
                                                     fontWeight: 700,
-                                                    color: '#144e83',
+                                                    color: '#134e83',
                                                     lineHeight: '1.2',
-                                                    letterSpacing: '-0.01em',
+                                                    letterSpacing: '0.01em',
                                                     display: 'block',
                                                     marginTop: '6px',
                                                 }}
@@ -1632,7 +1632,7 @@ export const CleanMode: React.FC = () => {
                                             </span>
                                             <button
                                                 onClick={handleToggleFdMask}
-                                                className="mt-2.5 w-[42px] h-[30px] rounded-[6px] border border-[#dce3ea] bg-[#f3f6f9] hover:bg-[#ebf0f5] active:scale-95 transition-all flex items-center justify-center cursor-pointer shadow-xs"
+                                                className="mt-3.5 w-[46px] h-[34px] rounded-[8px] border border-[#dce3ea] bg-white hover:bg-[#f3f6f9] active:scale-95 transition-all flex items-center justify-center cursor-pointer shadow-xs"
                                                 title={fdMasked ? 'Tampilkan Nominal' : 'Sembunyikan Nominal'}
                                                 aria-label="Toggle nominal visibility"
                                             >
