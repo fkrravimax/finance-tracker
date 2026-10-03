@@ -108,91 +108,99 @@ const renderCategoryIcon = (icon: SpendingCategory['icon'], color: string) => {
     switch (icon) {
         case 'grid':
             return (
-                <svg viewBox="0 0 14 14" className="w-[14px] h-[14px]">
-                    <rect x="1" y="1" width="5.2" height="5.2" rx="1.2" fill={color} />
-                    <rect x="7.8" y="1" width="5.2" height="5.2" rx="1.2" fill={color} />
-                    <rect x="1" y="7.8" width="5.2" height="5.2" rx="1.2" fill={color} />
-                    <rect x="7.8" y="7.8" width="5.2" height="5.2" rx="1.2" fill={color} />
-                </svg>
+                <g>
+                    <rect x="-5.5" y="-5.5" width="4.8" height="4.8" rx="1.2" fill={color} />
+                    <rect x="0.7" y="-5.5" width="4.8" height="4.8" rx="1.2" fill={color} />
+                    <rect x="-5.5" y="0.7" width="4.8" height="4.8" rx="1.2" fill={color} />
+                    <rect x="0.7" y="0.7" width="4.8" height="4.8" rx="1.2" fill={color} />
+                </g>
             );
         case 'shopping':
             return (
-                <svg viewBox="0 0 14 14" className="w-[14px] h-[14px]">
+                <g>
+                    {/* Arch handle */}
                     <path
-                        d="M2.5 5h9a.8.8 0 0 1 .8.9l-.7 6a1 1 0 0 1-1 .9H3.4a1 1 0 0 1-1-.9l-.7-6a.8.8 0 0 1 .8-.9z"
-                        fill={color}
-                    />
-                    <path
-                        d="M5 5V3.2a2 2 0 0 1 4 0V5"
+                        d="M -2.8 -1.2 C -2.8 -5.6 2.8 -5.6 2.8 -1.2"
                         fill="none"
-                        stroke="#ffffff"
-                        strokeWidth="1.2"
+                        stroke={color}
+                        strokeWidth="1.4"
                         strokeLinecap="round"
                     />
-                    <circle cx="7" cy="8" r="1.1" fill="#ffffff" />
-                </svg>
+                    {/* Bag body */}
+                    <rect x="-5.4" y="-1.4" width="10.8" height="7.2" rx="0.8" fill={color} />
+                    {/* 2 white eyelets */}
+                    <rect x="-3.2" y="-0.1" width="1.3" height="1.3" rx="0.3" fill="#ffffff" />
+                    <rect x="1.9" y="-0.1" width="1.3" height="1.3" rx="0.3" fill="#ffffff" />
+                </g>
             );
         case 'food':
             return (
-                <svg viewBox="0 0 14 14" className="w-[14px] h-[14px]">
+                <g>
+                    {/* Bread loaf body */}
                     <path
-                        d="M2 7.2C2 4.2 4.2 3 7 3s5 1.2 5 4.2c0 1.5-.7 2.6-1.6 2.6H3.6C2.7 9.8 2 8.7 2 7.2z"
+                        d="M -6.0 2.2 A 1.6 1.6 0 0 0 -4.4 3.8 L 4.4 3.8 A 1.6 1.6 0 0 0 6.0 2.2 L 6.0 0.4 C 6.0 -4.2 3.5 -4.5 0 -4.5 C -3.5 -4.5 -6.0 -4.2 -6.0 0.4 Z"
                         fill={color}
                     />
-                    <path
-                        d="M4.5 4.8l.8 2.2M7 4.5v2.5M9.5 4.8l-.8 2.2"
-                        stroke="#ffffff"
-                        strokeWidth="0.9"
-                        strokeLinecap="round"
-                    />
-                </svg>
+                    {/* 3 white score cuts */}
+                    <rect x="-3.5" y="-3.9" width="1.3" height="3.2" rx="0.5" fill="#ffffff" />
+                    <rect x="-0.65" y="-4.3" width="1.3" height="3.4" rx="0.5" fill="#ffffff" />
+                    <rect x="2.2" y="-3.9" width="1.3" height="3.2" rx="0.5" fill="#ffffff" />
+                </g>
             );
         case 'admin':
             return (
-                <svg viewBox="0 0 14 14" className="w-[14px] h-[14px]">
-                    <circle cx="7" cy="4.2" r="2.2" fill={color} />
+                <g>
+                    {/* Head */}
+                    <circle cx="-1.2" cy="-3.8" r="2.9" fill={color} />
+                    {/* Left shoulder/body */}
+                    <path d="M -5.8 5.2 A 5.2 5.2 0 0 1 -0.5 0.6 L -0.5 5.2 Z" fill={color} />
+                    {/* Coin circle with white dollar sign */}
+                    <circle cx="2.6" cy="3.0" r="2.8" fill={color} />
                     <path
-                        d="M3 11.2c0-2.2 1.8-3.6 4-3.6s4 1.4 4 3.6c0 .4-.3.6-.7.6H3.7c-.4 0-.7-.2-.7-.6z"
-                        fill={color}
+                        d="M 2.6 1.4 L 2.6 4.6 M 3.4 2.1 C 3.4 1.7 1.8 1.6 1.8 2.4 C 1.8 3.3 3.4 2.7 3.4 3.6 C 3.4 4.4 1.8 4.3 1.8 3.9"
+                        fill="none"
+                        stroke="#ffffff"
+                        strokeWidth="0.75"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
                     />
-                </svg>
+                </g>
             );
         case 'bill':
             return (
-                <svg viewBox="0 0 14 14" className="w-[14px] h-[14px]">
-                    <path
-                        d="M3 1.5h8a.8.8 0 0 1 .8.8v10.2l-1.8-.9-1.8.9-1.4-.9-1.8.9-1.8-.9-1 .5V2.3a.8.8 0 0 1 .8-.8z"
-                        fill={color}
-                    />
-                    <path d="M4.5 4.5h5m-5 2.5h5m-5 2.5h3" stroke="#ffffff" strokeWidth="1" strokeLinecap="round" />
-                </svg>
+                <g>
+                    <rect x="-4.2" y="-5.5" width="8.4" height="11.0" rx="0.8" fill={color} />
+                    <line x1="-2.4" y1="-2.8" x2="2.4" y2="-2.8" stroke="#ffffff" strokeWidth="1.0" strokeLinecap="round" />
+                    <line x1="-2.4" y1="0.0" x2="2.4" y2="0.0" stroke="#ffffff" strokeWidth="1.0" strokeLinecap="round" />
+                    <line x1="-2.4" y1="2.8" x2="1.0" y2="2.8" stroke="#ffffff" strokeWidth="1.0" strokeLinecap="round" />
+                </g>
             );
         case 'transport':
             return (
-                <svg viewBox="0 0 14 14" className="w-[14px] h-[14px]">
+                <g>
                     <path
-                        d="M2.5 6.5L4 3.2a.8.8 0 0 1 .7-.4h4.6a.8.8 0 0 1 .7.4l1.5 3.3v4a.8.8 0 0 1-.8.8h-.8a.8.8 0 0 1-.8-.8v-.5H4.9v.5a.8.8 0 0 1-.8.8h-.8a.8.8 0 0 1-.8-.8v-4z"
+                        d="M -5.2 1.5 L -3.6 -2.2 C -3.4 -2.6 -3.0 -2.8 -2.5 -2.8 L 2.5 -2.8 C 3.0 -2.8 3.4 -2.6 3.6 -2.2 L 5.2 1.5 L 5.2 4.5 C 5.2 4.9 4.8 5.2 4.4 5.2 L 3.6 5.2 C 3.2 5.2 2.8 4.9 2.8 4.5 L 2.8 4.0 L -2.8 4.0 L -2.8 4.5 C -2.8 4.9 -3.2 5.2 -3.6 5.2 L -4.4 5.2 C -4.8 5.2 -5.2 4.9 -5.2 4.5 Z"
                         fill={color}
                     />
-                    <circle cx="4.5" cy="8" r="1.1" fill="#ffffff" />
-                    <circle cx="9.5" cy="8" r="1.1" fill="#ffffff" />
-                </svg>
+                    <circle cx="-3.0" cy="2.2" r="1.1" fill="#ffffff" />
+                    <circle cx="3.0" cy="2.2" r="1.1" fill="#ffffff" />
+                </g>
             );
         case 'heart':
             return (
-                <svg viewBox="0 0 14 14" className="w-[14px] h-[14px]">
+                <g>
                     <path
-                        d="M7 12s-4.8-3.3-4.8-6.6a2.8 2.8 0 0 1 4.8-2 2.8 2.8 0 0 1 4.8 2C11.8 8.7 7 12 7 12z"
+                        d="M 0 5.2 C -4.0 2.2 -5.5 -0.5 -5.5 -2.5 C -5.5 -4.2 -4.0 -5.5 -2.5 -5.5 C -1.2 -5.5 0 -4.2 0 -3.2 C 0 -4.2 1.2 -5.5 2.5 -5.5 C 4.0 -5.5 5.5 -4.2 5.5 -2.5 C 5.5 -0.5 4.0 2.2 0 5.2 Z"
                         fill={color}
                     />
-                </svg>
+                </g>
             );
         default:
             return (
-                <svg viewBox="0 0 14 14" className="w-[14px] h-[14px]">
-                    <circle cx="7" cy="7" r="5" fill={color} />
-                    <circle cx="7" cy="7" r="2" fill="#ffffff" />
-                </svg>
+                <g>
+                    <circle cx="0" cy="0" r="4.8" fill={color} />
+                    <circle cx="0" cy="0" r="1.8" fill="#ffffff" />
+                </g>
             );
     }
 };
@@ -333,7 +341,7 @@ const SpendingDonutChart: React.FC<SpendingDonutChartProps> = ({
                             />
                             {/* Category Icon */}
                             <g
-                                transform={`translate(${seg.badgePos.x - 7}, ${seg.badgePos.y - 7})`}
+                                transform={`translate(${seg.badgePos.x}, ${seg.badgePos.y})`}
                                 opacity={isMuted ? 0.85 : 1}
                             >
                                 {renderCategoryIcon(seg.icon, seg.color)}
@@ -456,7 +464,7 @@ const SpendingDonutChart: React.FC<SpendingDonutChartProps> = ({
                         e.stopPropagation();
                         onToggleMask();
                     }}
-                    className="mt-2.5 w-[42px] h-[30px] rounded-[6px] border border-[#dce3ea] bg-[#f3f6f9] hover:bg-[#ebf0f5] active:scale-95 transition-all flex items-center justify-center cursor-pointer shadow-xs"
+                    className="mt-2.5 w-[42px] h-[30px] rounded-[6px] border border-[#dce3ea] bg-white hover:bg-[#f3f6f9] active:scale-95 transition-all flex items-center justify-center cursor-pointer shadow-xs"
                     title={isMasked ? 'Tampilkan Nominal' : 'Sembunyikan Nominal'}
                     aria-label="Toggle nominal visibility"
                 >
