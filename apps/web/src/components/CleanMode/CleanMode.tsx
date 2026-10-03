@@ -401,10 +401,11 @@ const SpendingDonutChart: React.FC<SpendingDonutChartProps> = ({
                             style={{
                                 fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", sans-serif',
                                 fontSize: '17px',
-                                fontWeight: 700,
+                                fontWeight: 800,
+                                WebkitFontSmoothing: 'subpixel-antialiased',
                                 color: '#134e83',
                                 lineHeight: '1.2',
-                                letterSpacing: '0.01em',
+                                letterSpacing: '0.005em',
                                 display: 'block',
                                 marginTop: '6px',
                             }}
@@ -445,10 +446,11 @@ const SpendingDonutChart: React.FC<SpendingDonutChartProps> = ({
                             style={{
                                 fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", sans-serif',
                                 fontSize: '17px',
-                                fontWeight: 700,
+                                fontWeight: 800,
+                                WebkitFontSmoothing: 'subpixel-antialiased',
                                 color: '#134e83',
                                 lineHeight: '1.2',
-                                letterSpacing: '0.01em',
+                                letterSpacing: '0.005em',
                                 display: 'block',
                                 marginTop: '6px',
                             }}
@@ -1620,10 +1622,11 @@ export const CleanMode: React.FC = () => {
                                                 style={{
                                                     fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", sans-serif',
                                                     fontSize: '17px',
-                                                    fontWeight: 700,
+                                                    fontWeight: 800,
+                                                    WebkitFontSmoothing: 'subpixel-antialiased',
                                                     color: '#134e83',
                                                     lineHeight: '1.2',
-                                                    letterSpacing: '0.01em',
+                                                    letterSpacing: '0.005em',
                                                     display: 'block',
                                                     marginTop: '6px',
                                                 }}
