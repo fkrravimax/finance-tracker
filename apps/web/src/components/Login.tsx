@@ -80,7 +80,13 @@ const Login: React.FC<LoginProps> = ({ onLogin, onBack, defaultSignUp = false })
 
     return (
         <>
-            <div className="min-h-[100dvh] w-full flex flex-col items-center justify-center font-display relative overflow-y-auto overflow-x-hidden py-10 px-4 sm:px-6">
+            <div
+                className="min-h-[100dvh] w-full flex flex-col items-center justify-center font-display relative overflow-y-auto overflow-x-hidden px-4 sm:px-6 py-8"
+                style={{
+                    paddingTop: 'max(env(safe-area-inset-top, 0px), 2rem)',
+                    paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 2rem)',
+                }}
+            >
                 {/* High-Performance Ambient Background (Pure CSS, 0 Bandwidth) */}
                 <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
                     <div className="absolute -top-[20%] -left-[10%] w-[55vw] h-[55vw] rounded-full bg-primary/10 dark:bg-primary/5 blur-[120px]" />

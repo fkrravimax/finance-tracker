@@ -21,8 +21,11 @@ const LandingHeader: React.FC<LandingHeaderProps> = ({ onSignIn, onSignUp }) => 
     };
 
     return (
-        <header className="sticky top-0 z-40 w-full backdrop-blur-md bg-background-light/85 dark:bg-background-dark/85 border-b border-slate-200/60 dark:border-[#493f22]/50 transition-colors">
-            <div className="max-w-7xl mx-auto flex items-center justify-between px-3 sm:px-6 lg:px-8 py-2.5 sm:py-3.5 md:py-4">
+        <header
+            style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
+            className="sticky top-0 z-40 w-full backdrop-blur-md bg-background-light/85 dark:bg-background-dark/85 border-b border-slate-200/60 dark:border-[#493f22]/50 transition-colors"
+        >
+            <div className="max-w-7xl mx-auto flex items-center justify-between px-3.5 sm:px-6 lg:px-8 py-3 sm:py-3.5 md:py-4">
                 {/* Brand / Logo */}
                 <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
                     <img src="/logo.png" alt="Rupiku Logo" className="w-7 h-7 sm:w-8 sm:h-8 md:w-9 md:h-9 object-contain shrink-0" />
