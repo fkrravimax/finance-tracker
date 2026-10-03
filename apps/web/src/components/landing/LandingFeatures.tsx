@@ -1,6 +1,6 @@
 import React from 'react';
 import { useLanguage } from '../../contexts/LanguageContext';
-import { FadeIn } from '../ui/Motion';
+import { motion } from 'framer-motion';
 
 interface LandingFeaturesProps {
     onSignUp: () => void;
@@ -11,94 +11,142 @@ const LandingFeatures: React.FC<LandingFeaturesProps> = ({ onSignUp }) => {
 
     const features = [
         {
+            tag: '01 / DASHBOARD',
             icon: 'dashboard',
             label: t('landing.features.dashboard'),
             desc: t('landing.features.dashboardDesc'),
             preview: '/feature-dashboard.jpg',
-            align: 'right' // Image on right
+            highlights: ['Real-time Net Cash Flow', 'Automated Burn Rate Alerts', 'Multi-currency support'],
+            align: 'right',
         },
         {
+            tag: '02 / LEDGER & AUDIT',
+            icon: 'receipt_long',
+            label: t('landing.features.transactions'),
+            desc: t('landing.features.transactionsDesc'),
+            preview: '/feature-transactions.jpg',
+            highlights: ['Instant Category Tagging', 'Multi-Account Transfers', 'Search & Filtering'],
+            align: 'left',
+        },
+        {
+            tag: '03 / GOALS & RESERVES',
             icon: 'savings',
             label: t('landing.features.savings'),
             desc: t('landing.features.savingsDesc'),
             preview: '/feature-savings.jpg',
-            align: 'left' // Image on left
+            highlights: ['Emergency Fund Vault', 'Milestone Projection', 'Target Progress Analytics'],
+            align: 'right',
         },
         {
+            tag: '04 / ASSET JOURNAL',
             icon: 'trending_up',
             label: t('landing.features.trading'),
             desc: t('landing.features.tradingDesc'),
             preview: '/feature-trading.jpg',
-            align: 'right'
-        },
-        {
-            icon: 'receipt_long',
-            label: t('landing.features.transactions'),
-            desc: t('landing.features.transactionsDesc'),
-            preview: '/feature-transactions.jpg', // Reusing hero image as it likely contains transactions
-            align: 'left'
+            highlights: ['Execution History', 'Risk-to-Reward Calculator', 'Portfolio Growth Curves'],
+            align: 'left',
         },
     ];
 
     return (
-        <div className="w-full max-w-7xl mx-auto px-4 md:px-8 flex flex-col gap-24 md:gap-32">
-            <div className="text-center max-w-3xl mx-auto mb-8">
-                <h2 className="text-3xl md:text-5xl font-black text-slate-900 dark:text-white mb-6">
-                    {t('landing.features.title') || "Powerful Features"}
+        <section id="features" className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24">
+            {/* Header */}
+            <div className="text-center max-w-3xl mx-auto mb-16 md:mb-24">
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-primary/10 dark:bg-primary/20 rounded-full mb-4 border border-primary/25">
+                    <span className="text-xs font-bold text-slate-800 dark:text-[#f4c025] uppercase tracking-wider">
+                        {t('landing.features.badge')}
+                    </span>
+                </div>
+                <h2 className="text-2xl sm:text-4xl md:text-5xl font-black text-slate-900 dark:text-white tracking-tight mb-4">
+                    {t('landing.features.title')}
                 </h2>
-                <p className="text-lg text-slate-600 dark:text-[#cbbc90]">
-                    {t('landing.features.subtitle') || "Everything you need to manage your wealth in one place."}
+                <p className="text-base sm:text-lg text-slate-600 dark:text-[#cbbc90] leading-relaxed">
+                    {t('landing.features.subtitle')}
                 </p>
             </div>
 
-            {features.map((feature, index) => (
-                <FadeIn
-                    key={index}
-                    direction={feature.align === 'left' ? 'right' : 'left'}
-                    className={`flex flex-col md:flex-row items-center gap-12 lg:gap-20 ${feature.align === 'left' ? 'md:flex-row-reverse' : ''
-                        }`}
-                >
-                    {/* Text Side */}
-                    <div className="flex-1 flex flex-col items-center md:items-start text-center md:text-left space-y-6">
-                        <div className="w-16 h-16 rounded-2xl bg-primary/10 dark:bg-primary/20 flex items-center justify-center">
-                            <span className="material-symbols-outlined text-3xl text-primary">
-                                {feature.icon}
-                            </span>
-                        </div>
-
-                        <h3 className="text-2xl md:text-4xl font-bold text-slate-900 dark:text-white">
-                            {feature.label}
-                        </h3>
-
-                        <p className="text-lg text-slate-600 dark:text-[#cbbc90] leading-relaxed">
-                            {feature.desc}
-                        </p>
-
-                        <button
-                            onClick={onSignUp}
-                            className="text-primary font-bold hover:underline flex items-center gap-2"
+            {/* Feature Rows */}
+            <div className="flex flex-col gap-20 md:gap-32">
+                {features.map((feature, index) => {
+                    const isImageLeft = feature.align === 'left';
+                    return (
+                        <motion.div
+                            key={index}
+                            initial={{ opacity: 0, y: 30 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true, margin: '-60px' }}
+                            transition={{ duration: 0.6 }}
+                            className={`flex flex-col lg:flex-row items-center gap-10 lg:gap-16 ${
+                                isImageLeft ? 'lg:flex-row-reverse' : ''
+                            }`}
                         >
-                            {t('landing.features.learnMore')} <span className="material-symbols-outlined text-sm">arrow_forward</span>
-                        </button>
-                    </div>
+                            {/* Text Column */}
+                            <div className="flex-1 flex flex-col items-start text-left space-y-5">
+                                <span className="text-xs font-bold tracking-widest text-primary font-mono">
+                                    {feature.tag}
+                                </span>
 
-                    {/* Image Side */}
-                    <div className="flex-1 w-full perspective-1000 group">
-                        <div className={`relative transform transition-all duration-700 hover:scale-[1.02] ${feature.align === 'left'
-                            ? 'md:rotate-y-3 md:hover:rotate-y-6'
-                            : 'md:-rotate-y-3 md:hover:-rotate-y-6'
-                            }`}>
-                            <div className="absolute inset-0 bg-primary/20 blur-3xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-700 -z-10"></div>
-                            <img
-                                src={feature.preview}
-                                alt={feature.label}
-                                className="w-full h-auto rounded-3xl shadow-2xl border border-slate-200/50 dark:border-[#493f22]/50 backdrop-blur-sm bg-background-light dark:bg-background-dark/50"
-                            />
-                        </div>
-                    </div>
-                </FadeIn>
-            ))}
-        </div>
+                                <div className="flex items-center gap-3">
+                                    <div className="w-12 h-12 rounded-xl bg-primary/15 dark:bg-[#342e1b] border border-primary/30 flex items-center justify-center text-primary">
+                                        <span className="material-symbols-outlined text-2xl">
+                                            {feature.icon}
+                                        </span>
+                                    </div>
+                                    <h3 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white tracking-tight">
+                                        {feature.label}
+                                    </h3>
+                                </div>
+
+                                <p className="text-slate-600 dark:text-[#cbbc90] text-base sm:text-lg leading-relaxed">
+                                    {feature.desc}
+                                </p>
+
+                                {/* Micro Highlights */}
+                                <ul className="space-y-2 pt-2">
+                                    {feature.highlights.map((item, hIdx) => (
+                                        <li
+                                            key={hIdx}
+                                            className="flex items-center gap-2.5 text-sm text-slate-700 dark:text-[#e4d7a8]"
+                                        >
+                                            <span className="w-4 h-4 rounded-full bg-emerald-500/20 text-emerald-500 flex items-center justify-center text-[10px] font-bold">
+                                                ✓
+                                            </span>
+                                            <span>{item}</span>
+                                        </li>
+                                    ))}
+                                </ul>
+
+                                <button
+                                    type="button"
+                                    onClick={onSignUp}
+                                    className="inline-flex items-center gap-2 pt-2 text-primary hover:text-primary-hover font-bold text-sm tracking-wide transition-colors group"
+                                >
+                                    <span>{t('landing.features.explore')}</span>
+                                    <span className="material-symbols-outlined text-base transition-transform group-hover:translate-x-1">
+                                        arrow_forward
+                                    </span>
+                                </button>
+                            </div>
+
+                            {/* Image Showcase Column - Flat, Crisp & High Elevation */}
+                            <div className="flex-1 w-full">
+                                <div className="relative rounded-2xl overflow-hidden border border-slate-200/90 dark:border-[#493f22] bg-white dark:bg-[#1a160b] shadow-xl group">
+                                    {/* Ambient card glow */}
+                                    <div className="absolute inset-0 bg-gradient-to-tr from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+
+                                    <img
+                                        src={feature.preview}
+                                        alt={feature.label}
+                                        className="w-full h-auto object-cover transform transition-transform duration-500 group-hover:scale-[1.015]"
+                                        loading="lazy"
+                                    />
+                                </div>
+                            </div>
+                        </motion.div>
+                    );
+                })}
+            </div>
+        </section>
     );
 };
 

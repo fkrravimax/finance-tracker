@@ -13,49 +13,55 @@ interface LandingPageProps {
 
 const LandingPage: React.FC<LandingPageProps> = ({ onSignUp, onSignIn }) => {
     return (
-        <div className="h-screen w-full font-display bg-background-light dark:bg-background-dark text-slate-900 dark:text-white relative overflow-hidden">
-            {/* Fixed Background - stays static */}
-            <div className="absolute inset-0 z-0">
-                <img src="/bg.png" alt="Background" className="w-full h-full object-cover object-center opacity-50 dark:opacity-40" />
-                <div className="absolute inset-0 bg-background-light/45 dark:bg-background-dark/80 backdrop-blur-[2px]"></div>
+        <div className="h-screen w-full font-display bg-background-light dark:bg-background-dark text-slate-900 dark:text-white relative overflow-hidden select-none sm:select-auto">
+            {/* High-Performance Ambient Background (Pure CSS, 0 Bandwidth) */}
+            <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
+                {/* Primary Ambient Glow */}
+                <div className="absolute -top-[20%] -left-[10%] w-[55vw] h-[55vw] rounded-full bg-primary/10 dark:bg-primary/5 blur-[120px]" />
+                {/* Secondary Accent Glow */}
+                <div className="absolute top-[40%] -right-[15%] w-[50vw] h-[50vw] rounded-full bg-amber-500/10 dark:bg-[#f4c025]/5 blur-[140px]" />
+                {/* Bottom Center Depth Glow */}
+                <div className="absolute -bottom-[20%] left-[20%] w-[60vw] h-[60vw] rounded-full bg-sky-500/5 dark:bg-amber-600/5 blur-[160px]" />
+
+                {/* Subtle Geometric Dot Grid Pattern */}
+                <div
+                    className="absolute inset-0 opacity-[0.4] dark:opacity-[0.18]"
+                    style={{
+                        backgroundImage: `radial-gradient(currentColor 1px, transparent 1px)`,
+                        backgroundSize: '28px 28px',
+                        color: 'var(--color-primary-val)',
+                    }}
+                />
             </div>
 
-            {/* Scrollable Content Container - handling the scroll */}
-            <div className="relative z-10 h-full overflow-y-auto overflow-x-hidden flex flex-col">
-                <LandingHeader />
+            {/* Scrollable Content Container */}
+            <div className="relative z-10 h-full overflow-y-auto overflow-x-hidden flex flex-col scroll-smooth">
+                <LandingHeader onSignIn={onSignIn} onSignUp={onSignUp} />
 
                 <main className="flex-1 flex flex-col w-full">
                     {/* Hero Section */}
-                    <div className="w-full min-h-[90vh] flex items-center justify-center pt-20 pb-12 shrink-0">
-                        <LandingHero onSignUp={onSignUp} />
+                    <div className="w-full flex items-center justify-center pt-4 pb-8 shrink-0">
+                        <LandingHero onSignUp={onSignUp} onSignIn={onSignIn} />
                     </div>
 
                     {/* Features Section */}
-                    <section className="w-full py-12 md:py-24 relative shrink-0">
+                    <div className="w-full shrink-0">
                         <LandingFeatures onSignUp={onSignUp} />
-                    </section>
+                    </div>
 
                     {/* How It Works Section */}
-                    <section className="w-full relative shrink-0">
-                        {/* Faded Background Layer */}
-                        <div className="absolute inset-0 bg-white/50 dark:bg-[#2b2616]/30 backdrop-blur-sm [mask-image:linear-gradient(to_bottom,transparent,black_20%,black_60%,transparent)] z-0 pointer-events-none"></div>
+                    <div className="w-full shrink-0 relative">
+                        <div className="absolute inset-0 bg-slate-100/40 dark:bg-[#252012]/40 backdrop-blur-[1px] -z-10" />
+                        <LandingHowItWorks />
+                    </div>
 
-                        <div className="relative z-10 py-12 md:py-24">
-                            <LandingHowItWorks />
-                        </div>
-                    </section>
-
-                    {/* CTA Section - Overlapping Start */}
-                    <div className="shrink-0 -mt-24 pt-24 relative z-10 pointer-events-none">
-                        <div className="pointer-events-auto">
-                            <LandingCTA onSignUp={onSignUp} />
-                        </div>
+                    {/* Final CTA Section */}
+                    <div className="w-full shrink-0">
+                        <LandingCTA onSignUp={onSignUp} />
                     </div>
                 </main>
 
-                <div className="shrink-0">
-                    <LandingFooter onSignIn={onSignIn} />
-                </div>
+                <LandingFooter onSignIn={onSignIn} />
             </div>
         </div>
     );

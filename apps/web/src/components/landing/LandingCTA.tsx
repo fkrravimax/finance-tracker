@@ -1,41 +1,90 @@
 import React from 'react';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { motion } from 'framer-motion';
 
 interface LandingCTAProps {
     onSignUp: () => void;
 }
 
 const LandingCTA: React.FC<LandingCTAProps> = ({ onSignUp }) => {
-    const { t, language } = useLanguage();
+    const { t } = useLanguage();
+
+    const scrollToFeatures = (e: React.MouseEvent) => {
+        e.preventDefault();
+        const element = document.getElementById('features');
+        if (element) {
+            element.scrollIntoView({ behavior: 'smooth' });
+        }
+    };
 
     return (
-        <section className="w-full py-24 px-4 md:px-8 relative">
-            {/* Faded Background Layer */}
-            <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-primary/10 to-primary/5 dark:from-[#2b2616]/0 dark:via-primary/5 dark:to-primary/5 [mask-image:linear-gradient(to_bottom,transparent,black_20%,black_80%,transparent)] -z-10 pointer-events-none"></div>
+        <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24">
+            <motion.div
+                initial={{ opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-50px' }}
+                transition={{ duration: 0.6 }}
+                className="relative rounded-3xl overflow-hidden border border-slate-200/90 dark:border-[#493f22] bg-gradient-to-b from-white to-slate-50 dark:from-[#252012] dark:to-[#1b170c] p-8 sm:p-12 md:p-16 text-center shadow-xl"
+            >
+                {/* Ambient Glow */}
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-48 bg-primary/15 dark:bg-primary/20 blur-3xl -z-10 rounded-full pointer-events-none" />
 
-            <div className="max-w-4xl mx-auto text-center relative z-10">
-                <h2 className="text-3xl md:text-5xl font-black text-slate-900 dark:text-white mb-6">
-                    {t('landing.cta.title') || "Ready to Master Your Finance?"}
-                </h2>
-                <p className="text-lg md:text-xl text-slate-600 dark:text-[#cbbc90] mb-8 max-w-2xl mx-auto">
-                    {t('landing.cta.subtitle') || "Join thousands of users who are already tracking their wealth with Rupiku."}
-                </p>
-                <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                    <button
-                        onClick={onSignUp}
-                        className="px-8 py-4 bg-primary hover:bg-primary-hover text-slate-900 font-bold text-lg rounded-2xl transition-all shadow-lg hover:shadow-primary/25 active:scale-[0.98] w-full sm:w-auto"
-                    >
-                        {t('landing.hero.getStarted')}
-                    </button>
-                    <button className="px-8 py-4 bg-white dark:bg-[#2b2616] border border-slate-200 dark:border-[#493f22] text-slate-900 dark:text-white font-bold text-lg rounded-2xl transition-all hover:bg-slate-50 dark:hover:bg-[#1a160b] w-full sm:w-auto">
-                        {language === 'id' ? 'Lihat Demo' : 'View Demo'}
-                    </button>
+                <div className="max-w-3xl mx-auto">
+                    {/* Badge */}
+                    <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-primary/10 dark:bg-primary/20 rounded-full mb-6 border border-primary/25">
+                        <span className="text-xs font-bold text-slate-800 dark:text-[#f4c025] uppercase tracking-wider">
+                            {t('landing.cta.badge')}
+                        </span>
+                    </div>
+
+                    <h2 className="text-2xl sm:text-4xl md:text-5xl font-black text-slate-900 dark:text-white tracking-tight leading-tight mb-5">
+                        {t('landing.cta.title')}
+                    </h2>
+
+                    <p className="text-base sm:text-lg text-slate-600 dark:text-[#cbbc90] mb-8 max-w-2xl mx-auto leading-relaxed">
+                        {t('landing.cta.subtitle')}
+                    </p>
+
+                    {/* Action Buttons */}
+                    <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 mb-10">
+                        <button
+                            type="button"
+                            onClick={onSignUp}
+                            className="w-full sm:w-auto px-8 py-3.5 bg-primary hover:bg-primary-hover text-slate-950 font-bold text-base rounded-xl transition-all shadow-lg shadow-primary/20 hover:shadow-primary/30 active:scale-[0.98] flex items-center justify-center gap-2 group"
+                        >
+                            <span>{t('landing.cta.button')}</span>
+                            <span className="material-symbols-outlined text-lg transition-transform group-hover:translate-x-1">
+                                arrow_forward
+                            </span>
+                        </button>
+
+                        <button
+                            type="button"
+                            onClick={scrollToFeatures}
+                            className="w-full sm:w-auto px-7 py-3.5 bg-white dark:bg-[#342e1b] hover:bg-slate-50 dark:hover:bg-[#3d3620] text-slate-800 dark:text-[#f4c025] font-bold text-base rounded-xl border border-slate-200 dark:border-[#493f22] transition-all shadow-sm active:scale-[0.98] flex items-center justify-center gap-2"
+                        >
+                            <span className="material-symbols-outlined text-lg">explore</span>
+                            <span>{t('landing.cta.explore')}</span>
+                        </button>
+                    </div>
+
+                    {/* Trust and Security Points */}
+                    <div className="pt-8 border-t border-slate-200/80 dark:border-[#493f22]/60 grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs font-semibold text-slate-600 dark:text-[#cbbc90]">
+                        <div className="flex items-center justify-center gap-2">
+                            <span className="material-symbols-outlined text-emerald-500 text-base">lock</span>
+                            <span>{t('landing.cta.securityPoint1')}</span>
+                        </div>
+                        <div className="flex items-center justify-center gap-2">
+                            <span className="material-symbols-outlined text-emerald-500 text-base">shield</span>
+                            <span>{t('landing.cta.securityPoint2')}</span>
+                        </div>
+                        <div className="flex items-center justify-center gap-2">
+                            <span className="material-symbols-outlined text-emerald-500 text-base">cloud_download</span>
+                            <span>{t('landing.cta.securityPoint3')}</span>
+                        </div>
+                    </div>
                 </div>
-            </div>
-
-            {/* Abstract Background Shapes (Faded) */}
-            <div className="absolute top-0 left-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2 -z-10 pointer-events-none opacity-50"></div>
-            <div className="absolute bottom-0 right-0 w-64 h-64 bg-purple-500/5 rounded-full blur-3xl translate-x-1/2 translate-y-1/2 -z-10 pointer-events-none opacity-50"></div>
+            </motion.div>
         </section>
     );
 };

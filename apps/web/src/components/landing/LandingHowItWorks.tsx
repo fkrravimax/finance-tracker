@@ -3,97 +3,85 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import { motion } from 'framer-motion';
 
 const LandingHowItWorks: React.FC = () => {
-    const { t, language } = useLanguage();
+    const { t } = useLanguage();
 
     const steps = [
-        { num: 1, icon: 'person_add', title: t('landing.howItWorks.step1Title'), desc: t('landing.howItWorks.step1Desc') },
-        { num: 2, icon: 'monitoring', title: t('landing.howItWorks.step2Title'), desc: t('landing.howItWorks.step2Desc') },
-        { num: 3, icon: 'trending_up', title: t('landing.howItWorks.step3Title'), desc: t('landing.howItWorks.step3Desc') },
+        {
+            num: '01',
+            icon: 'person_add',
+            title: t('landing.howItWorks.step1Title'),
+            desc: t('landing.howItWorks.step1Desc'),
+        },
+        {
+            num: '02',
+            icon: 'account_balance_wallet',
+            title: t('landing.howItWorks.step2Title'),
+            desc: t('landing.howItWorks.step2Desc'),
+        },
+        {
+            num: '03',
+            icon: 'insights',
+            title: t('landing.howItWorks.step3Title'),
+            desc: t('landing.howItWorks.step3Desc'),
+        },
     ];
 
     return (
-        <div className="w-full max-w-7xl mx-auto px-4 md:px-8 flex flex-col items-center">
-            <div className="text-center mb-12">
-                <div className="inline-block px-3 py-1 bg-primary/10 dark:bg-primary/20 rounded-full mb-4">
-                    <span className="text-xs font-bold text-primary uppercase tracking-wider">The Roadmap</span>
+        <section id="workflow" className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24">
+            <div className="text-center max-w-3xl mx-auto mb-16 md:mb-20">
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-primary/10 dark:bg-primary/20 rounded-full mb-4 border border-primary/25">
+                    <span className="text-xs font-bold text-slate-800 dark:text-[#f4c025] uppercase tracking-wider">
+                        {t('landing.howItWorks.badge')}
+                    </span>
                 </div>
-                <h2 className="text-3xl md:text-5xl font-black text-slate-900 dark:text-white mb-4">
+                <h2 className="text-2xl sm:text-4xl md:text-5xl font-black text-slate-900 dark:text-white tracking-tight mb-4">
                     {t('landing.howItWorks.title')}
                 </h2>
-                <p className="text-lg text-slate-600 dark:text-[#cbbc90] max-w-2xl">
-                    {language === 'en' ? 'Get started in minutes and take control of your financial future.' : 'Mulai dalam beberapa menit dan kendalikan masa depan finansial Anda.'}
+                <p className="text-base sm:text-lg text-slate-600 dark:text-[#cbbc90] leading-relaxed">
+                    {t('landing.howItWorks.subtitle')}
                 </p>
             </div>
 
-            {/* Mobile: Vertical Stack */}
-            <div className="flex md:hidden flex-col gap-6 w-full max-w-sm">
-                {steps.map((step) => (
-                    <div key={step.num} className="flex gap-4 items-start bg-white dark:bg-[#2b2616] p-4 rounded-2xl border border-slate-200 dark:border-[#493f22] shadow-sm">
-                        <div className="w-10 h-10 rounded-full bg-primary text-slate-900 text-lg font-bold flex items-center justify-center shrink-0">
-                            {step.num}
-                        </div>
-                        <div>
-                            <h3 className="font-bold text-lg text-slate-900 dark:text-white mb-1">{step.title}</h3>
-                            <p className="text-sm text-slate-500 dark:text-[#cbbc90] leading-relaxed">{step.desc}</p>
-                        </div>
-                    </div>
-                ))}
-            </div>
-
-            {/* Desktop: Horizontal Steps */}
-            <div className="hidden md:flex gap-8 lg:gap-12 w-full justify-center items-start relative mt-8">
-                {/* Connecting Line */}
-                <div className="absolute top-12 left-[10%] w-[80%] h-0.5 bg-slate-200 dark:bg-[#493f22] -z-10"></div>
-
+            {/* Stepper Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 relative">
                 {steps.map((step, index) => (
                     <motion.div
                         key={step.num}
-                        initial="initial"
-                        whileHover="hover"
-                        className="flex flex-col items-center flex-1 max-w-xs relative group cursor-pointer"
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true, margin: '-40px' }}
+                        transition={{ duration: 0.5, delay: index * 0.15 }}
+                        className="relative bg-white dark:bg-[#252012] border border-slate-200/90 dark:border-[#493f22] p-7 sm:p-8 rounded-2xl shadow-sm hover:shadow-md transition-shadow group flex flex-col justify-between"
                     >
-                        <motion.div
-                            variants={{
-                                initial: { y: 0 },
-                                hover: { y: -8 }
-                            }}
-                            transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                            className="w-24 h-24 rounded-3xl bg-white dark:bg-[#2b2616] border-2 border-slate-100 dark:border-[#493f22] flex items-center justify-center mb-6 shadow-xl relative"
-                        >
-                            <div className="w-16 h-16 rounded-2xl bg-primary/10 dark:bg-primary/20 flex items-center justify-center">
-                                <span className="material-symbols-outlined text-3xl text-primary">{step.icon}</span>
+                        <div>
+                            {/* Card Top: Number & Icon */}
+                            <div className="flex items-center justify-between mb-6">
+                                <span className="text-3xl font-black font-mono text-slate-300 dark:text-[#493f22] group-hover:text-primary transition-colors">
+                                    {step.num}
+                                </span>
+                                <div className="w-12 h-12 rounded-xl bg-primary/10 dark:bg-[#342e1b] border border-primary/20 flex items-center justify-center text-primary transition-transform group-hover:scale-105">
+                                    <span className="material-symbols-outlined text-2xl">
+                                        {step.icon}
+                                    </span>
+                                </div>
                             </div>
 
-                            {/* Floating Animated Number */}
-                            <motion.div
-                                animate={{ y: [0, -6, 0] }}
-                                transition={{
-                                    duration: 2.5,
-                                    repeat: Infinity,
-                                    ease: "easeInOut",
-                                    delay: index * 0.3
-                                }}
-                                className="absolute -top-3 -right-3"
-                            >
-                                <motion.div
-                                    variants={{
-                                        initial: { scale: 1, rotate: 0 },
-                                        hover: { scale: 1.15, rotate: [0, -10, 10, -5, 0] }
-                                    }}
-                                    transition={{ type: "spring", stiffness: 400, damping: 10 }}
-                                    className="w-8 h-8 rounded-full bg-primary text-slate-900 font-bold flex items-center justify-center shadow-lg"
-                                >
-                                    {step.num}
-                                </motion.div>
-                            </motion.div>
-                        </motion.div>
+                            <h3 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight mb-2.5">
+                                {step.title}
+                            </h3>
+                            <p className="text-sm sm:text-base text-slate-600 dark:text-[#cbbc90] leading-relaxed">
+                                {step.desc}
+                            </p>
+                        </div>
 
-                        <h3 className="font-bold text-xl text-slate-900 dark:text-white mb-3 text-center">{step.title}</h3>
-                        <p className="text-slate-500 dark:text-[#cbbc90] text-center leading-relaxed">{step.desc}</p>
+                        {/* Subtle step indicator underline */}
+                        <div className="mt-6 pt-4 border-t border-slate-100 dark:border-[#38311a] flex items-center gap-2 text-xs font-semibold text-slate-400 dark:text-[#cbbc90]/60">
+                            <span>Step {index + 1} of 3</span>
+                        </div>
                     </motion.div>
                 ))}
             </div>
-        </div>
+        </section>
     );
 };
 
