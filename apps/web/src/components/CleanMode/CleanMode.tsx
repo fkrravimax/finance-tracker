@@ -382,7 +382,7 @@ export const CleanMode: React.FC = () => {
                         {/* PRIMARY ACCOUNT CARD (Entirely enclosed inside Dark Blue Header - Never Cut Off!) */}
                         <div className="relative z-20 rounded-[20px] shadow-lg shadow-black/15 overflow-hidden bg-white">
                             {/* Top Dual-Tone Gradient Strip (Matching Authentic myBCA Sky Blue to Turquoise) */}
-                            <div className="bg-gradient-to-r from-[#75bbee] via-[#3da0c1] to-[#29b9b7] px-4 pt-3.5 pb-3.5 flex flex-col gap-2.5 text-white">
+                            <div className="bg-gradient-to-r from-[#75bbee] via-[#3da0c1] to-[#29b9b7] px-5 pt-3 pb-3 flex flex-col gap-2 text-white">
                                 {/* Row 1: BCA ID pill button (Left-aligned) */}
                                 <div>
                                     <div
@@ -405,7 +405,7 @@ export const CleanMode: React.FC = () => {
                                     <span
                                         className="text-[12.5px] text-white tracking-wide"
                                         style={{
-                                            fontFamily: '"Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif',
+                                            fontFamily: 'Arial, "Helvetica Neue", Helvetica, sans-serif',
                                             fontWeight: 600,
                                         }}
                                     >
@@ -430,21 +430,21 @@ export const CleanMode: React.FC = () => {
                             </div>
 
                             {/* Bottom White Card Section */}
-                            <div className="px-4 pt-4 pb-3.5 bg-white">
+                            <div className="px-5 pt-3.5 pb-3 bg-white">
                                 <p
-                                    className="text-[13px] font-normal text-[#53575a] tracking-tight"
-                                    style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", "Open Sans", sans-serif' }}
+                                    className="text-[12px] font-normal text-[#53575a] tracking-tight"
+                                    style={{ fontFamily: 'Arial, "Helvetica Neue", Helvetica, sans-serif' }}
                                 >
                                     Active Balance
                                 </p>
-                                <div className="flex items-center justify-between mt-2.5 mb-3">
+                                <div className="flex items-center justify-between mt-2 mb-2.5">
                                     <div className="flex items-baseline gap-2">
                                         <span
-                                            className="text-[22px] font-bold text-[#4a4f56] tracking-tight"
+                                            className="text-[18.5px] font-bold text-[#4a4f56] tracking-tight"
                                             style={{
-                                                fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", "Plus Jakarta Sans", sans-serif',
+                                                fontFamily: 'Arial, "Helvetica Neue", Helvetica, sans-serif',
                                                 fontWeight: 700,
-                                                letterSpacing: '-0.02em',
+                                                letterSpacing: '-0.01em',
                                                 color: '#4a4f56',
                                             }}
                                         >
@@ -455,11 +455,11 @@ export const CleanMode: React.FC = () => {
                                     {/* Eye Toggle Icon: Authentic Thicker/Bolder Eye from CONTOHTAMPILAN.PNG */}
                                     <button
                                         onClick={handleToggleMask}
-                                        className="p-1 rounded-full hover:bg-blue-50 active:scale-90 transition-all flex items-center justify-center"
+                                        className="p-0.5 rounded-full hover:bg-blue-50 active:scale-90 transition-all flex items-center justify-center -mr-1"
                                         title={isMasked ? 'Tampilkan Saldo' : 'Sembunyikan Saldo'}
                                     >
                                         {isMasked ? (
-                                            <svg className="w-[19px] h-[14px] text-[#005caa] stroke-current fill-none stroke-[2.5]" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round">
+                                            <svg className="w-[22px] h-[16px] text-[#005caa] stroke-current fill-none stroke-[2.5]" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round">
                                                 <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
                                                 <line x1="1" y1="1" x2="23" y2="23" />
                                             </svg>
@@ -467,19 +467,19 @@ export const CleanMode: React.FC = () => {
                                             <img
                                                 src="/clean-mode/icon_eye_hd.png"
                                                 alt="Eye"
-                                                className="w-[19px] h-auto object-contain"
+                                                className="w-[22px] h-auto object-contain"
                                             />
                                         )}
                                     </button>
                                 </div>
 
                                 {/* Hairline Divider */}
-                                <div className="border-t border-slate-100 mb-2.5" />
+                                <div className="border-t border-[#ececec] mb-2.5" />
 
                                 {/* Account Transactions Link */}
                                 <button
                                     onClick={() => setIsStatementOpen(true)}
-                                    className="w-full flex items-center gap-2 text-[#005caa] hover:text-[#004885] active:translate-x-0.5 transition-all text-left pt-0.5 pb-1"
+                                    className="w-full flex items-center gap-2 text-[#005caa] hover:text-[#004885] active:translate-x-0.5 transition-all text-left pt-0.5"
                                 >
                                     <img
                                         src="/clean-mode/icon_account_trans_hd.png"
@@ -488,7 +488,7 @@ export const CleanMode: React.FC = () => {
                                     />
                                     <span
                                         className="text-[12.5px] font-bold"
-                                        style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif' }}
+                                        style={{ fontFamily: 'Arial, "Helvetica Neue", Helvetica, sans-serif' }}
                                     >
                                         Account Transactions
                                     </span>
