@@ -6,6 +6,21 @@ import { dashboardService } from '../../services/dashboardService';
 import { authService } from '../../services/authService';
 import BcaStatementModal from './BcaStatementModal';
 
+const INDO_MONTHS = [
+    'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+    'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+];
+
+const getRecentMonths = (count = 5): string[] => {
+    const list: string[] = [];
+    const now = new Date();
+    for (let i = 0; i < count; i++) {
+        const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+        list.push(`${INDO_MONTHS[d.getMonth()]} ${d.getFullYear()}`);
+    }
+    return list;
+};
+
 export const CleanMode: React.FC = () => {
     const navigate = useNavigate();
 
@@ -45,7 +60,8 @@ export const CleanMode: React.FC = () => {
     const [fdMasked, setFdMasked] = useState<boolean>(() => {
         return localStorage.getItem('clean_mode_fd_masked') !== 'false';
     });
-    const [selectedMonth, setSelectedMonth] = useState<string>('September 2026');
+    const availableMonths = getRecentMonths(5);
+    const [selectedMonth, setSelectedMonth] = useState<string>(() => availableMonths[0]);
     const [isMonthPickerOpen, setIsMonthPickerOpen] = useState<boolean>(false);
 
     // Dynamic FD Nominals with LocalStorage Persistence
@@ -1030,7 +1046,7 @@ export const CleanMode: React.FC = () => {
                                     {/* Month Dropdown List */}
                                     {isMonthPickerOpen && (
                                         <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-[#d8e2ed] rounded-lg shadow-lg z-30 py-1 overflow-hidden">
-                                            {['September 2026', 'Agustus 2026', 'Juli 2026', 'Juni 2026'].map((m) => (
+                                            {availableMonths.map((m) => (
                                                 <button
                                                     key={m}
                                                     onClick={() => {
