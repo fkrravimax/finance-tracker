@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Check, ChevronRight, SlidersHorizontal, ArrowLeft, X, Settings } from 'lucide-react';
+import { Check, ChevronRight, SlidersHorizontal, ArrowLeft, X, Settings, Plus, Trash2, RotateCcw } from 'lucide-react';
 import { dashboardService } from '../../services/dashboardService';
 import { authService } from '../../services/authService';
 import BcaStatementModal from './BcaStatementModal';
@@ -19,6 +19,462 @@ const getRecentMonths = (count = 5): string[] => {
         list.push(`${INDO_MONTHS[d.getMonth()]} ${d.getFullYear()}`);
     }
     return list;
+};
+
+export interface SpendingCategory {
+    id: string;
+    name: string;
+    amount: number;
+    color: string;
+    icon: 'grid' | 'shopping' | 'food' | 'admin' | 'bill' | 'transport' | 'heart' | 'custom';
+}
+
+export const DEFAULT_SPENDING_CATEGORIES: SpendingCategory[] = [
+    {
+        id: 'misc',
+        name: 'Miscellaneous',
+        amount: 80310,
+        color: '#00a8ea',
+        icon: 'grid',
+    },
+    {
+        id: 'shopping',
+        name: 'Shopping',
+        amount: 50000,
+        color: '#c86573',
+        icon: 'shopping',
+    },
+    {
+        id: 'food',
+        name: 'Food & Beverage',
+        amount: 31000,
+        color: '#e5b34e',
+        icon: 'food',
+    },
+    {
+        id: 'admin',
+        name: 'Admin Fee',
+        amount: 20000,
+        color: '#9b629b',
+        icon: 'admin',
+    },
+];
+
+export const CATEGORY_COLORS = [
+    '#00a8ea', // Cyan
+    '#c86573', // Rose Coral
+    '#e5b34e', // Mustard
+    '#9b629b', // Purple
+    '#48bb78', // Emerald Green
+    '#ed8936', // Amber Orange
+    '#3182ce', // Royal Blue
+    '#e53e3e', // Crimson Red
+    '#38b2ac', // Teal
+    '#805ad5', // Deep Violet
+];
+
+export const formatFdAmount = (num: number): string => {
+    if (!num || isNaN(num) || num <= 0) return 'IDR 0';
+    if (num >= 1000000) {
+        const val = num / 1000000;
+        const formatted = val % 1 === 0 ? val.toString() : val.toFixed(2).replace('.', ',').replace(/,?0+$/, '');
+        return `IDR ${formatted} M`;
+    }
+    if (num >= 1000) {
+        const val = num / 1000;
+        const formatted = val % 1 === 0 ? val.toString() : val.toFixed(2).replace('.', ',').replace(/,?0+$/, '');
+        return `IDR ${formatted} K`;
+    }
+    return `IDR ${Math.round(num)}`;
+};
+
+const polarToCartesian = (cx: number, cy: number, r: number, angleInDegrees: number) => {
+    const angleInRadians = ((angleInDegrees - 90) * Math.PI) / 180.0;
+    return {
+        x: cx + r * Math.cos(angleInRadians),
+        y: cy + r * Math.sin(angleInRadians),
+    };
+};
+
+const describeArc = (cx: number, cy: number, r: number, startAngle: number, endAngle: number) => {
+    const start = polarToCartesian(cx, cy, r, startAngle);
+    const end = polarToCartesian(cx, cy, r, endAngle);
+    const angleDiff = endAngle - startAngle;
+    const largeArcFlag = angleDiff > 180 ? 1 : 0;
+    return `M ${start.x} ${start.y} A ${r} ${r} 0 ${largeArcFlag} 1 ${end.x} ${end.y}`;
+};
+
+const renderCategoryIcon = (icon: SpendingCategory['icon'], color: string) => {
+    switch (icon) {
+        case 'grid':
+            return (
+                <svg viewBox="0 0 14 14" className="w-[14px] h-[14px]">
+                    <rect x="1" y="1" width="5.2" height="5.2" rx="1.2" fill={color} />
+                    <rect x="7.8" y="1" width="5.2" height="5.2" rx="1.2" fill={color} />
+                    <rect x="1" y="7.8" width="5.2" height="5.2" rx="1.2" fill={color} />
+                    <rect x="7.8" y="7.8" width="5.2" height="5.2" rx="1.2" fill={color} />
+                </svg>
+            );
+        case 'shopping':
+            return (
+                <svg viewBox="0 0 14 14" className="w-[14px] h-[14px]">
+                    <path
+                        d="M2.5 5h9a.8.8 0 0 1 .8.9l-.7 6a1 1 0 0 1-1 .9H3.4a1 1 0 0 1-1-.9l-.7-6a.8.8 0 0 1 .8-.9z"
+                        fill={color}
+                    />
+                    <path
+                        d="M5 5V3.2a2 2 0 0 1 4 0V5"
+                        fill="none"
+                        stroke="#ffffff"
+                        strokeWidth="1.2"
+                        strokeLinecap="round"
+                    />
+                    <circle cx="7" cy="8" r="1.1" fill="#ffffff" />
+                </svg>
+            );
+        case 'food':
+            return (
+                <svg viewBox="0 0 14 14" className="w-[14px] h-[14px]">
+                    <path
+                        d="M2 7.2C2 4.2 4.2 3 7 3s5 1.2 5 4.2c0 1.5-.7 2.6-1.6 2.6H3.6C2.7 9.8 2 8.7 2 7.2z"
+                        fill={color}
+                    />
+                    <path
+                        d="M4.5 4.8l.8 2.2M7 4.5v2.5M9.5 4.8l-.8 2.2"
+                        stroke="#ffffff"
+                        strokeWidth="0.9"
+                        strokeLinecap="round"
+                    />
+                </svg>
+            );
+        case 'admin':
+            return (
+                <svg viewBox="0 0 14 14" className="w-[14px] h-[14px]">
+                    <circle cx="7" cy="4.2" r="2.2" fill={color} />
+                    <path
+                        d="M3 11.2c0-2.2 1.8-3.6 4-3.6s4 1.4 4 3.6c0 .4-.3.6-.7.6H3.7c-.4 0-.7-.2-.7-.6z"
+                        fill={color}
+                    />
+                </svg>
+            );
+        case 'bill':
+            return (
+                <svg viewBox="0 0 14 14" className="w-[14px] h-[14px]">
+                    <path
+                        d="M3 1.5h8a.8.8 0 0 1 .8.8v10.2l-1.8-.9-1.8.9-1.4-.9-1.8.9-1.8-.9-1 .5V2.3a.8.8 0 0 1 .8-.8z"
+                        fill={color}
+                    />
+                    <path d="M4.5 4.5h5m-5 2.5h5m-5 2.5h3" stroke="#ffffff" strokeWidth="1" strokeLinecap="round" />
+                </svg>
+            );
+        case 'transport':
+            return (
+                <svg viewBox="0 0 14 14" className="w-[14px] h-[14px]">
+                    <path
+                        d="M2.5 6.5L4 3.2a.8.8 0 0 1 .7-.4h4.6a.8.8 0 0 1 .7.4l1.5 3.3v4a.8.8 0 0 1-.8.8h-.8a.8.8 0 0 1-.8-.8v-.5H4.9v.5a.8.8 0 0 1-.8.8h-.8a.8.8 0 0 1-.8-.8v-4z"
+                        fill={color}
+                    />
+                    <circle cx="4.5" cy="8" r="1.1" fill="#ffffff" />
+                    <circle cx="9.5" cy="8" r="1.1" fill="#ffffff" />
+                </svg>
+            );
+        case 'heart':
+            return (
+                <svg viewBox="0 0 14 14" className="w-[14px] h-[14px]">
+                    <path
+                        d="M7 12s-4.8-3.3-4.8-6.6a2.8 2.8 0 0 1 4.8-2 2.8 2.8 0 0 1 4.8 2C11.8 8.7 7 12 7 12z"
+                        fill={color}
+                    />
+                </svg>
+            );
+        default:
+            return (
+                <svg viewBox="0 0 14 14" className="w-[14px] h-[14px]">
+                    <circle cx="7" cy="7" r="5" fill={color} />
+                    <circle cx="7" cy="7" r="2" fill="#ffffff" />
+                </svg>
+            );
+    }
+};
+
+interface SpendingDonutChartProps {
+    categories: SpendingCategory[];
+    selectedCategoryId: string | null;
+    onSelectCategory: (id: string | null) => void;
+    isMasked: boolean;
+    onToggleMask: () => void;
+}
+
+const SpendingDonutChart: React.FC<SpendingDonutChartProps> = ({
+    categories,
+    selectedCategoryId,
+    onSelectCategory,
+    isMasked,
+    onToggleMask,
+}) => {
+    const totalSpending = useMemo(() => {
+        return categories.reduce((sum, c) => sum + (Number(c.amount) || 0), 0);
+    }, [categories]);
+
+    const selectedCategory = useMemo(() => {
+        return categories.find((c) => c.id === selectedCategoryId) || null;
+    }, [categories, selectedCategoryId]);
+
+    const selectedPercent = useMemo(() => {
+        if (!selectedCategory || totalSpending <= 0) return 0;
+        return Math.round((selectedCategory.amount / totalSpending) * 100);
+    }, [selectedCategory, totalSpending]);
+
+    const segments = useMemo(() => {
+        if (totalSpending <= 0 || categories.length === 0) return [];
+        const hasMultiple = categories.length > 1;
+        const gapDegrees = hasMultiple ? 2.5 : 0;
+        let currentAngle = 0;
+
+        return categories.map((cat) => {
+            const fraction = Math.max(0, cat.amount) / totalSpending;
+            const sweepAngle = fraction * 360;
+            const arcStart = currentAngle + (hasMultiple ? gapDegrees / 2 : 0);
+            const arcEnd = currentAngle + sweepAngle - (hasMultiple ? gapDegrees / 2 : 0);
+            const midAngle = currentAngle + sweepAngle / 2;
+            const badgePos = polarToCartesian(110, 110, 88, midAngle);
+            const isSingle = categories.length === 1 || fraction >= 0.999;
+            const isSelected = selectedCategoryId === cat.id;
+
+            currentAngle += sweepAngle;
+
+            return {
+                ...cat,
+                fraction,
+                sweepAngle,
+                arcStart,
+                arcEnd,
+                midAngle,
+                badgePos,
+                isSingle,
+                isSelected,
+                d: isSingle
+                    ? describeArc(110, 110, 88, 0, 359.99)
+                    : describeArc(110, 110, 88, arcStart, arcEnd),
+            };
+        });
+    }, [categories, totalSpending, selectedCategoryId]);
+
+    return (
+        <div className="relative w-[220px] h-[220px] mx-auto flex items-center justify-center my-3.5 select-none">
+            {/* SVG Donut Chart */}
+            <svg
+                viewBox="0 0 220 220"
+                className="w-full h-full overflow-visible"
+                style={{ filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.04))' }}
+            >
+                {/* Background track if empty */}
+                {totalSpending <= 0 && (
+                    <circle
+                        cx="110"
+                        cy="110"
+                        r="88"
+                        fill="none"
+                        stroke="#e2e8f0"
+                        strokeWidth="14"
+                    />
+                )}
+
+                {/* Arc Segments */}
+                {segments.map((seg) => {
+                    const isMuted = selectedCategoryId !== null && selectedCategoryId !== seg.id;
+                    return (
+                        <path
+                            key={`arc-${seg.id}`}
+                            d={seg.d}
+                            fill="none"
+                            stroke={seg.color}
+                            strokeWidth="14"
+                            strokeLinecap="butt"
+                            opacity={isMuted ? 0.38 : 1}
+                            className="transition-all duration-300 cursor-pointer hover:opacity-90"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                onSelectCategory(seg.isSelected ? null : seg.id);
+                            }}
+                        />
+                    );
+                })}
+
+                {/* Badges on the Ring */}
+                {segments.map((seg) => {
+                    const isMuted = selectedCategoryId !== null && selectedCategoryId !== seg.id;
+                    return (
+                        <g
+                            key={`badge-${seg.id}`}
+                            className="cursor-pointer transition-all duration-200"
+                            style={{
+                                transformOrigin: `${seg.badgePos.x}px ${seg.badgePos.y}px`,
+                            }}
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                onSelectCategory(seg.isSelected ? null : seg.id);
+                            }}
+                        >
+                            {/* White Circular Badge */}
+                            <circle
+                                cx={seg.badgePos.x}
+                                cy={seg.badgePos.y}
+                                r="13"
+                                fill="#ffffff"
+                                stroke={seg.isSelected ? seg.color : '#dce3ec'}
+                                strokeWidth={seg.isSelected ? '1.8' : '1.2'}
+                                opacity={isMuted ? 0.85 : 1}
+                                style={{
+                                    filter: seg.isSelected
+                                        ? `drop-shadow(0 2px 6px ${seg.color}55)`
+                                        : 'drop-shadow(0 1px 3px rgba(0,0,0,0.12))',
+                                }}
+                            />
+                            {/* Category Icon */}
+                            <g
+                                transform={`translate(${seg.badgePos.x - 7}, ${seg.badgePos.y - 7})`}
+                                opacity={isMuted ? 0.85 : 1}
+                            >
+                                {renderCategoryIcon(seg.icon, seg.color)}
+                            </g>
+                        </g>
+                    );
+                })}
+            </svg>
+
+            {/* Center Information Display */}
+            <div
+                className="absolute inset-0 flex flex-col items-center justify-center text-center select-none cursor-pointer"
+                style={{
+                    fontFamily: '"Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif',
+                }}
+                onClick={() => {
+                    if (selectedCategoryId !== null) {
+                        onSelectCategory(null);
+                    }
+                }}
+                title={selectedCategoryId ? 'Klik tengah untuk kembali ke Total Spending' : undefined}
+            >
+                {selectedCategory ? (
+                    <>
+                        <span
+                            style={{
+                                fontFamily: '"Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif',
+                                fontSize: '16px',
+                                fontWeight: 800,
+                                color: '#00a2e8',
+                                lineHeight: '1.2',
+                                letterSpacing: '-0.01em',
+                                display: 'block',
+                            }}
+                        >
+                            {selectedPercent}%
+                        </span>
+                        <span
+                            style={{
+                                fontFamily: '"Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif',
+                                fontSize: '14.5px',
+                                fontWeight: 600,
+                                color: '#2c3e50',
+                                lineHeight: '1.2',
+                                letterSpacing: '-0.01em',
+                                display: 'block',
+                                marginTop: '2px',
+                                maxWidth: '110px',
+                                whiteSpace: 'pre-line',
+                            }}
+                        >
+                            {selectedCategory.name.includes('&')
+                                ? selectedCategory.name.replace('&', '&\n')
+                                : selectedCategory.name}
+                        </span>
+                        <span
+                            style={{
+                                fontFamily: '"Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif',
+                                fontSize: '16px',
+                                fontWeight: 700,
+                                color: '#144e83',
+                                lineHeight: '1.2',
+                                letterSpacing: '-0.01em',
+                                display: 'block',
+                                marginTop: '4px',
+                            }}
+                        >
+                            {isMasked ? 'IDR ******' : formatFdAmount(selectedCategory.amount)}
+                        </span>
+                    </>
+                ) : (
+                    <>
+                        <span
+                            style={{
+                                fontFamily: '"Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif',
+                                fontSize: '15px',
+                                fontWeight: 600,
+                                color: '#495057',
+                                lineHeight: '1.2',
+                                letterSpacing: '-0.01em',
+                                display: 'block',
+                            }}
+                        >
+                            Total
+                        </span>
+                        <span
+                            style={{
+                                fontFamily: '"Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif',
+                                fontSize: '15px',
+                                fontWeight: 600,
+                                color: '#495057',
+                                lineHeight: '1.2',
+                                letterSpacing: '-0.01em',
+                                display: 'block',
+                                marginTop: '2px',
+                            }}
+                        >
+                            Spending
+                        </span>
+                        <span
+                            style={{
+                                fontFamily: '"Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif',
+                                fontSize: '16.5px',
+                                fontWeight: 700,
+                                color: '#144e83',
+                                lineHeight: '1.2',
+                                letterSpacing: '-0.01em',
+                                display: 'block',
+                                marginTop: '6px',
+                            }}
+                        >
+                            {isMasked ? 'IDR ******' : formatFdAmount(totalSpending)}
+                        </span>
+                    </>
+                )}
+
+                {/* Eye Mask Toggle Button */}
+                <button
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        onToggleMask();
+                    }}
+                    className="mt-2.5 w-[42px] h-[30px] rounded-[6px] border border-[#dce3ea] bg-[#f3f6f9] hover:bg-[#ebf0f5] active:scale-95 transition-all flex items-center justify-center cursor-pointer shadow-xs"
+                    title={isMasked ? 'Tampilkan Nominal' : 'Sembunyikan Nominal'}
+                    aria-label="Toggle nominal visibility"
+                >
+                    {isMasked ? (
+                        <svg className="w-[18px] h-[18px] stroke-[#7c8a9c] fill-none stroke-[1.8]" viewBox="0 0 24 24">
+                            <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
+                            <line x1="1" y1="1" x2="23" y2="23" />
+                        </svg>
+                    ) : (
+                        <svg className="w-[18px] h-[18px] stroke-[#7c8a9c] fill-none stroke-[1.8]" viewBox="0 0 24 24">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                            <circle cx="12" cy="12" r="3" />
+                        </svg>
+                    )}
+                </button>
+            </div>
+        </div>
+    );
 };
 
 export const CleanMode: React.FC = () => {
@@ -64,10 +520,34 @@ export const CleanMode: React.FC = () => {
     const [selectedMonth, setSelectedMonth] = useState<string>(() => availableMonths[0]);
     const [isMonthPickerOpen, setIsMonthPickerOpen] = useState<boolean>(false);
 
-    // Dynamic FD Nominals with LocalStorage Persistence
-    const [fdSpendingAmount, setFdSpendingAmount] = useState<string>(() => {
-        return localStorage.getItem('clean_mode_fd_spending') || 'IDR 778,27 K';
+    // Spending Categories & Donut Selection (Exact 1:1 Matching myBCA)
+    const [spendingCategories, setSpendingCategories] = useState<SpendingCategory[]>(() => {
+        try {
+            const saved = localStorage.getItem('clean_mode_spending_categories');
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+            }
+        } catch (e) {
+            console.warn('Failed to parse clean_mode_spending_categories', e);
+        }
+        return DEFAULT_SPENDING_CATEGORIES;
     });
+
+    const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
+
+    // Compute live total spending
+    const totalSpending = useMemo(() => {
+        return spendingCategories.reduce((sum, c) => sum + (Number(c.amount) || 0), 0);
+    }, [spendingCategories]);
+
+    const fdSpendingAmount = useMemo(() => {
+        return formatFdAmount(totalSpending);
+    }, [totalSpending]);
+
+    const [customCategories, setCustomCategories] = useState<SpendingCategory[]>(spendingCategories);
+
+    // Dynamic FD Nominals with LocalStorage Persistence
     const [fdEarningAmount, setFdEarningAmount] = useState<string>(() => {
         return localStorage.getItem('clean_mode_fd_earning') || 'IDR 1 M';
     });
@@ -75,7 +555,6 @@ export const CleanMode: React.FC = () => {
         return localStorage.getItem('clean_mode_fd_cashflow') || 'IDR 221,73 K';
     });
 
-    const [customSpendingInput, setCustomSpendingInput] = useState<string>('');
     const [customEarningInput, setCustomEarningInput] = useState<string>('');
     const [customCashflowInput, setCustomCashflowInput] = useState<string>('');
 
@@ -212,10 +691,22 @@ export const CleanMode: React.FC = () => {
         setCustomNameInput(userName);
         setCustomAccountInput(accountNumber);
         setCustomBalanceInput(String(balance));
-        setCustomSpendingInput(fdSpendingAmount);
+        setCustomCategories(JSON.parse(JSON.stringify(spendingCategories)));
         setCustomEarningInput(fdEarningAmount);
         setCustomCashflowInput(fdCashflowAmount);
         setIsSettingsOpen(true);
+    };
+
+    const handleAddCategory = () => {
+        const nextColor = CATEGORY_COLORS[customCategories.length % CATEGORY_COLORS.length];
+        const newCat: SpendingCategory = {
+            id: `cat_${Date.now()}`,
+            name: 'Kategori Lain',
+            amount: 10000,
+            color: nextColor,
+            icon: 'custom',
+        };
+        setCustomCategories([...customCategories, newCat]);
     };
 
     const cleanFdAmount = (val: string) => {
@@ -243,11 +734,12 @@ export const CleanMode: React.FC = () => {
                 localStorage.setItem('clean_mode_balance', String(parsed));
             }
         }
-        if (customSpendingInput.trim()) {
-            const val = cleanFdAmount(customSpendingInput);
-            setFdSpendingAmount(val);
-            localStorage.setItem('clean_mode_fd_spending', val);
-        }
+        // Save spending categories
+        setSpendingCategories(customCategories);
+        localStorage.setItem('clean_mode_spending_categories', JSON.stringify(customCategories));
+        const customTotal = customCategories.reduce((sum, c) => sum + (Number(c.amount) || 0), 0);
+        localStorage.setItem('clean_mode_fd_spending', formatFdAmount(customTotal));
+
         if (customEarningInput.trim()) {
             const val = cleanFdAmount(customEarningInput);
             setFdEarningAmount(val);
@@ -1068,79 +1560,89 @@ export const CleanMode: React.FC = () => {
                                 </div>
 
                                 {/* Donut Ring & Center Details */}
-                                <div className="relative w-[220px] h-[220px] mx-auto flex items-center justify-center my-3.5">
-                                    <img
-                                        src={fdSlides[fdSlide].ringImg}
-                                        alt={fdSlides[fdSlide].title}
-                                        className="w-full h-full object-contain pointer-events-none select-none"
+                                {fdSlide === 0 ? (
+                                    <SpendingDonutChart
+                                        categories={spendingCategories}
+                                        selectedCategoryId={selectedCategoryId}
+                                        onSelectCategory={setSelectedCategoryId}
+                                        isMasked={fdMasked}
+                                        onToggleMask={handleToggleFdMask}
                                     />
-                                    <div
-                                        className="absolute inset-0 flex flex-col items-center justify-center text-center select-none"
-                                        style={{
-                                            fontFamily: '"Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif',
-                                        }}
-                                    >
-                                        <span
+                                ) : (
+                                    <div className="relative w-[220px] h-[220px] mx-auto flex items-center justify-center my-3.5">
+                                        <img
+                                            src={fdSlides[fdSlide].ringImg}
+                                            alt={fdSlides[fdSlide].title}
+                                            className="w-full h-full object-contain pointer-events-none select-none"
+                                        />
+                                        <div
+                                            className="absolute inset-0 flex flex-col items-center justify-center text-center select-none"
                                             style={{
                                                 fontFamily: '"Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif',
-                                                fontSize: '15px',
-                                                fontWeight: 600,
-                                                color: '#495057',
-                                                lineHeight: '1.2',
-                                                letterSpacing: '-0.01em',
-                                                display: 'block',
                                             }}
                                         >
-                                            Total
-                                        </span>
-                                        <span
-                                            style={{
-                                                fontFamily: '"Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif',
-                                                fontSize: '15px',
-                                                fontWeight: 600,
-                                                color: '#495057',
-                                                lineHeight: '1.2',
-                                                letterSpacing: '-0.01em',
-                                                display: 'block',
-                                                marginTop: '2px',
-                                            }}
-                                        >
-                                            {fdSlides[fdSlide].label}
-                                        </span>
-                                        <span
-                                            style={{
-                                                fontFamily: '"Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif',
-                                                fontSize: '16.5px',
-                                                fontWeight: 700,
-                                                color: '#144e83',
-                                                lineHeight: '1.2',
-                                                letterSpacing: '-0.01em',
-                                                display: 'block',
-                                                marginTop: '6px',
-                                            }}
-                                        >
-                                            {fdMasked ? 'IDR ******' : fdSlides[fdSlide].amount}
-                                        </span>
-                                        <button
-                                            onClick={handleToggleFdMask}
-                                            className="mt-2.5 w-[42px] h-[30px] rounded-[6px] border border-[#dce3ea] bg-[#f3f6f9] hover:bg-[#ebf0f5] active:scale-95 transition-all flex items-center justify-center cursor-pointer shadow-xs"
-                                            title={fdMasked ? 'Tampilkan Nominal' : 'Sembunyikan Nominal'}
-                                            aria-label="Toggle nominal visibility"
-                                        >
-                                            {fdMasked ? (
-                                                <svg className="w-[18px] h-[18px] stroke-[#7c8a9c] fill-none stroke-[1.8]" viewBox="0 0 24 24">
-                                                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
-                                                    <line x1="1" y1="1" x2="23" y2="23" />
-                                                </svg>
-                                            ) : (
-                                                <svg className="w-[18px] h-[18px] stroke-[#7c8a9c] fill-none stroke-[1.8]" viewBox="0 0 24 24">
-                                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                                                    <circle cx="12" cy="12" r="3" />
-                                                </svg>
-                                            )}
-                                        </button>
+                                            <span
+                                                style={{
+                                                    fontFamily: '"Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif',
+                                                    fontSize: '15px',
+                                                    fontWeight: 600,
+                                                    color: '#495057',
+                                                    lineHeight: '1.2',
+                                                    letterSpacing: '-0.01em',
+                                                    display: 'block',
+                                                }}
+                                            >
+                                                Total
+                                            </span>
+                                            <span
+                                                style={{
+                                                    fontFamily: '"Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif',
+                                                    fontSize: '15px',
+                                                    fontWeight: 600,
+                                                    color: '#495057',
+                                                    lineHeight: '1.2',
+                                                    letterSpacing: '-0.01em',
+                                                    display: 'block',
+                                                    marginTop: '2px',
+                                                }}
+                                            >
+                                                {fdSlides[fdSlide].label}
+                                            </span>
+                                            <span
+                                                style={{
+                                                    fontFamily: '"Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif',
+                                                    fontSize: '16.5px',
+                                                    fontWeight: 700,
+                                                    color: '#144e83',
+                                                    lineHeight: '1.2',
+                                                    letterSpacing: '-0.01em',
+                                                    display: 'block',
+                                                    marginTop: '6px',
+                                                }}
+                                            >
+                                                {fdMasked ? 'IDR ******' : fdSlides[fdSlide].amount}
+                                            </span>
+                                            <button
+                                                onClick={handleToggleFdMask}
+                                                className="mt-2.5 w-[42px] h-[30px] rounded-[6px] border border-[#dce3ea] bg-[#f3f6f9] hover:bg-[#ebf0f5] active:scale-95 transition-all flex items-center justify-center cursor-pointer shadow-xs"
+                                                title={fdMasked ? 'Tampilkan Nominal' : 'Sembunyikan Nominal'}
+                                                aria-label="Toggle nominal visibility"
+                                            >
+                                                {fdMasked ? (
+                                                    <svg className="w-[18px] h-[18px] stroke-[#7c8a9c] fill-none stroke-[1.8]" viewBox="0 0 24 24">
+                                                        <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
+                                                        <line x1="1" y1="1" x2="23" y2="23" />
+                                                    </svg>
+                                                ) : (
+                                                    <svg className="w-[18px] h-[18px] stroke-[#7c8a9c] fill-none stroke-[1.8]" viewBox="0 0 24 24">
+                                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                                                        <circle cx="12" cy="12" r="3" />
+                                                    </svg>
+                                                )}
+                                            </button>
+                                        </div>
                                     </div>
-                                </div>
+                                )}
 
                                 {/* Carousel Navigation Controls */}
                                 <div className="flex items-center justify-between px-6 mt-1 mb-2">
@@ -1439,25 +1941,132 @@ export const CleanMode: React.FC = () => {
 
                                     {/* Financial Diary Customization */}
                                     <div className="pt-2.5 border-t border-slate-100">
-                                        <div className="flex items-center gap-1.5 mb-2">
-                                            <span className="font-bold text-slate-800 text-[12.5px]">Financial Diary</span>
-                                            <span className="text-[10px] text-slate-400 font-medium">(Nominal Tampilan)</span>
+                                        <div className="flex items-center justify-between mb-2">
+                                            <div className="flex items-center gap-1.5">
+                                                <span className="font-bold text-slate-800 text-[12.5px]">Financial Diary</span>
+                                                <span className="text-[10px] text-slate-400 font-medium">(Diagram & Nominal)</span>
+                                            </div>
+                                            <span className="text-[11px] font-bold text-[#005caa]">
+                                                Total: {formatFdAmount(customCategories.reduce((s, c) => s + (Number(c.amount) || 0), 0))}
+                                            </span>
                                         </div>
 
-                                        <div className="space-y-2.5">
-                                            <div>
-                                                <label className="block text-slate-500 font-medium mb-1 text-[11px]">Total Spending</label>
-                                                <input
-                                                    type="text"
-                                                    value={customSpendingInput}
-                                                    placeholder="IDR 778,27 K"
-                                                    onChange={e => setCustomSpendingInput(e.target.value)}
-                                                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 font-bold focus:outline-none focus:ring-2 focus:ring-[#005caa]"
-                                                />
+                                        {/* Spending Categories List */}
+                                        <div className="bg-slate-50 border border-slate-200 rounded-2xl p-3 mb-3">
+                                            <div className="flex items-center justify-between mb-2">
+                                                <span className="text-[11px] font-bold text-slate-700">Kategori Total Spending</span>
+                                                <span className="text-[10px] text-slate-400">{customCategories.length} Kategori</span>
                                             </div>
 
+                                            <div className="space-y-2 max-h-[190px] overflow-y-auto cleanmode-no-scrollbar pr-0.5">
+                                                {customCategories.map((cat, idx) => {
+                                                    const curTotal = customCategories.reduce((s, c) => s + (Number(c.amount) || 0), 0);
+                                                    const pct = curTotal > 0 ? Math.round((cat.amount / curTotal) * 100) : 0;
+                                                    return (
+                                                        <div
+                                                            key={cat.id}
+                                                            className="bg-white border border-slate-200/80 rounded-xl p-2 flex flex-col gap-1.5 shadow-2xs"
+                                                        >
+                                                            <div className="flex items-center gap-2">
+                                                                {/* Color Selector Dot */}
+                                                                <button
+                                                                    type="button"
+                                                                    title="Klik untuk ganti warna"
+                                                                    onClick={() => {
+                                                                        const nextIdx = (CATEGORY_COLORS.indexOf(cat.color) + 1) % CATEGORY_COLORS.length;
+                                                                        const updated = [...customCategories];
+                                                                        updated[idx] = { ...updated[idx], color: CATEGORY_COLORS[nextIdx] };
+                                                                        setCustomCategories(updated);
+                                                                    }}
+                                                                    className="w-5 h-5 rounded-full shrink-0 flex items-center justify-center border border-black/10 shadow-xs cursor-pointer transition-transform hover:scale-110 active:scale-90"
+                                                                    style={{ backgroundColor: cat.color }}
+                                                                >
+                                                                    <span className="text-[9px] text-white font-bold opacity-80">●</span>
+                                                                </button>
+
+                                                                {/* Category Name Input */}
+                                                                <input
+                                                                    type="text"
+                                                                    value={cat.name}
+                                                                    onChange={(e) => {
+                                                                        const updated = [...customCategories];
+                                                                        updated[idx] = { ...updated[idx], name: e.target.value };
+                                                                        setCustomCategories(updated);
+                                                                    }}
+                                                                    placeholder="Nama Kategori"
+                                                                    className="flex-1 min-w-0 px-2 py-1 bg-slate-50 border border-slate-200 rounded-lg text-slate-800 font-semibold text-[11px] focus:outline-none focus:ring-1 focus:ring-[#005caa]"
+                                                                />
+
+                                                                {/* Delete Button (if > 1) */}
+                                                                {customCategories.length > 1 && (
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={() => {
+                                                                            setCustomCategories(customCategories.filter((_, i) => i !== idx));
+                                                                        }}
+                                                                        className="w-6 h-6 flex items-center justify-center text-slate-400 hover:text-rose-500 rounded-lg transition-colors cursor-pointer shrink-0"
+                                                                        title="Hapus Kategori"
+                                                                    >
+                                                                        <Trash2 className="w-3.5 h-3.5" />
+                                                                    </button>
+                                                                )}
+                                                            </div>
+
+                                                            {/* Amount & Percentage Row */}
+                                                            <div className="flex items-center gap-2 pl-7">
+                                                                <div className="relative flex-1">
+                                                                    <span className="absolute left-2 top-1/2 -translate-y-1/2 text-[10px] text-slate-400 font-bold">
+                                                                        Rp
+                                                                    </span>
+                                                                    <input
+                                                                        type="number"
+                                                                        value={cat.amount}
+                                                                        onChange={(e) => {
+                                                                            const val = Math.max(0, Number(e.target.value) || 0);
+                                                                            const updated = [...customCategories];
+                                                                            updated[idx] = { ...updated[idx], amount: val };
+                                                                            setCustomCategories(updated);
+                                                                        }}
+                                                                        placeholder="0"
+                                                                        className="w-full pl-7 pr-2 py-1 bg-slate-50 border border-slate-200 rounded-lg text-slate-800 font-mono font-bold text-[11px] focus:outline-none focus:ring-1 focus:ring-[#005caa]"
+                                                                    />
+                                                                </div>
+                                                                <div className="shrink-0 px-2 py-0.5 rounded-md bg-blue-50 text-[#005caa] font-bold text-[10.5px]">
+                                                                    {pct}% ({formatFdAmount(cat.amount)})
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
+
+                                            {/* Category Action Buttons */}
+                                            <div className="flex items-center gap-2 mt-2 pt-2 border-t border-slate-200/60">
+                                                <button
+                                                    type="button"
+                                                    onClick={handleAddCategory}
+                                                    className="flex-1 py-1.5 px-2 bg-white hover:bg-slate-50 border border-slate-200 rounded-xl text-slate-700 font-semibold text-[11px] flex items-center justify-center gap-1 transition-colors cursor-pointer shadow-2xs"
+                                                >
+                                                    <Plus className="w-3.5 h-3.5 text-[#005caa]" />
+                                                    <span>Tambah Kategori</span>
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        setCustomCategories(JSON.parse(JSON.stringify(DEFAULT_SPENDING_CATEGORIES)));
+                                                    }}
+                                                    className="py-1.5 px-2.5 bg-white hover:bg-slate-50 border border-slate-200 rounded-xl text-slate-500 hover:text-slate-700 font-semibold text-[11px] flex items-center justify-center gap-1 transition-colors cursor-pointer shadow-2xs"
+                                                    title="Kembalikan ke 4 Kategori myBCA Asli"
+                                                >
+                                                    <RotateCcw className="w-3.5 h-3.5" />
+                                                    <span>Reset myBCA</span>
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <div className="space-y-2">
                                             <div>
-                                                <label className="block text-slate-500 font-medium mb-1 text-[11px]">Total Earning</label>
+                                                <label className="block text-slate-500 font-medium mb-1 text-[11px]">Total Earning (Slide 2)</label>
                                                 <input
                                                     type="text"
                                                     value={customEarningInput}
@@ -1468,7 +2077,7 @@ export const CleanMode: React.FC = () => {
                                             </div>
 
                                             <div>
-                                                <label className="block text-slate-500 font-medium mb-1 text-[11px]">Total Cashflow</label>
+                                                <label className="block text-slate-500 font-medium mb-1 text-[11px]">Total Cashflow (Slide 3)</label>
                                                 <input
                                                     type="text"
                                                     value={customCashflowInput}
@@ -1493,7 +2102,7 @@ export const CleanMode: React.FC = () => {
                                                 setCustomNameInput('AHMAD FIKRI RAFI UDDIN');
                                                 setCustomAccountInput('801 - 040 - 1811');
                                                 setCustomBalanceInput('529265.71');
-                                                setCustomSpendingInput('IDR 778,27 K');
+                                                setCustomCategories(JSON.parse(JSON.stringify(DEFAULT_SPENDING_CATEGORIES)));
                                                 setCustomEarningInput('IDR 1 M');
                                                 setCustomCashflowInput('IDR 221,73 K');
                                             }}
