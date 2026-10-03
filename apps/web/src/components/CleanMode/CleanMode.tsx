@@ -405,7 +405,7 @@ export const CleanMode: React.FC = () => {
                                     <span
                                         className="text-[12.5px] text-white tracking-wide"
                                         style={{
-                                            fontFamily: 'Arial, "Helvetica Neue", Helvetica, sans-serif',
+                                            fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", "Plus Jakarta Sans", sans-serif',
                                             fontWeight: 600,
                                         }}
                                     >
@@ -433,18 +433,18 @@ export const CleanMode: React.FC = () => {
                             <div className="px-5 pt-3.5 pb-3 bg-white">
                                 <p
                                     className="text-[12px] font-normal text-[#53575a] tracking-tight"
-                                    style={{ fontFamily: 'Arial, "Helvetica Neue", Helvetica, sans-serif' }}
+                                    style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif' }}
                                 >
                                     Active Balance
                                 </p>
                                 <div className="flex items-center justify-between mt-2 mb-2.5">
                                     <div className="flex items-baseline gap-2">
                                         <span
-                                            className="text-[18.5px] font-bold text-[#4a4f56] tracking-tight"
+                                            className="text-[18.5px] font-extrabold text-[#4a4f56] tracking-tight"
                                             style={{
-                                                fontFamily: 'Arial, "Helvetica Neue", Helvetica, sans-serif',
-                                                fontWeight: 700,
-                                                letterSpacing: '-0.01em',
+                                                fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", sans-serif',
+                                                fontWeight: 800,
+                                                letterSpacing: '-0.02em',
                                                 color: '#4a4f56',
                                             }}
                                         >
@@ -488,7 +488,7 @@ export const CleanMode: React.FC = () => {
                                     />
                                     <span
                                         className="text-[12.5px] font-bold"
-                                        style={{ fontFamily: 'Arial, "Helvetica Neue", Helvetica, sans-serif' }}
+                                        style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif' }}
                                     >
                                         Account Transactions
                                     </span>
